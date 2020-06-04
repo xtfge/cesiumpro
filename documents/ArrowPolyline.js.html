@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: ArrowPolyline.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ArrowPolyline.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Arrow line
+ */
+import uuid from './uuid';
+
+class ArrowPolyline {
+  /**
+   * 箭头线
+   * @param {Object} [option={}] option具有以下参数
+   * @param {Color} [option.color=Color.RED] 线的颜色
+   * @param {Nubmer} [option.width=3] 圆柱的半径，即线的宽度
+   * @param {Number} [option.length=300] 线的长度
+   * @param {Number} [option.headWidth=2*option.width] 箭头的宽度
+   * @param {Number} [option.headLength=10] 箭头的长度
+   * @param {String} [option.id] 线的id
+   * @param {Boolean} [option.inverse]
+   */
+  constructor(option = {}) {
+    this._color = option.color || Cesium.Color.RED;
+    this._width = option.width || 3;
+    this._headWidth = option
+      .headWidth || 2 * this._width;
+    this._length = option.length || 300;
+    this._headLength = option.headLength || 10;
+    this._inverse = option.inverse || false;
+    this.position = option.position;
+    const id = option.id || uuid();
+    const line = Cesium.CylinderGeometry.createGeometry(new Cesium.CylinderGeometry({
+      length: this._length,
+      topRadius: this._width,
+      bottomRadius: this._width,
+    }));
+    const arrow = Cesium.CylinderGeometry.createGeometry(new Cesium.CylinderGeometry({
+      length: this._headLength,
+      topRadius: 0,
+      bottomRadius: this._headWidth,
+    }));
+    let offset = (this._length + this._headLength) / 2;
+    if (this._inverse) {
+      offset = -offset;
+    }
+
+    ArrowPolyline.translate(arrow, [0, 0, offset]);
+
+    return new Cesium.Primitive({
+      modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(this.position),
+      geometryInstances: [new Cesium.GeometryInstance(
+        {
+          id: `${id}-line`,
+          geometry: line,
+        },
+      ),
+      new Cesium.GeometryInstance({
+        id: `${id}-arrow`,
+        geometry: arrow,
+      })],
+      appearance: new Cesium.MaterialAppearance({
+        material: Cesium.Material.fromType('Color', { color: this._color }),
+      }),
+    });
+  }
+
+  /**
+   * 几何要素平移
+   * @param {CylinderGeometry} geometry 代表简单的几何对象
+   * @param {Cartesian3} offset 定义平移距离
+   */
+  static translate(geometry, offset) {
+    const scratchOffset = new Cesium.Cartesian3();
+    if (Cesium.isArray(offset)) {
+      [scratchOffset.x, scratchOffset.y, scratchOffset.z] = offset;
+    } else {
+      Cesium.Cartesian3.clone(offset, scratchOffset);
+    }
+
+    for (let i = 0; i &lt; geometry.attributes.position.values.length; i += 3) {
+      geometry.attributes.position.values[i] += scratchOffset.x;
+      geometry.attributes.position.values[i + 1] += scratchOffset.y;
+      geometry.attributes.position.values[i + 2] += scratchOffset.z;
+    }
+  }
+}
+export default ArrowPolyline;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-GraphicType.html">GraphicType</a></li></ul><h3>Classes</h3><ul><li><a href="ArrowPolyline.html">ArrowPolyline</a></li><li><a href="BaseGraphic.html">BaseGraphic</a></li><li><a href="Cartometry.html">Cartometry</a></li><li><a href="CesiumBillboard.html">CesiumBillboard</a></li><li><a href="CesiumLabel.html">CesiumLabel</a></li><li><a href="CesiumModel.html">CesiumModel</a></li><li><a href="CesiumPoint.html">CesiumPoint</a></li><li><a href="CesiumPolygon.html">CesiumPolygon</a></li><li><a href="CesiumPolyline.html">CesiumPolyline</a></li><li><a href="CesiumProError.html">CesiumProError</a></li><li><a href="CursorTip.html">CursorTip</a></li><li><a href="CVT.html">CVT</a></li><li><a href="Dataloader.html">Dataloader</a></li><li><a href="DraggableElement.html">DraggableElement</a></li><li><a href="EarthRotation.html">EarthRotation</a></li><li><a href="Event.html">Event</a></li><li><a href="GraphicManager.html">GraphicManager</a></li><li><a href="GroundSkyBox.html">GroundSkyBox</a></li><li><a href="Helper.html">Helper</a></li><li><a href="MarkerManager.html">MarkerManager</a></li><li><a href="RectangleSelector.html">RectangleSelector</a></li><li><a href="SceneSetting.html">SceneSetting</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkViewer">checkViewer</a></li><li><a href="global.html#createEarth">createEarth</a></li><li><a href="global.html#depthTest">depthTest</a></li><li><a href="global.html#flyTo">flyTo</a></li><li><a href="global.html#getScale">getScale</a></li><li><a href="global.html#logo">logo</a></li><li><a href="global.html#pointVisibilityOnEarth">pointVisibilityOnEarth</a></li><li><a href="global.html#saveCurViewerImage">saveCurViewerImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Jun 04 2020 16:20:35 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

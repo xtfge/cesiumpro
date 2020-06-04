@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Cartometry.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Cartometry.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * 地图量算工具
+ */
+const radiansPerDegrees = Math.PI / 180;
+const degreesPerRadian = 180 / Math.PI;
+/**
+ * 地图量算工具
+ */
+class Cartometry {
+  /**
+   * 贴地距离
+   * @param {Array} positions Cartesian3的集合
+   * @return {Number} 长度，单位米
+   */
+  static surfaceDistance(positions) {
+    let distance = 0;
+    for (let i = 0; i &lt; positions.length - 1; i += 1) {
+      const point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
+      const point2cartographic = Cesium.Cartographic.fromCartesian(positions[i + 1]);
+      /** 根据经纬度计算出距离* */
+      const geodesic = new Cesium.EllipsoidGeodesic();
+      geodesic.setEndPoints(point1cartographic, point2cartographic);
+      const s = geodesic.surfaceDistance;
+      distance += s;
+    }
+    return distance;
+  }
+
+  /**
+ * 空间距离
+ * @param {Array} positions Cartesian3的集合
+ * @return {Number} 长度，单位米
+ */
+  static spaceDistance(positions) {
+    let dis = 0;
+    for (let i = 1; i &lt; positions.length; i++) {
+      const s = positions[i - 1];
+      const e = positions[i];
+      dis += Math.sqrt((s.x - e.x) ** 2 + (s.y - e.y) ** 2 + (s.z - e.z) ** 2);
+    }
+    return dis;
+  }
+
+  /**
+   * @private
+   * 角度
+   */
+  static Angle(p1, p2, p3) {
+    const bearing21 = Cartometry.Bearing(p2, p1);
+    const bearing23 = Cartometry.Bearing(p2, p3);
+    let angle = bearing21 - bearing23;
+    if (angle &lt; 0) {
+      angle += 360;
+    }
+    return angle;
+  }
+
+  /**
+   * @private
+   * 方向
+   */
+  static Bearing(from, to) {
+    const lat1 = from.lat * radiansPerDegrees;
+    const lon1 = from.lon * radiansPerDegrees;
+    const lat2 = to.lat * radiansPerDegrees;
+    const lon2 = to.lon * radiansPerDegrees;
+    let angle = -Math.atan2(Math.sin(lon1 - lon2)
+      * Math.cos(lat2), Math.cos(lat1) * Math.sin(lat2)
+    - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon1 - lon2));
+    if (angle &lt; 0) {
+      angle += Math.PI * 2.0;
+    }
+    angle *= degreesPerRadian;// 角度
+    return angle;
+  }
+
+  /**
+   * 贴地面积
+   * @param {Array} positions Cartesian的集合
+   * @return {Number} 面积，单位：平方米
+   */
+  static surfaceArea(positions) {
+    const points = positions.map((_) => {
+      const cartographic = Cesium.Cartographic.fromCartesian(_);
+      return {
+        lon: Cesium.Math.toDegrees(cartographic.longitude),
+        lat: Cesium.Math.toDegrees(cartographic.latitude),
+        height: cartographic.height,
+      };
+    });
+
+    let res = 0;
+    // 拆分三角曲面
+
+    for (let i = 0; i &lt; points.length - 2; i += 1) {
+      const j = (i + 1) % points.length;
+      const k = (i + 2) % points.length;
+      const totalAngle = Cartometry.Angle(points[i], points[j], points[k]);
+
+
+      const distemp1 = Cartometry.surfaceDistance([positions[i], positions[j]]);
+      const distemp2 = Cartometry.surfaceDistance([positions[j], positions[k]]);
+      res += distemp1 * distemp2 * Math.abs(Math.sin(totalAngle));
+    }
+    return res;
+  }
+}
+export default Cartometry;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-GraphicType.html">GraphicType</a></li></ul><h3>Classes</h3><ul><li><a href="ArrowPolyline.html">ArrowPolyline</a></li><li><a href="BaseGraphic.html">BaseGraphic</a></li><li><a href="Cartometry.html">Cartometry</a></li><li><a href="CesiumBillboard.html">CesiumBillboard</a></li><li><a href="CesiumLabel.html">CesiumLabel</a></li><li><a href="CesiumModel.html">CesiumModel</a></li><li><a href="CesiumPoint.html">CesiumPoint</a></li><li><a href="CesiumPolygon.html">CesiumPolygon</a></li><li><a href="CesiumPolyline.html">CesiumPolyline</a></li><li><a href="CesiumProError.html">CesiumProError</a></li><li><a href="CursorTip.html">CursorTip</a></li><li><a href="CVT.html">CVT</a></li><li><a href="Dataloader.html">Dataloader</a></li><li><a href="DraggableElement.html">DraggableElement</a></li><li><a href="EarthRotation.html">EarthRotation</a></li><li><a href="Event.html">Event</a></li><li><a href="GraphicManager.html">GraphicManager</a></li><li><a href="GroundSkyBox.html">GroundSkyBox</a></li><li><a href="Helper.html">Helper</a></li><li><a href="MarkerManager.html">MarkerManager</a></li><li><a href="RectangleSelector.html">RectangleSelector</a></li><li><a href="SceneSetting.html">SceneSetting</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkViewer">checkViewer</a></li><li><a href="global.html#createEarth">createEarth</a></li><li><a href="global.html#depthTest">depthTest</a></li><li><a href="global.html#flyTo">flyTo</a></li><li><a href="global.html#getScale">getScale</a></li><li><a href="global.html#logo">logo</a></li><li><a href="global.html#pointVisibilityOnEarth">pointVisibilityOnEarth</a></li><li><a href="global.html#saveCurViewerImage">saveCurViewerImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Jun 04 2020 16:20:35 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

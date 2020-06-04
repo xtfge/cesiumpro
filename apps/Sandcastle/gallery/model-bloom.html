@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="description"
+        content="Use Viewer to start building new applications or easily embed Cesium into existing applications.">
+    <meta name="cesium-sandcastle-labels" content="模型相关">
+    <title>Cesium Demo</title>
+    <script type="text/javascript" src="../Sandcastle-header.js"></script>
+
+</head>
+
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
+    <style>
+        @import url(../templates/bucket.css);
+    </style>
+    <div id="cesiumContainer" class="fullSize"></div>
+    <div id="loadingOverlay">
+        <h1>Loading...</h1>
+    </div>
+    <div id="toolbar"></div>
+    <script id="cesium_sandcastle_script">
+        function startup(CesiumPro) {
+            'use strict';
+            //Sandcastle_Begin
+            const viewer = CesiumPro.createEarth('cesiumContainer');
+            CesiumPro.logo();
+            const bloom = viewer.scene.postProcessStages.bloom;
+            bloom.enabled = true;
+            bloom.uniforms.glowOnly = false;
+            bloom.uniforms.contrast = 128;
+            bloom.uniforms.delta = 1.0;
+            bloom.uniforms.brightness = -0.3;
+            bloom.uniforms.stepSize = 5.0;
+            bloom.uniforms.sigma = 3.78;
+            CesiumPro.Dataloader.loadTileset(viewer,
+                'http://localhost:8080/模型/数字城市/tileset.json', {
+                luminanceAtZenith: 0.8,
+                skipLevelOfDetail: false
+            })
+                .readyPromise.then(tileset => {
+                    viewer.flyTo(tileset);
+                    tileset.style = new Cesium.Cesium3DTileStyle({
+                        color: 'vec4(0, 0.5, 1.0,1)'
+                    });
+                });
+
+            //Sandcastle_End
+            Sandcastle.finishedLoading();
+        }
+        if (typeof CesiumPro !== 'undefined' && typeof Cesium !== 'undefined') {
+            window.startupCalled = true;
+            startup(CesiumPro);
+        }
+    </script>
+</body>
+
+</html>

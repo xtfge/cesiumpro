@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: SceneSetting</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: SceneSetting</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>SceneSetting<span class="signature">(viewer)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Cesium 场景的常用设置</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="SceneSetting"><span class="type-signature"></span>new SceneSetting<span class="signature">(viewer)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Viewer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Cesium Viewer对象</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="depthTest"><span class="type-signature"></span>depthTest<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    强制地形调整
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line22">line 22</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="fog"><span class="type-signature"></span>fog<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    雾
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line142">line 142</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const viewer = new Cesium.Viewer('mapContainer');conset sc = new SceneSetting(viewer);sc.fog = {enabled:true, density: 0.001, minimumBrightness: 0.8, screenSpaceErrorFactor: 2}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="fxaa"><span class="type-signature"></span>fxaa<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    抗锯齿
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="light"><span class="type-signature"></span>light<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    亮度设置，该值被限制在-1~1之间
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line82">line 82</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="lighting"><span class="type-signature"></span>lighting<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    晨昏线
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="mode"><span class="type-signature"></span>mode<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    场景模式
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line192">line 192</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="moon"><span class="type-signature"></span>moon<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    月亮
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line181">line 181</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="resolution"><span class="type-signature"></span>resolution<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    分辨率,该值被限制在0.1~2.0之间
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line69">line 69</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="shadows"><span class="type-signature"></span>shadows<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    阴影
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line46">line 46</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="skyAtmosphere"><span class="type-signature"></span>skyAtmosphere<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    大气
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line109">line 109</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const viewer = new Cesium.Viewer('mapContainer');conset sc = new SceneSetting(viewer);sc.skyAtmosphere = {  hueShift: -0.8,  saturationShift: -0.7,  brightnessShift: -0.33}</code></pre>
+
+
+
+        
+            
+<h4 class="name" id="sun"><span class="type-signature"></span>sun<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    太阳
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="SceneSetting.js.html">SceneSetting.js</a>, <a href="SceneSetting.js.html#line170">line 170</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-GraphicType.html">GraphicType</a></li></ul><h3>Classes</h3><ul><li><a href="ArrowPolyline.html">ArrowPolyline</a></li><li><a href="BaseGraphic.html">BaseGraphic</a></li><li><a href="Cartometry.html">Cartometry</a></li><li><a href="CesiumBillboard.html">CesiumBillboard</a></li><li><a href="CesiumLabel.html">CesiumLabel</a></li><li><a href="CesiumModel.html">CesiumModel</a></li><li><a href="CesiumPoint.html">CesiumPoint</a></li><li><a href="CesiumPolygon.html">CesiumPolygon</a></li><li><a href="CesiumPolyline.html">CesiumPolyline</a></li><li><a href="CesiumProError.html">CesiumProError</a></li><li><a href="CursorTip.html">CursorTip</a></li><li><a href="CVT.html">CVT</a></li><li><a href="Dataloader.html">Dataloader</a></li><li><a href="DraggableElement.html">DraggableElement</a></li><li><a href="EarthRotation.html">EarthRotation</a></li><li><a href="Event.html">Event</a></li><li><a href="GraphicManager.html">GraphicManager</a></li><li><a href="GroundSkyBox.html">GroundSkyBox</a></li><li><a href="Helper.html">Helper</a></li><li><a href="MarkerManager.html">MarkerManager</a></li><li><a href="RectangleSelector.html">RectangleSelector</a></li><li><a href="SceneSetting.html">SceneSetting</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkViewer">checkViewer</a></li><li><a href="global.html#createEarth">createEarth</a></li><li><a href="global.html#depthTest">depthTest</a></li><li><a href="global.html#flyTo">flyTo</a></li><li><a href="global.html#getScale">getScale</a></li><li><a href="global.html#logo">logo</a></li><li><a href="global.html#pointVisibilityOnEarth">pointVisibilityOnEarth</a></li><li><a href="global.html#saveCurViewerImage">saveCurViewerImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Jun 04 2020 16:20:35 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

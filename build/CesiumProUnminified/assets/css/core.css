@@ -1,0 +1,26 @@
+.cursor-tip-class {
+  position: fixed;
+  padding-left: 10px;
+  padding-right: 20px;
+  background-color: #171E26;
+  color: #FFFFFF;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 999;
+  min-width: 140px;
+  font-size: 12px;
+  line-height: 32px; }
+
+.pop-layer-class {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-style: solid;
+  pointer-events: none;
+  border-color: #00000088;
+  box-sizing: unset;
+  display: inline-block;
+  border-width: 10000px;
+  z-index: 9999; }

@@ -1,0 +1,36 @@
+<html>
+<head>
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+  <!-- <script src="https://cdn.bootcss.com/require.js/1.0.0/require.js"></script> -->
+  <script src="../../thirdParty/Cesium/Cesium.js"></script>
+  <link href="../../thirdParty/Cesium/Widgets/widgets.css" rel='stylesheet'/>
+  <script src="../../build/CesiumPro/CesiumPro.umd.js"></script>
+  <link href="../../build/CesiumPro/assets/css/core.css"
+  rel="stylesheet"/>
+  <style>
+    #map{
+      width:100%;
+      height:100%;
+      margin: 0;
+      overflow: hidden;
+      position: absolute;
+    }
+    body{
+      width:100%;
+      height:100%;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="map">
+  </div>
+  <script>
+    window.onload=function(){
+      this.viewer=CesiumPro.createEarth('map')
+      CesiumPro.logo(false)
+    }
+  </script>
+</body>
+</html>

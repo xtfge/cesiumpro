@@ -1,0 +1,67 @@
+{
+  "name": "cesiumpro",
+  "version": "0.1.0",
+  "description": "cesium extension.",
+  "main": "./build/CesiumPro/CesiumPro.esm.js",
+  "files": [
+    "build",
+    "documents",
+    "package.json"
+  ],
+  "scripts": {
+    "start": "node server.js",
+    "build": "gulp build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix --ext .js,.vue source",
+    "doc": "gulp doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xtfge/cesiumPro.git"
+  },
+  "keywords": [
+    "cesium",
+    "3d",
+    "webgis"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xtfge/cesiumPro/issues"
+  },
+  "homepage": "https://github.com/xtfge/cesiumPro#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "babel-preset-env": "^1.7.0",
+    "compression": "^1.7.4",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "express": "^4.17.1",
+    "globby": "^11.0.0",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-jshint": "^2.1.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-uglify": "^3.0.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^1.21.4",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-external-globals": "^0.5.0",
+    "rollup-plugin-strip-pragma": "^1.0.0",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-uglify-es": "0.0.1",
+    "stream-to-promise": "^2.2.0",
+    "uglify-es": "^3.3.9"
+  },
+  "dependencies": {
+    "jsdoc": "^3.6.4"
+  }
+}

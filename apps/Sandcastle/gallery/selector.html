@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="description"
+        content="Use Viewer to start building new applications or easily embed Cesium into existing applications.">
+    <meta name="cesium-sandcastle-labels" content="交互">
+    <title>Cesium Demo</title>
+    <script type="text/javascript" src="../Sandcastle-header.js"></script>
+    <script src="./js/utils.js"></script>
+
+
+</head>
+
+<body class="sandcastle-loading" data-sandcastle-bucket="bucket-requirejs.html">
+    <style>
+        @import url(../templates/bucket.css);
+    </style>
+    <div id="cesiumContainer" class="fullSize"></div>
+    <div id="loadingOverlay">
+        <h1>Loading...</h1>
+    </div>
+    <div id="toolbar"></div>
+    <script id="cesium_sandcastle_script">
+        function startup(CesiumPro) {
+            'use strict';
+            //Sandcastle_Begin
+            const viewer = CesiumPro.createEarth('cesiumContainer');
+            CesiumPro.logo();
+            const selector = new CesiumPro.selector.RectangleSelector({mask:true});
+            // selector.on();
+            let entities;
+            selector.submitEvent.addEventListener((extend) => {
+                const entities=viewer.entities.values;
+                entities.map(e=>{
+                    const v=intersect(e.position.getValue(),extend);
+                    if(v){
+                        e.point.color=Cesium.Color.GOLD;
+                    }
+                })
+
+            })
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(110, 40, 1000),
+                duration: 0,
+                complete() {
+                    const pos = randomPosition(viewer, 20);
+                    entities = pos.map(p => {
+                        viewer.entities.add({
+                            position: p,
+                            point: {
+                                pixelSize: 10,
+                                color: Cesium.Color.RED
+                            }
+                        });
+                    });
+                }
+            })
+            function intersect(target, extend) {
+                if (CesiumPro.pointVisibilityOnEarth(target, viewer)) {
+                    const pixel = CesiumPro.CVT.toPixel(target, viewer);
+                    if (pixel.x > extend.left && pixel.x < extend.right &&
+                        pixel.y > extend.top && pixel.y < extend.bottom) {
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+            function clear(){
+                const entities=viewer.entities.values;
+                entities.map(e=>{
+                    e.point.color=Cesium.Color.RED;
+                })
+            }
+            Sandcastle.addToolbarButton('框选',function(){clear();selector.on()})
+            Sandcastle.addToolbarButton('清除',clear)
+            //Sandcastle_End
+
+            Sandcastle.finishedLoading();
+        }
+        if (typeof CesiumPro !== 'undefined' && typeof Cesium !== 'undefined') {
+            window.startupCalled = true;
+            startup(CesiumPro);
+        }
+    </script>
+</body>
+
+</html>

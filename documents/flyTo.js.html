@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: flyTo.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: flyTo.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* eslint-disable no-nested-ternary */
+/*
+ * 定位,适用于开场动画，先调位置，再调整高度，最后调整角度 
+ */
+import CVT from './CVT';
+import checkViewer from './checkViewer';
+
+const CHINA = Cesium.Cartesian3.fromDegrees(95, 30, 15000000);
+/**
+ * 将Cesium默认的flyTo分解为三个步骤，改变位置，改变高度，改变角度
+ * @param {Viewer} viewer Cesium Viewer对象
+ * @param {Object} options 具有以下属性
+ * @param {Cartesian3} [options.destination] 定位的目的地,默认中国全境
+ * @param {Object} [options.orientation] 定位的角度
+ * @param {duration1} [options.duration1] 改变位置时的持续时长
+ * @param {duration2} [options.duration2] 改变高度的持续时长
+ * @param {duration3} [options.duration3] 改变角度的持续时长
+ * @param {duration} [options.duration=3.0] 如果没有分阶段定义duration，该值将每应用于每个阶段
+ */
+function flyTo(viewer, options = { destination: CHINA }) {
+  const { destination, orientation } = options;
+  checkViewer(viewer);
+  if (!Cesium.defined(destination)) {
+    return false;
+  }
+
+  const { camera } = viewer;
+  // 当前相机高度
+  const curHeight = camera.positionCartographic.height;
+  const cartographic = CVT.toDegrees(destination, viewer);
+  const duration1 = Cesium.defined(options.duration1)
+    ? options.duration1 : Cesium.defined(options.duration)
+      ? options.duration : 3;
+  const duration2 = Cesium.defined(options.duration2)
+    ? options.duration2 : Cesium.defined(options.duration)
+      ? options.duration : 3;
+  const duration3 = Cesium.defined(options.duration3)
+    ? options.duration3 : Cesium.defined(options.duration)
+      ? options.duration : 3;
+  // step1.改变高度
+  const step1Destination = Cesium.Cartesian3.fromDegrees(cartographic.lon,
+    cartographic.lat,
+    curHeight);
+  const step2Destination = destination;
+  return new Promise((resolve) => {
+    camera.flyTo({
+      destination: step1Destination,
+      duration: duration1,
+      complete() {
+        camera.flyTo({
+          destination: step2Destination,
+          duration: duration2,
+          complete() {
+            if (Cesium.defined(orientation)) {
+              camera.flyTo({
+                destination: step2Destination,
+                duration: duration3,
+                orientation,
+                complete() {
+                  resolve();
+                },
+              });
+            } else {
+              resolve();
+            }
+          },
+        });
+      },
+    });
+  });
+}
+export default flyTo;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-GraphicType.html">GraphicType</a></li></ul><h3>Classes</h3><ul><li><a href="ArrowPolyline.html">ArrowPolyline</a></li><li><a href="BaseGraphic.html">BaseGraphic</a></li><li><a href="Cartometry.html">Cartometry</a></li><li><a href="CesiumBillboard.html">CesiumBillboard</a></li><li><a href="CesiumLabel.html">CesiumLabel</a></li><li><a href="CesiumModel.html">CesiumModel</a></li><li><a href="CesiumPoint.html">CesiumPoint</a></li><li><a href="CesiumPolygon.html">CesiumPolygon</a></li><li><a href="CesiumPolyline.html">CesiumPolyline</a></li><li><a href="CesiumProError.html">CesiumProError</a></li><li><a href="CursorTip.html">CursorTip</a></li><li><a href="CVT.html">CVT</a></li><li><a href="Dataloader.html">Dataloader</a></li><li><a href="DraggableElement.html">DraggableElement</a></li><li><a href="EarthRotation.html">EarthRotation</a></li><li><a href="Event.html">Event</a></li><li><a href="GraphicManager.html">GraphicManager</a></li><li><a href="GroundSkyBox.html">GroundSkyBox</a></li><li><a href="Helper.html">Helper</a></li><li><a href="MarkerManager.html">MarkerManager</a></li><li><a href="RectangleSelector.html">RectangleSelector</a></li><li><a href="SceneSetting.html">SceneSetting</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkViewer">checkViewer</a></li><li><a href="global.html#createEarth">createEarth</a></li><li><a href="global.html#depthTest">depthTest</a></li><li><a href="global.html#flyTo">flyTo</a></li><li><a href="global.html#getScale">getScale</a></li><li><a href="global.html#logo">logo</a></li><li><a href="global.html#pointVisibilityOnEarth">pointVisibilityOnEarth</a></li><li><a href="global.html#saveCurViewerImage">saveCurViewerImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Jun 04 2020 16:20:35 GMT+0800 (GMT+08:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
