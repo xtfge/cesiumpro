@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://github.com/xtfge/CesiumPro/edit/master/README.md">Elngish</a>
-  <a href="https://github.com/xtfge/CesiumPro/edit/master/README_zh.md">简体中文</a>
+  <a href="https://github.com/xtfge/CesiumPro/blob/master/README.md">Elngish</a>
+  <a href="https://github.com/xtfge/CesiumPro/blob/master/README_zh.md">简体中文</a>
 </p>
 
 ## Cesium Pro
