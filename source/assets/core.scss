@@ -1,0 +1,16 @@
+@import './global.scss';
+//跟随鼠标的提示信息
+.cursor-tip-class{
+  position : fixed;
+  // border : 1px $border-color solid;
+  padding-left : 10px;
+  padding-right : 20px;
+  background-color : $bg-color;
+  color : $font-color;
+  border-radius : $b-radius;
+  pointer-events : none;
+  z-index : 999;
+  min-width:  140px;
+  font-size: $font-size;
+  line-height: 32px;
+}

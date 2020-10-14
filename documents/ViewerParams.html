@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      ViewerParams - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        ViewerParams
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="ViewerParams">
+    <a href="#ViewerParams" class="doc-link"></a>
+    new CesiumPro.ViewerParams<span class="signature">(viewer, <span class="optional">debug</span>)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L11">ViewerParams.js 11</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  获取当前场景的参数，包括经纬度、海拔、视高、帧率、延迟以及相机参数heading、pitch、roll。如果要更新帧率和延迟，应该在对象初始化后调用addPostRenderEvent()方法。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cesium.Viewer</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debug</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否打开调试模式，打开开将在控制台打印参数</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="alt">
+    <a href="#alt" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> alt<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L147">ViewerParams.js 147</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  地形高/海拔
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="center">
+    <a href="#center" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> center<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L195">ViewerParams.js 195</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  场景中心坐标
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="fps">
+    <a href="#fps" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> fps<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L179">ViewerParams.js 179</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  帧率
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="heading">
+    <a href="#heading" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> heading<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L155">ViewerParams.js 155</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  相机旋转角
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="height">
+    <a href="#height" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> height<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L139">ViewerParams.js 139</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  视高
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="lat">
+    <a href="#lat" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> lat<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L131">ViewerParams.js 131</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  纬度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="lon">
+    <a href="#lon" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> lon<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L123">ViewerParams.js 123</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  经度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="ms">
+    <a href="#ms" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> ms<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L187">ViewerParams.js 187</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  延迟
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="params">
+    <a href="#params" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> params<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L105">ViewerParams.js 105</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  所有属性的集合
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pitch">
+    <a href="#pitch" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> pitch<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L163">ViewerParams.js 163</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  相机仰俯角
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="roll">
+    <a href="#roll" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> roll<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L171">ViewerParams.js 171</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  相机翻滚角
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addMousemoveEvent">
+    <a href="#addMousemoveEvent" class="doc-link"></a>
+    addMousemoveEvent<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L34">ViewerParams.js 34</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  开始监听鼠标移动事件，获取鼠标所在位置的经纬度及高程。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addPostRenderEvent">
+    <a href="#addPostRenderEvent" class="doc-link"></a>
+    addPostRenderEvent<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L72">ViewerParams.js 72</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  添加postRender事件监听，对象初始化后必须调用该方法帧率和延迟以及相机能数才会实时刷新
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L91">ViewerParams.js 91</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  销毁对象
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="removeMousemoveEvent">
+    <a href="#removeMousemoveEvent" class="doc-link"></a>
+    removeMousemoveEvent<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L65">ViewerParams.js 65</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  移除鼠标移动事件监听，经纬度、高程、视高将不会更新
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="removePostRenderEvent">
+    <a href="#removePostRenderEvent" class="doc-link"></a>
+    removePostRenderEvent<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L82">ViewerParams.js 82</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  移除postRender事件监听,帧率和延迟以及相机能数将不会更新
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="updateHeadingPitchRoll">
+    <a href="#updateHeadingPitchRoll" class="doc-link"></a>
+    updateHeadingPitchRoll<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L234">ViewerParams.js 234</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  更新相机参数
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="viewerCenter">
+    <a href="#viewerCenter" class="doc-link"></a>
+    viewerCenter<span class="signature">(<span class="optional">inWorldCoordinates</span>, <span class="optional">result</span>)</span> &rarr; <span class="type-signature returnType">Cesium.Cartesian3</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/0.0.1/Source/ViewerParams.js#L247">ViewerParams.js 247</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  场景的中心坐标
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>inWorldCoordinates</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否转为世界坐标，如果为false,将返回相机参考系的坐标</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cesium.Cartesian3</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                结果的保存对象</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    场景的中心坐标
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.5</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="ajaxCatch"><a href="ajaxCatch.html">ajaxCatch</a></li><li data-name="ArrowPolyline"><a href="ArrowPolyline.html">ArrowPolyline</a></li><li data-name="Cartometry"><a href="Cartometry.html">Cartometry</a></li><li data-name="CartometryManager"><a href="CartometryManager.html">CartometryManager</a></li><li data-name="CartometryType"><a href="CartometryType.html">CartometryType</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="checkViewer"><a href="checkViewer.html">checkViewer</a></li><li data-name="createViewer"><a href="createViewer.html">createViewer</a></li><li data-name="CursorTip"><a href="CursorTip.html">CursorTip</a></li><li data-name="CVT"><a href="CVT.html">CVT</a></li><li data-name="DataLoader"><a href="DataLoader.html">DataLoader</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="depthTest"><a href="depthTest.html">depthTest</a></li><li data-name="DraggableElement"><a href="DraggableElement.html">DraggableElement</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="flyTo"><a href="flyTo.html">flyTo</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="guid"><a href="guid.html">guid</a></li><li data-name="logo"><a href="logo.html">logo</a></li><li data-name="ModelAttachVector"><a href="ModelAttachVector.html">ModelAttachVector</a></li><li data-name="pickPosition"><a href="pickPosition.html">pickPosition</a></li><li data-name="PolygonGraphic"><a href="PolygonGraphic.html">PolygonGraphic</a></li><li data-name="URL"><a href="URL.html">URL</a></li><li data-name="ViewerParams"><a href="ViewerParams.html">ViewerParams</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

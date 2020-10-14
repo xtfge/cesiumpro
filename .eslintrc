@@ -1,0 +1,63 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "plugin:vue/essential",
+        "airbnb-base"
+    ],
+    "globals": {
+        "$": "readonly",
+        "Cesium": "writable"
+    },
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        
+    ],
+    "rules": {
+        "linebreak-style": [
+            0,
+            "error",
+            "windows"
+        ],
+        "no-extend-native": [
+            0,
+            "error"
+        ],
+        "no-param-reassign": [
+            0,
+            "error"
+        ],
+        "func-names": [
+            0,
+            "warning"
+        ],
+        "no-restricted-syntax": [
+            0,
+            "error"
+        ],
+        "no-console": [
+            0
+        ],
+        "import/extensions": [
+            0
+        ],
+        "no-plusplus": [
+            0
+        ],
+        "no-underscore-dangle": [
+            0
+        ],
+        "no-unused-expressions": [
+            0
+        ],
+        "max-classes-per-file":[0],
+        "array-callback-return":[0],
+        "no-return-assign":[0]
+    }
+}
