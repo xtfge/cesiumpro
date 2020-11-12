@@ -1,4 +1,4 @@
-import defaultValue from './defaultValue'
+import defaultValue from './defaultValue';
 /**
  * 坐标拾取函数,如果pixel所在位置有Primitive或Entity，将获取Primitive或Entity上的位置，否则获取球面坐标。
  * 简言之,如果点击在模型上将获得模型上的坐标，否则获取球面坐标。
@@ -12,7 +12,7 @@ import defaultValue from './defaultValue'
  */
 function pickPosition(pixel, viewer) {
   let cartesian;
-  elliposid = defaultValue(elliposid, Cesium.Ellipsoid.WGS84)
+  elliposid = defaultValue(elliposid, Cesium.Ellipsoid.WGS84);
   // cartesian = viewer.camera.pickEllipsoid(pixel, elliposid);
   const ray = viewer.camera.getPickRay(pixel);
   cartesian = viewer.scene.globe.pick(ray);
@@ -24,6 +24,6 @@ function pickPosition(pixel, viewer) {
       console.warn('This browser does not support pickPosition.');
     }
   }
-  return cartesian
+  return cartesian;
 }
 export default pickPosition;

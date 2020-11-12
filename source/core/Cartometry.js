@@ -8,7 +8,7 @@ const Cartometry = {};
  * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
  * @return {Number} 长度，单位米
  */
-Cartometry.surfaceDistance = function(positions) {
+Cartometry.surfaceDistance = function (positions) {
   let distance = 0;
   for (let i = 0; i < positions.length - 1; i += 1) {
     const point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
@@ -27,7 +27,7 @@ Cartometry.surfaceDistance = function(positions) {
  * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
  * @return {Number} 长度，单位米
  */
-Cartometry.spaceDistance = function(positions) {
+Cartometry.spaceDistance = function (positions) {
   let dis = 0;
   for (let i = 1; i < positions.length; i++) {
     const s = positions[i - 1];
@@ -45,7 +45,7 @@ Cartometry.spaceDistance = function(positions) {
  * @param {Cesium.Cartesian3} p3 向量2终点
  * @return {Number} 返回p1p2和p1p3之间的夹角，单位：度
  */
-Cartometry.angle = function(p1, p2, p3) {
+Cartometry.angle = function (p1, p2, p3) {
   // 以任意一点为原点建立局部坐标系
   const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(p1);
   const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
@@ -72,7 +72,7 @@ Cartometry.angle = function(p1, p2, p3) {
  * const end=Cesium.Cartesian3.fromDegrees(110,40)
  * const angle = CesiumPro.Cartometry.angleBetweenNorth(start,end);
  */
-Cartometry.angleBetweenNorth = function(center, point) {
+Cartometry.angleBetweenNorth = function (center, point) {
   const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
   const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
   const localp = Cesium.Matrix4.multiplyByPoint(inverseMatrix, point, new Cesium.Cartesian3());
@@ -96,7 +96,7 @@ Cartometry.angleBetweenNorth = function(center, point) {
  * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
  * @return {Number} 面积，单位：平方米
  */
-Cartometry.surfaceArea = function(positions) {
+Cartometry.surfaceArea = function (positions) {
   // TODO:计算方法有问题
   let res = 0;
   // 拆分三角曲面
@@ -117,7 +117,7 @@ Cartometry.surfaceArea = function(positions) {
  * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
  * @return {Number} 面积，单位：平方米
  */
-Cartometry.spaceArea = function(positions) {
+Cartometry.spaceArea = function (positions) {
   let res = 0;
   // 拆分三角曲面
 
@@ -137,7 +137,7 @@ Cartometry.spaceArea = function(positions) {
  * @param  {} positions
  * @return {} 相信两个顶点之间的高度差，单位m
  */
-Cartometry.heightFromCartesianArray = function(positions) {
+Cartometry.heightFromCartesianArray = function (positions) {
   if (positions.length < 2) {
     return 0;
   }

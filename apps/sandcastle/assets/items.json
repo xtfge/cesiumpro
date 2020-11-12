@@ -73,6 +73,52 @@
     ]
   },
   {
+    "label":"视图参数",
+    "value":"view",
+    "icon":"glyphicon glyphicon-search",
+    "children":[
+      {
+        "label":"",
+        "value":"all",
+        "children":[
+          {
+            "label":"点是否可见",
+            "value":"2.1-pointVisiblity",
+            "thumb":"./assets/images/selector.png"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label":"可视化",
+    "value":"visiual",
+    "icon":"glyphicon glyphicon-search",
+    "children":[
+      {
+        "label":"常见",
+        "value":"cesium",
+        "children":[
+          {
+            "label":"动态线",
+            "value":"3.1-dynamic-pl",
+            "thumb":"./assets/images/selector.png"
+          },
+          {
+            "label":"扩散扫描",
+            "value":"3.2-dynamic-circle",
+            "thumb":"./assets/images/selector.png"
+          },
+          {
+            "label":"圆形扫描",
+            "value":"3.3-dynamic-scan",
+            "thumb":"./assets/images/selector.png"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "label":"分析",
     "value":"analysis",
     "icon":"glyphicon glyphicon-asterisk",
@@ -98,4 +144,5 @@
       }
     ]
   }
+
 ]

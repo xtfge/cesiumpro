@@ -55,7 +55,7 @@ class Event {
     this._scopes.push(scope);
 
     const event = this;
-    return function() {
+    return function () {
       event.removeEventListener(listener, scope);
     };
   }

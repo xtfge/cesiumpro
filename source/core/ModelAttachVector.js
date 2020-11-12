@@ -1,9 +1,10 @@
-import checkViewer from './checkViewer'
-import CesiumProError from './CesiumProError'
-import defaultValue from './defaultValue'
+import checkViewer from './checkViewer';
+import CesiumProError from './CesiumProError';
+import defaultValue from './defaultValue';
 import $ from '../thirdParty/jquery';
-import ajaxCatch from './ajaxCatch'
-import PolygonGraphic from './PolygonGraphic'
+import ajaxCatch from './ajaxCatch';
+import PolygonGraphic from '../graphic/PolygonGraphic';
+
 class ModelAttachVector {
   /**
    * 创建模型的关联矢量，主要用于为模型附加属性信息，可以达到模型单体化的视觉效果。
@@ -19,7 +20,7 @@ class ModelAttachVector {
     const {
       viewer,
       vectorResource,
-      key
+      key,
     } = options;
     checkViewer(viewer);
     this._materail = defaultValue(options.material, Cesium.Color.GOLD.withAlpha(0.5));
@@ -27,13 +28,13 @@ class ModelAttachVector {
     this._highlightMaterial = defaultValue(options.highlightMaterial, Cesium.Color.AQUA);
     this._viewer = viewer;
     this._vectorResource = vectorResource;
-    this._key = defaultValue(key, 'id')
+    this._key = defaultValue(key, 'id');
     const feats = vectorResource.features;
-    //以数组的形式保存了所有entity
-    this.entities = []
-    //以key-value的形式保存所有entity;
+    // 以数组的形式保存了所有entity
+    this.entities = [];
+    // 以key-value的形式保存所有entity;
     this.entityMap = new Map();
-    this._mode = defaultValue(options.mode, 'edit')
+    this._mode = defaultValue(options.mode, 'edit');
 
     $.ajax({
       url: this._vectorResource,
@@ -41,12 +42,12 @@ class ModelAttachVector {
       dataType: 'json',
       success: (res) => {
         const feats = res.features;
-        for (let feat of feats) {
+        for (const feat of feats) {
           if (feat.geometry.coordinates) {
             const hierarchy = ModelAttachVector.coordinates2Hierarchy(feat.geometry.coordinates);
             const center = PolygonGraphic.centerFromPonits(hierarchy.positions);
             if (center) {
-              feat.properties.center = JSON.stringify(center)
+              feat.properties.center = JSON.stringify(center);
             }
             const entity = this._viewer.entities.add({
               id: feat.properties[this._key],
@@ -56,19 +57,18 @@ class ModelAttachVector {
                 material: this._mode === 'edit' ? this._materail : this._previewMaterial,
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                 outline: false,
-                perPositionHeight: false
-              }
-            })
-            this.entities.push(entity)
-            this.entityMap.set(entity.id, entity)
+                perPositionHeight: false,
+              },
+            });
+            this.entities.push(entity);
+            this.entityMap.set(entity.id, entity);
           }
-
         }
       },
       error: (e) => {
-        ajaxCatch(e)
-      }
-    })
+        ajaxCatch(e);
+      },
+    });
   }
 
   /**
@@ -78,10 +78,11 @@ class ModelAttachVector {
   get mode() {
     return this._mode;
   }
+
   set mode(v) {
     this._mode = v;
     if (this._mode === 'edit') {
-      this.setMaterial(this._materail)
+      this.setMaterial(this._materail);
     } else if (this._mode === 'preview') {
       this.setMaterial(this._previewMaterial);
     } else {
@@ -95,7 +96,7 @@ class ModelAttachVector {
    */
   setMaterial(material) {
     const values = this.entityMap.values();
-    for (let v of values) {
+    for (const v of values) {
       if (v.polygon) {
         v.polygon.material = material;
       }
@@ -104,11 +105,11 @@ class ModelAttachVector {
 
   /**
    * 通过key设置高亮
-   * @param  {Cesium.Entity} key 
+   * @param  {Cesium.Entity} key
    */
   highLightByKey(key) {
     const entity = this.getByKey(key);
-    this.highLightByEntity(entity)
+    this.highLightByEntity(entity);
   }
 
   /**
@@ -120,21 +121,23 @@ class ModelAttachVector {
       entity.polygon.material = this._highlightMaterial;
     }
   }
+
   /**
    * 将Geojson的coordinates转为Cesium.Cartesian3数组
    * @param  {Array} coors coordinates
    * @return {Cesium.Cartesian3[]} 可以直接用于多边形hierarchy的Cestesian3数组
    */
   static coordinates2Hierarchy(coors) {
-    const positions = []
-    for (let cs of coors) {
-      for (let c of cs) {
-        positions.push(c[0], c[1])
+    const positions = [];
+    for (const cs of coors) {
+      for (const c of cs) {
+        positions.push(c[0], c[1]);
       }
     }
-    const cartesian = Cesium.Cartesian3.fromDegreesArray(positions)
+    const cartesian = Cesium.Cartesian3.fromDegreesArray(positions);
     return new Cesium.PolygonHierarchy(cartesian);
   }
+
   /**
    * 定位到指定要素，如果未指定key将定位到所有要素
    * @param  {String} [key=''] 要素的key值
@@ -142,11 +145,12 @@ class ModelAttachVector {
   zoomTo(id = '') {
     const entity = this.getByKey(id);
     if (entity) {
-      this._viewer.zoomTo(entity)
+      this._viewer.zoomTo(entity);
     } else {
       this._viewer.zoomTo(this.getAll());
     }
   }
+
   /**
    * 通过key获得指定要素
    * @param  {String} key key值
@@ -154,7 +158,7 @@ class ModelAttachVector {
    */
   getByKey(key) {
     const entity = this._viewer.entities.getById(key);
-    return entity
+    return entity;
   }
 
   /**
@@ -164,13 +168,14 @@ class ModelAttachVector {
   getAll() {
     return Array.from(this.entityMap.values());
   }
+
   /**
    * 删除所有要素
    */
   removeAll() {
     const keys = this.entityMap.keys();
-    for (let k of keys) {
-      this.remove(k)
+    for (const k of keys) {
+      this.remove(k);
     }
     this.entityMap.clear();
   }
@@ -195,7 +200,6 @@ class ModelAttachVector {
     this._viewer = undefined;
     this.entities = undefined;
   }
-
 }
 
 export default ModelAttachVector;

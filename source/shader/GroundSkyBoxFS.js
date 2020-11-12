@@ -7,4 +7,4 @@ const shader = 'uniform samplerCube u_cubeMap;\n\
   }\n\
   ';
 
-export default shader
+export default shader;

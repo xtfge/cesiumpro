@@ -21,9 +21,8 @@ function depthTest(target, depth = true) {
   } else if (target instanceof Cesium.Globe) {
     target.depthTestAgainstTerrain = depth;
   } else {
-    throw new CesiumProError("无效的对象")
+    throw new CesiumProError('无效的对象');
   }
-
 }
 
 export default depthTest;

@@ -38,26 +38,24 @@ function getBaseUrlFromCesiumScript() {
   return undefined;
 }
 
-
 function buildModuleUrlFromRequireToUrl(moduleID) {
   // moduleID will be non-relative, so require it relative to this module, in Core.
   return tryMakeAbsolute(require.toUrl(`../${moduleID}`));
 }
 
-
-function getCesiumBaseUrl() {
+function getCesiumProBaseUrl() {
   if (defined(baseResource)) {
     return baseResource;
   }
 
   let baseUrlString;
-  if (typeof CESIUMPRO_BASE_URL !== 'undefined') {
-    baseUrlString = CESIUMPRO_BASE_URL;
+  if (window.CESIUMPRO_BASE_URL) {
+    baseUrlString = window.CESIUMPRO_BASE_URL;
   } else if (
-    typeof window.define === 'object' &&
-    defined(window.define.amd) &&
-    !window.define.amd.toUrlUndefined &&
-    defined(window.require.toUrl)
+    typeof window.define === 'object'
+    && defined(window.define.amd)
+    && !window.define.amd.toUrlUndefined
+    && defined(window.require.toUrl)
   ) {
     baseUrlString = Cesium.getAbsoluteUri(
       '..',
@@ -68,7 +66,7 @@ function getCesiumBaseUrl() {
   }
   if (!defined(baseUrlString)) {
     throw new CesiumProError(
-      'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUM_BASE_URL.',
+      'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
     );
   }
   // >>includeEnd('debug');
@@ -82,21 +80,20 @@ function getCesiumBaseUrl() {
 }
 
 function buildModuleUrlFromBaseUrl(moduleID) {
-  const resource = getCesiumBaseUrl().getDerivedResource({
+  const resource = getCesiumProBaseUrl().getDerivedResource({
     url: moduleID,
   });
   return resource.url;
 }
 
-
 function buildModuleUrl(relativeUrl) {
   if (!defined(implementation)) {
     // select implementation
     if (
-      typeof window.define === 'object' &&
-      defined(window.define.amd) &&
-      !window.define.amd.toUrlUndefined &&
-      defined(require.toUrl)
+      typeof window.define === 'object'
+      && defined(window.define.amd)
+      && !window.define.amd.toUrlUndefined
+      && defined(require.toUrl)
     ) {
       implementation = buildModuleUrlFromRequireToUrl;
     } else {
@@ -112,7 +109,7 @@ function buildModuleUrl(relativeUrl) {
  * @namespace URL
  *
  */
-const URL = {}
+const URL = {};
 /**
  * 从多个字符串拼接url,以/为分割符
  * @param  {...String} args
@@ -123,7 +120,7 @@ const URL = {}
  * URL.join("www.baidu.com/",'/tieba/','cesium')
  * //www.baidu.com/tieba/cesium
  */
-URL.join = function(...args) {
+URL.join = function (...args) {
   const formatArgs = [];
   for (let arg of args) {
     if (arg.startsWith('/')) {
@@ -134,19 +131,19 @@ URL.join = function(...args) {
     }
     formatArgs.push(arg);
   }
-  let urlstr = formatArgs.join('/');
+  const urlstr = formatArgs.join('/');
   // if (!(urlstr.startsWith('http') || urlstr.startsWith('ftp'))) {
   //   urlstr = `http://${urlstr}`;
   // }
   return urlstr;
-}
+};
 
 /**
  * 获取CesiumPro静态资源的完整路径
  * @param {String} path 指定文件
  * @returns {String}
  */
-URL.buildModuleUrl = function(path) {
-  return buildModuleUrl(path)
-}
+URL.buildModuleUrl = function (path) {
+  return buildModuleUrl(path);
+};
 export default URL;

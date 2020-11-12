@@ -1,4 +1,5 @@
-import Graphic from './Graphic'
+import Graphic from './Graphic';
+
 class ModelGraphic extends Graphic {
   constructor() {
     super();
@@ -11,4 +12,4 @@ class ModelGraphic extends Graphic {
     minimumPixelSize: 64,
   }
 }
-export default ModelGraphic
+export default ModelGraphic;

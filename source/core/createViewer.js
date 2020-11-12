@@ -22,7 +22,7 @@ function createViewer(container, options = {}) {
     sceneModePicker: false,
     shadows: false,
     imageryProvider: new Cesium.UrlTemplateImageryProvider({
-      url: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}&s=Gali'
+      url: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}&s=Gali',
     }),
     contextOptions: {
       // cesium状态下允许canvas转图片convertToImage
@@ -32,7 +32,7 @@ function createViewer(container, options = {}) {
         stencil: true,
         antialias: true,
         premultipliedAlpha: true,
-        preserveDrawingBuffer: true, //截图时需要打开
+        preserveDrawingBuffer: true, // 截图时需要打开
         failIfMajorPerformanceCaveat: true,
       },
       allowTextureFilterAnisotropic: true,
@@ -40,10 +40,12 @@ function createViewer(container, options = {}) {
     // terrainProvider: Cesium.createWorldTerrain()
     // terrainProvider: false
   };
-  return new Cesium.Viewer(container, {
+  const viewer = new Cesium.Viewer(container, {
     ...defaultOption,
     ...options,
   });
+  viewer.camera.flyChinaHome();
+  return viewer;
 }
 
 export default createViewer;

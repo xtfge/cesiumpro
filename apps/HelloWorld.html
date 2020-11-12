@@ -40,56 +40,25 @@
         CartometryType,
         ModelAttachVector,
         DataLoader,
-        ViewerParams
+        ViewerParams,
+        PlotUtil,
+
+        PointGraphic,
+        NodeGraphic,
+        PolylineGraphic,
+        PolygonGraphic,
+        GraphicType,
+        URL,
+        ArrowGraphic,
+        VectorTileProvider
       } from '../build/CesiumProUnminified/CesiumPro.esm.js'
       const viewer = createViewer('map');
       logo()
-
-      function formatText(v) {
-        return '' + v
-      }
-      // const tileset = new Cesium.Cesium3DTileset({
-      //   url: "http://localhost:8080/模型/油汽站/tileset.json"
-      // })
-      // tileset.readyPromise.then(e => {
-      //   viewer.scene.primitives.add(e);
-      //   viewer.flyTo(e);
-      // })
-      const tileset = DataLoader.loadTileset(viewer, {
-        url: "http://localhost:8080/模型/油汽站/tileset.json",
-      }, {
-        position: Cesium.Cartesian3.fromDegrees(101.27059, 42.57557),
-        debug: true
-      })
-      tileset.readyPromise.then(e => {
-        // viewer.scene.primitives.add(e);
-        viewer.flyTo(e);
-      })
-      const vp = new ViewerParams(viewer, true);
-      const m = new CartometryManager({
-        viewer,
-        autoDepthTest: true,
-        formatText,
-        mode: CartometryType.SPACE_AREA,
-        auxiliaryLineMaterial: Cesium.Color.GREEN,
-        auxiliaryGeometry: {
-          angle: false,
-          distance: true
-        },
-        nodeMode: {
-          distance: false
-        }
-      });
-      window.a = new ModelAttachVector({
-        viewer,
-        vectorResource: './ck.geojson',
-        material: Cesium.Color.GOLD.withAlpha(0.5),
-        key: "名称",
-        mode: 'preview',
-        highlightMaterial: Cesium.Color.AQUA.withAlpha(0.2)
-      })
-      window.m = m;
-      // m.surfaceDistance();
+      window.viewer = viewer;
+      viewer.imageryLayers.removeAll();
+      viewer.imageryLayers.addImageryProvider(new VectorTileProvider({
+        url: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}&s=Gali'
+      }))
     </script>
   </body>
 

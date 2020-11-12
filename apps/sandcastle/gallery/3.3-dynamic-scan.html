@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script type="text/javascript" src="../../thirdParty/CesiumUnminified/Cesium.js"></script>
+
+    <script type="text/javascript" src='../../build/CesiumProUnminified/CesiumPro.umd.js'>
+
+    </script>
+    <link href="../../thirdParty/CesiumUnminified/Widgets/Widgets.css" rel="stylesheet" />
+
+    <title>Document</title>
+
+    <style media="screen">
+      html,
+      body,
+      #map {
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      const viewer = CesiumPro.createViewer('map');
+      const polygon = viewer.entities.add({
+        polygon: {
+          hierarchy: Cesium.Cartesian3.fromDegreesArray([110, 30, 110, 40, 120, 40, 120, 30]),
+          material: new CesiumPro.DynamicSectorFadeMaterialProperty()
+        }
+      })
+      const center = Cesium.Cartesian3.fromDegrees(100, 35);
+      const radius = 500000
+      const circle = viewer.entities.add({
+        position: center,
+        ellipse: {
+          semiMajorAxis: radius,
+          semiMinorAxis: radius,
+          material: new CesiumPro.DynamicSectorFadeMaterialProperty(),
+        }
+      });
+      const matrix = new Cesium.Transforms.eastNorthUpToFixedFrame(center);
+      const positions = []
+      for (let i = 0; i <= 360; i++) {
+        const angle = Cesium.Math.toRadians(i);
+        const localPoint = new Cesium.Cartesian3(radius * Math.cos(angle), radius * Math.sin(angle), 0)
+        positions.push(Cesium.Matrix4.multiplyByPoint(matrix, localPoint, new Cesium.Cartesian3))
+      }
+      viewer.entities.add({
+        polyline: {
+          positions,
+          width: 3,
+          material: Cesium.Color.RED
+        }
+      })
+    </script>
+  </body>
+
+</html>

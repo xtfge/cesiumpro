@@ -1,14 +1,14 @@
 /* eslint-disable no-multi-assign */
 /* eslint-disable no-multi-str */
 import skyBoxFS from '../shader/GroundSkyBoxFS';
-import skyBoxVS from '../shader/GroundSkyBoxVS'
+import skyBoxVS from '../shader/GroundSkyBoxVS';
 /*
  * Cesium近地天空盒
  */
 
-const SkyBoxFS = skyBoxFS
+const SkyBoxFS = skyBoxFS;
 
-const SkyBoxVS = skyBoxVS
+const SkyBoxVS = skyBoxVS;
 
 class GroundSkyBox {
   /**
@@ -76,8 +76,8 @@ class GroundSkyBox {
       return undefined;
     }
 
-    if ((frameState.mode !== SceneMode.SCENE3D) &&
-      (frameState.mode !== SceneMode.MORPHING)) {
+    if ((frameState.mode !== SceneMode.SCENE3D)
+      && (frameState.mode !== SceneMode.MORPHING)) {
       return undefined;
     }
 
@@ -88,29 +88,29 @@ class GroundSkyBox {
     }
 
     const {
-      context
+      context,
     } = frameState;
 
     if (this._sources !== this.sources) {
       this._sources = this.sources;
       const {
-        sources
+        sources,
       } = this;
 
-      if ((!defined(sources.positiveX)) ||
-        (!defined(sources.negativeX)) ||
-        (!defined(sources.positiveY)) ||
-        (!defined(sources.negativeY)) ||
-        (!defined(sources.positiveZ)) ||
-        (!defined(sources.negativeZ))) {
+      if ((!defined(sources.positiveX))
+        || (!defined(sources.negativeX))
+        || (!defined(sources.positiveY))
+        || (!defined(sources.negativeY))
+        || (!defined(sources.positiveZ))
+        || (!defined(sources.negativeZ))) {
         throw new DeveloperError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
       }
 
-      if ((typeof sources.positiveX !== typeof sources.negativeX) ||
-        (typeof sources.positiveX !== typeof sources.positiveY) ||
-        (typeof sources.positiveX !== typeof sources.negativeY) ||
-        (typeof sources.positiveX !== typeof sources.positiveZ) ||
-        (typeof sources.positiveX !== typeof sources.negativeZ)) {
+      if ((typeof sources.positiveX !== typeof sources.negativeX)
+        || (typeof sources.positiveX !== typeof sources.positiveY)
+        || (typeof sources.positiveX !== typeof sources.negativeY)
+        || (typeof sources.positiveX !== typeof sources.positiveZ)
+        || (typeof sources.positiveX !== typeof sources.negativeZ)) {
         throw new DeveloperError('this.sources properties must all be the same type.');
       }
 

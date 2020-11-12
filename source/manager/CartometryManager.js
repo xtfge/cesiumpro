@@ -1,19 +1,18 @@
-import CursorTip from './CursorTip';
-import defaultValue from './defaultValue';
-import checkViewer from './checkViewer';
-import PointGraphic from './PointGraphic'
-import PolylineGraphic from './PolylineGraphic'
-import PolygonGraphic from './PolygonGraphic'
-import LabelGraphic from './LabelGraphic'
-import Cartometry from './Cartometry';
-import CartometryType from './CartometryType';
-import Event from './Event';
-import depthTest from './depthTest'
+import CursorTip from '../core/CursorTip';
+import defaultValue from '../core/defaultValue';
+import checkViewer from '../core/checkViewer';
+import PointGraphic from '../graphic/PointGraphic';
+import PolylineGraphic from '../graphic/PolylineGraphic';
+import PolygonGraphic from '../graphic/PolygonGraphic';
+import Cartometry from '../core/Cartometry';
+import CartometryType from '../core/CartometryType';
+import Event from '../core/Event';
+import depthTest from '../core/depthTest';
 
-const formatText = function(value, mode, islast) {
-  if (mode === CartometryType.SURFACE_DISTANCE ||
-    mode === CartometryType.SPACE_DISTANCE ||
-    mode === CartometryType.HEIGHT) {
+const formatText = function (value, mode, islast) {
+  if (mode === CartometryType.SURFACE_DISTANCE
+    || mode === CartometryType.SPACE_DISTANCE
+    || mode === CartometryType.HEIGHT) {
     const preText = islast ? '总长度 ' : '';
     if (value > 10000) {
       return `${preText}${(value / 1000).toFixed(2)} km`;
@@ -27,7 +26,7 @@ const formatText = function(value, mode, islast) {
     return `${value.toFixed(2)} m²`;
   }
   if (mode === CartometryType.ANGLE) {
-    return `${(value%360).toFixed(2)}°`
+    return `${(value % 360).toFixed(2)}°`;
   }
   return undefined;
 };
@@ -40,7 +39,7 @@ class CartometryManager {
    *
    * @param {*} options 具有以下属性
    * @param {Cesium.Viewer} options.viewer Cesium.Viewer对象
-   * @param {Object} [options.labelStyle=LabelGraphic.defaultStyle] 定义label样式,和Cesium.LabelGraphic具有相同的参数
+   * @param {Object} [options.labelStyle=PointGraphic.defaultLabelStyle] 定义label样式,和Cesium.LabelGraphic具有相同的参数
    * @param {Object} [options.polylineStyle=PolylineGraphic.defaultStyle] 定义线样式，和Cesium.PolylineGraphic具有相同的参数
    * @param {Object} [options.polygonStyle=PolygonGraphic.defaultStyle] 定义多边形样式,和Cesium.PolygonGraphic具有相同的参数
    * @param {Object} [options.pointStyle=PointGraphic.defaultStyle] 定义点样式,和Cesium.PointGraphic具有相同的参数
@@ -70,7 +69,7 @@ class CartometryManager {
     checkViewer(viewer);
     this._viewer = viewer;
     const defaultLabelStyle = LabelGraphic.defaultStyle;
-    defaultLabelStyle.disableDepthTestDistance = Number.POSITIVE_INFINITY
+    defaultLabelStyle.disableDepthTestDistance = Number.POSITIVE_INFINITY;
     this._labelStyle = defaultValue(labelStyle, defaultLabelStyle);
     this._polylineStyle = defaultValue(polylineStyle, PolylineGraphic.defaultStyle);
     this._polygonStyle = defaultValue(polygonStyle, PolygonGraphic.defaultStyle);
@@ -108,11 +107,11 @@ class CartometryManager {
     this.listening = false;
     const auxiliarylineMaterial = new Cesium.PolylineDashMaterialProperty({
       color: Cesium.Color.RED,
-    })
+    });
     this._auxiliarylineMaterial = defaultValue(options.auxiliaryLineMaterial, auxiliarylineMaterial);
     const auxiliarypolygonMaterial = new Cesium.PolylineDashMaterialProperty({
       color: Cesium.Color.RED,
-    })
+    });
     this._auxiliaryPolygonMaterial = defaultValue(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
   }
 
@@ -176,8 +175,7 @@ class CartometryManager {
 
   /**
    * 开始测量时触发的事件
-   * @Event
-   * @type {Event} [description]
+   * @type {Event}
    */
   get startMeasure() {
     return this._startMeasure;
@@ -185,7 +183,6 @@ class CartometryManager {
 
   /**
    * 结束测量时触发的事件
-   * @Event
    * @type {Event}
    */
   get stopMeasure() {
@@ -194,7 +191,6 @@ class CartometryManager {
 
   /**
    * 添加节点时触发的事件
-   * @Event
    * @type {Event}
    */
   get addNode() {
@@ -321,7 +317,7 @@ class CartometryManager {
     this._listening = false;
     this.tip.show = false;
     if (this._autoDepthTest) {
-      depthTest(this._viewer, this._depthTestAgainstTerrain)
+      depthTest(this._viewer, this._depthTestAgainstTerrain);
     }
   }
 
@@ -330,10 +326,10 @@ class CartometryManager {
    */
   clear() {
     const values = this._values;
-    for (let v of values) {
+    for (const v of values) {
       this._viewer.entities.remove(v);
     }
-    this._values = []
+    this._values = [];
   }
 
   /**
@@ -436,8 +432,8 @@ class CartometryManager {
       options.clampToGround = false;
       options.positions = new Cesium.CallbackProperty(() => positions, false);
       this.createPolyline(options);
-    } else if (mode === CartometryType.SURFACE_DISTANCE ||
-      mode === CartometryType.ANGLE) {
+    } else if (mode === CartometryType.SURFACE_DISTANCE
+      || mode === CartometryType.ANGLE) {
       options = this.polylineStyle;
       options.clampToGround = true;
       options.positions = new Cesium.CallbackProperty(() => positions, false);
@@ -561,8 +557,8 @@ class CartometryManager {
     const labelOptions = this.labelStyle;
     labelOptions.text = text;
     const coor = CVT.toDegrees(cartesian);
-    labelOptions.pixelOffset = new Cesium.Cartesian3(0, 0, coor.height > 0 ? -coor.height : 0)
-    console.log(coor, '请检查它不为0')
+    labelOptions.pixelOffset = new Cesium.Cartesian3(0, 0, coor.height > 0 ? -coor.height : 0);
+    console.log(coor, '请检查它不为0');
     const label = this._viewer.entities.add({
       position: cartesian,
       label: labelOptions,
@@ -644,24 +640,24 @@ class CartometryManager {
    */
   _createAuxiliaryGraphicforAngle(positions) {
     if (positions.length !== 2) {
-      return
+      return;
     }
     const distance = Cartometry.spaceDistance(positions);
     const matrix = new Cesium.Transforms.eastNorthUpToFixedFrame(positions[0]);
     const inverseMatrix = new Cesium.Matrix4();
     Cesium.Matrix4.inverseTransformation(matrix, inverseMatrix);
     // const x = Cesium.Matrix4.multiplyByPoint(matrix, new Cesium.Cartesian3(distance, 0, 0), new Cesium.Cartesian3);
-    const y = Cesium.Matrix4.multiplyByPoint(matrix, new Cesium.Cartesian3(0, distance, 0), new Cesium.Cartesian3);
+    const y = Cesium.Matrix4.multiplyByPoint(matrix, new Cesium.Cartesian3(0, distance, 0), new Cesium.Cartesian3());
     const options = {
       polyline: {
         positions: [positions[0], y],
         material: this._auxiliarylineMaterial,
         width: this.polylineStyle.width || 3,
-        clampToGround: true
-      }
-    }
+        clampToGround: true,
+      },
+    };
     const pl = this._viewer.entities.add(options);
-    this._values.push(pl)
+    this._values.push(pl);
   }
 
   /**

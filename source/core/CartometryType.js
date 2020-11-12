@@ -39,7 +39,7 @@ const CartometryType = {
    * @type {Number}
    * @constant
    */
-  ANGLE: 6
+  ANGLE: 6,
 };
 
 /**
@@ -47,18 +47,18 @@ const CartometryType = {
  * @param {CartometryType}
  * @returns {Number}
  */
-CartometryType.validate = function(type) {
-  return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE ||
-    type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE ||
-    type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
-}
+CartometryType.validate = function (type) {
+  return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE
+    || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE
+    || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
+};
 
 /**
  * 从枚举值获得枚举标签
  * @param  {CartometryType} value 枚举值
  * @returns {String}
  */
-CartometryType.getKey = function(value) {
+CartometryType.getKey = function (value) {
   let key;
   switch (value) {
     case 1:
@@ -83,5 +83,5 @@ CartometryType.getKey = function(value) {
       key = undefined;
   }
   return key;
-}
+};
 export default Object.freeze(CartometryType);

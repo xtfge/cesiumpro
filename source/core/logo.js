@@ -14,12 +14,12 @@ import $ from '../thirdParty/jquery.js';
 function logo(options = {}) {
   $('.cesium-widget-credits').empty();
   if (options.url) {
-    let style = ''
+    let style = '';
     if (options.width) {
-      style += "width=" + options.width;
+      style += `width=${options.width}`;
     }
     if (options.height) {
-      style += " height=" + options.height;
+      style += ` height=${options.height}`;
     }
     $('.cesium-widget-credits').append(`<img src='${options.url}' ${style}/>`);
   }

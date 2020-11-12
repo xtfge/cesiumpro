@@ -15,39 +15,39 @@ import CVT from './CVT';
  * @return {Promise}
  */
 function flyTo(viewer, options = {}) {
-  const camera = viewer.camera
+  const { camera } = viewer;
   const step1 = defaultValue(options.step1Duration, 3);
   const step2 = defaultValue(options.step2Duration, 3);
   const step3 = defaultValue(options.step3Duration, 3);
 
   const curHeight = camera.positionCartographic.height;
   const cartographic = CVT.toDegrees(options.destination, viewer);
-  //第一步改变位置
-  const step1Destination = Cesium.Cartesian3.fromDegrees(cartographic.lon, cartographic.lat, cur_height)
-  //第二步改变高度
+  // 第一步改变位置
+  const step1Destination = Cesium.Cartesian3.fromDegrees(cartographic.lon, cartographic.lat, cur_height);
+  // 第二步改变高度
   const step2Destination = options.destination;
 
   return new Promise((resolve) => {
     camera.flyTo({
       destination: step1Destination,
       duration: step1,
-      complete: function() {
+      complete() {
         camera.flyTo({
           destination: step2Destination,
           duration: step2,
-          complete: function() {
+          complete() {
             camera.flyTo({
               destination: step2Destination,
               duration: step3,
-              complete: function() {
+              complete() {
                 resolve();
-              }
-            })
-          }
-        })
-      }
-    })
-  })
+              },
+            });
+          },
+        });
+      },
+    });
+  });
 }
 
 export default flyTo;

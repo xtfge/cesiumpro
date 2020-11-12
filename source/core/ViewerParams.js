@@ -54,7 +54,7 @@ class ViewerParams {
       }
       this.updateHeadingPitchRoll();
       if (this.debug) {
-        console.log(this.params)
+        console.log(this.params);
       }
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
   }
@@ -272,8 +272,8 @@ class ViewerParams {
     }
 
     if (
-      scene.mode === Cesium.SceneMode.SCENE2D ||
-      scene.mode === Cesium.SceneMode.COLUMBUS_VIEW
+      scene.mode === Cesium.SceneMode.SCENE2D
+      || scene.mode === Cesium.SceneMode.COLUMBUS_VIEW
     ) {
       result = camera.worldToCameraCoordinatesPoint(result, result);
 

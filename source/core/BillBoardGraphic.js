@@ -1,4 +1,5 @@
-import Graphic from './Graphic'
+import Graphic from './Graphic';
+
 class BillboardGraphic extends Graphic {
   constructor() {
     super();

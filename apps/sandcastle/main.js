@@ -382,7 +382,7 @@ __webpack_require__.r(__webpack_exports__);
  * @Date: 2020-09-18 17:35:47
  * @E-mail: zhangbo@geovis.com.cn
  * @LastModifiedBy: zhangbo
- * @LastEditTime: 2020-09-27 19:28:37
+ * @LastEditTime: 2020-11-09 16:25:32
  * @Desc:
  */
 
@@ -404,6 +404,9 @@ class EditorComponent {
             success: (res) => {
                 this.value = res;
                 this.setValue(this.value);
+                if (this.value) {
+                    this.run();
+                }
             }
         });
         this.id = id;

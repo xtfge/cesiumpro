@@ -125,8 +125,6 @@ function combineJavaScript(options) {
 
   return promise.then(() => {
     const promises = [];
-
-    // copy to build folder with copyright header added at the top
     let stream = gulp.src([`${combineOutput}/**`])
       .pipe(gulp.dest(outputDirectory));
 

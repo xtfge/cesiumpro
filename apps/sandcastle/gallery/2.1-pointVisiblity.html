@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script type="text/javascript" src="../../thirdParty/CesiumUnminified/Cesium.js"></script>
+
+    <script type="text/javascript" src='../../build/CesiumProUnminified/CesiumPro.umd.js'>
+
+    </script>
+    <link href="../../thirdParty/CesiumUnminified/Widgets/Widgets.css" rel="stylesheet" />
+
+    <title>Document</title>
+
+    <style media="screen">
+      html,
+      body,
+      #map {
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="map"></div>
+    <script type="text/javascript">
+      const viewer = CesiumPro.createViewer('map')
+      const point = Cesium.Cartesian3.fromDegrees(110, 30);
+      viewer.entities.add({
+        position: point,
+        point: {
+          color: Cesium.Color.RED,
+          pixelSize: 10
+        }
+      })
+      viewer.scene.postRender.addEventListener(() => {
+        const visible = CesiumPro.pointVisiblity(point, viewer);
+        if (visible) {
+          console.log('可见')
+        } else {
+          console.log('不可见')
+        }
+      })
+      parent.viewer = viewer;
+    </script>
+  </body>
+
+</html>

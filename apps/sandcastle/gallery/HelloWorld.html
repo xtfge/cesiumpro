@@ -31,7 +31,8 @@
   <body>
     <div id="map"></div>
     <script type="text/javascript">
-      const viewer = CesiumPro.createViewer('map')
+      const viewer = CesiumPro.createViewer('map');
+      viewer.imageryLayers.removeAll();
     </script>
   </body>
 

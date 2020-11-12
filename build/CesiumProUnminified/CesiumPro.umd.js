@@ -13,38 +13,6 @@
   (global = global || self, factory(global.CesiumPro = {}));
 }(this, (function (exports) { 'use strict';
 
-  /**
-   * 捕获ajax异常
-   *
-   * @exports ajaxCatch
-   * @param {Any} e ajax抛出的错误
-   * @param {function} [callback=console.error] 回调函数
-   *
-   * @example
-   *
-   * axios.get('url')
-   * .then(res=>{
-   *    do(res)
-   * }).catch(e=>{
-   *    CesiumPro.ajaxCatch(e,console.log);
-   * })
-   */
-  var errorCatch = function errorCatch(e) {
-    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : console.error;
-
-    if (e.response) {
-      callback(e.status, e.response.data);
-    } else if (e.request) {
-      callback(e.status, e.request);
-    } else if (e.message) {
-      callback(e.status, e.message);
-    } else if (e.statusText) {
-      callback(e.status, e.statusText);
-    } else {
-      callback(e);
-    }
-  };
-
   function _typeof(obj) {
     "@babel/helpers - typeof";
 
@@ -266,8 +234,50 @@
     };
   }
 
+  function _superPropBase(object, property) {
+    while (!Object.prototype.hasOwnProperty.call(object, property)) {
+      object = _getPrototypeOf(object);
+      if (object === null) break;
+    }
+
+    return object;
+  }
+
+  function _get(target, property, receiver) {
+    if (typeof Reflect !== "undefined" && Reflect.get) {
+      _get = Reflect.get;
+    } else {
+      _get = function _get(target, property, receiver) {
+        var base = _superPropBase(target, property);
+
+        if (!base) return;
+        var desc = Object.getOwnPropertyDescriptor(base, property);
+
+        if (desc.get) {
+          return desc.get.call(receiver);
+        }
+
+        return desc.value;
+      };
+    }
+
+    return _get(target, property, receiver || target);
+  }
+
   function _readOnlyError(name) {
     throw new Error("\"" + name + "\" is read-only");
+  }
+
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
+  }
+
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   function _unsupportedIterableToArray(o, minLen) {
@@ -285,6 +295,10 @@
     for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
 
     return arr2;
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   function _createForOfIteratorHelper(o, allowArrayLike) {
@@ -344,14 +358,901 @@
     };
   }
 
-  var Graphic =
+  var CesiumProError$1 = /*#__PURE__*/function (_Error) {
+    _inherits(CesiumProError, _Error);
+
+    var _super = _createSuper(CesiumProError);
+
+    /**
+     * 定义CesiumPro抛出的错误
+     * @extends Error
+     * @param {String} message 描述错误消息的内容
+     * @example
+     * function flyTo(viewer,entity){
+     *    if(!viewer){
+     *      throw(new CesiumPro.CesiumProError("viewer未定义"))
+     *    }
+     *    viewer.flyTo(entity)
+     * }
+     *
+     */
+    function CesiumProError(message) {
+      var _this;
+
+      _classCallCheck(this, CesiumProError);
+
+      _this = _super.call(this, message);
+      _this.name = 'CesiumProError';
+      return _this;
+    }
+
+    return CesiumProError;
+  }( /*#__PURE__*/_wrapNativeSuper(Error));
+
+  function _abstract() {
+    throw new CesiumProError$1('抽象方法无法被调用。');
+  }
+
   /**
-   * 绘图图形基类
-   * @param {Object} options 具有以下参数
+   * 捕获ajax异常
+   *
+   * @exports ajaxCatch
+   * @param {Any} e ajax抛出的错误
+   * @param {function} [callback=console.error] 回调函数
+   *
+   * @example
+   *
+   * axios.get('url')
+   * .then(res=>{
+   *    do(res)
+   * }).catch(e=>{
+   *    CesiumPro.ajaxCatch(e,console.log);
+   * })
    */
-  function Graphic(options) {
-    _classCallCheck(this, Graphic);
+  var errorCatch = function errorCatch(e) {
+    var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : console.error;
+
+    if (e.response) {
+      callback(e.status, e.response.data);
+    } else if (e.request) {
+      callback(e.status, e.request);
+    } else if (e.message) {
+      callback(e.status, e.message);
+    } else if (e.statusText) {
+      callback(e.status, e.statusText);
+    } else {
+      callback(e);
+    }
   };
+
+  /**
+   * 生成符合RFC4122 v4的guid
+   * @exports guid
+   * @return {String} guid
+   */
+  function guid() {
+    // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.floor(Math.random() * 16); // y值限定在[8,B]
+
+      /* eslint-disable */
+
+      var v = c === 'x' ? r : r & 0x3 | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  /**
+   * 如果第一个元素为空或未定义，则返回第二个元素，用于设置默认属性
+   * @exports defaultValue
+   * @param {any} a
+   * @param {any} b
+   * @returns {any} 如果第一个元素为空或未定义，则返回第二个元素
+   *
+   * @example
+   * param = Cesium.defaultValue(param, 'default');
+   */
+  function defaultValue(a, b) {
+    if (a !== undefined && a !== null) {
+      return a;
+    }
+
+    return b;
+  }
+  /**
+   *
+   * 空对象，该对象不能被编辑
+   *
+   * @type {Object}
+   * @memberof defaultValue
+   *
+   */
+
+
+  defaultValue.EMPTY_OBJECT = Object.freeze({});
+
+  var ArrowPolyline =
+  /**
+   * 通过Primitive创建箭头线，其实质是一个圆柱加一个圆锥，所以他永远不会延着地球表面弯曲。
+   * @param {} options [description]
+   */
+  function ArrowPolyline(options) {
+    _classCallCheck(this, ArrowPolyline);
+
+    options = defaultValue(options, defaultValue.EMPTY_OBJECT);
+    this._color = defaultValue(options.color, Cesium.Color.RED);
+    this._width = defaultValue(options.width, 3);
+    this._headWidth = defaultValue(options.headWidth, 2 * this._width);
+    this._color = option.color || Cesium.Color.RED;
+    this._width = option.width || 3;
+    this._headWidth = option.headWidth || 2 * this._width;
+    this._length = option.length || 300;
+    this._headLength = option.headLength || 10;
+    this._inverse = option.inverse || false;
+    this.position = option.position;
+    var id = option.id || guid();
+    var line = Cesium.CylinderGeometry.createGeometry(new Cesium.CylinderGeometry({
+      length: this._length,
+      topRadius: this._width,
+      bottomRadius: this._width
+    }));
+    var arrow = Cesium.CylinderGeometry.createGeometry(new Cesium.CylinderGeometry({
+      length: this._headLength,
+      topRadius: 0,
+      bottomRadius: this._headWidth
+    }));
+    var offset = (this._length + this._headLength) / 2;
+
+    if (this._inverse) {
+      offset = -offset;
+    }
+
+    ArrowPolyline.translate(arrow, [0, 0, offset]);
+    return new Cesium.Primitive({
+      modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(this.position),
+      geometryInstances: [new Cesium.GeometryInstance({
+        id: "".concat(id, "-line"),
+        geometry: line
+      }), new Cesium.GeometryInstance({
+        id: "".concat(id, "-arrow"),
+        geometry: arrow
+      })],
+      appearance: new Cesium.MaterialAppearance({
+        material: Cesium.Material.fromType('Color', {
+          color: this._color
+        })
+      })
+    });
+  };
+
+  _defineProperty(ArrowPolyline, "translate", function (geometry, offset) {
+    var scratchOffset = new Cesium.Cartesian3();
+
+    if (Cesium.isArray(offset)) {
+      scratchOffset.x = offset[0];
+      scratchOffset.y = offset[1];
+      scratchOffset.z = offset[2];
+    } else {
+      Cesium.Cartesian3.clone(offset, scratchOffset);
+    }
+
+    for (var i = 0; i < geometry.attributes.position.values.length; i += 3) {
+      geometry.attributes.position.values[i] += scratchOffset.x;
+      geometry.attributes.position.values[i + 1] += scratchOffset.y;
+      geometry.attributes.position.values[i + 2] += scratchOffset.z;
+    }
+  });
+
+  /**
+   * 判断一个变量是否被定义
+   * @param value
+   * @exports defined
+   */
+  function defined(value) {
+    return value !== undefined && value !== null;
+  }
+
+  function compareNumber(a, b) {
+    return b - a;
+  }
+
+  var Event = /*#__PURE__*/function () {
+    /**
+     * 事件管理器
+     * @example
+     * const addMarkerEvent=new Event();
+     * function saveMark(mark){
+     *  console.log("添加了一个mark",mark.id)
+     * }
+     * addMarkerEvent.on(saveMark)
+     * const mark=viewer.entities.add({
+     *  id:"mark1",
+     *  billboard:{
+     *    image:"./icon/pin.png"
+     *  }
+     * })
+     * addMarkerEvent.emit(mark)
+     */
+    function Event() {
+      _classCallCheck(this, Event);
+
+      this._listeners = [];
+      this._scopes = [];
+      this._toRemove = [];
+      this._insideRaiseEvent = false;
+    }
+    /**
+     * 当前订阅事件的侦听器个数
+     */
+
+
+    _createClass(Event, [{
+      key: "addEventListener",
+
+      /**
+       * 注册事件触发时执行的回调函数
+       * @param {Function} listener 事件触发时执行的回调函数
+       * @param {Object} [scope] 侦听器函数中this的指针
+       * @return {Function} 用于取消侦听器监测的函数
+       *
+       * @see Event#removeEventListener
+       * @see Event#raise
+       */
+      value: function addEventListener(listener, scope) {
+        if (typeof listener !== 'function') {
+          throw new CesiumProError$1('侦听器应该是一个函数');
+        }
+
+        this._listeners.push(listener);
+
+        this._scopes.push(scope);
+
+        var event = this;
+        return function () {
+          event.removeEventListener(listener, scope);
+        };
+      }
+      /**
+       * 注销事件触发时的回调函数
+       * @param {Function} listener 将要被注销的函数
+       * @param {Object} [scope] 侦听器函数中this的指针
+       * @return {Boolean} 如果为真，事件被成功注销，否则，事件注销失败
+       *
+       * @see Event#addEventListener
+       * @see Event#raise
+       */
+
+    }, {
+      key: "removeEventListener",
+      value: function removeEventListener(listener, scope) {
+        if (typeof listener !== 'function') {
+          throw new CesiumProError$1('侦听器应该是一个函数');
+        }
+
+        var listeners = this._listeners;
+        var scopes = this._scopes;
+        var index = -1;
+
+        for (var i = 0; i < listeners.length; i++) {
+          if (listeners[i] === listener && scopes[i] === scope) {
+            index = i;
+            break;
+          }
+        }
+
+        if (index !== -1) {
+          if (this._insideRaiseEvent) {
+            // In order to allow removing an event subscription from within
+            // a callback, we don't actually remove the items here.  Instead
+            // remember the index they are at and undefined their value.
+            this._toRemove.push(index);
+
+            listeners[index] = undefined;
+            scopes[index] = undefined;
+          } else {
+            listeners.splice(index, 1);
+            scopes.splice(index, 1);
+          }
+
+          return true;
+        }
+
+        return false;
+      }
+      /**
+       * 触发事件
+       * @param {*} arguments 此方法接受任意数据的参数并传递给侦听器函数
+       *
+       * @see Event#addEventListener
+       * @see Event#removeEventListener
+       */
+
+    }, {
+      key: "raise",
+      value: function raise() {
+        this._insideRaiseEvent = true;
+        var i;
+        var listeners = this._listeners;
+        var scopes = this._scopes;
+        var length = listeners.length;
+
+        for (i = 0; i < length; i++) {
+          var listener = listeners[i];
+
+          if (Cesium.defined(listener)) {
+            listeners[i].apply(scopes[i], arguments);
+          }
+        } // Actually remove items removed in removeEventListener.
+
+
+        var toRemove = this._toRemove;
+        length = toRemove.length; // 降序排列，从后往前删
+
+        if (length > 0) {
+          toRemove.sort(compareNumber);
+
+          for (i = 0; i < length; i++) {
+            var index = toRemove[i];
+            listeners.splice(index, 1);
+            scopes.splice(index, 1);
+          }
+
+          toRemove.length = 0;
+        }
+
+        this._insideRaiseEvent = false;
+      }
+    }, {
+      key: "numberOfListeners",
+      get: function get() {
+        return this._listeners.length - this._toRemove.length;
+      }
+    }]);
+
+    return Event;
+  }();
+
+  /**
+   * 检查变是否是一个Cesium.Viewer对象
+   * @exports checkViewer
+   *
+   * @param {any} viewer 将要检查的对象
+   */
+
+  function checkViewer(viewer) {
+    if (!(viewer && viewer instanceof Cesium.Viewer)) {
+      var type = _typeof(viewer);
+
+      throw new CesiumProError$1("Expected viewer to be typeof Viewer, actual typeof was ".concat(type));
+    }
+  }
+
+  function createProperty(name) {
+    var configurable = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var privateName = "_".concat(name);
+    return {
+      configurable: configurable,
+      get: function get() {
+        return this[privateName];
+      },
+      set: function set(value) {
+        var oldValue = this[privateName];
+
+        if (value !== oldValue) {
+          this[privateName] = value;
+
+          this._definitionChanged.raise(name, value, oldValue);
+        }
+      }
+    };
+  }
+
+  var Properties = /*#__PURE__*/function () {
+    /**
+     * 一个key-value集合，用于保存对象的属性信息
+     * @param {Object} [options={}]
+     */
+    function Properties() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, Properties);
+
+      this._definitionChange = new Event();
+      this._propertyNames = [];
+
+      for (var key in options) {
+        if (options.hasOwnProperty(key)) {
+          this["_".concat(key)] = options[key];
+
+          this._propertyNames.push(key);
+
+          Object.defineProperty(this, key, createProperty(key));
+        }
+      }
+    }
+    /**
+     * 所有属性的key值
+     * @return {Array} 所有属性的key值
+     */
+
+
+    _createClass(Properties, [{
+      key: "addProperty",
+
+      /**
+       * 添加属性
+       * @param {*} key   键
+       * @param {*} value 值
+       * @fires Properties#definitionChanged
+       */
+      value: function addProperty(key, value) {
+        if (!defined(key)) {
+          throw new CesiumProError$1('key is reqiured.');
+        }
+
+        if (this.propertyNames.includes(key)) {
+          throw new CesiumProError$1("".concat(key, "has be a registered property."));
+        }
+
+        this["_".concat(key)] = value;
+        Object.defineProperty(this, key, createProperty(key));
+      }
+      /**
+       * 删除属性
+       * @param  {*} key
+       * @fires Properties#definitionChanged
+       */
+
+    }, {
+      key: "removeProperty",
+      value: function removeProperty(key) {
+        if (!defined(key)) {
+          throw new CesiumProError$1('key is reqiured.');
+        }
+
+        if (this.propertyNames.includes(key)) {
+          delete this[key];
+          delete this["_".concat(key)];
+          var index = this.propertyNames.indexOf(key);
+          this.propertyNames.slice(index, 1);
+          this.definitionChanged.raise(key);
+        }
+      }
+      /**
+       * 将该对象转换为字符串
+       * @return {String}
+       */
+
+    }, {
+      key: "toString",
+      value: function toString() {
+        var json = this.toJson();
+        return JSON.stringify(json);
+      }
+      /**
+       * 将该对象转换为json
+       * @return {Object}
+       */
+
+    }, {
+      key: "toJson",
+      value: function toJson() {
+        var json = {};
+
+        var _iterator = _createForOfIteratorHelper(this.propertyNames),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var property = _step.value;
+            json[property] = this[property];
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        return json;
+      }
+      /**
+       * 判断该对象是否包含属性key
+       * @param  {*}  key
+       * @return {Boolean}
+       */
+
+    }, {
+      key: "hasProperty",
+      value: function hasProperty(key) {
+        if (!defined(key)) {
+          throw new CesiumProError$1('key is reqiured.');
+        }
+
+        return this.propertyNames.includes(key);
+      }
+      /**
+       * 其定义发生变化时触发的事件,事件订阅者以发生变化的属性、变化后的值、变化前的值作为参数。
+       * @Event
+       * @return {Event}
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        this._definitionChanged = undefined;
+        this._propertyNames = undefined;
+      }
+    }, {
+      key: "propertyNames",
+      get: function get() {
+        return this._propertyNames;
+      }
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+    }]);
+
+    return Properties;
+  }();
+
+  var _Cesium = Cesium,
+      CallbackProperty = _Cesium.CallbackProperty,
+      ConstantPositionProperty = _Cesium.ConstantPositionProperty;
+
+  function toCallbackProperty(values) {
+    return new CallbackProperty(function () {
+      return values;
+    }, false);
+  }
+
+  var Graphic = /*#__PURE__*/function () {
+    /**
+     * 可编辑的几何图形基类，定义了可编辑几何图形的公共属性和操作方法，一般做为某种图形的父类使用，不要直接创建它。
+     * @param {Cesium.Viewer} viewer
+     * @param {Object} options   具有以下属性
+     * @param {Object} entityOptions 描述一个实体对象
+     */
+    function Graphic(viewer, entityOptions) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      _classCallCheck(this, Graphic);
+
+      checkViewer(viewer);
+      this._viewer = viewer;
+      this._type = undefined;
+      this._properties = undefined;
+      this._show = true;
+      this._id = defaultValue(options.id, guid());
+      this._dataSource = new Cesium.CustomDataSource('cesiumpro-graphic');
+      this._root = this._dataSource.entities;
+      this._node = undefined;
+      this._preEdit = new Event();
+      this._postEdit = new Event();
+      this._preCreate = new Event();
+      this._postCreate = new Event();
+      this._preRemove = new Event();
+      this._postRemove = new Event();
+    }
+    /**
+     * 图形id
+     * @readonly
+     * @type {String}
+     */
+
+
+    _createClass(Graphic, [{
+      key: "add",
+
+      /**
+       * 将实体添加到场景中
+       * @fires Graphic#preCreate
+       * @fires Graphic#postCreate
+       */
+      value: function add() {
+        this.preCreate.raise(this.entity);
+
+        if (defined(this.viewer && defined(this.entity))) {
+          this._viewer.entities.add(this.entity);
+
+          this.postCreate.raise(this);
+        }
+      }
+      /**
+       * 将实体从场景中删除。
+       * @fires Graphic#preRemove
+       * @fires Graphic#postRemove
+       */
+
+    }, {
+      key: "remove",
+      value: function remove() {
+        this.preRemove.raise(this);
+
+        if (defined(this.viewer) && defined(this.entity)) {
+          this._viewer.entities.remove(this.entity);
+
+          this.postRemove.raise(this);
+        }
+      }
+      /**
+       * 销毁对象。
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        if (defined(this.viewer) && defined(this.entity)) {
+          this._viewer.entities.remove(this.entity);
+        }
+
+        this._viewer = undefined;
+        this._entity = undefined;
+        this._entityOptions = undefined;
+        this._positions = undefined;
+        this.properties && this.properties.destroy();
+        this._properties = undefined;
+      }
+      /**
+       * 定位到图形
+       */
+
+    }, {
+      key: "zoomTo",
+      value: function zoomTo() {
+        if (defined(this._viewer)) {
+          this._viewer.flyTo([this.entity]);
+        }
+
+        if (this.entity.position) {
+          var position = this.entity.position.getValue(this._viewer.clock.currentTime);
+        }
+      }
+      /**
+       * 开始编辑几何信息，此时图形的顶点可以被修改、删除、移动。
+       * 属性信息的编辑不需要调用该方法。
+       * @fires Graphic#preEdit
+       */
+
+    }, {
+      key: "startEdit",
+      value: function startEdit() {
+        if (this.entity) {
+          this.preEdit.raise(this);
+          var callbackProperty = toCallbackProperty(this.positions);
+          this.entity.position && (this.entity.position = callbackProperty);
+          this.entity.polyline && (this.entity.polyline.positions = toCallbackProperty(this._nodePositions || this.positions));
+          this.entity.polygon && (this.entity.polygon.hierarchy = toCallbackProperty(new Cesium.PolygonHierarchy(this.positions)));
+        }
+      }
+      /**
+       * @fires Graphic#postEdit
+       * 几何要素编辑完成后调用该方法，以降低性能消耗。
+       * <p style='font-weight:bold'>建议在图形编辑完成后调用该方法，因为CallbackProperty对资源消耗比较大，虽然对单个图形来说，不调用此方法并不会有任何影响。</p>
+       */
+
+    }, {
+      key: "stopEdit",
+      value: function stopEdit() {
+        if (this.entity) {
+          var callbackProperty = toCallbackProperty(this.positions);
+          this.entity.position && (this.entity.position = this.positions);
+          this.entity.polyline && (this.entity.polyline.positions = this._nodePositions || this.positions);
+          this.entity.polygon && (this.entity.polygon.hierarchy = new Cesium.PolygonHierarchy(this.positions));
+          this.postEdit.raise(this);
+        }
+      }
+      /**
+       * 创建属性信息
+       * @private
+       */
+
+    }, {
+      key: "createProperties",
+      value: function createProperties() {
+        var options = this._entityOptions;
+        var properties = options.properties;
+
+        if (properties) {
+          this._properties = new Properties(properties);
+          delete options.properties;
+        }
+      }
+      /**
+       * 创建实体
+       * @private
+       * @return {Entity}
+       */
+
+    }, {
+      key: "createEntity",
+      value: function createEntity() {
+        this.createProperties();
+      }
+      /**
+       * 将对象转为GeoJson格式
+       * @return {Object}
+       */
+
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson() {
+        _abstract();
+      }
+      /**
+       * 返回该图形的几何描述，包括类型，经纬度等，必须在派生类中实现它。
+       * @return {Object}
+       */
+
+    }, {
+      key: "getGeometry",
+      value: function getGeometry() {
+        _abstract();
+      }
+    }, {
+      key: "id",
+      get: function get() {
+        return this._id;
+      }
+      /**
+       * 保存所有图形实体的集合
+       * @return {EntityCollection}
+       */
+
+    }, {
+      key: "root",
+      get: function get() {
+        return this._root;
+      }
+      /**
+       * 图形的顶点位置信息
+       * @readonly
+       * @return {Cartesian3[]|Cartesian3}
+       */
+
+    }, {
+      key: "positions",
+      get: function get() {
+        return this._positions;
+      }
+      /**
+       * 图形类型
+       * @readonly
+       * @type {GraphicType}
+       */
+
+    }, {
+      key: "type",
+      get: function get() {
+        return this._type;
+      }
+      /**
+       * 保存了描述该图形的所有属性信息
+       * @readonly
+       * @type {Properties} 描述该图形的所有属性信息
+       */
+
+    }, {
+      key: "properties",
+      get: function get() {
+        return this._properties;
+      }
+      /**
+       * 包含了该图形几何信息的实体，场景将根据它渲染图形，且场景中任何对该图形的操作都直接作用于其实体。
+       * @readonly
+       * @type {Cesium.Entity} 图形在场景中的实体
+       */
+
+    }, {
+      key: "entity",
+      get: function get() {
+        return this._entity;
+      }
+      /**
+       * 图形开始编辑前触发的事件，事件订阅者将以被编辑图形作为参数
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "preEdit",
+      get: function get() {
+        return this._preEdit;
+      }
+      /**
+       * 图形编辑完成后触发的事件，事件订阅者将以被编辑图形作为参数
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "postEdit",
+      get: function get() {
+        return this._postEdit;
+      }
+      /**
+       * 实体创建完成，添加到场景之前触发的事件，事件订阅者将以创建的实体作为参数。此时图形还没有添加到场景。
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "preCreate",
+      get: function get() {
+        return this._preCreate;
+      }
+      /**
+       * 图形创建完成后触发的事件，事件订阅者将以被创建的实体作为参数，此时图形已经被添加到场景中。
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "postCreate",
+      get: function get() {
+        return this._postCreate;
+      }
+      /**
+       * 图形被删除前触发的事件，事件订阅者将以被删除的图形作为参数
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "preRemove",
+      get: function get() {
+        return this._preRemove;
+      }
+      /**
+       * 图形被删除后触发的事件，事件订阅者将以被删除的图形作为参数
+       * @readonly
+       * @Event
+       * @type {Event}
+       */
+
+    }, {
+      key: "postRemove",
+      get: function get() {
+        return this._postRemove;
+      }
+      /**
+       * viewer
+       * @readonly
+       * @type {Cesium.Viewer}
+       */
+
+    }, {
+      key: "viewer",
+      get: function get() {
+        return this._viewer;
+      }
+      /**
+       * 图形是否可见
+       * @return {Bool} [description]
+       */
+
+    }, {
+      key: "show",
+      get: function get() {
+        return this._show;
+      },
+      set: function set(v) {
+        this._show = v;
+
+        if (this.entity) {
+          this.entity.show = this._show;
+        }
+      }
+    }]);
+
+    return Graphic;
+  }();
 
   var BillboardGraphic = /*#__PURE__*/function (_Graphic) {
     _inherits(BillboardGraphic, _Graphic);
@@ -546,50 +1447,185 @@
   };
 
   /**
-   * 生成符合RFC4122 v4的guid
-   * @exports guid
-   * @return {String} guid
+   * 地图量算类型
+   * @exports CartometryType
+   * @enum {Number}
    */
-  function guid() {
-    // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      var r = Math.floor(Math.random() * 16); // y值限定在[8,B]
+  var CartometryType = {
+    /**
+     * 贴地距离
+     * @type {Number}
+     * @constant
+     */
+    SURFACE_DISTANCE: 1,
 
-      /* eslint-disable */
+    /**
+     * 空间距离
+     * @type {Number}
+     * @constant
+     */
+    SPACE_DISTANCE: 2,
 
-      var v = c === 'x' ? r : r & 0x3 | 0x8;
-      return v.toString(16);
-    });
-  }
+    /**
+     * 空间面积
+     * @type {Number}
+     * @constant
+     */
+    SPACE_AREA: 3,
 
+    /**
+     * 贴地面积
+     * @type {Number}
+     * @constant
+     */
+    SURFACE_AREA: 4,
+
+    /**
+     * 高度
+     * @type {Number}
+     * @constant
+     */
+    HEIGHT: 5,
+
+    /**
+     * 方位角
+     * @type {Number}
+     * @constant
+     */
+    ANGLE: 6
+  };
   /**
-   * 如果第一个元素为空或未定义，则返回第二个元素，用于设置默认属性
-   * @exports defaultValue
-   * @param {any} a
-   * @param {any} b
-   * @returns {any} 如果第一个元素为空或未定义，则返回第二个元素
-   *
-   * @example
-   * param = Cesium.defaultValue(param, 'default');
+   * 验证是否是合法类型
+   * @param {CartometryType}
+   * @returns {Number}
    */
-  function defaultValue(a, b) {
-    if (a !== undefined && a !== null) {
-      return a;
+
+  CartometryType.validate = function (type) {
+    return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
+  };
+  /**
+   * 从枚举值获得枚举标签
+   * @param  {CartometryType} value 枚举值
+   * @returns {String}
+   */
+
+
+  CartometryType.getKey = function (value) {
+    var key;
+
+    switch (value) {
+      case 1:
+        key = 'SURFACE_DISTANCE';
+        break;
+
+      case 2:
+        key = 'SPACE_DISTANCE';
+        break;
+
+      case 3:
+        key = 'SPACE_AREA';
+        break;
+
+      case 4:
+        key = 'SURFACE_AREA';
+        break;
+
+      case 5:
+        key = 'HEIGHT';
+        break;
+
+      case 6:
+        key = 'ANGLE';
+        break;
+
+      default:
+        key = undefined;
     }
 
-    return b;
-  }
+    return key;
+  };
+
+  var CartometryType$1 = Object.freeze(CartometryType);
+
   /**
-   *
-   * 空对象，该对象不能被编辑
-   *
-   * @type {Object}
-   * @memberof defaultValue
-   *
+   * @exports clone
+   * 生成一个对象的副本
+   * @param  {Object} object 被克隆的对象
+   * @param  {Bool} deep   是否深度遍历
+   * @return {Object}   object的副本
    */
 
+  function clone(object, deep) {
+    if (object === null || _typeof(object) !== 'object') {
+      return object;
+    }
 
-  defaultValue.EMPTY_OBJECT = Object.freeze({});
+    deep = defaultValue(deep, false);
+    var result = new object.constructor();
+
+    for (var propertyName in object) {
+      if (object.hasOwnProperty(propertyName)) {
+        var value = object[propertyName];
+
+        if (deep) {
+          value = clone(value, deep);
+        }
+
+        result[propertyName] = value;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * 创建三维场景,修改了Cesium.Viewer的默认参数，隐藏了一些默认按钮,默认底图修改为google
+   *
+   * @exports createViewer
+   * @param {String|Element} container 用于创建三维场景的DOM或元素id
+   * @param {Object} options 同Cesium Viewer相同的参数
+   * @returns {Cesium.Viewer}
+   */
+  function createViewer(container) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var defaultOption = {
+      animation: false,
+      timeline: false,
+      geocoder: false,
+      homeButton: false,
+      navigationHelpButton: false,
+      baseLayerPicker: false,
+      fullscreenElement: 'cesiumContainer',
+      fullscreenButton: false,
+      shouldAnimate: true,
+      infoBox: false,
+      selectionIndicator: false,
+      sceneModePicker: false,
+      shadows: false,
+      imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}&s=Gali'
+      }),
+      contextOptions: {
+        // cesium状态下允许canvas转图片convertToImage
+        webgl: {
+          alpha: true,
+          depth: false,
+          stencil: true,
+          antialias: true,
+          premultipliedAlpha: true,
+          preserveDrawingBuffer: true,
+          // 截图时需要打开
+          failIfMajorPerformanceCaveat: true
+        },
+        allowTextureFilterAnisotropic: true
+      } // terrainProvider: Cesium.createWorldTerrain()
+      // terrainProvider: false
+
+    };
+    var viewer = new Cesium.Viewer(container, _objectSpread2(_objectSpread2({}, defaultOption), options));
+    viewer.camera.flyChinaHome();
+    return viewer;
+  }
 
   /* eslint-disable */
   var arr = [];
@@ -10051,62 +11087,1520 @@
     return CursorTip;
   }();
 
-  var CesiumProError$1 = /*#__PURE__*/function (_Error) {
-    _inherits(CesiumProError, _Error);
-
-    var _super = _createSuper(CesiumProError);
-
-    /**
-     * 定义CesiumPro抛出的错误
-     * @extends Error
-     * @param {String} message 描述错误消息的内容
-     * @example
-     * function flyTo(viewer,entity){
-     *    if(!viewer){
-     *      throw(new CesiumPro.CesiumProError("viewer未定义"))
-     *    }
-     *    viewer.flyTo(entity)
-     * }
-     *
-     */
-    function CesiumProError(message) {
-      var _this;
-
-      _classCallCheck(this, CesiumProError);
-
-      _this = _super.call(this, message);
-      _this.name = 'CesiumProError';
-      return _this;
-    }
-
-    return CesiumProError;
-  }( /*#__PURE__*/_wrapNativeSuper(Error));
-
   /**
-   * 检查变是否是一个Cesium.Viewer对象
-   * @exports checkViewer
-   *
-   * @param {any} viewer 将要检查的对象
+   * 坐标转换工具
+   * @namespace CVT
    */
 
-  function checkViewer(viewer) {
-    if (!(viewer && viewer instanceof Cesium.Viewer)) {
-      var type = _typeof(viewer);
+  var CVT$1 = {};
+  /**
+   * 笛卡尔坐标转屏幕坐标
+   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
 
-      throw new CesiumProError$1("Expected viewer to be typeof Viewer, actual typeof was ".concat(type));
+  CVT$1.cartesian2Pixel = function (cartesian, viewer) {
+    return Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, cartesian);
+  };
+  /**
+   * 屏幕坐标转笛卡尔坐标
+   * @param {Cesium.Cartesian2} pixel 屏幕坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.pixel2Cartesian = function (pixel, viewer) {
+    var ray = viewer.camera.getPickRay(pixel);
+    var cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+    return cartesian;
+  };
+  /**
+   * 屏幕坐标转笛卡尔坐标，此方法获得的坐标为二维坐标，即高度永远为0
+   * @param {Cesium.Cartesian2} pixel 屏幕坐标
+   * @param {Cesium.Viewer} [viewer] Viewer对象
+   */
+
+
+  CVT$1.pixel2Cartesian2D = function (pixel, viewer) {
+    var ellipsoid;
+
+    if (defined(viewer)) {
+      ellipsoid = viewer.scene.globe.ellipsoid;
+    } else {
+      ellipsoid = Cesium.Ellipsoid.WGS84;
+    }
+
+    var cartesian = viewer.camera.pickEllipsoid(pixel, ellipsoid);
+    return cartesian;
+  };
+  /**
+   * 笛卡尔坐标转经纬度（弧度）
+   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
+   * @param {Cesium.Viewer} [viewer] Viewer对象
+   */
+
+
+  CVT$1.cartesian2Radians = function (cartesian, viewer) {
+    var ellipsoid;
+
+    if (defined(viewer)) {
+      ellipsoid = viewer.scene.globe.ellipsoid;
+    } else {
+      ellipsoid = Cesium.Ellipsoid.WGS84;
+    }
+
+    var cartographic = Cesium.Cartographic.fromCartesian(cartesian, ellipsoid);
+    var lon = cartographic.longitude;
+    var lat = cartographic.latitude;
+    var height = cartographic.height;
+    return {
+      lon: lon,
+      lat: lat,
+      height: height
+    };
+  };
+  /**
+   * 笛卡尔坐标转经纬度（度）
+   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.cartesian2Degrees = function (cartesian, viewer) {
+    var coords = CVT$1.cartesian2Radians(cartesian, viewer);
+    var lon = Cesium.Math.toDegrees(coords.lon);
+    var lat = Cesium.Math.toDegrees(coords.lat);
+    var height = coords.height;
+    return {
+      lon: lon,
+      lat: lat,
+      height: height
+    };
+  };
+  /**
+   * 屏幕坐标转经纬度（度）
+   * @param {Cesium.Cartesian2} pixel 屏幕坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.pixel2Degrees = function (pixel, viewer) {
+    var cartesian = CVT$1.pixel2Cartesian(pixel, viewer);
+
+    if (Cesium.defined(cartesian)) {
+      return CVT$1.cartesian2Degrees(cartesian, viewer);
+    }
+
+    return undefined;
+  };
+  /**
+   * 屏幕坐标转经纬度（弧度）
+   * @param {Cesium.Cartesian2} pixel 屏幕坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.pixel2Radians = function (pixel, viewer) {
+    var cartesian = CVT$1.pixel2Cartesian(pixel, viewer);
+
+    if (Cesium.defined(cartesian)) {
+      return CVT$1.cartesian2Radians(cartesian, viewer);
+    }
+
+    return undefined;
+  };
+  /**
+   * 获得经纬度坐标（度）
+   * @param {Cesium.Cartesian2|Cesium.Cartesian3|Cesium.Cartographic} position
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.toDegrees = function (position, viewer) {
+    if (position instanceof Cesium.Cartesian3) {
+      return CVT$1.cartesian2Degrees(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartesian2) {
+      return CVT$1.pixel2Degrees(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartographic) {
+      return {
+        lon: Cesium.Math.toDegrees(position.longitude),
+        lat: Cesium.Math.toDegrees(position.latitude),
+        height: position.height
+      };
+    }
+
+    return undefined;
+  };
+  /**
+   * 获得经纬度坐标（弧度）
+   * @param {Cesium.Cartesian2|Cesium.Cartesian3|Cesium.Cartographic} position
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.toRadians = function (position, viewer) {
+    if (position instanceof Cesium.Cartesian3) {
+      return CVT$1.cartesian2Radians(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartesian2) {
+      return CVT$1.pixel2Radians(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartographic) {
+      return {
+        lon: position.longitude,
+        lat: position.latitude,
+        height: position.height
+      };
+    }
+
+    return undefined;
+  };
+  /**
+   * 获得屏幕坐标
+   * @param {Cesium.Cartesian3|Cesium.Cartographic} position
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.toPixel = function (position, viewer) {
+    if (position instanceof Cesium.Cartesian3) {
+      return CVT$1.cartesian2Pixel(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartographic) {
+      var cartesian = Cesium.Cartographic.toCartesian(position);
+      return CVT$1.cartesian2Pixel(cartesian, viewer);
+    }
+
+    return undefined;
+  };
+  /**
+   * 获得笛卡尔坐标
+   * @param {Cesium.Cartesian2|Cesium.Cartographic} position
+   * @param {Cesium.Viewer} viewer Viewer对象
+   */
+
+
+  CVT$1.toCartesian = function (position, viewer) {
+    if (position instanceof Cesium.Cartesian2) {
+      return CVT$1.pixel2Cartesian(position, viewer);
+    }
+
+    if (position instanceof Cesium.Cartographic) {
+      return Cesium.Cartographic.toCartesian(position);
+    }
+
+    return undefined;
+  };
+
+  /**
+   * 各类数据加载
+   * @exports DataLoader
+   */
+  var DataLoader = {};
+  /**
+   * 加载gltf/glb模型。
+   * @param  {Cesium.Viewer} viewer  Cesium Viewer对象
+   * @param  {Cesium.Cartesian3} [position=new Cesium.Cartesian3] 模型的位置,如果options中定义了modelMatrix，将覆盖该参数
+   * @param  {Object} [options={}] 描述model的参数,同Cesium.Model.fromGltf
+   * @return {Cesium.Cesium3DTileset}
+   */
+
+  DataLoader.loadModel = function (viewer) {
+    var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Cesium.Cartesian3();
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+    if (!options.modelMatrix && position) {
+      var matrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+      options.modelMatrix = matrix;
+    }
+
+    return viewer.scene.primitives.add(Cesium.Model.fromGltf(options));
+  };
+
+  function rotate(tileset, rotation) {
+    var transform = Cesium.Matrix3.fromRotationZ(Cesium.Math.toRadians(rotation));
+    Cesium.Matrix4.multiplyByMatrix3(tileset.root.transform, transform, tileset.root.transform);
+  }
+
+  function transform(tileset, translation) {
+    Cesium.Matrix4.multiplyByTranslation(tileset.modelMatrix, translation, tileset.modelMatrix);
+  }
+
+  function adjustHeight(tileset, height) {
+    var center = tileset.boundingSphere.center;
+    var coord = CVT.toDegrees(center, viewer);
+    var surface = Cesium.Cartesian3.fromDegrees(coord.lon, coord.lat, 0);
+    var offset = Cesium.Cartesian3.fromDegrees(coord.lon, coord.lat, height);
+    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
+    tileset.modelMatrix = Cesium.Matrix4.multiply(tileset.modelMatrix, Cesium.Matrix4.fromTranslation(translation), tileset.modelMatrix);
+  }
+
+  function adjustLocation(tileset, position) {
+    var matrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+    tileset.root.transform = matrix;
+  }
+
+  DataLoader.loadTileset = function (viewer) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var kwargs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var height = kwargs.height,
+        position = kwargs.position,
+        debug = kwargs.debug;
+    var cesium3dtileset = new Cesium.Cesium3DTileset(options);
+    cesium3dtileset.readyPromise.then(function (tileset) {
+      viewer.scene.primitives.add(tileset);
+
+      if (Cesium.defined(position)) {
+        adjustLocation(tileset, position);
+      }
+
+      if (Cesium.defined(height)) {
+        adjustHeight(tileset, height);
+      }
+
+      if (debug) {
+        height = (_readOnlyError("height"), height || 0);
+        var height0 = 0;
+        var translation;
+        var rotation;
+
+        document.onkeypress = function (e) {
+          // 升高
+          if (e.keyCode === 'Q'.charCodeAt() || e.keyCode === 'q'.charCodeAt()) {
+            height0 = 1;
+          } // 降低
+          else if (e.keyCode === 'E'.charCodeAt() || e.keyCode === 'e'.charCodeAt()) {
+              height0 = -1;
+            } // 平移
+            else if (e.keyCode === 'A'.charCodeAt() || e.keyCode === 'a'.charCodeAt()) {
+                translation = new Cesium.Cartesian3(-2, 0, 0);
+              } else if (e.keyCode === 'D'.charCodeAt() || e.keyCode === 'd'.charCodeAt()) {
+                translation = new Cesium.Cartesian3(2, 0, 0);
+              } else if (e.keyCode === 'W'.charCodeAt() || e.keyCode === 'w'.charCodeAt()) {
+                translation = new Cesium.Cartesian3(0, -2, 0);
+              } else if (e.keyCode === 'S'.charCodeAt() || e.keyCode === 's'.charCodeAt()) {
+                translation = new Cesium.Cartesian3(0, 2, 0);
+              } // 旋转
+              else if (e.keyCode === 'Z'.charCodeAt() || e.keyCode === 'z'.charCodeAt()) {
+                  rotation = -1;
+                } else if (e.keyCode === 'X'.charCodeAt() || e.keyCode === 'x'.charCodeAt()) {
+                  rotation = 1;
+                }
+
+          adjustHeight(tileset, height0);
+
+          if (Cesium.defined(translation)) {
+            transform(tileset, translation);
+          }
+
+          if (Cesium.defined(rotation)) {
+            rotate(tileset, rotation);
+          }
+
+          rotation = undefined;
+          translation = undefined;
+        };
+      }
+    });
+    return cesium3dtileset;
+  };
+
+  /**
+   * 时间数据格式的扩展方法
+   *
+   * @exports dateFormat
+   * @param  {String} fmt  时间格式
+   * @param  {Date} date 时间
+   * @return {String}     格式化后的时间
+   *
+   * @example
+   * const date=new Date();
+   * dateFormat('yy-mm-dd HH:MM:SS',date)
+   * dateFormat('HH:MM:SS',date)
+   */
+  function dateFormat(fmt, date) {
+    var ret;
+    var opt = {
+      'y+': date.getFullYear().toString(),
+      // 年
+      'm+': (date.getMonth() + 1).toString(),
+      // 月
+      'd+': date.getDate().toString(),
+      // 日
+      'H+': date.getHours().toString(),
+      // 时
+      'M+': date.getMinutes().toString(),
+      // 分
+      'S+': date.getSeconds().toString() // 秒
+      // 有其他格式化字符需求可以继续添加，必须转化成字符串
+
+    };
+    var keys = Object.keys(opt);
+
+    for (var _i = 0, _keys = keys; _i < _keys.length; _i++) {
+      var k = _keys[_i];
+      ret = new RegExp("(".concat(k, ")")).exec(fmt);
+
+      if (ret) {
+        fmt = fmt.replace(ret[1], ret[1].length === 1 ? opt[k] : opt[k].padStart(ret[1].length, '0'));
+      }
+    }
+
+    return fmt;
+  }
+  /**
+   * 将时间格式化方法注册到原生的Date对象，注册名为format
+   *
+   * @type function
+   * @memberof dateFormat
+   *
+   * @example
+   *
+   * const date=new Date();
+   * date.format('yy-mm-dd')
+   */
+
+
+  dateFormat.register = function () {
+    window.Date.prototype.format = function (format) {
+      dateFormat(format, this);
+    };
+  };
+
+  /**
+   * 开启/关闭基于地形的深度检测
+   *
+   * @exports depthTest
+   *
+   * @param {Cesium.Globe|Cesium.Viewer|Cesium.Scene} target 测试检测对象
+   * @param {Boolean} depth 深度检测状态
+   *
+   * @example
+   *
+   * const viewer=CesiumPro.createViewer('map');
+   * CesiumPro.depthTest(viewer);
+   * CesiumPro.depthTest(viewer.scene);
+   * CesiumPro.depthTest(viewer.scene.globe);
+   */
+  function depthTest(target) {
+    var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+    if (target instanceof Cesium.Viewer) {
+      target.scene.globe.depthTestAgainstTerrain = depth;
+    } else if (target instanceof Cesium.Scene) {
+      target.globe.depthTestAgainstTerrain = depth;
+    } else if (target instanceof Cesium.Globe) {
+      target.depthTestAgainstTerrain = depth;
+    } else {
+      throw new CesiumProError('无效的对象');
     }
   }
+
+  var DraggableElement = /*#__PURE__*/function () {
+    /**
+     * 创建一个可拖拽的DOM元素,该元素的position必须为absolute或fixed;
+     * @param {String} container 要移到的元素的选择器
+     * @param {String} [target=container] 监听鼠标事件的元素，一般是标题栏
+     * @example
+     * new DraggableElement('#tool-panel')
+     * new DraggableElement('#tool-panel','.tool-header-class')
+     */
+    function DraggableElement(container) {
+      var target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : container;
+
+      _classCallCheck(this, DraggableElement);
+
+      if (!jQuery(container)) {
+        throw new Error('请指定要操作的元素');
+      }
+
+      if (!target) {
+        target = container;
+      }
+
+      this._target = target;
+      this._container = container;
+      var self = this;
+      jQuery(self.target).mousedown(function (e) // e鼠标事件
+      {
+        jQuery(self.target).css('cursor', 'move'); // 改变鼠标指针的形状
+        // let offset = $("#" + container).offset(); //DIV在页面的位置
+
+        var offset = jQuery(self.container).position(); // DIV在页面的位置
+
+        var x = e.pageX - offset.left; // 获得鼠标指针离DIV元素左边界的距离
+
+        var y = e.pageY - offset.top; // 获得鼠标指针离DIV元素上边界的距离
+
+        jQuery(document).bind('mousemove', function (ev) // 绑定鼠标的移动事件，因为光标在DIV元素外面也要有效果，所以要用doucment的事件，而不用DIV元素的事件
+        {
+          jQuery(self.target).css('cursor', 'move');
+          jQuery(self.container).stop(); // 加上这个之后
+
+          var _x = ev.pageX - x; // 获得X轴方向移动的值
+
+
+          var _y = ev.pageY - y; // 获得Y轴方向移动的值
+
+
+          jQuery(self.container).animate({
+            left: "".concat(_x, "px"),
+            top: "".concat(_y, "px")
+          }, 10);
+        });
+      });
+      jQuery(document).mouseup(function () {
+        jQuery(self.target).css('cursor', 'default');
+        jQuery(this).unbind('mousemove');
+      });
+    }
+    /**
+     * 触发事件的对象，返回的是对象的选择器
+     * @readonly
+     * @type String
+     */
+
+
+    _createClass(DraggableElement, [{
+      key: "destroy",
+
+      /**
+       * 销毁可拖拽对象，仅仅是移除拖拽事件，不会销毁DOM对象
+       */
+      value: function destroy() {
+        jQuery(this.target).unbind('mousedown');
+        this._container = undefined;
+        this._target = undefined;
+      }
+    }, {
+      key: "target",
+      get: function get() {
+        return this._target;
+      }
+      /**
+       * 拖拽的对象，返回的是对象的选择器
+       * @readonly
+       * @type String
+       */
+
+    }, {
+      key: "container",
+      get: function get() {
+        return this._container;
+      }
+    }]);
+
+    return DraggableElement;
+  }();
+
+  var _Cesium$1 = Cesium,
+      SceneMode = _Cesium$1.SceneMode,
+      Rectangle = _Cesium$1.Rectangle,
+      Cartesian3 = _Cesium$1.Cartesian3,
+      Matrix4 = _Cesium$1.Matrix4,
+      Camera = _Cesium$1.Camera;
+  window.DEFAULT_VIEW_RECTANGLE = Rectangle.fromDegrees(70, 5, 130, 60);
+  /**
+   * 定位到中国
+   * @param  {Cesium.Camera} camera  场景相机
+   * @param  {Number} [duration=3.0] 飞行持续时间
+   *
+   * @example
+   * 1. <code>CesiumPro.flyChinaHome(viewer.camera);</code>
+   * 2. 此外，CesiumPro将该方法注册到Cesium.Camera的原型链，因此，你也可以像下面这样使用它
+   *    <code>viewer.camera.flyChinaHome()</code>
+   */
+
+  function flyChinaHome(camera, duration) {
+    var mode = camera._mode;
+
+    if (mode === SceneMode.MORPHING) {
+      camera._scene.completeMorph();
+    }
+
+    if (mode === SceneMode.SCENE2D) {
+      camera.flyTo({
+        destination: DEFAULT_VIEW_RECTANGLE,
+        duration: duration,
+        endTransform: Matrix4.IDENTITY
+      });
+    } else if (mode === SceneMode.SCENE3D) {
+      var destination = camera.getRectangleCameraCoordinates(DEFAULT_VIEW_RECTANGLE);
+      var mag = Cartesian3.magnitude(destination);
+      mag += mag * Camera.DEFAULT_VIEW_FACTOR;
+      Cartesian3.normalize(destination, destination);
+      Cartesian3.multiplyByScalar(destination, mag, destination);
+      camera.flyTo({
+        destination: destination,
+        duration: duration,
+        endTransform: Matrix4.IDENTITY
+      });
+    } else if (mode === SceneMode.COLUMBUS_VIEW) {
+      var maxRadii = camera._projection.ellipsoid.maximumRadius;
+      var position = new Cartesian3(0.0, -1.0, 1.0);
+      position = Cartesian3.multiplyByScalar(Cartesian3.normalize(position, position), 5.0 * maxRadii, position);
+      camera.flyTo({
+        destination: position,
+        duration: duration,
+        orientation: {
+          heading: 0.0,
+          pitch: -Math.acos(Cartesian3.normalize(position, pitchScratch).z),
+          roll: 0.0
+        },
+        endTransform: Matrix4.IDENTITY,
+        convert: false
+      });
+    }
+  }
+
+  (function () {
+    Cesium.Camera.prototype.flyChinaHome = function () {
+      flyChinaHome(this);
+    };
+  })();
+
+  /**
+   * 此方法将定位分成3个步骤：step 1:调整位置,step 2:调整高度,step 3:调整角度，一般用于小场景初始化时。
+   * @exports flyTo
+   *
+   * @param  {Cesium.Viewer} viewer  Cesium Viewer对象
+   * @param  {Object} [options={}] 具有以下参数
+   * @param  {Cesium.Cartesian3} options.destination 目标位置
+   * @param  {Object} [options.orientation] 相机姿态
+   * @param  {Number} [options.step1Duration=3.0] 调整高度的持续时间
+   * @param  {Number} [options.step1Duration=3.0] 调整位置的持续时间
+   * @param  {Number} [options.step1Duration=3.0] 调整姿态的持续时间
+   * @return {Promise}
+   */
+
+  function flyTo(viewer) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var camera = viewer.camera;
+    var step1 = defaultValue(options.step1Duration, 3);
+    var step2 = defaultValue(options.step2Duration, 3);
+    var step3 = defaultValue(options.step3Duration, 3);
+    var curHeight = camera.positionCartographic.height;
+    var cartographic = CVT$1.toDegrees(options.destination, viewer); // 第一步改变位置
+
+    var step1Destination = Cesium.Cartesian3.fromDegrees(cartographic.lon, cartographic.lat, cur_height); // 第二步改变高度
+
+    var step2Destination = options.destination;
+    return new Promise(function (resolve) {
+      camera.flyTo({
+        destination: step1Destination,
+        duration: step1,
+        complete: function complete() {
+          camera.flyTo({
+            destination: step2Destination,
+            duration: step2,
+            complete: function complete() {
+              camera.flyTo({
+                destination: step2Destination,
+                duration: step3,
+                complete: function complete() {
+                  resolve();
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+  }
+
+  /**
+   * 设置场景的抗锯齿效果。
+   * @exports fxaa
+   * @param  {Cesium.Viewer} viewer
+   * @param  {Bool} value 是否开启抗锯齿效果
+   */
+
+  function fxaa(viewer, value) {
+    checkViewer(viewer);
+    viewer.scene.postProcessStages.fxaa.enabled = value;
+  }
+
+  /**
+   * 为了方便管理几何要素自定义的几何类型，它不符合OGC标准。
+   * @exports GraphicType
+   * @enum {Number}
+   */
+  var GraphicType = {
+    /**
+     * 点
+     * @type {Number}
+     * @constant
+     */
+    POINT: 1,
+
+    /**
+     * 线
+     * @type {Number}
+     * @constant
+     */
+    POLYLINE: 2,
+
+    /**
+     * 面
+     * @type {Number}
+     * @constant
+     */
+    POLYGON: 3,
+
+    /**
+     * 模型
+     * @type {Number}
+     * @constant
+     */
+    MODEL: 4,
+
+    /**
+     * label
+     * @type {Number}
+     * @constant
+     */
+    LABEL: 5,
+
+    /**
+     * 箭头（特殊标绘）
+     * @type {Number}
+     * @constant
+     */
+    ARROW: 6,
+
+    /**
+     * 广告牌(Mark)
+     * @type {Number}
+     * @constant
+     */
+    BILLBOARD: 7,
+
+    /**
+     * 多点
+     * @type {Number}
+     * @constant
+     */
+    MUTIPOINT: 8
+  };
+  /**
+   * 从枚举值获得枚举标签
+   * @type {GraphicType}
+   *
+   * @example
+   * const type=GraphicType.MODEL;
+   * GraphicType.getKey(type);
+   * //return 'Model'
+   */
+
+  GraphicType.getKey = function (type) {
+    var name = '';
+
+    switch (type) {
+      case GraphicType.POINT:
+        name = 'Point';
+        break;
+
+      case GraphicType.POLYLINE:
+        name = 'Polyline';
+        break;
+
+      case GraphicType.POLYGON:
+        name = 'POLYGON';
+        break;
+
+      case GraphicType.LABEL:
+        name = 'Label';
+        break;
+
+      case GraphicType.MODEL:
+        name = 'Model';
+        break;
+
+      case GraphicType.ARROW:
+        name = 'ARROW';
+        break;
+
+      case GraphicType.BILLBOARD:
+        name = 'Billboard';
+        break;
+
+      case GraphicType.MUTIPOINT:
+        name = 'MutlPoint';
+        break;
+
+      default:
+        name = 'unknown';
+    }
+
+    return name;
+  };
+  /**
+   * 将类型转换为OGC标准类型
+   * @param  {GraphicType} type 要素类型
+   * @return {String}     OGC要素类型
+   */
+
+
+  GraphicType.getOGCType = function (type) {
+    var validate = GraphicType.validate(type);
+
+    if (!validate) {
+      return 'unknown';
+    }
+
+    var ogcName = '';
+
+    switch (type) {
+      case GraphicType.POINT:
+      case GraphicType.LABEL:
+      case GraphicType.MODEL:
+      case GraphicType.BILLBOARD:
+        ogcName = 'Point';
+        break;
+
+      case GraphicType.POLYLINE:
+        ogcName = 'LineString';
+        break;
+
+      case GraphicType.ARROW:
+      case GraphicType.POLYGON:
+        ogcName = 'Polygon';
+        break;
+
+      case GraphicType.MUTIPOINT:
+        ogcName = 'MutlPoint';
+    }
+
+    return ogcName;
+  };
+  /**
+   * 验证是否是合法类型
+   * @param {CartometryType}
+   * @returns {Number}
+   */
+
+
+  GraphicType.validate = function (type) {
+    return type === GraphicType.POINT || type === GraphicType.POLYLINE || type === GraphicType.POLYGON || type === GraphicType.ARROW || type === GraphicType.MODEL || type === GraphicType.LABEL || type === GraphicType.MUTIPOINT || type === GraphicType.BILLBOARD;
+  };
+
+  var GraphicType$1 = Object.freeze(GraphicType);
+
+  var shader = 'uniform samplerCube u_cubeMap;\n\
+  varying vec3 v_texCoord;\n\
+  void main()\n\
+  {\n\
+  vec4 color = textureCube(u_cubeMap, normalize(v_texCoord));\n\
+  gl_FragColor = vec4(czm_gammaCorrect(color).rgb, czm_morphTime);\n\
+  }\n\
+  ';
+
+  var shader$1 = 'attribute vec3 position;\n\
+  varying vec3 v_texCoord;\n\
+  uniform mat3 u_rotateMatrix;\n\
+  void main()\n\
+  {\n\
+  vec3 p = czm_viewRotation * u_rotateMatrix * (czm_temeToPseudoFixed * (czm_entireFrustum.y * position));\n\
+  gl_Position = czm_projection * vec4(p, 1.0);\n\
+  v_texCoord = position.xyz;\n\
+  }\n\
+  ';
+
+  /*
+   * Cesium近地天空盒
+   */
+
+  var SkyBoxFS = shader;
+  var SkyBoxVS = shader$1;
+
+  var GroundSkyBox = /*#__PURE__*/function () {
+    /**
+     * 近景天空盒
+     * @param {Object} options 同Cesium Skybox
+     */
+    function GroundSkyBox(options) {
+      _classCallCheck(this, GroundSkyBox);
+
+      var _Cesium = Cesium,
+          defaultValue = _Cesium.defaultValue,
+          Matrix4 = _Cesium.Matrix4,
+          DrawCommand = _Cesium.DrawCommand;
+      this.sources = options.sources;
+      this._sources = undefined;
+      /**
+       * 决定天空盒是否被显示.
+       *
+       * @type {Boolean}
+       * @default true
+       */
+
+      this.show = defaultValue(options.show, true);
+      this._command = new DrawCommand({
+        modelMatrix: Matrix4.clone(Matrix4.IDENTITY),
+        owner: this
+      });
+      this._cubeMap = undefined;
+      this._attributeLocations = undefined;
+      this._useHdr = undefined;
+      this._isDestroyed = false;
+    }
+    /**
+     *
+     * 当场景渲染的时候会自动调用该函数更新天空盒。
+     * <p>切勿主动调用该函数。</p>
+     */
+
+
+    _createClass(GroundSkyBox, [{
+      key: "update",
+      value: function update(frameState, useHdr) {
+        var _Cesium2 = Cesium,
+            BoxGeometry = _Cesium2.BoxGeometry,
+            Cartesian3 = _Cesium2.Cartesian3,
+            defined = _Cesium2.defined,
+            DeveloperError = _Cesium2.DeveloperError,
+            GeometryPipeline = _Cesium2.GeometryPipeline,
+            Matrix4 = _Cesium2.Matrix4,
+            Transforms = _Cesium2.Transforms,
+            VertexFormat = _Cesium2.VertexFormat,
+            BufferUsage = _Cesium2.BufferUsage,
+            CubeMap = _Cesium2.CubeMap,
+            loadCubeMap = _Cesium2.loadCubeMap,
+            RenderState = _Cesium2.RenderState,
+            VertexArray = _Cesium2.VertexArray,
+            BlendingState = _Cesium2.BlendingState,
+            SceneMode = _Cesium2.SceneMode,
+            ShaderProgram = _Cesium2.ShaderProgram,
+            ShaderSource = _Cesium2.ShaderSource,
+            Matrix3 = _Cesium2.Matrix3;
+        var skyboxMatrix3 = new Matrix3();
+        var that = this;
+
+        if (!this.show) {
+          return undefined;
+        }
+
+        if (frameState.mode !== SceneMode.SCENE3D && frameState.mode !== SceneMode.MORPHING) {
+          return undefined;
+        } // The sky box is only rendered during the render pass; it is not pickable,
+        // it doesn't cast shadows, etc.
+
+
+        if (!frameState.passes.render) {
+          return undefined;
+        }
+
+        var context = frameState.context;
+
+        if (this._sources !== this.sources) {
+          this._sources = this.sources;
+          var sources = this.sources;
+
+          if (!defined(sources.positiveX) || !defined(sources.negativeX) || !defined(sources.positiveY) || !defined(sources.negativeY) || !defined(sources.positiveZ) || !defined(sources.negativeZ)) {
+            throw new DeveloperError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
+          }
+
+          if (_typeof(sources.positiveX) !== _typeof(sources.negativeX) || _typeof(sources.positiveX) !== _typeof(sources.positiveY) || _typeof(sources.positiveX) !== _typeof(sources.negativeY) || _typeof(sources.positiveX) !== _typeof(sources.positiveZ) || _typeof(sources.positiveX) !== _typeof(sources.negativeZ)) {
+            throw new DeveloperError('this.sources properties must all be the same type.');
+          }
+
+          if (typeof sources.positiveX === 'string') {
+            // Given urls for cube-map images.  Load them.
+            loadCubeMap(context, this._sources).then(function (cubeMap) {
+              that._cubeMap = that._cubeMap && that._cubeMap.destroy();
+              that._cubeMap = cubeMap;
+            });
+          } else {
+            this._cubeMap = this._cubeMap && this._cubeMap.destroy();
+            this._cubeMap = new CubeMap({
+              context: context,
+              source: sources
+            });
+          }
+        }
+
+        var command = this._command;
+        command.modelMatrix = Transforms.eastNorthUpToFixedFrame(frameState.camera._positionWC);
+
+        if (!defined(command.vertexArray)) {
+          command.uniformMap = {
+            u_cubeMap: function u_cubeMap() {
+              return that._cubeMap;
+            },
+            u_rotateMatrix: function u_rotateMatrix() {
+              if (typeof Matrix4.getRotation === 'function') {
+                return Matrix4.getRotation(command.modelMatrix, skyboxMatrix3);
+              }
+
+              return Matrix4.getMatrix3(command.modelMatrix, skyboxMatrix3);
+            }
+          };
+          var geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
+            dimensions: new Cartesian3(2.0, 2.0, 2.0),
+            vertexFormat: VertexFormat.POSITION_ONLY
+          }));
+          var attributeLocations = this._attributeLocations = GeometryPipeline.createAttributeLocations(geometry);
+          command.vertexArray = VertexArray.fromGeometry({
+            context: context,
+            geometry: geometry,
+            attributeLocations: attributeLocations,
+            bufferUsage: BufferUsage._DRAW
+          });
+          command.renderState = RenderState.fromCache({
+            blending: BlendingState.ALPHA_BLEND
+          });
+        }
+
+        if (!defined(command.shaderProgram) || this._useHdr !== useHdr) {
+          var fs = new ShaderSource({
+            defines: [useHdr ? 'HDR' : ''],
+            sources: [SkyBoxFS]
+          });
+          command.shaderProgram = ShaderProgram.fromCache({
+            context: context,
+            vertexShaderSource: SkyBoxVS,
+            fragmentShaderSource: fs,
+            attributeLocations: this._attributeLocations
+          });
+          this._useHdr = useHdr;
+        }
+
+        if (!defined(this._cubeMap)) {
+          return undefined;
+        }
+
+        return command;
+      }
+      /**
+       * 对象是否被销毁
+       */
+
+    }, {
+      key: "isDestroyed",
+      value: function isDestroyed() {
+        return this._isDestroyed;
+      }
+      /**
+       * 销毁对象
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        var command = this._command;
+        command.vertexArray = command.vertexArray && command.vertexArray.destroy();
+        command.shaderProgram = command.shaderProgram && command.shaderProgram.destroy();
+        this._cubeMap = this._cubeMap && this._cubeMap.destroy();
+        return Cesium.destroyObject(this);
+      }
+    }]);
+
+    return GroundSkyBox;
+  }();
+
+  /*
+   * 移除Cesium 默认logo，并添加新logo
+   */
+  /**
+   * 移除Cesium 默认logo，并添加新logo
+   * @exports logo
+   * @param {Object} [options] 具有以下参数
+   * @param  {String} [options.url] 新logo的url，如果为空将仅移除默认logo，不添加新logo
+   * @param {Number} [options.width] logo图片的宽度
+   * @param {Number} [options.height] logo图片高度
+   */
+
+  function logo() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    jQuery('.cesium-widget-credits').empty();
+
+    if (options.url) {
+      var style = '';
+
+      if (options.width) {
+        style += "width=".concat(options.width);
+      }
+
+      if (options.height) {
+        style += " height=".concat(options.height);
+      }
+
+      jQuery('.cesium-widget-credits').append("<img src='".concat(options.url, "' ").concat(style, "/>"));
+    }
+  }
+
+  var cesiumScriptRegex = /((?:.*\/)|^)CesiumPro\.(esm|umd)\.js(?:\?|#|$)/;
+  var a;
+
+  function tryMakeAbsolute(url) {
+    if (typeof document === 'undefined') {
+      // Node.js and Web Workers. In both cases, the URL will already be absolute.
+      return url;
+    }
+
+    if (!defined(a)) {
+      a = document.createElement('a');
+    }
+
+    a.href = url; // IE only absolutizes href on get, not set
+    // eslint-disable-next-line no-self-assign
+
+    a.href = a.href;
+    return a.href;
+  }
+
+  var baseResource;
+  var implementation;
+
+  function getBaseUrlFromCesiumScript() {
+    var scripts = document.getElementsByTagName('script');
+
+    for (var i = 0, len = scripts.length; i < len; ++i) {
+      var src = scripts[i].getAttribute('src');
+      var result = cesiumScriptRegex.exec(src);
+
+      if (result !== null) {
+        return result[1];
+      }
+    }
+
+    return undefined;
+  }
+
+  function buildModuleUrlFromRequireToUrl(moduleID) {
+    // moduleID will be non-relative, so require it relative to this module, in Core.
+    return tryMakeAbsolute(require.toUrl("../".concat(moduleID)));
+  }
+
+  function getCesiumProBaseUrl() {
+    if (defined(baseResource)) {
+      return baseResource;
+    }
+
+    var baseUrlString;
+
+    if (window.CESIUMPRO_BASE_URL) {
+      baseUrlString = window.CESIUMPRO_BASE_URL;
+    } else if (_typeof(window.define) === 'object' && defined(window.define.amd) && !window.define.amd.toUrlUndefined && defined(window.require.toUrl)) {
+      baseUrlString = Cesium.getAbsoluteUri('..', 'core/URL.js');
+    } else {
+      baseUrlString = getBaseUrlFromCesiumScript();
+    }
+
+    if (!defined(baseUrlString)) {
+      throw new CesiumProError$1('Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.');
+    } // >>includeEnd('debug');
+
+
+    baseResource = new Cesium.Resource({
+      url: tryMakeAbsolute(baseUrlString)
+    });
+    baseResource.appendForwardSlash();
+    return baseResource;
+  }
+
+  function buildModuleUrlFromBaseUrl(moduleID) {
+    var resource = getCesiumProBaseUrl().getDerivedResource({
+      url: moduleID
+    });
+    return resource.url;
+  }
+
+  function buildModuleUrl(relativeUrl) {
+    if (!defined(implementation)) {
+      // select implementation
+      if (_typeof(window.define) === 'object' && defined(window.define.amd) && !window.define.amd.toUrlUndefined && defined(require.toUrl)) {
+        implementation = buildModuleUrlFromRequireToUrl;
+      } else {
+        implementation = buildModuleUrlFromBaseUrl;
+      }
+    }
+
+    var url = implementation(relativeUrl);
+    return url;
+  }
+  /**
+   * URL相关工具
+   * @namespace URL
+   *
+   */
+
+
+  var URL = {};
+  /**
+   * 从多个字符串拼接url,以/为分割符
+   * @param  {...String} args
+   * @return {String}      url
+   *
+   * @example
+   *
+   * URL.join("www.baidu.com/",'/tieba/','cesium')
+   * //www.baidu.com/tieba/cesium
+   */
+
+  URL.join = function () {
+    var formatArgs = [];
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    for (var _i = 0, _args = args; _i < _args.length; _i++) {
+      var arg = _args[_i];
+
+      if (arg.startsWith('/')) {
+        arg = arg.substring(1);
+      }
+
+      if (arg.endsWith('/')) {
+        arg = arg.substring(0, arg.length - 1);
+      }
+
+      formatArgs.push(arg);
+    }
+
+    var urlstr = formatArgs.join('/'); // if (!(urlstr.startsWith('http') || urlstr.startsWith('ftp'))) {
+    //   urlstr = `http://${urlstr}`;
+    // }
+
+    return urlstr;
+  };
+  /**
+   * 获取CesiumPro静态资源的完整路径
+   * @param {String} path 指定文件
+   * @returns {String}
+   */
+
+
+  URL.buildModuleUrl = function (path) {
+    return buildModuleUrl(path);
+  };
 
   var PointGraphic = /*#__PURE__*/function (_Graphic) {
     _inherits(PointGraphic, _Graphic);
 
     var _super = _createSuper(PointGraphic);
 
-    function PointGraphic() {
+    /**
+     * 点图形，泛指图形位置由一个点确定的图形，包括普通点、文字、模型、广告牌等
+     * @extends Graphic
+     *
+     * @param {Cesium.Viewer} viewer        [description]
+     * @param {Object} entityOptions 除以下属性外，同Cesium.PointGraphics
+     * @param {Cartesian3} [entityOptions.position] 点的位置信息
+     * @param {Object} [options={}]  具有以下属性
+     * @param {GraphicType} [options.type=GraphicType.POINT] 标绘类型
+     */
+    function PointGraphic(viewer, entityOptions) {
+      var _this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
       _classCallCheck(this, PointGraphic);
 
-      return _super.call(this);
+      if (!defined(entityOptions.position)) {
+        throw new CesiumProError$1('parameter position is required.');
+      }
+
+      _this = _super.call(this, viewer, options);
+      _this._entityOptions = entityOptions;
+      _this._positions = entityOptions.position;
+      _this._type = defaultValue(options.type, GraphicType$1.POINT);
+      _this._entity = _this.createEntity();
+
+      _this.add();
+
+      return _this;
     }
+    /**
+     * 该图形的几何描述，包括类型，经纬度等
+     * @return {Object}
+     */
+
+
+    _createClass(PointGraphic, [{
+      key: "getGeometry",
+      value: function getGeometry() {
+        var cartographic = PointGraphic.toDegrees(this.positions);
+        var coordinates = [cartographic.lon, cartographic.lat];
+        var type = GraphicType$1.getOGCType(this.type);
+        return {
+          type: type,
+          coordinates: coordinates
+        };
+      }
+      /**
+       * @private
+       */
+
+    }, {
+      key: "createEntity",
+      value: function createEntity() {
+        _get(_getPrototypeOf(PointGraphic.prototype), "createEntity", this).call(this);
+
+        delete this._entityOptions.position;
+        var options = {
+          id: this.id,
+          position: this.positions
+        };
+
+        if (this.type === GraphicType$1.POINT) {
+          options.point = clone(this._entityOptions);
+        }
+
+        if (this.type === GraphicType$1.BILLBOARD) {
+          options.billboard = clone(this._entityOptions);
+
+          if (!defined(options.billboard.image)) {
+            options.billboard.image = URL.buildModuleUrl('./assets/images/marker.png');
+          }
+        }
+
+        if (this.type === GraphicType$1.LABEL) {
+          options.label = clone(this._entityOptions);
+        }
+
+        if (this.type === GraphicType$1.MODEL) {
+          options.orientation = this._entityOptions.orientation;
+          delete this._entityOptions.orientation;
+          options.model = clone(this._entityOptions);
+
+          if (!defined(options.model.uri)) {
+            options.model.uri = URL.buildModuleUrl('./assets/models/Wood_Tower.gltf');
+          }
+        }
+
+        this._entityOptions = options;
+        return new Cesium.Entity(this._entityOptions);
+      }
+      /**
+       * 比较两个点位置是否相同
+       * @param  {PointGraphic} point
+       * @return {Bool}
+       */
+
+    }, {
+      key: "equal",
+      value: function equal(point) {
+        return PointGraphic.equal(this.positions, point.positions);
+      }
+      /**
+       * 添加文字
+       * @param {Object} options 描述一个Cesium.LabelGraphics.
+       */
+
+    }, {
+      key: "addLabel",
+      value: function addLabel(options) {
+        this.entity.label = options;
+      }
+      /**
+       * 更新点样式
+       * @param  {Object} style 描述一个Cesium.PointGraphics
+       */
+
+    }, {
+      key: "updatePointStyle",
+      value: function updatePointStyle(style) {
+        if (!style || !this.entity.point) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            this.entity.point[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 更新文字样式
+       * @param  {Object} style 描述一个Cesium.LabelGraphics
+       */
+
+    }, {
+      key: "updateLabelStyle",
+      value: function updateLabelStyle(style) {
+        if (!style || !this.entity.label) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            this.entity.label[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 更新模型样式
+       * @param  {Object} style 描述一个Cesium.ModelGraphics
+       */
+
+    }, {
+      key: "updateModelStyle",
+      value: function updateModelStyle(style) {
+        if (!style || !this.entity.model) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            this.entity.model[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 更新图标样式
+       * @param  {Object} style 描述一个Cesium.BillboardGraphics
+       */
+
+    }, {
+      key: "updateBillboardStyle",
+      value: function updateBillboardStyle(style) {
+        if (!style || !this.entity.billboard) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            this.entity.billboard[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 更新图形位置,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param  {Cesium.Cartesian3} position
+       */
+
+    }, {
+      key: "updatePosition",
+      value: function updatePosition(position) {
+        this.positions.x = position.x;
+        this.positions.y = position.y;
+        this.positions.z = position.z;
+      }
+      /**
+       * 比较两个点位置是否相同
+       * @param  {PointGraphic} left
+       * @param  {PointGraphic} right
+       * @return {Bool}
+       */
+
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson() {
+        return PointGraphic.toGeoJson(this);
+      }
+      /**
+       * 将图形转为GeoJson
+       * @param  {PointGraphic} graphic
+       * @return {Object}  graphic的geojson格式
+       */
+
+    }], [{
+      key: "equal",
+      value: function equal(left, right) {
+        return Cesium.Cartesian3.equals(left.positions, point.positions);
+      }
+      /**
+       * 默认样式
+       * @type {Object}
+       */
+
+    }, {
+      key: "toDegrees",
+
+      /**
+       * 将Cartesian3坐标转换为经纬度
+       * @param  {Cartesian3|PointGraphic} point
+       * @return {Object}  经纬度
+       */
+      value: function toDegrees(point) {
+        if (point instanceof Cesium.Cartesian3) {
+          return CVT$1.cartesian2Degrees(point);
+        }
+
+        if (point instanceof PointGraphic) {
+          return CVT$1.cartesian2Degrees(point.positions);
+        }
+      }
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson(graphic) {
+        var type = GraphicType$1.getOGCType(graphic.type);
+        var properties = graphic.properties ? graphic.properties.toJson() : {};
+        properties.graphicType = graphic.type;
+        var features = {
+          type: 'Feature',
+          properties: properties,
+          geometry: graphic.getGeometry()
+        };
+        return features;
+      }
+      /**
+       * 利用GeoJson创建图形
+       * @param  {Cesium.Viewer} viewer
+       * @param  {String|Object} json   json对象或字符串
+       * @param  {Object} style  图形样式
+       * @return {PointGraphic}
+       */
+
+    }, {
+      key: "fromGeoJson",
+      value: function fromGeoJson(viewer, json, style) {
+        if (typeof json === 'string') {
+          json = JSON.parse(json);
+        }
+
+        if (!defined(json.geometry) || !defined(json.properties)) {
+          return;
+        }
+
+        var type = json.properties.graphicType;
+
+        if (type !== GraphicType$1.POINT) {
+          throw new CesiumProError$1('json没有包含一个有效的PointGraphic.');
+        }
+
+        var coordinate = json.geometry && json.geometry.coordinates;
+        return PointGraphic.fromCoordinates(viewer, coordinate, json.properties, style);
+      }
+      /**
+       * 从坐标点生成点图形
+       * @param {Cesium.Viewer} viewer
+       * @param  {Number[]} coordinate  包含经纬和纬度的数组
+       * @param  {Style} [style=PointGraphic.defaultStyle] 点样式
+       * @return {PointGraphic}
+       */
+
+    }, {
+      key: "fromCoordinates",
+      value: function fromCoordinates(viewer, coordinate, properties) {
+        var _Cesium$Cartesian;
+
+        var style = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : PointGraphic.defaultStyle;
+
+        var position = (_Cesium$Cartesian = Cesium.Cartesian3).fromDegrees.apply(_Cesium$Cartesian, _toConsumableArray(coordinate));
+
+        var options = _objectSpread2({
+          position: position,
+          properties: properties
+        }, style);
+
+        return new PointGraphic(viewer, options);
+      }
+      /**
+       * 默认点样式
+       * @type {Object}
+       */
+
+    }]);
 
     return PointGraphic;
   }(Graphic);
@@ -10115,41 +12609,226 @@
     color: Cesium.Color.RED,
     pixelSize: 5,
     outlineColor: Cesium.Color.WHITE,
-    outlineWidth: 3
+    outlineWidth: 3,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
   });
 
-  _defineProperty(PointGraphic, "highlightStyle", {
-    color: Cesium.Color.AQUA,
-    pixelSize: 5,
-    outlineColor: Cesium.Color.AQUA,
-    outlineWidth: 3
+  _defineProperty(PointGraphic, "defaultPointStyle", PointGraphic.defaultStyle);
+
+  _defineProperty(PointGraphic, "defaultLabelStyle", _defineProperty({
+    font: '36px sans-serif',
+    fillColor: Cesium.Color.WHITE,
+    showBackground: true,
+    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+    scale: 0.5,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+    pixelOffset: new Cesium.Cartesian2(0, 0)
+  }, "heightReference", Cesium.HeightReference.NONE));
+
+  _defineProperty(PointGraphic, "defaultBillboardStyle", {
+    verticalOrigin: Cesium.VerticalOrigin.BASELINE,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
   });
 
-  var PolylineGraphic = /*#__PURE__*/function (_Graphic) {
-    _inherits(PolylineGraphic, _Graphic);
+  _defineProperty(PointGraphic, "defaultModelStyle", {
+    colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+    color: Cesium.Color.WHITE,
+    colorBlendAmount: 0.5,
+    minimumPixelSize: 64
+  });
 
-    var _super = _createSuper(PolylineGraphic);
+  var NodeGraphic = /*#__PURE__*/function () {
+    /**
+     * 用于创建线面图形的顶点图形
+     * @param {Viewer} viewer
+     * @param {Object} entityOptions 描述一个点图形
+     * @param {Object} [options={}]  [description]
+     */
+    function NodeGraphic(viewer, entityOptions) {
+      _classCallCheck(this, NodeGraphic);
 
-    function PolylineGraphic() {
-      _classCallCheck(this, PolylineGraphic);
-
-      return _super.call(this);
+      this._viewer = viewer;
+      this._type = GraphicType$1.MUTIPOINT;
+      this._positions = entityOptions.positions;
+      this._entityOptions = entityOptions;
+      this._values = [];
+      this.createEntity();
     }
+    /**
+     * 顶点图形的几何信息
+     * @return {Object}
+     */
 
-    return PolylineGraphic;
-  }(Graphic);
 
-  _defineProperty(PolylineGraphic, "defaultStyle", {
-    clampToGround: true,
-    material: Cesium.Color.fromCssColorString('rgba(247,224,32,1)'),
-    width: 3
-  });
+    _createClass(NodeGraphic, [{
+      key: "getGeometry",
+      value: function getGeometry() {
+        var coordinates = [];
+        var type = GraphicType$1.getOGCType(this.type);
 
-  _defineProperty(PolylineGraphic, "highlightStyle", {
-    clampToGround: true,
-    material: Cesium.Color.AQUA,
-    width: 3
-  });
+        var _iterator = _createForOfIteratorHelper(this.positions),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var position = _step.value;
+            var cartographic = PointGraphic.toDegrees(position);
+            coordinates.push([cartographic.lon, cartographic.lat]);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        return {
+          type: type,
+          coordinates: coordinates
+        };
+      }
+      /**
+       * @private
+       */
+
+    }, {
+      key: "createEntity",
+      value: function createEntity() {
+        var _this = this;
+
+        delete this._entityOptions.positions;
+        var options = this._entityOptions;
+        var count = this._positions.length;
+
+        var _loop = function _loop(i) {
+          var entity = new Cesium.Entity({
+            position: new Cesium.CallbackProperty(function () {
+              return _this._positions[i];
+            }, false),
+            point: options
+          });
+
+          var value = _this._viewer.entities.add(entity);
+
+          _this._values.push(value);
+        };
+
+        for (var i = 0; i < count; i++) {
+          _loop(i);
+        }
+      }
+      /**
+       * 添加一个顶点
+       * @param {Cartesian3} node 顶点坐标
+       */
+
+    }, {
+      key: "addNode",
+      value: function addNode(node) {
+        var options = this._entityOptions;
+
+        this._values.push(this._viewer.entities.add({
+          position: node,
+          point: options
+        }));
+      }
+      /**
+       * 删除指定索引的顶点
+       * @param  {Number} index 顶点序号
+       * @return {Entity}    被删除的顶点
+       */
+
+    }, {
+      key: "removeNode",
+      value: function removeNode(index) {
+        var node = this._values[index];
+
+        this._viewer.entities.remove(node);
+
+        this._values.splice(index, 1);
+
+        return node;
+      }
+      /**
+       * 更新顶点位置
+       * @param  {Number} index 需要更新的顶点序号
+       * @param  {Cartesian3} node  新的顶点位置
+       */
+
+    }, {
+      key: "updateNode",
+      value: function updateNode(index, node) {
+        if (index >= this._positions.length) {
+          return;
+        }
+
+        this._positions[index] = node;
+      }
+      /**
+       * 销毁对象
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        var _iterator2 = _createForOfIteratorHelper(this._values),
+            _step2;
+
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var v = _step2.value;
+
+            this._viewer.entities.remove(v);
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+
+        this._values = undefined;
+        this._viewer = undefined;
+      }
+      /**
+       * 将当前图形转为GeoJson
+       * @return {Object} 该图形的GeoJson格式
+       */
+
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson() {
+        return NodeGraphic.toGeoJson(this);
+      }
+      /**
+       * 将图形对象转为GeoJson
+       * @param  {NodeGraphic} nodeGraphic [description]
+       * @return {Object}      nodeGraphic的GeoJson格式
+       */
+
+    }], [{
+      key: "toGeoJson",
+      value: function toGeoJson(nodeGraphic) {
+        var type = GraphicType$1.getOGCType(graphic.type);
+        var properties = graphic.properties ? graphic.properties.toJson() : {};
+        properties.graphicType = graphic.type;
+        var features = {
+          type: 'Feature',
+          properties: properties,
+          geometry: graphic.getGeometry()
+        };
+        return features;
+      }
+      /**
+       * 默认样式
+       * @type {Object}
+       */
+
+    }]);
+
+    return NodeGraphic;
+  }();
+
+  _defineProperty(NodeGraphic, "defaultStyle", PointGraphic.defaultStyle);
 
   var PolygonGraphic = /*#__PURE__*/function (_Graphic) {
     _inherits(PolygonGraphic, _Graphic);
@@ -10157,15 +12836,301 @@
     var _super = _createSuper(PolygonGraphic);
 
     /**
-     * 多边形
+     * 可编辑的多边形
+     * @extends Graphic
+     * @param {Cesium.Viewer} viewer
+     * @param {Object} entityOptions 和Cesium.PolygonGraphics具有相同的属性
+     * @param {Object} [options={}] 具有以下属性
      */
-    function PolygonGraphic() {
+    function PolygonGraphic(viewer, entityOptions) {
+      var _this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
       _classCallCheck(this, PolygonGraphic);
 
-      return _super.call(this);
-    }
+      _this = _super.call(this, viewer, options);
+      _this._entityOptions = entityOptions;
+      _this._positions = defaultValue(entityOptions.positions, []);
+      _this._nodePositions = [].concat(_toConsumableArray(_this.positions), [_this.positions[0]]);
+      _this._type = GraphicType$1.POLYGON;
+      _this._entity = _this.createEntity();
 
-    _createClass(PolygonGraphic, null, [{
+      _this.add();
+
+      return _this;
+    }
+    /**
+     * 该图形的几何描述，包括类型，经纬度等
+     * @return {Object}
+     */
+
+
+    _createClass(PolygonGraphic, [{
+      key: "getGeometry",
+      value: function getGeometry() {
+        return PolygonGrphic.getGeometry(this);
+      }
+      /**
+       * 获得图形的几何描述，包括类型，经纬度等
+       * @return {Object}
+       */
+
+    }, {
+      key: "createEntity",
+
+      /**
+       * @private
+       */
+      value: function createEntity() {
+        _get(_getPrototypeOf(PolygonGraphic.prototype), "createEntity", this).call(this);
+
+        delete this._entityOptions.positions;
+        var options = {
+          id: this.id,
+          polygon: _objectSpread2({
+            hierarchy: this.positions
+          }, this._entityOptions)
+        };
+
+        if (this._entityOptions.outline) {
+          options.polyline = {
+            positions: this._nodePositions,
+            material: this._entityOptions.outlineColor,
+            width: this._entityOptions.outlineWidth
+          };
+          options.polygon.outline = false;
+        }
+
+        this._entityOptions = options;
+        return new Cesium.Entity(this._entityOptions);
+      }
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson() {
+        return PolygonGraphic.toGeoJson(this);
+      }
+      /**
+       * 开始编辑几何信息，此时图形的顶点可以被修改、删除、移动。
+       * 属性信息的编辑不需要调用该方法。
+       * @fires Graphic#preEdit
+       */
+
+    }, {
+      key: "startEdit",
+      value: function startEdit() {
+        _get(_getPrototypeOf(PolygonGraphic.prototype), "startEdit", this).call(this);
+
+        var style = PointGraphic.defaultStyle;
+        this._node = new NodeGraphic(this._viewer, _objectSpread2({
+          positions: this.positions
+        }, style));
+      }
+      /**
+       * @fires Graphic#postEdit
+       * 几何要素编辑完成后调用该方法，以降低性能消耗。
+       * <p style='font-weight:bold'>建议在图形编辑完成后调用该方法，因为CallbackProperty
+       * 对资源消耗比较大，虽然对单个图形来说，不调用此方法可能并不会有任何影响。</p>
+       */
+
+    }, {
+      key: "stopEdit",
+      value: function stopEdit() {
+        _get(_getPrototypeOf(PolygonGraphic.prototype), "stopEdit", this).call(this);
+
+        this._node && this._node.destroy();
+        this._node = undefined;
+      }
+      /**
+       * 添加顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param {Cartesian} node 新顶点
+       */
+
+    }, {
+      key: "addNode",
+      value: function addNode(node) {
+        this.positions.push(node);
+        this._nodePositions[this._nodePositions.length] = this._nodePositions[this._nodePositions.length - 1];
+        this._nodePositions[this._nodePositions.length - 1] = node;
+      }
+      /**
+       * 删除一个顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param  {Number} index 顶点编号
+       */
+
+    }, {
+      key: "removeNode",
+      value: function removeNode(index) {
+        if (index < 0 || index >= this.positions.length) {
+          return;
+        }
+
+        this.positions.splice(index, 1);
+
+        this._nodePositions.splice(index, 1);
+
+        var nodeCount = this.positions.length;
+
+        if (index === 0) {
+          this._nodePositions[nodeCount] = this._nodePositions[0];
+        }
+      }
+      /**
+       * 删除最后一个顶点
+       */
+
+    }, {
+      key: "popNode",
+      value: function popNode() {
+        var index = this.positions.length - 1;
+        this.removeNode(index);
+      }
+      /**
+       * 更新一个顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param  {Number} index 顶点编号
+       * @param  {Cartesian} node  将要更新的位置
+       */
+
+    }, {
+      key: "updateNode",
+      value: function updateNode(index, node) {
+        if (index >= this.positions.length) {
+          return;
+        }
+
+        this.positions[index] = node;
+        var nodeCount = this.positions.length;
+        this._nodePositions[index] = node;
+
+        if (index === 0) {
+          this._nodePositions[nodeCount] = node;
+        }
+      }
+      /**
+       * 更新模型样式
+       * @param  {Object} style 描述一个Cesium.ModelGraphics
+       */
+
+    }, {
+      key: "updateStyle",
+      value: function updateStyle(style) {
+        if (!style || !this.entity.model) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            if (s === 'outline' && !style.outline && this.entity.polyline) {
+              this.entity.polyline = undefined;
+            }
+
+            if (s === 'outlineColor' && this.entity.polyline) {
+              this.entity.polyline.material = style[s];
+            }
+
+            if (s === 'outlineWidth' && this.entity.polyline) {
+              this.entity.polyline.width = style[s];
+            }
+
+            this.entity.polygon[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 将图形转为GeoJson
+       * @param  {PolygonGraphic} graphic
+       * @return {Object}  graphic的geojson格式
+       */
+
+    }], [{
+      key: "getGeometry",
+      value: function getGeometry(graphic) {
+        var coordinates = [];
+        var type = GraphicType$1.getOGCType(graphic.type);
+
+        var _iterator = _createForOfIteratorHelper(graphic.positions),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var position = _step.value;
+            var lonlat = PointGraphic.toDegrees(position);
+            coordinates.push([lonlat.lon, lonlat.lat]);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        return {
+          type: type,
+          coordinates: [coordinates]
+        };
+      }
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson(graphic) {
+        var type = GraphicType$1.getOGCType(graphic.type);
+        var properties = graphic.properties ? graphic.properties.toJson() : {};
+        properties.graphicType = graphic.type;
+        var features = {
+          type: 'Feature',
+          properties: properties,
+          geometry: graphic.getGeometry()
+        };
+        return features;
+      }
+      /**
+       * 利用GeoJson创建图形
+       * @param  {Cesium.Viewer} viewer
+       * @param  {String|Object} json   json对象或字符串
+       * @param  {Object} style  图形样式
+       * @return {PolygonGraphic}
+       */
+
+    }, {
+      key: "fromGeoJson",
+      value: function fromGeoJson(viewer, json, style) {
+        if (typeof json === 'string') {
+          json = JSON.parse(json);
+        }
+
+        if (!defined(json.geometry) || !defined(json.properties)) {
+          return;
+        }
+
+        var type = json.properties.graphicType;
+
+        if (type !== GraphicType$1.POLYGON) {
+          throw new CesiumProError('json没有包含一个有效的PolygonGraphic.');
+        }
+
+        var coordinate = json.geometry && json.geometry.coordinates;
+        return PolygonGraphic.fromCoordinates(viewer, coordinate, json.properties, style);
+      }
+      /**
+       * 从坐标点生成点图形
+       * @param {Cesium.Viewer} viewer
+       * @param  {Number[]} coordinate  包含经纬和纬度的数组
+       * @param  {Style} [style=PointGraphic.defaultStyle] 点样式
+       * @return {PolygonGraphic}
+       */
+
+    }, {
+      key: "fromCoordinates",
+      value: function fromCoordinates(viewer, coordinates, properties) {
+        var style = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : PolygonGraphic.defaultStyle;
+        var positions = Cesium.Cartesian3.fromDegreesArray(coordinates[0].flat());
+
+        var options = _objectSpread2({
+          positions: positions,
+          properties: properties
+        }, style);
+
+        return new PolygonGraphic(viewer, options);
+      }
+    }, {
       key: "centerFromPonits",
 
       /**
@@ -10219,8 +13184,9 @@
 
   _defineProperty(PolygonGraphic, "defaultStyle", {
     material: Cesium.Color.fromCssColorString('rgba(247,224,32,0.5)'),
-    outlineColor: Cesium.Color.fromCssColorString('rgba(255,247,145,1)'),
+    outlineColor: Cesium.Color.RED,
     outlineWidth: 2,
+    outline: true,
     perPositionHeight: false
   });
 
@@ -10229,321 +13195,4533 @@
     outlineColor: Cesium.Color.AQUA.withAlpha(0.4)
   });
 
-  var LabelGraphic = /*#__PURE__*/function (_Graphic) {
-    _inherits(LabelGraphic, _Graphic);
+  var ModelAttachVector = /*#__PURE__*/function () {
+    /**
+     * 创建模型的关联矢量，主要用于为模型附加属性信息，可以达到模型单体化的视觉效果。
+     * @param {Object} [options={}]具有以下属性
+     * @param {Cesium.Viewer} options.viewer Cesium.Viewer对象
+     * @param {String} options.vectorResource 矢量文件路径，目前只支持geojson
+     * @param {String} [options.key='id'] 将要作为关键字的属性字段，该字段必须在矢量文件的属性表中，且不重复
+     * @param {Cesium.Material} [options.material=Cesium.Color.GOLD.withAlpha(0.5)] 编辑模式下要素的材质
+     * @param {Cesium.Material} [options.highlightMaterial=Cesium.Color.AQUA] 高亮材质
+     * @param {String} [options.mode='edit'] 默认模式
+     */
+    function ModelAttachVector() {
+      var _this = this;
 
-    var _super = _createSuper(LabelGraphic);
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    function LabelGraphic() {
-      _classCallCheck(this, LabelGraphic);
+      _classCallCheck(this, ModelAttachVector);
+
+      var viewer = options.viewer,
+          vectorResource = options.vectorResource,
+          key = options.key;
+      checkViewer(viewer);
+      this._materail = defaultValue(options.material, Cesium.Color.GOLD.withAlpha(0.5));
+      this._previewMaterial = Cesium.Color.RED.withAlpha(0.0);
+      this._highlightMaterial = defaultValue(options.highlightMaterial, Cesium.Color.AQUA);
+      this._viewer = viewer;
+      this._vectorResource = vectorResource;
+      this._key = defaultValue(key, 'id');
+      var feats = vectorResource.features; // 以数组的形式保存了所有entity
+
+      this.entities = []; // 以key-value的形式保存所有entity;
+
+      this.entityMap = new Map();
+      this._mode = defaultValue(options.mode, 'edit');
+      jQuery.ajax({
+        url: this._vectorResource,
+        method: 'get',
+        dataType: 'json',
+        success: function success(res) {
+          var feats = res.features;
+
+          var _iterator = _createForOfIteratorHelper(feats),
+              _step;
+
+          try {
+            for (_iterator.s(); !(_step = _iterator.n()).done;) {
+              var feat = _step.value;
+
+              if (feat.geometry.coordinates) {
+                var hierarchy = ModelAttachVector.coordinates2Hierarchy(feat.geometry.coordinates);
+                var center = PolygonGraphic.centerFromPonits(hierarchy.positions);
+
+                if (center) {
+                  feat.properties.center = JSON.stringify(center);
+                }
+
+                var entity = _this._viewer.entities.add({
+                  id: feat.properties[_this._key],
+                  properties: feat.properties,
+                  polygon: {
+                    hierarchy: hierarchy.positions,
+                    material: _this._mode === 'edit' ? _this._materail : _this._previewMaterial,
+                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                    outline: false,
+                    perPositionHeight: false
+                  }
+                });
+
+                _this.entities.push(entity);
+
+                _this.entityMap.set(entity.id, entity);
+              }
+            }
+          } catch (err) {
+            _iterator.e(err);
+          } finally {
+            _iterator.f();
+          }
+        },
+        error: function error(e) {
+          errorCatch(e);
+        }
+      });
+    }
+    /**
+     * 要素的表现模式,edit-编辑模式,preview-预览模式
+     * @type {String}
+     */
+
+
+    _createClass(ModelAttachVector, [{
+      key: "setMaterial",
+
+      /**
+       * 设置要素材质
+       * @private
+       */
+      value: function setMaterial(material) {
+        var values = this.entityMap.values();
+
+        var _iterator2 = _createForOfIteratorHelper(values),
+            _step2;
+
+        try {
+          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+            var v = _step2.value;
+
+            if (v.polygon) {
+              v.polygon.material = material;
+            }
+          }
+        } catch (err) {
+          _iterator2.e(err);
+        } finally {
+          _iterator2.f();
+        }
+      }
+      /**
+       * 通过key设置高亮
+       * @param  {Cesium.Entity} key
+       */
+
+    }, {
+      key: "highLightByKey",
+      value: function highLightByKey(key) {
+        var entity = this.getByKey(key);
+        this.highLightByEntity(entity);
+      }
+      /**
+       * 通过Entity设置高亮
+       * @param  {Cesium.Entity} entity
+       */
+
+    }, {
+      key: "highLightByEntity",
+      value: function highLightByEntity(entity) {
+        if (entity && entity.polygon) {
+          entity.polygon.material = this._highlightMaterial;
+        }
+      }
+      /**
+       * 将Geojson的coordinates转为Cesium.Cartesian3数组
+       * @param  {Array} coors coordinates
+       * @return {Cesium.Cartesian3[]} 可以直接用于多边形hierarchy的Cestesian3数组
+       */
+
+    }, {
+      key: "zoomTo",
+
+      /**
+       * 定位到指定要素，如果未指定key将定位到所有要素
+       * @param  {String} [key=''] 要素的key值
+       */
+      value: function zoomTo() {
+        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var entity = this.getByKey(id);
+
+        if (entity) {
+          this._viewer.zoomTo(entity);
+        } else {
+          this._viewer.zoomTo(this.getAll());
+        }
+      }
+      /**
+       * 通过key获得指定要素
+       * @param  {String} key key值
+       * @return {Cesium.Entity}
+       */
+
+    }, {
+      key: "getByKey",
+      value: function getByKey(key) {
+        var entity = this._viewer.entities.getById(key);
+
+        return entity;
+      }
+      /**
+       * 返回所有要素
+       * @return {Cesium.Entity[]} 矢量数据中的所有要素
+       */
+
+    }, {
+      key: "getAll",
+      value: function getAll() {
+        return Array.from(this.entityMap.values());
+      }
+      /**
+       * 删除所有要素
+       */
+
+    }, {
+      key: "removeAll",
+      value: function removeAll() {
+        var keys = this.entityMap.keys();
+
+        var _iterator3 = _createForOfIteratorHelper(keys),
+            _step3;
+
+        try {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+            var k = _step3.value;
+            this.remove(k);
+          }
+        } catch (err) {
+          _iterator3.e(err);
+        } finally {
+          _iterator3.f();
+        }
+
+        this.entityMap.clear();
+      }
+      /**
+       * 删除指定key的几何要素
+       * @param  {String} key key值
+       */
+
+    }, {
+      key: "remove",
+      value: function remove(key) {
+        var entity = this.getByKey(key);
+
+        if (entity) {
+          this._viewer.entities.remove(entity);
+
+          this.entityMap["delete"](entity.id);
+        }
+      }
+      /**
+       * 销毁对象
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        this.removeAll();
+        this._viewer = undefined;
+        this.entities = undefined;
+      }
+    }, {
+      key: "mode",
+      get: function get() {
+        return this._mode;
+      },
+      set: function set(v) {
+        this._mode = v;
+
+        if (this._mode === 'edit') {
+          this.setMaterial(this._materail);
+        } else if (this._mode === 'preview') {
+          this.setMaterial(this._previewMaterial);
+        } else {
+          console.console.warn('无效的模式');
+        }
+      }
+    }], [{
+      key: "coordinates2Hierarchy",
+      value: function coordinates2Hierarchy(coors) {
+        var positions = [];
+
+        var _iterator4 = _createForOfIteratorHelper(coors),
+            _step4;
+
+        try {
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var cs = _step4.value;
+
+            var _iterator5 = _createForOfIteratorHelper(cs),
+                _step5;
+
+            try {
+              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+                var c = _step5.value;
+                positions.push(c[0], c[1]);
+              }
+            } catch (err) {
+              _iterator5.e(err);
+            } finally {
+              _iterator5.f();
+            }
+          }
+        } catch (err) {
+          _iterator4.e(err);
+        } finally {
+          _iterator4.f();
+        }
+
+        var cartesian = Cesium.Cartesian3.fromDegreesArray(positions);
+        return new Cesium.PolygonHierarchy(cartesian);
+      }
+    }]);
+
+    return ModelAttachVector;
+  }();
+
+  var ModelGraphic = /*#__PURE__*/function (_Graphic) {
+    _inherits(ModelGraphic, _Graphic);
+
+    var _super = _createSuper(ModelGraphic);
+
+    function ModelGraphic() {
+      _classCallCheck(this, ModelGraphic);
 
       return _super.call(this);
     }
 
-    return LabelGraphic;
+    return ModelGraphic;
   }(Graphic);
 
-  _defineProperty(LabelGraphic, "defaultStyle", _defineProperty({
-    font: '36px sans-serif',
-    fillColor: Cesium.Color.WHITE,
-    showBackground: true,
-    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-    // outlineWidth: 2,
-    scale: 0.5,
-    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-    pixelOffset: new Cesium.Cartesian2(0, 0)
-  }, "heightReference", Cesium.HeightReference.NONE));
+  _defineProperty(ModelGraphic, "defaultStyle", {
+    colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
+    color: Cesium.Color.WHITE,
+    colorBlendAmount: 0.5,
+    minimumPixelSize: 64
+  });
 
   /**
-   * 地图量算类型
-   * @exports CartometryType
-   * @enum {Number}
-   */
-  var CartometryType = {
-    /**
-     * 贴地距离
-     * @type {Number}
-     * @constant
-     */
-    SURFACE_DISTANCE: 1,
-
-    /**
-     * 空间距离
-     * @type {Number}
-     * @constant
-     */
-    SPACE_DISTANCE: 2,
-
-    /**
-     * 空间面积
-     * @type {Number}
-     * @constant
-     */
-    SPACE_AREA: 3,
-
-    /**
-     * 贴地面积
-     * @type {Number}
-     * @constant
-     */
-    SURFACE_AREA: 4,
-
-    /**
-     * 高度
-     * @type {Number}
-     * @constant
-     */
-    HEIGHT: 5,
-
-    /**
-     * 方位角
-     * @type {Number}
-     * @constant
-     */
-    ANGLE: 6
-  };
-  /**
-   * 验证是否是合法类型
-   * @param {CartometryType}
-   * @returns {Number}
+   * 坐标拾取函数,如果pixel所在位置有Primitive或Entity，将获取Primitive或Entity上的位置，否则获取球面坐标。
+   * 简言之,如果点击在模型上将获得模型上的坐标，否则获取球面坐标。
+   * <p><span style="font-weight:bold">Note:</span>获取模型上的坐标时需要打开地形深度调整，否则获取的点位不准。</p>
+   *
+   * @exports pickPosition
+   * @see depthTest
+   * @param  {Cesium.Cartesian3} pixel 屏幕坐标
+   * @param {Cesium.Viewer} viewer Viewer对象
+   * @return {Cesium.Cartesian3}       笛卡尔坐标
    */
 
-  CartometryType.validate = function (type) {
-    return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
-  };
-  /**
-   * 从枚举值获得枚举标签
-   * @param  {CartometryType} value 枚举值
-   * @returns {String}
-   */
+  function pickPosition(pixel, viewer) {
+    var cartesian;
+    elliposid = defaultValue(elliposid, Cesium.Ellipsoid.WGS84); // cartesian = viewer.camera.pickEllipsoid(pixel, elliposid);
 
+    var ray = viewer.camera.getPickRay(pixel);
+    cartesian = viewer.scene.globe.pick(ray);
+    var feat = viewer.scene.pick(pixel);
 
-  CartometryType.getKey = function (value) {
-    var key;
-
-    switch (value) {
-      case 1:
-        key = 'SURFACE_DISTANCE';
-        break;
-
-      case 2:
-        key = 'SPACE_DISTANCE';
-        break;
-
-      case 3:
-        key = 'SPACE_AREA';
-        break;
-
-      case 4:
-        key = 'SURFACE_AREA';
-        break;
-
-      case 5:
-        key = 'HEIGHT';
-        break;
-
-      case 6:
-        key = 'ANGLE';
-        break;
-
-      default:
-        key = undefined;
+    if (feat) {
+      if (viewer.scene.pickPositionSupported) {
+        cartesian = viewer.scene.pickPosition(pixel);
+      } else {
+        console.warn('This browser does not support pickPosition.');
+      }
     }
 
-    return key;
-  };
-
-  var CartometryType$1 = Object.freeze(CartometryType);
-
-  function compareNumber(a, b) {
-    return b - a;
+    return cartesian;
   }
 
-  var Event = /*#__PURE__*/function () {
+  var Plotting = /*#__PURE__*/function () {
     /**
-     * 事件管理器
-     * @example
-     * const addMarkerEvent=new Event();
-     * function saveMark(mark){
-     *  console.log("添加了一个mark",mark.id)
-     * }
-     * addMarkerEvent.on(saveMark)
-     * const mark=viewer.entities.add({
-     *  id:"mark1",
-     *  billboard:{
-     *    image:"./icon/pin.png"
-     *  }
-     * })
-     * addMarkerEvent.emit(mark)
+     * 提供了交互绘图的通用方法和事件
+     * @param {Object} options 具有以下属性
      */
-    function Event() {
-      _classCallCheck(this, Event);
+    function Plotting(options) {
+      _classCallCheck(this, Plotting);
 
-      this._listeners = [];
-      this._scopes = [];
-      this._toRemove = [];
-      this._insideRaiseEvent = false;
+      options = defaultValue(options, options.EMPTY_OBJECT);
+
+      if (options.viewer instanceof Cesium.Viewer) {
+        throw new CesiumProError$1('param viewer must be a Cesium.Viewer Object.');
+      }
+
+      this._viewer = options.viewer;
+      this._handler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
+      this._graphics = new Map();
     }
     /**
-     * 当前订阅事件的侦听器个数
+     * 图形集合，所有绘图结果都保存在该对象中
+     * @return {Map} 所有绘图结果的集合
      */
 
 
-    _createClass(Event, [{
-      key: "on",
+    _createClass(Plotting, [{
+      key: "destroy",
 
       /**
-       * 注册事件触发时执行的回调函数
-       * @param {Function} listener 事件触发时执行的回调函数
-       * @param {Object} [scope] 侦听器函数中this的指针
-       * @return {Function} 用于取消侦听器监测的函数
-       *
-       * @see Event#off
-       * @see Event#emit
+       * 销毁绘图对象，并销毁由该对象绘制的所有要素。
        */
-      value: function on(listener, scope) {
-        if (typeof listener !== 'function') {
-          throw new CesiumProError$1('侦听器应该是一个函数');
+      value: function destroy() {
+        if (!this._handler.isDestroyed()) {
+          this._handler.destroy();
         }
 
-        this._listeners.push(listener);
+        var values = this.graphics.values();
 
-        this._scopes.push(scope);
+        var _iterator = _createForOfIteratorHelper(values),
+            _step;
 
-        var event = this;
-        return function () {
-          event.removeEventListener(listener, scope);
-        };
-      }
-      /**
-       * 注销事件触发时的回调函数
-       * @param {Function} listener 将要被注销的函数
-       * @param {Object} [scope] 侦听器函数中this的指针
-       * @return {Boolean} 如果为真，事件被成功注销，否则，事件注销失败
-       *
-       * @see Event#on
-       * @see Event#emit
-       */
-
-    }, {
-      key: "off",
-      value: function off(listener, scope) {
-        if (typeof listener !== 'function') {
-          throw new CesiumProError$1('侦听器应该是一个函数');
-        }
-
-        var listeners = this._listeners;
-        var scopes = this._scopes;
-        var index = -1;
-
-        for (var i = 0; i < listeners.length; i++) {
-          if (listeners[i] === listener && scopes[i] === scope) {
-            index = i;
-            break;
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var v = _step.value;
+            v.destroy();
           }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
         }
 
-        if (index !== -1) {
-          if (this._insideRaiseEvent) {
-            // In order to allow removing an event subscription from within
-            // a callback, we don't actually remove the items here.  Instead
-            // remember the index they are at and undefined their value.
-            this._toRemove.push(index);
-
-            listeners[index] = undefined;
-            scopes[index] = undefined;
-          } else {
-            listeners.splice(index, 1);
-            scopes.splice(index, 1);
-          }
-
-          return true;
-        }
-
-        return false;
-      }
-      /**
-       * 触发事件
-       * @param {*} arguments 此方法接受任意数据的参数并传递给侦听器函数
-       *
-       * @see Event#on
-       * @see Event#off
-       */
-
-    }, {
-      key: "emit",
-      value: function emit() {
-        this._insideRaiseEvent = true;
-        var i;
-        var listeners = this._listeners;
-        var scopes = this._scopes;
-        var length = listeners.length;
-
-        for (i = 0; i < length; i++) {
-          var listener = listeners[i];
-
-          if (Cesium.defined(listener)) {
-            listeners[i].apply(scopes[i], arguments);
-          }
-        } // Actually remove items removed in removeEventListener.
-
-
-        var toRemove = this._toRemove;
-        length = toRemove.length; // 降序排列，从后往前删
-
-        if (length > 0) {
-          toRemove.sort(compareNumber);
-
-          for (i = 0; i < length; i++) {
-            var index = toRemove[i];
-            listeners.splice(index, 1);
-            scopes.splice(index, 1);
-          }
-
-          toRemove.length = 0;
-        }
-
-        this._insideRaiseEvent = false;
+        this.graphics.clear();
+        this.graphics = undefined;
+        this._viewer = undefined;
       }
     }, {
-      key: "numberOfListeners",
+      key: "graphics",
       get: function get() {
-        return this._listeners.length - this._toRemove.length;
+        return this._graphics;
       }
     }]);
 
-    return Event;
+    return Plotting;
   }();
 
-  /**
-   * 开启/关闭基于地形的深度检测
-   *
-   * @exports depthTest
-   *
-   * @param {Cesium.Globe|Cesium.Viewer|Cesium.Scene} target 测试检测对象
-   * @param {Boolean} depth 深度检测状态
-   *
-   * @example
-   *
-   * const viewer=CesiumPro.createViewer('map');
-   * CesiumPro.depthTest(viewer);
-   * CesiumPro.depthTest(viewer.scene);
-   * CesiumPro.depthTest(viewer.scene.globe);
-   */
-  function depthTest(target) {
-    var depth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+  var PlotUtil = /*#__PURE__*/function () {
+    /**
+     * 几何图形学基础方法
+     */
+    function PlotUtil() {
+      _classCallCheck(this, PlotUtil);
+    }
+    /**
+     * 平面点的欧氏距离，如果点的数据大于2，将计算相邻两个点的距离之和。
+     * @param  {Number[]} args 需要计算距离的平面点集合
+     * @return {Float}      欧氏距离
+     */
 
-    if (target instanceof Cesium.Viewer) {
-      target.scene.globe.depthTestAgainstTerrain = depth;
-    } else if (target instanceof Cesium.Scene) {
-      target.globe.depthTestAgainstTerrain = depth;
-    } else if (target instanceof Cesium.Globe) {
-      target.depthTestAgainstTerrain = depth;
-    } else {
-      throw new CesiumProError("无效的对象");
+
+    _createClass(PlotUtil, null, [{
+      key: "distance",
+      value: function distance() {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        var length = args.length;
+
+        if (length < 2) {
+          return 0;
+        }
+
+        var distance = 0;
+
+        for (var i = 0; i < length - 1; i++) {
+          var nextIndex = (i + 1) % length;
+          var start = args[i];
+          var end = args[nextIndex];
+          distance += Math.sqrt(Math.pow(start[0] - end[0], 2) + Math.pow(start[1] - end[1], 2));
+        }
+
+        return distance;
+      }
+      /**
+       * @param  {Number[]} points            [description]
+       * @param  {Number} [percentage=0.99] [description]
+       * @return {Number}                  长度
+       */
+
+    }, {
+      key: "baseLength",
+      value: function baseLength(points) {
+        var percentage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.99;
+        return Math.pow(PlotUtil.distance.apply(PlotUtil, _toConsumableArray(points)), percentage);
+      }
+      /**
+       * 平面两点的中点
+       * @param  {Number[]} start 起点
+       * @param  {Number[]} end   终点
+       * @return {Number[]}       中点坐标
+       */
+
+    }, {
+      key: "mid",
+      value: function mid(start, end) {
+        return [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+      }
+      /**
+       * 方位角
+       * @param  {Number[]} start 起点
+       * @param  {Number[]} end   终点
+       * @return {Number} 向量与Y轴的夹角
+       */
+
+    }, {
+      key: "azimuth",
+      value: function azimuth(start, end) {
+        var result;
+        var _ref = [end, start];
+        start = _ref[0];
+        end = _ref[1];
+        // 向量与Y轴的夹角;
+        var angle = Math.asin(Math.abs(start[1] - end[1]) / PlotUtil.distance(start, end));
+        result = start[1] >= end[1] && start[0] >= end[0] ? angle + Math.PI : start[1] >= end[1] && start[0] < end[0] ? Cesium.Math.TWO_PI - angle : start[1] < end[1] && start[0] >= end[0] ? Math.PI - angle : angle;
+        return result;
+      }
+      /**
+       * 根据两个点计算第三个点,具体为：如果以end为圆心，以radius为半径创建一个圆,以向量<start,end>方位角为起始位置，
+       * 旋转angle度后得到的圆弧上的点,inverse为false，向正方向旋转,true,向负方向旋转
+       * @param  {Number[]} start   起点，即圆心
+       * @param  {Number[]} end     终点
+       * @param  {Number} angle   旋转角度，单位弧度
+       * @param  {Number} radius    半径
+       * @param  {bool} inverse  是否逆向旋转
+       * @return {Number[]}      新点位
+       */
+
+    }, {
+      key: "thirdPoint",
+      value: function thirdPoint(start, end, angle, radius) {
+        var inverse = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+        var azimuth = PlotUtil.azimuth(start, end);
+        var adjustAngle = inverse ? azimuth - angle : azimuth + angle;
+        var x = radius * Math.cos(adjustAngle);
+        var y = radius * Math.sin(adjustAngle);
+        return [end[0] + x, end[1] + y];
+      }
+      /**
+       * 判断由t,o,e是否顺时针环绕
+       * @param  {Number[]}  t
+       * @param  {Number[]}  o
+       * @param  {Number[]}  e
+       * @return {Boolean}
+       */
+
+    }, {
+      key: "isClockWise",
+      value: function isClockWise(t, o, e) {
+        return (e[1] - t[1]) * (o[0] - t[0]) > (o[1] - t[1]) * (e[0] - t[0]);
+      }
+      /**
+       * 计算两条直线之间的夹角，两条直线必须有公共点
+       * @param  {Number[]} origin 两直接的公共点
+       * @param  {Number[]} point1 直线1的另一个顶点
+       * @param  {Number[]} point2 直线2的另一个顶点
+       * @return {number}  两直线之间的夹角，单位弧度
+       */
+
+    }, {
+      key: "angleOfThreePoints",
+      value: function angleOfThreePoints(origin, point1, point2) {
+        var angle = PlotUtil.azimuth(origin, point1) - PlotUtil.azimuth(origin, point2);
+        return angle > 0 ? angle : Math.PI * 2 + angle;
+      }
+      /**
+       * 四边形B样条曲面因子
+       * @param  {Number} t
+       * @param  {Number} o
+       * @return {Number}
+       */
+
+    }, {
+      key: "quadricBSplineFactor",
+      value: function quadricBSplineFactor(t, o) {
+        if (t === 0) {
+          return Math.pow(o - 1, 2) / 2;
+        }
+
+        if (t === 1) {
+          return (-2.0 * Math.pow(o, 2) + 2 * o + 1) / 2;
+        }
+
+        if (t === 2) {
+          return Math.pow(o, 2) / 2;
+        }
+
+        return 0;
+      }
+      /**
+       * 四边形B样条曲线
+       *
+       * @param  {Number[]} points 计算四边形B样条曲线的输入点
+       * @return {Number[]}        构成四边形B样条曲线的点
+       */
+
+    }, {
+      key: "quadricBSpline",
+      value: function quadricBSpline(points) {
+        if (points <= 2) {
+          return points;
+        }
+
+        var result = [];
+        var fac = 2;
+        var length = points.length - fac - 1;
+        result.push(points[0]);
+
+        for (var n = 0; n <= length; n++) {
+          for (var g = 0; g <= 1; g += 0.05) {
+            var x = 0;
+            var y = 0;
+
+            for (var s = 0; s <= fac; s++) {
+              var factor = PlotUtil.quadricBSplineFactor(s, g);
+              x += factor * points[n + s][0];
+              y += factor * points[n + s][1];
+            }
+
+            result.push([x, y]);
+          }
+        }
+
+        result.push(points[points.length - 1]);
+        return result;
+      }
+      /**
+       * 组合C<sub>0</sub><sup style="margin-left:-5px">t</sup>的值
+       * @param  {Number} t
+       * @param  {Number} o
+       * @return {Number}
+       */
+
+    }, {
+      key: "binomialFactor",
+      value: function binomialFactor(t, o) {
+        return PlotUtil.factorial(t) / (PlotUtil.factorial(o) * PlotUtil.factorial(t - o));
+      }
+      /**
+       * 求阶乘
+       * @param  {Number} n n必须不小于0
+       * @return {Number}   n的阶乘(n!)
+       */
+
+    }, {
+      key: "factorial",
+      value: function factorial(n) {
+        if (n < 0) {
+          return NaN;
+        }
+
+        if (n === 0) {
+          return 1;
+        }
+
+        return n * PlotUtil.factorial(n - 1);
+      }
+      /**
+       * 贝塞尔曲线
+       * @param {Number[]} points [description]
+       * @return {Number[]}   构成贝塞尔曲线的点集
+       */
+
+    }, {
+      key: "BezierCurve",
+      value: function BezierCurve(points) {
+        var count = points.length;
+
+        if (count < 2) {
+          return points;
+        }
+
+        var curves = [];
+
+        for (var i = 0; i <= 1; i += 0.01) {
+          var x = 0;
+          var y = 0;
+
+          for (var j = 0; j < count; j++) {
+            var factor = PlotUtil.binomialFactor(count - 1, j);
+            var s = Math.pow(i, j);
+            var a = Math.pow(1 - i, count - j - 1);
+            x += factor * s * a * points[j][0];
+            y += factor * s * a * points[j][1];
+          }
+
+          curves.push([x, y]);
+        }
+
+        curves.push(points[count - 1]);
+        return curves;
+      }
+    }]);
+
+    return PlotUtil;
+  }();
+
+  /*
+   * 判断点是否在球的背面
+   */
+  var _Cesium$SceneMode = Cesium.SceneMode,
+      SCENE2D = _Cesium$SceneMode.SCENE2D,
+      SCENE3D = _Cesium$SceneMode.SCENE3D;
+  var _Cesium$2 = Cesium,
+      BoundingSphere = _Cesium$2.BoundingSphere;
+  /**
+   * 判断点位在场景中是否可见
+   * @exports pointVisibility
+   * @param {Cartesian3} position 点
+   * @param {Viewer} viewer Viewer对象
+   * @return {Bool} 如果可见返回true，否则返回false。
+   */
+
+  function pointVisibility(position, viewer) {
+    checkViewer(viewer);
+
+    if (viewer.scene.mode === SCENE3D) {
+      var visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position).isPointVisible(position);
+
+      if (!visibility) {
+        return false;
+      }
+
+      var windowPosition = CVT$1.toPixel(point, viewer);
+
+      if (!defined(windowPosition)) {
+        return false;
+      }
+
+      var width = viewer.canvas.width || viewer.canvas.clientWidth;
+      var height = viewer.canvas.height || viewer.canvas.clientHeight;
+      return windowPosition.x > 0 && windowPosition.x < width && windowPosition.y > 0 && windowPosition.y < height;
+    } else if (viewer.scene.mode === SCENE2D) {
+      var frustum = viewer.scene.camera.frustum;
+      var _viewer$scene$camera = viewer.scene.camera,
+          positionWC = _viewer$scene$camera.positionWC,
+          directionWC = _viewer$scene$camera.directionWC,
+          upWC = _viewer$scene$camera.upWC;
+      var cullingVolume = frustum.computeCullingVolume(positionWC, directionWC, upWC);
+      var bounding = BoundingSphere.projectTo2D(new BoundingSphere(point, 1));
+
+      var _visibility = cullingVolume.computeVisibility(bounding);
+
+      return _visibility === Cesium.Intersect.INSIDE || _visibility === Cesium.Intersect.INERSECTING;
     }
   }
+
+  /**
+   * 从某范围生成一定数量的随机点,默认生成当前视图范围内的一个随机点
+   * @param  {Cesium.Viewer} viewer viewer
+   * @param  {Number} [count=1] 随机点数量
+   * @param {Cesium.Rectangle} 定义生成随机点的边界，如果未定义，将使用当前窗口的视图范围
+   * @return {Cartesian3[]}        [description]
+   */
+  function randomPosition(viewer, count, extent) {}
+
+  var ViewerParams = /*#__PURE__*/function () {
+    /**
+     * 获取当前场景的参数，包括经纬度、海拔、视高、帧率、延迟以及相机参数heading、pitch、roll。
+     * 如果要更新帧率和延迟，应该在对象初始化后调用addPostRenderEvent()方法。
+     * @param {Cesium.Viewer} viewer
+     * @param {Boolean} [debug=false] 是否打开调试模式，打开开将在控制台打印参数
+     */
+    function ViewerParams(viewer) {
+      var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      _classCallCheck(this, ViewerParams);
+
+      checkViewer(viewer);
+      this._viewer = viewer;
+      this._handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+      this._lastFpsSampleTime = 0;
+      this._fpsFrameCount = 0;
+      this._msFrameCount = 0;
+      this._fps = 0;
+      this._ms = 0;
+      this._lon = 0;
+      this._lat = 0;
+      this._height = 0;
+      this._alt = undefined;
+      this._heading = undefined;
+      this._pitch = undefined;
+      this._roll = undefined;
+      this.debug = debug;
+      this.addMousemoveEvent();
+    }
+    /**
+     * 开始监听鼠标移动事件，获取鼠标所在位置的经纬度及高程。
+     */
+
+
+    _createClass(ViewerParams, [{
+      key: "addMousemoveEvent",
+      value: function addMousemoveEvent() {
+        var _this = this;
+
+        this.removeMousemoveEvent();
+
+        this._handler.setInputAction(function (e) {
+          var coor = CVT$1.toDegrees(e.endPosition, _this._viewer);
+
+          if (!Cesium.defined(coor)) {
+            return;
+          }
+
+          _this._lon = coor.lon;
+          _this._lat = coor.lat;
+          _this._height = coor.height;
+          _this._alt = undefined;
+
+          if (_this._viewer.terrainProvider) {
+            var cartesian = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(_this._lon, _this._lat));
+            Cesium.sampleTerrainMostDetailed(_this._viewer.terrainProvider, [cartesian]).then(function (sampler) {
+              _this._alt = sampler[0].height;
+            });
+          }
+
+          _this.updateHeadingPitchRoll();
+
+          if (_this.debug) {
+            console.log(_this.params);
+          }
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      }
+      /**
+       * 移除鼠标移动事件监听，经纬度、高程、视高将不会更新
+       */
+
+    }, {
+      key: "removeMousemoveEvent",
+      value: function removeMousemoveEvent() {
+        this._handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      }
+      /**
+       * 添加postRender事件监听，对象初始化后必须调用该方法帧率和延迟以及相机能数才会实时刷新
+       */
+
+    }, {
+      key: "addPostRenderEvent",
+      value: function addPostRenderEvent() {
+        var _this2 = this;
+
+        this.postRenderFunction = this._viewer.scene.postRender.addEventListener(function () {
+          _this2.updateFps();
+
+          _this2.updateHeadingPitchRoll();
+        });
+      }
+      /**
+       * 移除postRender事件监听,帧率和延迟以及相机能数将不会更新
+       */
+
+    }, {
+      key: "removePostRenderEvent",
+      value: function removePostRenderEvent() {
+        if (this.postRenderFunction) {
+          this.postRenderFunction();
+        }
+      }
+      /**
+       * 销毁对象
+       */
+
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        this.removeMousemoveEvent();
+        this.removePostRenderEvent();
+
+        if (!this._handler.isDestroyed()) {
+          this._handler.destroy();
+        }
+
+        this._handler = undefined;
+        this._viewer = undefined;
+      }
+      /**
+       * 所有属性的集合
+       * @readonly
+       */
+
+    }, {
+      key: "updateFps",
+      value: function updateFps() {
+        var time = Cesium.getTimestamp();
+
+        if (!Cesium.defined(this._lastFpsSampleTime)) {
+          this._lastFpsSampleTime = Cesium.getTimestamp();
+        }
+
+        if (!Cesium.defined(this.lastMsSampleTime)) {
+          this.lastMsSampleTime = Cesium.getTimestamp();
+        }
+
+        this._fpsFrameCount++;
+        var fpsElapsedTime = time - this._lastFpsSampleTime;
+
+        if (fpsElapsedTime > 1000) {
+          var fps = 'N/A';
+          fps = this._fpsFrameCount * 1000 / fpsElapsedTime || 0;
+          this._fps = "".concat(fps.toFixed(0), " FPS");
+          this._lastFpsSampleTime = time;
+          this._fpsFrameCount = 0;
+        }
+
+        this._msFrameCount++;
+        var msElapsedTime = time - this.lastMsSampleTime;
+
+        if (msElapsedTime > 200) {
+          var ms = 'N/A';
+          ms = (msElapsedTime / this._msFrameCount).toFixed(2);
+          this._ms = "".concat(ms, " MS");
+          this.lastMsSampleTime = time;
+          this._msFrameCount = 0;
+        }
+      }
+      /**
+       * 更新相机参数
+       */
+
+    }, {
+      key: "updateHeadingPitchRoll",
+      value: function updateHeadingPitchRoll() {
+        var viewer = this._viewer;
+        this._heading = viewer.camera.heading;
+        this._pitch = viewer.camera.pitch;
+        this._roll = viewer.camera.roll;
+      }
+      /**
+       * 场景的中心坐标
+       * @param  {Boolean} [inWorldCoordinates=true] 是否转为世界坐标，如果为false,将返回相机参考系的坐标
+       * @param  {Cesium.Cartesian3}  [result] 结果的保存对象
+       * @return {Cesium.Cartesian3} 场景的中心坐标
+       */
+
+    }, {
+      key: "viewerCenter",
+      value: function viewerCenter() {
+        var inWorldCoordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+        var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Cesium.Cartesian3();
+        var _this$_viewer = this._viewer,
+            scene = _this$_viewer.scene,
+            camera = _this$_viewer.camera;
+        var unprojectedScratch = new Cesium.Cartographic();
+        var rayScratch = new Cesium.Ray();
+        var viewer = this._viewer;
+
+        if (scene.mode === Cesium.SceneMode.MORPHING) {
+          return undefined;
+        }
+
+        if (Cesium.defined(viewer.trackedEntity)) {
+          result = viewer.trackedEntity.position.getValue(viewer.clock.currentTime, result);
+        } else {
+          rayScratch.origin = camera.positionWC;
+          rayScratch.direction = camera.directionWC;
+          result = scene.globe.pick(rayScratch, scene, result);
+        }
+
+        if (!Cesium.defined(result)) {
+          return undefined;
+        }
+
+        if (scene.mode === Cesium.SceneMode.SCENE2D || scene.mode === Cesium.SceneMode.COLUMBUS_VIEW) {
+          result = camera.worldToCameraCoordinatesPoint(result, result);
+
+          if (inWorldCoordinates) {
+            result = scene.globe.ellipsoid.cartographicToCartesian(scene.mapProjection.unproject(result, unprojectedScratch), result);
+          }
+        } else if (!inWorldCoordinates) {
+          result = camera.worldToCameraCoordinatesPoint(result, result);
+        }
+
+        return result;
+      }
+    }, {
+      key: "params",
+      get: function get() {
+        return {
+          lon: this.lon,
+          lat: this.lat,
+          height: this.height,
+          alt: this.alt,
+          heading: this.heading,
+          pitch: this.pitch,
+          roll: this.roll,
+          fps: this.fps,
+          ms: this.ms
+        };
+      }
+      /**
+       * 经度
+       * @readonly
+       */
+
+    }, {
+      key: "lon",
+      get: function get() {
+        return this._lon;
+      }
+      /**
+       * 纬度
+       * @readonly
+       */
+
+    }, {
+      key: "lat",
+      get: function get() {
+        return this._lat;
+      }
+      /**
+       * 视高
+       * @readonly
+       */
+
+    }, {
+      key: "height",
+      get: function get() {
+        return this._height;
+      }
+      /**
+       * 地形高/海拔
+       * @readonly
+       */
+
+    }, {
+      key: "alt",
+      get: function get() {
+        return this._alt;
+      }
+      /**
+       * 相机旋转角
+       * @readonly
+       */
+
+    }, {
+      key: "heading",
+      get: function get() {
+        return Cesium.Math.toDegrees(this._heading);
+      }
+      /**
+       * 相机仰俯角
+       * @readonly
+       */
+
+    }, {
+      key: "pitch",
+      get: function get() {
+        return Cesium.Math.toDegrees(this._pitch);
+      }
+      /**
+       * 相机翻滚角
+       * @readonly
+       */
+
+    }, {
+      key: "roll",
+      get: function get() {
+        return Cesium.Math.toDegrees(this._roll);
+      }
+      /**
+       * 帧率
+       * @readonly
+       */
+
+    }, {
+      key: "fps",
+      get: function get() {
+        return this._fps;
+      }
+      /**
+       * 延迟
+       * @readonly
+       */
+
+    }, {
+      key: "ms",
+      get: function get() {
+        return this._ms;
+      }
+      /**
+       * 场景中心坐标
+       * @readonly
+       */
+
+    }, {
+      key: "center",
+      get: function get() {
+        return this.viewerCenter();
+      }
+    }]);
+
+    return ViewerParams;
+  }();
+
+  var _Cesium$3 = Cesium,
+      Cartesian2 = _Cesium$3.Cartesian2,
+      Cartesian3$1 = _Cesium$3.Cartesian3,
+      ImageryProvider = _Cesium$3.ImageryProvider,
+      when = _Cesium$3.when,
+      WebMercatorTilingScheme = _Cesium$3.WebMercatorTilingScheme,
+      Resource = _Cesium$3.Resource,
+      CesiumMath = _Cesium$3.CesiumMath,
+      Rectangle$1 = _Cesium$3.Rectangle,
+      GeographicProjection = _Cesium$3.GeographicProjection,
+      Event$1 = _Cesium$3.Event,
+      DeveloperError = _Cesium$3.DeveloperError,
+      defined$1 = _Cesium$3.defined,
+      defaultValue$1 = _Cesium$3.defaultValue,
+      Credit = _Cesium$3.Credit,
+      combine = _Cesium$3.combine,
+      Cartographic = _Cesium$3.Cartographic;
+  var templateRegex = /{[^}]+}/g;
+  var tags = {
+    x: xTag,
+    y: yTag,
+    z: zTag,
+    s: sTag,
+    reverseX: reverseXTag,
+    reverseY: reverseYTag,
+    reverseZ: reverseZTag,
+    westDegrees: westDegreesTag,
+    southDegrees: southDegreesTag,
+    eastDegrees: eastDegreesTag,
+    northDegrees: northDegreesTag,
+    westProjected: westProjectedTag,
+    southProjected: southProjectedTag,
+    eastProjected: eastProjectedTag,
+    northProjected: northProjectedTag,
+    width: widthTag,
+    height: heightTag
+  };
+  var pickFeaturesTags = combine(tags, {
+    i: iTag,
+    j: jTag,
+    reverseI: reverseITag,
+    reverseJ: reverseJTag,
+    longitudeDegrees: longitudeDegreesTag,
+    latitudeDegrees: latitudeDegreesTag,
+    longitudeProjected: longitudeProjectedTag,
+    latitudeProjected: latitudeProjectedTag,
+    format: formatTag
+  });
+  /**
+   * @typedef {Object} VectorTileProvider.ConstructorOptions
+   *
+   * Initialization options for the VectorTileProvider constructor
+   *
+   * @property {Promise.<Object>|Object} [options] Object with the following properties:
+   * @property {Resource|String} url  The URL template to use to request tiles.  It has the following keywords:
+   * <ul>
+   *     <li><code>{z}</code>: The level of the tile in the tiling scheme.  Level zero is the root of the quadtree pyramid.</li>
+   *     <li><code>{x}</code>: The tile X coordinate in the tiling scheme, where 0 is the Westernmost tile.</li>
+   *     <li><code>{y}</code>: The tile Y coordinate in the tiling scheme, where 0 is the Northernmost tile.</li>
+   *     <li><code>{s}</code>: One of the available subdomains, used to overcome browser limits on the number of simultaneous requests per host.</li>
+   *     <li><code>{reverseX}</code>: The tile X coordinate in the tiling scheme, where 0 is the Easternmost tile.</li>
+   *     <li><code>{reverseY}</code>: The tile Y coordinate in the tiling scheme, where 0 is the Southernmost tile.</li>
+   *     <li><code>{reverseZ}</code>: The level of the tile in the tiling scheme, where level zero is the maximum level of the quadtree pyramid.  In order to use reverseZ, maximumLevel must be defined.</li>
+   *     <li><code>{westDegrees}</code>: The Western edge of the tile in geodetic degrees.</li>
+   *     <li><code>{southDegrees}</code>: The Southern edge of the tile in geodetic degrees.</li>
+   *     <li><code>{eastDegrees}</code>: The Eastern edge of the tile in geodetic degrees.</li>
+   *     <li><code>{northDegrees}</code>: The Northern edge of the tile in geodetic degrees.</li>
+   *     <li><code>{westProjected}</code>: The Western edge of the tile in projected coordinates of the tiling scheme.</li>
+   *     <li><code>{southProjected}</code>: The Southern edge of the tile in projected coordinates of the tiling scheme.</li>
+   *     <li><code>{eastProjected}</code>: The Eastern edge of the tile in projected coordinates of the tiling scheme.</li>
+   *     <li><code>{northProjected}</code>: The Northern edge of the tile in projected coordinates of the tiling scheme.</li>
+   *     <li><code>{width}</code>: The width of each tile in pixels.</li>
+   *     <li><code>{height}</code>: The height of each tile in pixels.</li>
+   * </ul>
+   * @property {Resource|String} [pickFeaturesUrl] The URL template to use to pick features.  If this property is not specified,
+   *                 {@link VectorTileProvider#pickFeatures} will immediately returned undefined, indicating no
+   *                 features picked.  The URL template supports all of the keywords supported by the <code>url</code>
+   *                 parameter, plus the following:
+   * <ul>
+   *     <li><code>{i}</code>: The pixel column (horizontal coordinate) of the picked position, where the Westernmost pixel is 0.</li>
+   *     <li><code>{j}</code>: The pixel row (vertical coordinate) of the picked position, where the Northernmost pixel is 0.</li>
+   *     <li><code>{reverseI}</code>: The pixel column (horizontal coordinate) of the picked position, where the Easternmost pixel is 0.</li>
+   *     <li><code>{reverseJ}</code>: The pixel row (vertical coordinate) of the picked position, where the Southernmost pixel is 0.</li>
+   *     <li><code>{longitudeDegrees}</code>: The longitude of the picked position in degrees.</li>
+   *     <li><code>{latitudeDegrees}</code>: The latitude of the picked position in degrees.</li>
+   *     <li><code>{longitudeProjected}</code>: The longitude of the picked position in the projected coordinates of the tiling scheme.</li>
+   *     <li><code>{latitudeProjected}</code>: The latitude of the picked position in the projected coordinates of the tiling scheme.</li>
+   *     <li><code>{format}</code>: The format in which to get feature information, as specified in the {@link GetFeatureInfoFormat}.</li>
+   * </ul>
+   * @property {Object} [urlSchemeZeroPadding] Gets the URL scheme zero padding for each tile coordinate. The format is '000' where
+   * each coordinate will be padded on the left with zeros to match the width of the passed string of zeros. e.g. Setting:
+   * urlSchemeZeroPadding : { '{x}' : '0000'}
+   * will cause an 'x' value of 12 to return the string '0012' for {x} in the generated URL.
+   * It the passed object has the following keywords:
+   * <ul>
+   *  <li> <code>{z}</code>: The zero padding for the level of the tile in the tiling scheme.</li>
+   *  <li> <code>{x}</code>: The zero padding for the tile X coordinate in the tiling scheme.</li>
+   *  <li> <code>{y}</code>: The zero padding for the the tile Y coordinate in the tiling scheme.</li>
+   *  <li> <code>{reverseX}</code>: The zero padding for the tile reverseX coordinate in the tiling scheme.</li>
+   *  <li> <code>{reverseY}</code>: The zero padding for the tile reverseY coordinate in the tiling scheme.</li>
+   *  <li> <code>{reverseZ}</code>: The zero padding for the reverseZ coordinate of the tile in the tiling scheme.</li>
+   * </ul>
+   * @property {String|String[]} [subdomains='abc'] The subdomains to use for the <code>{s}</code> placeholder in the URL template.
+   *                          If this parameter is a single string, each character in the string is a subdomain.  If it is
+   *                          an array, each element in the array is a subdomain.
+   * @property {Credit|String} [credit=''] A credit for the data source, which is displayed on the canvas.
+   * @property {Number} [minimumLevel=0] The minimum level-of-detail supported by the imagery provider.  Take care when specifying
+   *                 this that the number of tiles at the minimum level is small, such as four or less.  A larger number is likely
+   *                 to result in rendering problems.
+   * @property {Number} [maximumLevel] The maximum level-of-detail supported by the imagery provider, or undefined if there is no limit.
+   * @property {Rectangle} [rectangle=Rectangle.MAX_VALUE] The rectangle, in radians, covered by the image.
+   * @property {TilingScheme} [tilingScheme=WebMercatorTilingScheme] The tiling scheme specifying how the ellipsoidal
+   * surface is broken into tiles.  If this parameter is not provided, a {@link WebMercatorTilingScheme}
+   * is used.
+   * @property {Ellipsoid} [ellipsoid] The ellipsoid.  If the tilingScheme is specified,
+   *                    this parameter is ignored and the tiling scheme's ellipsoid is used instead. If neither
+   *                    parameter is specified, the WGS84 ellipsoid is used.
+   * @property {Number} [tileWidth=256] Pixel width of image tiles.
+   * @property {Number} [tileHeight=256] Pixel height of image tiles.
+   * @property {Boolean} [hasAlphaChannel=true] true if the images provided by this imagery provider
+   *                  include an alpha channel; otherwise, false.  If this property is false, an alpha channel, if
+   *                  present, will be ignored.  If this property is true, any images without an alpha channel will
+   *                  be treated as if their alpha is 1.0 everywhere.  When this property is false, memory usage
+   *                  and texture upload time are potentially reduced.
+   * @property {GetFeatureInfoFormat[]} [getFeatureInfoFormats] The formats in which to get feature information at a
+   *                                 specific location when {@link VectorTileProvider#pickFeatures} is invoked.  If this
+   *                                 parameter is not specified, feature picking is disabled.
+   * @property {Boolean} [enablePickFeatures=true] If true, {@link VectorTileProvider#pickFeatures} will
+   *        request the <code>pickFeaturesUrl</code> and attempt to interpret the features included in the response.  If false,
+   *        {@link VectorTileProvider#pickFeatures} will immediately return undefined (indicating no pickable
+   *        features) without communicating with the server.  Set this property to false if you know your data
+   *        source does not support picking features or if you don't want this provider's features to be pickable. Note
+   *        that this can be dynamically overridden by modifying the {@link UriTemplateImageryProvider#enablePickFeatures}
+   *        property.
+   * @property {Object} [customTags] Allow to replace custom keywords in the URL template. The object must have strings as keys and functions as values.
+   */
+
+  /**
+   * Provides imagery by requesting tiles using a specified URL template.
+   *
+   * @alias VectorTileProvider
+   * @constructor
+   *
+   * @param {VectorTileProvider.ConstructorOptions} options Object describing initialization options
+   *
+   * @example
+   * // Access Natural Earth II imagery, which uses a TMS tiling scheme and Geographic (EPSG:4326) project
+   * var tms = new Cesium.VectorTileProvider({
+   *     url : Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII') + '/{z}/{x}/{reverseY}.jpg',
+   *     credit : '© Analytical Graphics, Inc.',
+   *     tilingScheme : new Cesium.GeographicTilingScheme(),
+   *     maximumLevel : 5
+   * });
+   * // Access the CartoDB Positron basemap, which uses an OpenStreetMap-like tiling scheme.
+   * var positron = new Cesium.VectorTileProvider({
+   *     url : 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+   *     credit : 'Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+   * });
+   * // Access a Web Map Service (WMS) server.
+   * var wms = new Cesium.VectorTileProvider({
+   *    url : 'https://programs.communications.gov.au/geoserver/ows?tiled=true&' +
+   *          'transparent=true&format=image%2Fpng&exceptions=application%2Fvnd.ogc.se_xml&' +
+   *          'styles=&service=WMS&version=1.1.1&request=GetMap&' +
+   *          'layers=public%3AMyBroadband_Availability&srs=EPSG%3A3857&' +
+   *          'bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&' +
+   *          'width=256&height=256',
+   *    rectangle : Cesium.Rectangle.fromDegrees(96.799393, -43.598214999057824, 153.63925700000001, -9.2159219997013)
+   * });
+   * // Using custom tags in your template url.
+   * var custom = new Cesium.VectorTileProvider({
+   *    url : 'https://yoururl/{Time}/{z}/{y}/{x}.png',
+   *    customTags : {
+   *        Time: function(imageryProvider, x, y, level) {
+   *            return '20171231'
+   *        }
+   *    }
+   * });
+   *
+   */
+
+  function VectorTileProvider(options) {
+    //>>includeStart('debug', pragmas.debug);
+    if (!defined$1(options)) {
+      throw new DeveloperError("options is required.");
+    }
+
+    if (!when.isPromise(options) && !defined$1(options.url)) {
+      throw new DeveloperError("options is required.");
+    } //>>includeEnd('debug');
+
+
+    this._errorEvent = new Event$1();
+    this._resource = undefined;
+    this._urlSchemeZeroPadding = undefined;
+    this._pickFeaturesResource = undefined;
+    this._tileWidth = undefined;
+    this._tileHeight = undefined;
+    this._maximumLevel = undefined;
+    this._minimumLevel = undefined;
+    this._tilingScheme = undefined;
+    this._rectangle = undefined;
+    this._tileDiscardPolicy = undefined;
+    this._credit = undefined;
+    this._hasAlphaChannel = undefined;
+    this._readyPromise = undefined;
+    this._tags = undefined;
+    this._pickFeaturesTags = undefined;
+    /**
+     * The default alpha blending value of this provider, with 0.0 representing fully transparent and
+     * 1.0 representing fully opaque.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultAlpha = undefined;
+    /**
+     * The default alpha blending value on the night side of the globe of this provider, with 0.0 representing fully transparent and
+     * 1.0 representing fully opaque.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultNightAlpha = undefined;
+    /**
+     * The default alpha blending value on the day side of the globe of this provider, with 0.0 representing fully transparent and
+     * 1.0 representing fully opaque.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultDayAlpha = undefined;
+    /**
+     * The default brightness of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0
+     * makes the imagery darker while greater than 1.0 makes it brighter.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultBrightness = undefined;
+    /**
+     * The default contrast of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0 reduces
+     * the contrast while greater than 1.0 increases it.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultContrast = undefined;
+    /**
+     * The default hue of this provider in radians. 0.0 uses the unmodified imagery color.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultHue = undefined;
+    /**
+     * The default saturation of this provider. 1.0 uses the unmodified imagery color. Less than 1.0 reduces the
+     * saturation while greater than 1.0 increases it.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultSaturation = undefined;
+    /**
+     * The default gamma correction to apply to this provider.  1.0 uses the unmodified imagery color.
+     *
+     * @type {Number|undefined}
+     * @default undefined
+     */
+
+    this.defaultGamma = undefined;
+    /**
+     * The default texture minification filter to apply to this provider.
+     *
+     * @type {TextureMinificationFilter}
+     * @default undefined
+     */
+
+    this.defaultMinificationFilter = undefined;
+    /**
+     * The default texture magnification filter to apply to this provider.
+     *
+     * @type {TextureMagnificationFilter}
+     * @default undefined
+     */
+
+    this.defaultMagnificationFilter = undefined;
+    /**
+     * Gets or sets a value indicating whether feature picking is enabled.  If true, {@link VectorTileProvider#pickFeatures} will
+     * request the <code>options.pickFeaturesUrl</code> and attempt to interpret the features included in the response.  If false,
+     * {@link VectorTileProvider#pickFeatures} will immediately return undefined (indicating no pickable
+     * features) without communicating with the server.  Set this property to false if you know your data
+     * source does not support picking features or if you don't want this provider's features to be pickable.
+     * @type {Boolean}
+     * @default true
+     */
+
+    this.enablePickFeatures = true;
+    this.reinitialize(options);
+  }
+
+  Object.defineProperties(VectorTileProvider.prototype, {
+    /**
+     * Gets the URL template to use to request tiles.  It has the following keywords:
+     * <ul>
+     *  <li> <code>{z}</code>: The level of the tile in the tiling scheme.  Level zero is the root of the quadtree pyramid.</li>
+     *  <li> <code>{x}</code>: The tile X coordinate in the tiling scheme, where 0 is the Westernmost tile.</li>
+     *  <li> <code>{y}</code>: The tile Y coordinate in the tiling scheme, where 0 is the Northernmost tile.</li>
+     *  <li> <code>{s}</code>: One of the available subdomains, used to overcome browser limits on the number of simultaneous requests per host.</li>
+     *  <li> <code>{reverseX}</code>: The tile X coordinate in the tiling scheme, where 0 is the Easternmost tile.</li>
+     *  <li> <code>{reverseY}</code>: The tile Y coordinate in the tiling scheme, where 0 is the Southernmost tile.</li>
+     *  <li> <code>{reverseZ}</code>: The level of the tile in the tiling scheme, where level zero is the maximum level of the quadtree pyramid.  In order to use reverseZ, maximumLevel must be defined.</li>
+     *  <li> <code>{westDegrees}</code>: The Western edge of the tile in geodetic degrees.</li>
+     *  <li> <code>{southDegrees}</code>: The Southern edge of the tile in geodetic degrees.</li>
+     *  <li> <code>{eastDegrees}</code>: The Eastern edge of the tile in geodetic degrees.</li>
+     *  <li> <code>{northDegrees}</code>: The Northern edge of the tile in geodetic degrees.</li>
+     *  <li> <code>{westProjected}</code>: The Western edge of the tile in projected coordinates of the tiling scheme.</li>
+     *  <li> <code>{southProjected}</code>: The Southern edge of the tile in projected coordinates of the tiling scheme.</li>
+     *  <li> <code>{eastProjected}</code>: The Eastern edge of the tile in projected coordinates of the tiling scheme.</li>
+     *  <li> <code>{northProjected}</code>: The Northern edge of the tile in projected coordinates of the tiling scheme.</li>
+     *  <li> <code>{width}</code>: The width of each tile in pixels.</li>
+     *  <li> <code>{height}</code>: The height of each tile in pixels.</li>
+     * </ul>
+     * @memberof VectorTileProvider.prototype
+     * @type {String}
+     * @readonly
+     */
+    url: {
+      get: function get() {
+        return this._resource.url;
+      }
+    },
+
+    /**
+     * Gets the URL scheme zero padding for each tile coordinate. The format is '000' where each coordinate will be padded on
+     * the left with zeros to match the width of the passed string of zeros. e.g. Setting:
+     * urlSchemeZeroPadding : { '{x}' : '0000'}
+     * will cause an 'x' value of 12 to return the string '0012' for {x} in the generated URL.
+     * It has the following keywords:
+     * <ul>
+     *  <li> <code>{z}</code>: The zero padding for the level of the tile in the tiling scheme.</li>
+     *  <li> <code>{x}</code>: The zero padding for the tile X coordinate in the tiling scheme.</li>
+     *  <li> <code>{y}</code>: The zero padding for the the tile Y coordinate in the tiling scheme.</li>
+     *  <li> <code>{reverseX}</code>: The zero padding for the tile reverseX coordinate in the tiling scheme.</li>
+     *  <li> <code>{reverseY}</code>: The zero padding for the tile reverseY coordinate in the tiling scheme.</li>
+     *  <li> <code>{reverseZ}</code>: The zero padding for the reverseZ coordinate of the tile in the tiling scheme.</li>
+     * </ul>
+     * @memberof VectorTileProvider.prototype
+     * @type {Object}
+     * @readonly
+     */
+    urlSchemeZeroPadding: {
+      get: function get() {
+        return this._urlSchemeZeroPadding;
+      }
+    },
+
+    /**
+     * Gets the URL template to use to use to pick features.  If this property is not specified,
+     * {@link VectorTileProvider#pickFeatures} will immediately return undefined, indicating no
+     * features picked.  The URL template supports all of the keywords supported by the
+     * {@link VectorTileProvider#url} property, plus the following:
+     * <ul>
+     *     <li><code>{i}</code>: The pixel column (horizontal coordinate) of the picked position, where the Westernmost pixel is 0.</li>
+     *     <li><code>{j}</code>: The pixel row (vertical coordinate) of the picked position, where the Northernmost pixel is 0.</li>
+     *     <li><code>{reverseI}</code>: The pixel column (horizontal coordinate) of the picked position, where the Easternmost pixel is 0.</li>
+     *     <li><code>{reverseJ}</code>: The pixel row (vertical coordinate) of the picked position, where the Southernmost pixel is 0.</li>
+     *     <li><code>{longitudeDegrees}</code>: The longitude of the picked position in degrees.</li>
+     *     <li><code>{latitudeDegrees}</code>: The latitude of the picked position in degrees.</li>
+     *     <li><code>{longitudeProjected}</code>: The longitude of the picked position in the projected coordinates of the tiling scheme.</li>
+     *     <li><code>{latitudeProjected}</code>: The latitude of the picked position in the projected coordinates of the tiling scheme.</li>
+     *     <li><code>{format}</code>: The format in which to get feature information, as specified in the {@link GetFeatureInfoFormat}.</li>
+     * </ul>
+     * @memberof VectorTileProvider.prototype
+     * @type {String}
+     * @readonly
+     */
+    pickFeaturesUrl: {
+      get: function get() {
+        return this._pickFeaturesResource.url;
+      }
+    },
+
+    /**
+     * Gets the proxy used by this provider.
+     * @memberof VectorTileProvider.prototype
+     * @type {Proxy}
+     * @readonly
+     * @default undefined
+     */
+    proxy: {
+      get: function get() {
+        return this._resource.proxy;
+      }
+    },
+
+    /**
+     * Gets the width of each tile, in pixels. This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Number}
+     * @readonly
+     * @default 256
+     */
+    tileWidth: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("tileWidth must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._tileWidth;
+      }
+    },
+
+    /**
+     * Gets the height of each tile, in pixels.  This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Number}
+     * @readonly
+     * @default 256
+     */
+    tileHeight: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("tileHeight must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._tileHeight;
+      }
+    },
+
+    /**
+     * Gets the maximum level-of-detail that can be requested, or undefined if there is no limit.
+     * This function should not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Number|undefined}
+     * @readonly
+     * @default undefined
+     */
+    maximumLevel: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("maximumLevel must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._maximumLevel;
+      }
+    },
+
+    /**
+     * Gets the minimum level-of-detail that can be requested.  This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Number}
+     * @readonly
+     * @default 0
+     */
+    minimumLevel: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("minimumLevel must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._minimumLevel;
+      }
+    },
+
+    /**
+     * Gets the tiling scheme used by this provider.  This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {TilingScheme}
+     * @readonly
+     * @default new WebMercatorTilingScheme()
+     */
+    tilingScheme: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("tilingScheme must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._tilingScheme;
+      }
+    },
+
+    /**
+     * Gets the rectangle, in radians, of the imagery provided by this instance.  This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Rectangle}
+     * @readonly
+     * @default tilingScheme.rectangle
+     */
+    rectangle: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("rectangle must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._rectangle;
+      }
+    },
+
+    /**
+     * Gets the tile discard policy.  If not undefined, the discard policy is responsible
+     * for filtering out "missing" tiles via its shouldDiscardImage function.  If this function
+     * returns undefined, no tiles are filtered.  This function should
+     * not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {TileDiscardPolicy}
+     * @readonly
+     * @default undefined
+     */
+    tileDiscardPolicy: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("tileDiscardPolicy must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._tileDiscardPolicy;
+      }
+    },
+
+    /**
+     * Gets an event that is raised when the imagery provider encounters an asynchronous error.  By subscribing
+     * to the event, you will be notified of the error and can potentially recover from it.  Event listeners
+     * are passed an instance of {@link TileProviderError}.
+     * @memberof VectorTileProvider.prototype
+     * @type {Event}
+     * @readonly
+     */
+    errorEvent: {
+      get: function get() {
+        return this._errorEvent;
+      }
+    },
+
+    /**
+     * Gets a value indicating whether or not the provider is ready for use.
+     * @memberof VectorTileProvider.prototype
+     * @type {Boolean}
+     * @readonly
+     */
+    ready: {
+      get: function get() {
+        return defined$1(this._resource);
+      }
+    },
+
+    /**
+     * Gets a promise that resolves to true when the provider is ready for use.
+     * @memberof VectorTileProvider.prototype
+     * @type {Promise.<Boolean>}
+     * @readonly
+     */
+    readyPromise: {
+      get: function get() {
+        return this._readyPromise;
+      }
+    },
+
+    /**
+     * Gets the credit to display when this imagery provider is active.  Typically this is used to credit
+     * the source of the imagery.  This function should not be called before {@link VectorTileProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Credit}
+     * @readonly
+     * @default undefined
+     */
+    credit: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("credit must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._credit;
+      }
+    },
+
+    /**
+     * Gets a value indicating whether or not the images provided by this imagery provider
+     * include an alpha channel.  If this property is false, an alpha channel, if present, will
+     * be ignored.  If this property is true, any images without an alpha channel will be treated
+     * as if their alpha is 1.0 everywhere.  When this property is false, memory usage
+     * and texture upload time are reduced.  This function should
+     * not be called before {@link ImageryProvider#ready} returns true.
+     * @memberof VectorTileProvider.prototype
+     * @type {Boolean}
+     * @readonly
+     * @default true
+     */
+    hasAlphaChannel: {
+      get: function get() {
+        //>>includeStart('debug', pragmas.debug);
+        if (!this.ready) {
+          throw new DeveloperError("hasAlphaChannel must not be called before the imagery provider is ready.");
+        } //>>includeEnd('debug');
+
+
+        return this._hasAlphaChannel;
+      }
+    }
+  });
+  /**
+   * Reinitializes this instance.  Reinitializing an instance already in use is supported, but it is not
+   * recommended because existing tiles provided by the imagery provider will not be updated.
+   *
+   * @param {Promise.<Object>|Object} options Any of the options that may be passed to the {@link VectorTileProvider} constructor.
+   */
+
+  VectorTileProvider.prototype.reinitialize = function (options) {
+    var that = this;
+    that._readyPromise = when(options).then(function (properties) {
+      //>>includeStart('debug', pragmas.debug);
+      if (!defined$1(properties)) {
+        throw new DeveloperError("options is required.");
+      }
+
+      if (!defined$1(properties.url)) {
+        throw new DeveloperError("options.url is required.");
+      } //>>includeEnd('debug');
+
+
+      var customTags = properties.customTags;
+      var allTags = combine(tags, customTags);
+      var allPickFeaturesTags = combine(pickFeaturesTags, customTags);
+      var resource = Resource.createIfNeeded(properties.url);
+      var pickFeaturesResource = Resource.createIfNeeded(properties.pickFeaturesUrl);
+      that.enablePickFeatures = defaultValue$1(properties.enablePickFeatures, that.enablePickFeatures);
+      that._urlSchemeZeroPadding = defaultValue$1(properties.urlSchemeZeroPadding, that.urlSchemeZeroPadding);
+      that._tileDiscardPolicy = properties.tileDiscardPolicy;
+      that._getFeatureInfoFormats = properties.getFeatureInfoFormats;
+      that._subdomains = properties.subdomains;
+
+      if (Array.isArray(that._subdomains)) {
+        that._subdomains = that._subdomains.slice();
+      } else if (defined$1(that._subdomains) && that._subdomains.length > 0) {
+        that._subdomains = that._subdomains.split("");
+      } else {
+        that._subdomains = ["a", "b", "c"];
+      }
+
+      that._tileWidth = defaultValue$1(properties.tileWidth, 256);
+      that._tileHeight = defaultValue$1(properties.tileHeight, 256);
+      that._minimumLevel = defaultValue$1(properties.minimumLevel, 0);
+      that._maximumLevel = properties.maximumLevel;
+      that._tilingScheme = defaultValue$1(properties.tilingScheme, new WebMercatorTilingScheme({
+        ellipsoid: properties.ellipsoid
+      }));
+      that._rectangle = defaultValue$1(properties.rectangle, that._tilingScheme.rectangle);
+      that._rectangle = Rectangle$1.intersection(that._rectangle, that._tilingScheme.rectangle);
+      that._hasAlphaChannel = defaultValue$1(properties.hasAlphaChannel, true);
+      var credit = properties.credit;
+
+      if (typeof credit === "string") {
+        credit = new Credit(credit);
+      }
+
+      that._credit = credit;
+      that._resource = resource;
+      that._tags = allTags;
+      that._pickFeaturesResource = pickFeaturesResource;
+      that._pickFeaturesTags = allPickFeaturesTags;
+      return true;
+    });
+  };
+  /**
+   * Gets the credits to be displayed when a given tile is displayed.
+   *
+   * @param {Number} x The tile X coordinate.
+   * @param {Number} y The tile Y coordinate.
+   * @param {Number} level The tile level;
+   * @returns {Credit[]} The credits to be displayed when the tile is displayed.
+   *
+   * @exception {DeveloperError} <code>getTileCredits</code> must not be called before the imagery provider is ready.
+   */
+
+
+  VectorTileProvider.prototype.getTileCredits = function (x, y, level) {
+    //>>includeStart('debug', pragmas.debug);
+    if (!this.ready) {
+      throw new DeveloperError("getTileCredits must not be called before the imagery provider is ready.");
+    } //>>includeEnd('debug');
+
+
+    return undefined;
+  };
+  /**
+   * Requests the image for a given tile.  This function should
+   * not be called before {@link VectorTileProvider#ready} returns true.
+   *
+   * @param {Number} x The tile X coordinate.
+   * @param {Number} y The tile Y coordinate.
+   * @param {Number} level The tile level.
+   * @param {Request} [request] The request object. Intended for internal use only.
+   * @returns {Promise.<HTMLImageElement|HTMLCanvasElement>|undefined} A promise for the image that will resolve when the image is available, or
+   *          undefined if there are too many active requests to the server, and the request
+   *          should be retried later.  The resolved image may be either an
+   *          Image or a Canvas DOM object.
+   */
+
+
+  VectorTileProvider.prototype.requestImage = function (x, y, level, request) {
+    //>>includeStart('debug', pragmas.debug);
+    if (!this.ready) {
+      throw new DeveloperError("requestImage must not be called before the imagery provider is ready.");
+    } //>>includeEnd('debug');
+
+
+    return ImageryProvider.loadImage(this, buildImageResource(this, x, y, level, request));
+  };
+  /**
+   * Asynchronously determines what features, if any, are located at a given longitude and latitude within
+   * a tile.  This function should not be called before {@link ImageryProvider#ready} returns true.
+   *
+   * @param {Number} x The tile X coordinate.
+   * @param {Number} y The tile Y coordinate.
+   * @param {Number} level The tile level.
+   * @param {Number} longitude The longitude at which to pick features.
+   * @param {Number} latitude  The latitude at which to pick features.
+   * @return {Promise.<ImageryLayerFeatureInfo[]>|undefined} A promise for the picked features that will resolve when the asynchronous
+   *                   picking completes.  The resolved value is an array of {@link ImageryLayerFeatureInfo}
+   *                   instances.  The array may be empty if no features are found at the given location.
+   *                   It may also be undefined if picking is not supported.
+   */
+
+
+  VectorTileProvider.prototype.pickFeatures = function (x, y, level, longitude, latitude) {
+    //>>includeStart('debug', pragmas.debug);
+    if (!this.ready) {
+      throw new DeveloperError("pickFeatures must not be called before the imagery provider is ready.");
+    } //>>includeEnd('debug');
+
+
+    if (!this.enablePickFeatures || !defined$1(this._pickFeaturesResource) || this._getFeatureInfoFormats.length === 0) {
+      return undefined;
+    }
+
+    var formatIndex = 0;
+    var that = this;
+
+    function handleResponse(format, data) {
+      return format.callback(data);
+    }
+
+    function doRequest() {
+      if (formatIndex >= that._getFeatureInfoFormats.length) {
+        // No valid formats, so no features picked.
+        return when([]);
+      }
+
+      var format = that._getFeatureInfoFormats[formatIndex];
+      var resource = buildPickFeaturesResource(that, x, y, level, longitude, latitude, format.format);
+      ++formatIndex;
+
+      if (format.type === "json") {
+        return resource.fetchJson().then(format.callback).otherwise(doRequest);
+      } else if (format.type === "xml") {
+        return resource.fetchXML().then(format.callback).otherwise(doRequest);
+      } else if (format.type === "text" || format.type === "html") {
+        return resource.fetchText().then(format.callback).otherwise(doRequest);
+      }
+
+      return resource.fetch({
+        responseType: format.format
+      }).then(handleResponse.bind(undefined, format)).otherwise(doRequest);
+    }
+
+    return doRequest();
+  };
+
+  var degreesScratchComputed = false;
+  var degreesScratch = new Rectangle$1();
+  var projectedScratchComputed = false;
+  var projectedScratch = new Rectangle$1();
+
+  function buildImageResource(imageryProvider, x, y, level, request) {
+    degreesScratchComputed = false;
+    projectedScratchComputed = false;
+    var resource = imageryProvider._resource;
+    var url = resource.getUrlComponent(true);
+    var allTags = imageryProvider._tags;
+    var templateValues = {};
+    var match = url.match(templateRegex);
+
+    if (defined$1(match)) {
+      match.forEach(function (tag) {
+        var key = tag.substring(1, tag.length - 1); //strip {}
+
+        if (defined$1(allTags[key])) {
+          templateValues[key] = allTags[key](imageryProvider, x, y, level);
+        }
+      });
+    }
+
+    return resource.getDerivedResource({
+      request: request,
+      templateValues: templateValues
+    });
+  }
+
+  var ijScratchComputed = false;
+  var ijScratch = new Cartesian2();
+  var longitudeLatitudeProjectedScratchComputed = false;
+
+  function buildPickFeaturesResource(imageryProvider, x, y, level, longitude, latitude, format) {
+    degreesScratchComputed = false;
+    projectedScratchComputed = false;
+    ijScratchComputed = false;
+    longitudeLatitudeProjectedScratchComputed = false;
+    var resource = imageryProvider._pickFeaturesResource;
+    var url = resource.getUrlComponent(true);
+    var allTags = imageryProvider._pickFeaturesTags;
+    var templateValues = {};
+    var match = url.match(templateRegex);
+
+    if (defined$1(match)) {
+      match.forEach(function (tag) {
+        var key = tag.substring(1, tag.length - 1); //strip {}
+
+        if (defined$1(allTags[key])) {
+          templateValues[key] = allTags[key](imageryProvider, x, y, level, longitude, latitude, format);
+        }
+      });
+    }
+
+    return resource.getDerivedResource({
+      templateValues: templateValues
+    });
+  }
+
+  function padWithZerosIfNecessary(imageryProvider, key, value) {
+    if (imageryProvider && imageryProvider.urlSchemeZeroPadding && imageryProvider.urlSchemeZeroPadding.hasOwnProperty(key)) {
+      var paddingTemplate = imageryProvider.urlSchemeZeroPadding[key];
+
+      if (typeof paddingTemplate === "string") {
+        var paddingTemplateWidth = paddingTemplate.length;
+
+        if (paddingTemplateWidth > 1) {
+          value = value.length >= paddingTemplateWidth ? value : new Array(paddingTemplateWidth - value.toString().length + 1).join("0") + value;
+        }
+      }
+    }
+
+    return value;
+  }
+
+  function xTag(imageryProvider, x, y, level) {
+    return padWithZerosIfNecessary(imageryProvider, "{x}", x);
+  }
+
+  function reverseXTag(imageryProvider, x, y, level) {
+    var reverseX = imageryProvider.tilingScheme.getNumberOfXTilesAtLevel(level) - x - 1;
+    return padWithZerosIfNecessary(imageryProvider, "{reverseX}", reverseX);
+  }
+
+  function yTag(imageryProvider, x, y, level) {
+    return padWithZerosIfNecessary(imageryProvider, "{y}", y);
+  }
+
+  function reverseYTag(imageryProvider, x, y, level) {
+    var reverseY = imageryProvider.tilingScheme.getNumberOfYTilesAtLevel(level) - y - 1;
+    return padWithZerosIfNecessary(imageryProvider, "{reverseY}", reverseY);
+  }
+
+  function reverseZTag(imageryProvider, x, y, level) {
+    var maximumLevel = imageryProvider.maximumLevel;
+    var reverseZ = defined$1(maximumLevel) && level < maximumLevel ? maximumLevel - level - 1 : level;
+    return padWithZerosIfNecessary(imageryProvider, "{reverseZ}", reverseZ);
+  }
+
+  function zTag(imageryProvider, x, y, level) {
+    return padWithZerosIfNecessary(imageryProvider, "{z}", level);
+  }
+
+  function sTag(imageryProvider, x, y, level) {
+    var index = (x + y + level) % imageryProvider._subdomains.length;
+    return imageryProvider._subdomains[index];
+  }
+
+  function computeDegrees(imageryProvider, x, y, level) {
+    if (degreesScratchComputed) {
+      return;
+    }
+
+    imageryProvider.tilingScheme.tileXYToRectangle(x, y, level, degreesScratch);
+    degreesScratch.west = CesiumMath.toDegrees(degreesScratch.west);
+    degreesScratch.south = CesiumMath.toDegrees(degreesScratch.south);
+    degreesScratch.east = CesiumMath.toDegrees(degreesScratch.east);
+    degreesScratch.north = CesiumMath.toDegrees(degreesScratch.north);
+    degreesScratchComputed = true;
+  }
+
+  function westDegreesTag(imageryProvider, x, y, level) {
+    computeDegrees(imageryProvider, x, y, level);
+    return degreesScratch.west;
+  }
+
+  function southDegreesTag(imageryProvider, x, y, level) {
+    computeDegrees(imageryProvider, x, y, level);
+    return degreesScratch.south;
+  }
+
+  function eastDegreesTag(imageryProvider, x, y, level) {
+    computeDegrees(imageryProvider, x, y, level);
+    return degreesScratch.east;
+  }
+
+  function northDegreesTag(imageryProvider, x, y, level) {
+    computeDegrees(imageryProvider, x, y, level);
+    return degreesScratch.north;
+  }
+
+  function computeProjected(imageryProvider, x, y, level) {
+    if (projectedScratchComputed) {
+      return;
+    }
+
+    imageryProvider.tilingScheme.tileXYToNativeRectangle(x, y, level, projectedScratch);
+    projectedScratchComputed = true;
+  }
+
+  function westProjectedTag(imageryProvider, x, y, level) {
+    computeProjected(imageryProvider, x, y, level);
+    return projectedScratch.west;
+  }
+
+  function southProjectedTag(imageryProvider, x, y, level) {
+    computeProjected(imageryProvider, x, y, level);
+    return projectedScratch.south;
+  }
+
+  function eastProjectedTag(imageryProvider, x, y, level) {
+    computeProjected(imageryProvider, x, y, level);
+    return projectedScratch.east;
+  }
+
+  function northProjectedTag(imageryProvider, x, y, level) {
+    computeProjected(imageryProvider, x, y, level);
+    return projectedScratch.north;
+  }
+
+  function widthTag(imageryProvider, x, y, level) {
+    return imageryProvider.tileWidth;
+  }
+
+  function heightTag(imageryProvider, x, y, level) {
+    return imageryProvider.tileHeight;
+  }
+
+  function iTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeIJ(imageryProvider, x, y, level, longitude, latitude);
+    return ijScratch.x;
+  }
+
+  function jTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeIJ(imageryProvider, x, y, level, longitude, latitude);
+    return ijScratch.y;
+  }
+
+  function reverseITag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeIJ(imageryProvider, x, y, level, longitude, latitude);
+    return imageryProvider.tileWidth - ijScratch.x - 1;
+  }
+
+  function reverseJTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeIJ(imageryProvider, x, y, level, longitude, latitude);
+    return imageryProvider.tileHeight - ijScratch.y - 1;
+  }
+
+  var rectangleScratch = new Rectangle$1();
+  var longitudeLatitudeProjectedScratch = new Cartesian3$1();
+
+  function computeIJ(imageryProvider, x, y, level, longitude, latitude, format) {
+    if (ijScratchComputed) {
+      return;
+    }
+
+    computeLongitudeLatitudeProjected(imageryProvider, x, y, level, longitude, latitude);
+    var projected = longitudeLatitudeProjectedScratch;
+    var rectangle = imageryProvider.tilingScheme.tileXYToNativeRectangle(x, y, level, rectangleScratch);
+    ijScratch.x = imageryProvider.tileWidth * (projected.x - rectangle.west) / rectangle.width | 0;
+    ijScratch.y = imageryProvider.tileHeight * (rectangle.north - projected.y) / rectangle.height | 0;
+    ijScratchComputed = true;
+  }
+
+  function longitudeDegreesTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    return CesiumMath.toDegrees(longitude);
+  }
+
+  function latitudeDegreesTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    return CesiumMath.toDegrees(latitude);
+  }
+
+  function longitudeProjectedTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeLongitudeLatitudeProjected(imageryProvider, x, y, level, longitude, latitude);
+    return longitudeLatitudeProjectedScratch.x;
+  }
+
+  function latitudeProjectedTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    computeLongitudeLatitudeProjected(imageryProvider, x, y, level, longitude, latitude);
+    return longitudeLatitudeProjectedScratch.y;
+  }
+
+  var cartographicScratch = new Cartographic();
+
+  function computeLongitudeLatitudeProjected(imageryProvider, x, y, level, longitude, latitude, format) {
+    if (longitudeLatitudeProjectedScratchComputed) {
+      return;
+    }
+
+    if (imageryProvider.tilingScheme.projection instanceof GeographicProjection) {
+      longitudeLatitudeProjectedScratch.x = CesiumMath.toDegrees(longitude);
+      longitudeLatitudeProjectedScratch.y = CesiumMath.toDegrees(latitude);
+    } else {
+      var cartographic = cartographicScratch;
+      cartographic.longitude = longitude;
+      cartographic.latitude = latitude;
+      imageryProvider.tilingScheme.projection.project(cartographic, longitudeLatitudeProjectedScratch);
+    }
+
+    longitudeLatitudeProjectedScratchComputed = true;
+  }
+
+  function formatTag(imageryProvider, x, y, level, longitude, latitude, format) {
+    return format;
+  }
+
+  function _classCallCheck$1(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties$1(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass$1(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties$1(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties$1(Constructor, staticProps);
+    return Constructor;
+  }
+
+  function _defineProperty$1(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _inherits$1(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function");
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) _setPrototypeOf$1(subClass, superClass);
+  }
+
+  function _getPrototypeOf$1(o) {
+    _getPrototypeOf$1 = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+      return o.__proto__ || Object.getPrototypeOf(o);
+    };
+    return _getPrototypeOf$1(o);
+  }
+
+  function _setPrototypeOf$1(o, p) {
+    _setPrototypeOf$1 = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf$1(o, p);
+  }
+
+  function _isNativeReflectConstruct$1() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function _assertThisInitialized$1(self) {
+    if (self === void 0) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return self;
+  }
+
+  function _possibleConstructorReturn$1(self, call) {
+    if (call && (_typeof(call) === "object" || typeof call === "function")) {
+      return call;
+    }
+
+    return _assertThisInitialized$1(self);
+  }
+
+  function _createSuper$1(Derived) {
+    var hasNativeReflectConstruct = _isNativeReflectConstruct$1();
+
+    return function _createSuperInternal() {
+      var Super = _getPrototypeOf$1(Derived),
+          result;
+
+      if (hasNativeReflectConstruct) {
+        var NewTarget = _getPrototypeOf$1(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn$1(this, result);
+    };
+  }
+
+  function _superPropBase$1(object, property) {
+    while (!Object.prototype.hasOwnProperty.call(object, property)) {
+      object = _getPrototypeOf$1(object);
+      if (object === null) break;
+    }
+
+    return object;
+  }
+
+  function _get$1(target, property, receiver) {
+    if (typeof Reflect !== "undefined" && Reflect.get) {
+      _get$1 = Reflect.get;
+    } else {
+      _get$1 = function _get(target, property, receiver) {
+        var base = _superPropBase$1(target, property);
+
+        if (!base) return;
+        var desc = Object.getOwnPropertyDescriptor(base, property);
+
+        if (desc.get) {
+          return desc.get.call(receiver);
+        }
+
+        return desc.value;
+      };
+    }
+
+    return _get$1(target, property, receiver || target);
+  }
+
+  function _toConsumableArray$1(arr) {
+    return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _unsupportedIterableToArray$1(arr) || _nonIterableSpread$1();
+  }
+
+  function _arrayWithoutHoles$1(arr) {
+    if (Array.isArray(arr)) return _arrayLikeToArray$1(arr);
+  }
+
+  function _iterableToArray$1(iter) {
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+  }
+
+  function _unsupportedIterableToArray$1(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray$1(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen);
+  }
+
+  function _arrayLikeToArray$1(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  }
+
+  function _nonIterableSpread$1() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  /**
+   * 如果第一个元素为空或未定义，则返回第二个元素，用于设置默认属性
+   * @exports defaultValue
+   * @param {any} a
+   * @param {any} b
+   * @returns {any} 如果第一个元素为空或未定义，则返回第二个元素
+   *
+   * @example
+   * param = Cesium.defaultValue(param, 'default');
+   */
+
+
+  function defaultValue$2(a, b) {
+    if (a !== undefined && a !== null) {
+      return a;
+    }
+
+    return b;
+  }
+  /**
+   *
+   * 空对象，该对象不能被编辑
+   *
+   * @type {Object}
+   * @memberof defaultValue
+   *
+   */
+
+
+  defaultValue$2.EMPTY_OBJECT = Object.freeze({});
+  /**
+   * 箭头构件类型
+   * @exports ComponentType
+   * @enum {Number}
+   */
+
+  var ComponentType = {
+    /**
+     * 箭头
+     * @type {Number}
+     * @constant
+     */
+    ARROW: 0,
+
+    /**
+     * 半箭头
+     * @type {Number}
+     * @constant
+     */
+    HALF_ARROW: 1,
+
+    /**
+     * 贝塞尔曲线
+     * @type {Number}
+     * @constant
+     */
+    BEZIER: 2,
+
+    /**
+     * 样条曲线
+     * @type {Number}
+     * @constant
+     */
+    SPLINE: 3,
+
+    /**
+     * 燕尾
+     * @type {Number}
+     * @constant
+     */
+    SWALLOW_TRAIL: 4,
+
+    /**
+     * 梯形
+     * @type {Number}
+     * @constant
+     */
+    TRAPEZOID: 5,
+
+    /**
+     * 半梯形
+     * @type {Number}
+     * @constant
+     */
+    HALF_TRAPEZOID: 6,
+    HALF_SWALLOW_TRAIL: 7,
+    HALF_SPLINE: 8
+  };
+
+  ComponentType.getLabel = function (component) {
+    var label;
+
+    switch (component.type) {
+      case ComponentType.HALF_ARROW:
+        label = 'HALF_ARROW';
+        break;
+
+      case ComponentType.ARROW:
+        lebel = 'ARROW';
+        break;
+
+      case ComponentType.BEZIER:
+        label = 'BEZIER';
+        break;
+
+      case ComponentType.SPLINE:
+        label = "SPLINE";
+        break;
+
+      case ComponentType.SWALLOW_TRAIL:
+        label = 'SWALLOW_TRAIL';
+        break;
+
+      case ComponentType.HALF_SWALLOW_TRAIL:
+        label = 'HALF_SWALLOW_TRAIL';
+        break;
+
+      case ComponentType.HALF_SPLINE:
+        label = 'HALF_SPLINE';
+        break;
+
+      default:
+        label = undefined;
+    }
+
+    return label;
+  };
+  /**
+   * function
+   * @param  {[type]} type [description]
+   * @return {[type]}      [description]
+   */
+
+
+  ComponentType.getErrorMsg = function (component) {
+    var type = component.type;
+    var controls = component.controls.length;
+
+    if (!ComponentType.validate(component)) {
+      throw new Error(ComponentType.getLabel(component) + '控制点个数必须不少于' + component.controlPointsCount[0] + ",实际只有" + controls + '个');
+    }
+  };
+
+  ComponentType.validate = function (component) {
+    var controls = component.controls.length;
+
+    if (controls < component.controlPointsCount[0]) {
+      return false;
+    }
+
+    return true;
+  };
+
+  var Component = /*#__PURE__*/function () {
+    function Component() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, Component);
+
+      this._controls = options.controls || [];
+      this._index = options.index;
+      this._inverse = options.inverse || false;
+
+      if (!this._index) {
+        var count = this._controls.length;
+        this._index = new Array(count);
+
+        for (var i = 0; i < count; i++) {
+          this._index[i] = i;
+        }
+      }
+    }
+    /**
+     * 描述箭头的控制点个数，数组第一个值为最小个数，控制点小于最小值将无法创建箭头，
+     * 数组第二个值表示最大控制点个数，大于最大值的控制点将被抛弃
+     * @return {Point[]} 控制点个数
+     */
+
+
+    _createClass$1(Component, [{
+      key: "createNodes",
+      value: function createNodes() {
+        ComponentType.getErrorMsg(this);
+      }
+      /**
+       * 返回index指定的控制点
+       * @param  {Number} index
+       * @return {Number[]}
+       */
+
+    }, {
+      key: "get",
+      value: function get(index) {
+        if (this.index) {
+          return this.controls[this.index[index]];
+        }
+
+        return this.controls[index];
+      }
+    }, {
+      key: "controls",
+      get: function get() {
+        return this._controls;
+      }
+      /**
+       * 生成组件时输入顶点的索引
+       * @return {Number[]}
+       */
+
+    }, {
+      key: "index",
+      get: function get() {
+        return this._index;
+      }
+      /**
+       * 组件类型
+       * @return {ComponentType}
+       */
+
+    }, {
+      key: "type",
+      get: function get() {
+        return this._type;
+      }
+    }, {
+      key: "controlPointsCount",
+      get: function get() {
+        return this._controlPointsCount;
+      }
+    }, {
+      key: "nodes",
+      get: function get() {
+        return this._nodes;
+      },
+      set: function set(v) {
+        this._nodes = v;
+      }
+      /**
+       * 确定箭头在控制点连线的的左侧还是右侧，inverse为false是生成的图形在控制点连线的左侧
+       * @return {Bool}
+       */
+
+    }, {
+      key: "inverse",
+      get: function get() {
+        return this._inverse;
+      },
+      set: function set(v) {
+        this._inverse = v;
+      }
+    }]);
+
+    return Component;
+  }();
+
+  var PlotUtil$1 = /*#__PURE__*/function () {
+    /**
+     * 几何图形学基础方法
+     */
+    function PlotUtil() {
+      _classCallCheck$1(this, PlotUtil);
+    }
+    /**
+     * 平面点的欧氏距离，如果点的数据大于2，将计算相邻两个点的距离之和。
+     * @param  {Number[]} args 需要计算距离的平面点集合
+     * @return {Float}      欧氏距离
+     */
+
+
+    _createClass$1(PlotUtil, null, [{
+      key: "distance",
+      value: function distance() {
+        var length = arguments.length;
+
+        if (length < 2) {
+          return 0;
+        }
+
+        var distance = 0;
+
+        for (var i = 0; i < length - 1; i++) {
+          var nextIndex = (i + 1) % length;
+          var start = i < 0 || arguments.length <= i ? undefined : arguments[i];
+          var end = nextIndex < 0 || arguments.length <= nextIndex ? undefined : arguments[nextIndex];
+          distance += Math.sqrt(Math.pow(start[0] - end[0], 2) + Math.pow(start[1] - end[1], 2));
+        }
+
+        return distance;
+      }
+      /**
+       * @param  {Number[]} points            [description]
+       * @param  {Number} [percentage=0.99] [description]
+       * @return {Number}                  长度
+       */
+
+    }, {
+      key: "baseLength",
+      value: function baseLength(points) {
+        var percentage = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.99;
+        return Math.pow(PlotUtil.distance.apply(PlotUtil, _toConsumableArray$1(points)), percentage);
+      }
+      /**
+       * 平面两点的中点
+       * @param  {Number[]} start 起点
+       * @param  {Number[]} end   终点
+       * @return {Number[]}       中点坐标
+       */
+
+    }, {
+      key: "mid",
+      value: function mid(start, end) {
+        return [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
+      }
+      /**
+       * 方位角
+       * @param  {Number[]} start 起点
+       * @param  {Number[]} end   终点
+       * @return {Number} 向量与Y轴的夹角
+       */
+
+    }, {
+      key: "azimuth",
+      value: function azimuth(start, end) {
+        var result;
+        var _ref = [end, start];
+        start = _ref[0];
+        end = _ref[1]; //向量与Y轴的夹角;
+
+        var angle = Math.asin(Math.abs(start[1] - end[1]) / PlotUtil.distance(start, end));
+        result = start[1] >= end[1] && start[0] >= end[0] ? angle + Math.PI : start[1] >= end[1] && start[0] < end[0] ? Math.PI * 2 - angle : start[1] < end[1] && start[0] >= end[0] ? Math.PI - angle : angle;
+        return result;
+      }
+      /**
+       * 根据两个点计算第三个点,具体为：如果以end为圆心，以radius为半径创建一个圆,以向量<start,end>方位角为起始位置，
+       * 旋转angle度后得到的圆弧上的点,inverse为false，向正方向旋转,true,向负方向旋转
+       * @param  {Number[]} start   起点，即圆心
+       * @param  {Number[]} end     终点
+       * @param  {Number} angle   旋转角度，单位弧度
+       * @param  {Number} radius    半径
+       * @param  {bool} inverse  是否逆向旋转
+       * @return {Number[]}      新点位
+       */
+
+    }, {
+      key: "thirdPoint",
+      value: function thirdPoint(start, end, angle, radius) {
+        var inverse = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+        var azimuth = PlotUtil.azimuth(start, end);
+        var adjustAngle = inverse ? azimuth - angle : azimuth + angle;
+        var x = radius * Math.cos(adjustAngle);
+        var y = radius * Math.sin(adjustAngle);
+        return [end[0] + x, end[1] + y];
+      }
+      /**
+       * 判断由t,o,e是否顺时针环绕
+       * @param  {Number[]}  t
+       * @param  {Number[]}  o
+       * @param  {Number[]}  e
+       * @return {Boolean}
+       */
+
+    }, {
+      key: "isClockWise",
+      value: function isClockWise(t, o, e) {
+        return (e[1] - t[1]) * (o[0] - t[0]) > (o[1] - t[1]) * (e[0] - t[0]);
+      }
+      /**
+       * 计算两条直线之间的夹角，两条直线必须有公共点
+       * @param  {Number[]} origin 两直接的公共点
+       * @param  {Number[]} point1 直线1的另一个顶点
+       * @param  {Number[]} point2 直线2的另一个顶点
+       * @return {number}  两直线之间的夹角，单位弧度
+       */
+
+    }, {
+      key: "angleOfThreePoints",
+      value: function angleOfThreePoints(origin, point1, point2) {
+        var angle = PlotUtil.azimuth(origin, point1) - PlotUtil.azimuth(origin, point2);
+        return angle > 0 ? angle : Math.PI * 2 + angle;
+      }
+      /**
+       * 四边形B样条曲面因子
+       * @param  {Number} t
+       * @param  {Number} o
+       * @return {Number}
+       */
+
+    }, {
+      key: "quadricBSplineFactor",
+      value: function quadricBSplineFactor(t, o) {
+        if (t === 0) {
+          return Math.pow(o - 1, 2) / 2;
+        }
+
+        if (t === 1) {
+          return (-2.0 * Math.pow(o, 2) + 2 * o + 1) / 2;
+        }
+
+        if (t === 2) {
+          return Math.pow(o, 2) / 2;
+        }
+
+        return 0;
+      }
+      /**
+       * 四边形B样条曲线
+       *
+       * @param  {Number[]} points 计算四边形B样条曲线的输入点
+       * @return {Number[]}        构成四边形B样条曲线的点
+       */
+
+    }, {
+      key: "quadricBSpline",
+      value: function quadricBSpline(points) {
+        if (points <= 2) {
+          return points;
+        }
+
+        var result = [];
+        var fac = 2;
+        var length = points.length - fac - 1;
+        result.push(points[0]);
+
+        for (var n = 0; n <= length; n++) {
+          for (var g = 0; g <= 1; g += 0.05) {
+            var x = 0,
+                y = 0;
+
+            for (var s = 0; s <= fac; s++) {
+              var factor = PlotUtil.quadricBSplineFactor(s, g);
+              x += factor * points[n + s][0];
+              y += factor * points[n + s][1];
+            }
+
+            result.push([x, y]);
+          }
+        }
+
+        result.push(points[points.length - 1]);
+        return result;
+      }
+      /**
+       * 组合C<sub>0</sub><sup style="margin-left:-5px">t</sup>的值
+       * @param  {Number} t
+       * @param  {Number} o
+       * @return {Number}
+       */
+
+    }, {
+      key: "binomialFactor",
+      value: function binomialFactor(t, o) {
+        return PlotUtil.factorial(t) / (PlotUtil.factorial(o) * PlotUtil.factorial(t - o));
+      }
+      /**
+       * 求阶乘
+       * @param  {Number} n n必须不小于0
+       * @return {Number}   n的阶乘(n!)
+       */
+
+    }, {
+      key: "factorial",
+      value: function factorial(n) {
+        if (n < 0) {
+          return NaN;
+        }
+
+        if (n === 0) {
+          return 1;
+        }
+
+        return n * PlotUtil.factorial(n - 1);
+      }
+      /**
+       * 贝塞尔曲线
+       * @param {Number[]} points [description]
+       * @return {Number[]}   构成贝塞尔曲线的点集
+       */
+
+    }, {
+      key: "BezierCurve",
+      value: function BezierCurve(points) {
+        var count = points.length;
+
+        if (count < 2) {
+          return points;
+        }
+
+        var curves = [];
+
+        for (var i = 0; i <= 1; i += 0.01) {
+          var x = 0,
+              y = 0;
+
+          for (var j = 0; j < count; j++) {
+            var factor = PlotUtil.binomialFactor(count - 1, j);
+            var s = Math.pow(i, j);
+            var a = Math.pow(1 - i, count - j - 1);
+            x += factor * s * a * points[j][0];
+            y += factor * s * a * points[j][1];
+          }
+
+          curves.push([x, y]);
+        }
+
+        curves.push(points[count - 1]);
+        return curves;
+      }
+    }]);
+
+    return PlotUtil;
+  }();
+
+  var HalfArrowComponent = /*#__PURE__*/function (_Component) {
+    _inherits$1(HalfArrowComponent, _Component);
+
+    var _super = _createSuper$1(HalfArrowComponent);
+    /**
+     * 半箭头头部
+     *           *-----------------------------
+     *          **             |              |
+     *         * *             |              |
+     *        *  *           neck height  arrow height
+     *       *   *             |              |
+     *      *    *             |              |
+     *     *     *             |              |
+     *    *   ***x（neck control）--------------              |
+     *   *  *                                 |
+     *  *--------x(tail control)-----------------------------
+     *
+     *
+     *
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Number} [options.heightFactor=0.18] 箭头状况高度占整个图形高度(控制点连线长度)的百分比
+     * @param {Number} [options.neckHeightFactor=0.15] 脖子占整个整个图形高度的百分比
+     * @param {Number} [options.widthFactor=0.3] 箭头宽度占高度的百分比
+     * @param {Number} [options.neckWidthFactor=options.widthFactor/2] 脖子宽度占箭头高度的百分比
+     * @param {Number} [options.inverse=false] inverse为false是生成的图形在控制点连线的右侧
+     */
+
+
+    function HalfArrowComponent() {
+      var _this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, HalfArrowComponent);
+
+      _this = _super.call(this, options);
+      _this._controlPointsCount = [2, 2];
+      _this._type = ComponentType.HALF_ARROW;
+      _this._heightFactor = defaultValue$2(options.heightFactor, 0.18);
+      _this._neckHeightFactor = defaultValue$2(options.neckHeightFactor, 0.15);
+      _this._headWidthFactor = defaultValue$2(options.headWidthFactor, 0.5);
+      _this._neckWidthFactor = defaultValue$2(options.neckWidthFactor, 0.3);
+      _this._headMaxHeight = options.headMaxHeight;
+      _this._headTailHeightFactor = defaultValue$2(options.headTailHeightFactor, 0.3);
+      _this._inverse = defaultValue$2(options.inverse, false);
+      _this._nodes = [];
+
+      _this.createNodes();
+
+      return _this;
+    }
+
+    _createClass$1(HalfArrowComponent, [{
+      key: "createNodes",
+
+      /**
+       * 生成构成图形的顶点
+       * @return {Number[]} 生成构成图形的顶点
+       */
+      value: function createNodes() {
+        _get$1(_getPrototypeOf$1(HalfArrowComponent.prototype), "createNodes", this).call(this);
+
+        var controls = this.controls;
+        var baseLength = PlotUtil$1.baseLength(controls);
+        var height = this.heightFactor * baseLength;
+        baseLength = PlotUtil$1.distance(this.get(0), this.get(1));
+
+        if (this.headMaxHeight && height > this.headMaxHeight) {
+          height = this.headMaxHeight;
+        }
+
+        var neckWidth = this.neckWidthFactor * height;
+        var width = this.headWidthFactor * height;
+        height = height > baseLength ? baseLength : height;
+        var neckHeight = this.neckHeightFactor * height;
+        var tailControl = PlotUtil$1.thirdPoint(this.get(0), this.get(1), 0, height);
+        var neckControl = PlotUtil$1.thirdPoint(this.get(0), this.get(1), 0, neckHeight);
+        var tail = PlotUtil$1.thirdPoint(this.get(1), tailControl, Math.PI / 2, width, this.inverse);
+        var neck = PlotUtil$1.thirdPoint(this.get(1), neckControl, Math.PI / 2, neckWidth, this.inverse);
+        this.neck = neck;
+        this.tail = tail;
+        this.neckControl = neckControl;
+        this.tailControl = tailControl;
+        this._nodes = [neckControl, neck, tail, this.get(1)];
+        this.completedNodes = new Map();
+        this.completedNodes.set(this.inverse, [neckControl, neck, tail, this.get(1)]);
+        return this._nodes;
+      }
+    }, {
+      key: "headMaxHeight",
+      get: function get() {
+        return this._headMaxHeight;
+      }
+      /**
+       * 箭头高度因子
+       * @return {Number} 箭头高度占整个图形高度的百分比
+       */
+
+    }, {
+      key: "heightFactor",
+      get: function get() {
+        return this._heightFactor;
+      }
+      /**
+       * 脖子高度因子
+       * @return {Number}
+       */
+
+    }, {
+      key: "neckHeightFactor",
+      get: function get() {
+        return this._neckHeightFactor;
+      }
+      /**
+       * 箭头宽度因子
+       * @return {Number}
+       */
+
+    }, {
+      key: "headWidthFactor",
+      get: function get() {
+        return this._headWidthFactor;
+      }
+      /**
+       * 脖子宽度因子
+       * @return {Number}
+       */
+
+    }, {
+      key: "neckWidthFactor",
+      get: function get() {
+        return this._neckWidthFactor;
+      }
+      /**
+       * 构成图形的顶点
+       * @return {[type]}
+       */
+
+    }, {
+      key: "nodes",
+      get: function get() {
+        return this._nodes;
+      }
+    }]);
+
+    return HalfArrowComponent;
+  }(Component);
+
+  var ArrowComponent = /*#__PURE__*/function (_HalfArrowComponent) {
+    _inherits$1(ArrowComponent, _HalfArrowComponent);
+
+    var _super = _createSuper$1(ArrowComponent);
+    /**
+     * 箭头头部
+     *
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Number} [options.heightFactor=0.18] 箭头状况高度占整个图形高度(控制点连线长度)的百分比
+     * @param {Number} [options.neckHeightFactor=0.85] 脖子占整个箭头的百分比
+     * @param {Number} [options.widthFactor=0.3] 箭头宽度占高度的百分比
+     * @param {Number} [options.neckWidthFactor=options.widthFactor/2] 脖子宽度占箭头高度的百分比
+     */
+
+
+    function ArrowComponent() {
+      var _this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, ArrowComponent);
+
+      _this = _super.call(this, options);
+      _this._type = ComponentType.ARROW;
+
+      _this.createNodes();
+
+      return _this;
+    }
+
+    _createClass$1(ArrowComponent, [{
+      key: "createNodes",
+      value: function createNodes() {
+        var completedNodes = new Map();
+        this._inverse = true;
+
+        var rightHalf = _get$1(_getPrototypeOf$1(ArrowComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(rightHalf));
+        this._inverse = false;
+
+        var leftHalf = _get$1(_getPrototypeOf$1(ArrowComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(leftHalf));
+        leftHalf.shift();
+        rightHalf.shift();
+        leftHalf.pop();
+        this.inverse = undefined;
+        this.completedNodes = completedNodes;
+        this._nodes = [].concat(_toConsumableArray$1(leftHalf), _toConsumableArray$1(rightHalf.reverse()));
+        return [].concat(_toConsumableArray$1(leftHalf), _toConsumableArray$1(rightHalf.reverse()));
+      }
+    }]);
+
+    return ArrowComponent;
+  }(HalfArrowComponent);
+
+  var HalfTrapezoidComponent = /*#__PURE__*/function (_Component) {
+    _inherits$1(HalfTrapezoidComponent, _Component);
+
+    var _super = _createSuper$1(HalfTrapezoidComponent);
+    /**
+     * 半梯形
+     *    *** head control
+     *   *  *
+     *  *   *
+     * *****x tail control
+     * @param {[type]} options [description]
+     * @param {Number} [options.heightFactor] 梯形高度高图形高度的百分比
+     * @param {Number} [options.tailWidth=0.5] 梯形尾部宽度占高度的百分比
+     * @param {Number} [options.headWidthFactor=0.3] 梯形头部宽度占高度的百分比
+     */
+
+
+    function HalfTrapezoidComponent(options) {
+      var _this;
+
+      _classCallCheck$1(this, HalfTrapezoidComponent);
+
+      _this = _super.call(this, options);
+      _this._type = ComponentType.HALF_TRAPEZOID;
+      _this._controlPointsCount = [2, 2];
+      _this._heightFactor = defaultValue$2(options.heightFactor, 0.82);
+      _this._tailWidthFactor = defaultValue$2(options.tailWidthFactor, 0.5);
+      _this._headWidthFactor = defaultValue$2(options.headWidthFactor, 0.3);
+
+      _this.createNodes();
+
+      return _this;
+    }
+    /**
+     * 梯形高度因子
+     * @return {Number} 梯形高度高图形高度的百分比
+     */
+
+
+    _createClass$1(HalfTrapezoidComponent, [{
+      key: "createNodes",
+      value: function createNodes() {
+        _get$1(_getPrototypeOf$1(HalfTrapezoidComponent.prototype), "createNodes", this).call(this);
+
+        var tailControl = this.get(0);
+        var baseLength = PlotUtil$1.baseLength(this._controls);
+        var height = this.heightFactor * baseLength;
+        var headControl = PlotUtil$1.thirdPoint(this.get(1), tailControl, 0, height, this.inverse);
+        var tailWidth = this.tailWidthFactor * baseLength;
+        var headWidth = this.headWidthFactor * baseLength;
+        var leftHead = PlotUtil$1.thirdPoint(tailControl, headControl, Math.PI / 2, headWidth, this.inverse);
+        var leftTail = PlotUtil$1.thirdPoint(headControl, tailControl, Math.PI / 2, tailWidth, !this.inverse);
+        this._nodes = [leftHead, leftTail, tailControl, headControl].flat();
+        this.completedNodes = new Map();
+        this.completedNodes.set(this.inverse, [leftTail]);
+        return [leftTail];
+      }
+    }, {
+      key: "linkArrow",
+      value: function linkArrow(options) {
+        var arrowNodes = options.arrowNodes,
+            bodyNodes = options.bodyNodes,
+            inverse = options.inverse;
+
+        if (inverse) {
+          return [].concat(_toConsumableArray$1(bodyNodes), _toConsumableArray$1(arrowNodes));
+        }
+
+        return [].concat(_toConsumableArray$1(arrowNodes), _toConsumableArray$1(bodyNodes));
+      }
+    }, {
+      key: "linkTail",
+      value: function linkTail() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var tailNodes = options.tailNodes,
+            bodyNodes = options.bodyNodes,
+            inverse = options.inverse;
+        return [].concat(_toConsumableArray$1(tailNodes), _toConsumableArray$1(bodyNodes));
+      }
+    }, {
+      key: "heightFactor",
+      get: function get() {
+        return this._heightFactor;
+      }
+      /**
+       * 梯形头部宽度因子
+       * @return {Number} 梯形头部宽度占高度的百分比
+       */
+
+    }, {
+      key: "headWidthFactor",
+      get: function get() {
+        return this._headWidthFactor;
+      }
+      /**
+       * 梯形尾部宽度因子
+       * @return {Number} 梯形尾部宽度占高度的百分比
+       */
+
+    }, {
+      key: "tailWidthFactor",
+      get: function get() {
+        return this._tailWidthFactor;
+      }
+    }]);
+
+    return HalfTrapezoidComponent;
+  }(Component);
+
+  var TrapezoidComponent = /*#__PURE__*/function (_HalfTrapezoidCompone) {
+    _inherits$1(TrapezoidComponent, _HalfTrapezoidCompone);
+
+    var _super = _createSuper$1(TrapezoidComponent);
+
+    function TrapezoidComponent() {
+      var _this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, TrapezoidComponent);
+
+      _this = _super.call(this, options);
+      _this._type = ComponentType.TRAPEZOID;
+      return _this;
+    }
+
+    _createClass$1(TrapezoidComponent, [{
+      key: "createNodes",
+      value: function createNodes() {
+        var completedNodes = new Map();
+        this.inverse = false;
+
+        var right = _get$1(_getPrototypeOf$1(TrapezoidComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(right));
+        this.inverse = true;
+
+        var left = _get$1(_getPrototypeOf$1(TrapezoidComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(left));
+        this.completedNodes = completedNodes;
+        this.inverse = undefined;
+        this._nodes = left.concat(right);
+        return this._nodes;
+      }
+    }]);
+
+    return TrapezoidComponent;
+  }(HalfTrapezoidComponent);
+
+  var Arrow = /*#__PURE__*/function () {
+    function Arrow(options) {
+      _classCallCheck$1(this, Arrow);
+
+      this._headHeightFactor = defaultValue$2(options.headHeightFactor, 0.2);
+      this._neckHeightFactor = defaultValue$2(options.neckHeightFactor, 0.8);
+      this._headWidthFactor = defaultValue$2(options.headWidthFactor, 0.5);
+      this._neckWidthFactor = defaultValue$2(options.neckWidthFactor, 0.3);
+      this._tailWidthFactor = defaultValue$2(options.tailWidthFactor, 0.3);
+      this._tailHeightFactor = defaultValue$2(options.tailHeightFactor, 0.20);
+      this._controls = defaultValue$2(options.controls, []);
+      this._headComponent = undefined;
+      this._bodyComponent = undefined;
+      this._tailComponent = undefined;
+      this._nodes = undefined;
+      this._polygon = [];
+      this._polyline = [];
+    }
+
+    _createClass$1(Arrow, [{
+      key: "postProcessing",
+
+      /**
+       * 几何图形做进一步处理
+       * @return {Number[]}
+       */
+      value: function postProcessing(pts) {
+        return pts;
+      }
+      /**
+       * 合并箭头的各个组件
+       * @return {Number[]}
+       */
+
+    }, {
+      key: "merge",
+      value: function merge() {
+        var _this$polygon, _this$polyline;
+
+        var head = this.headComponent;
+        var body = this.bodyComponent;
+        var tail = this.tailComponent;
+        var bodyNodes;
+        body && (bodyNodes = body.completedNodes);
+        var nodes = [];
+        var tNode;
+
+        if (bodyNodes && bodyNodes.get(true)) {
+          tNode = bodyNodes.get(true);
+          nodes = body.linkTail({
+            tailNodes: nodes,
+            bodyNodes: tNode
+          });
+        }
+
+        if (head) {
+          tNode = head.nodes;
+
+          if (body) {
+            nodes = body.linkArrow({
+              arrowNodes: tNode,
+              bodyNodes: nodes,
+              inverse: true,
+              target: this
+            });
+          } else {
+            nodes = tNode;
+          }
+        }
+
+        if (bodyNodes && bodyNodes.get(false)) {
+          tNode = bodyNodes.get(false);
+          nodes = body.linkArrow({
+            arrowNodes: nodes,
+            bodyNodes: tNode,
+            inverse: false,
+            target: this
+          });
+        }
+
+        if (tail) {
+          var _nodes;
+
+          (_nodes = nodes).push.apply(_nodes, _toConsumableArray$1(tail.nodes));
+        }
+
+        this.reset();
+
+        (_this$polygon = this.polygon).push.apply(_this$polygon, _toConsumableArray$1(nodes.flat())); // nodes.shift();
+
+
+        (_this$polyline = this.polyline).push.apply(_this$polyline, _toConsumableArray$1(nodes.flat()));
+      }
+    }, {
+      key: "update",
+      value: function update() {
+        this.createNodes();
+      }
+    }, {
+      key: "reset",
+      value: function reset() {
+        this.polygon.splice(0);
+        this.polyline.splice(0);
+      }
+    }, {
+      key: "polygon",
+      get: function get() {
+        return this._polygon;
+      }
+    }, {
+      key: "polyline",
+      get: function get() {
+        return this._polyline;
+      }
+    }, {
+      key: "controls",
+      get: function get() {
+        return this._controls;
+      }
+    }]);
+
+    return Arrow;
+  }();
+
+  var HalfSwallowTail = /*#__PURE__*/function (_Component) {
+    _inherits$1(HalfSwallowTail, _Component);
+
+    var _super = _createSuper$1(HalfSwallowTail);
+    /**
+     * [constructor description]
+     * @param {Object} [options={}] [description]
+     * @param {Number} [options.heightFactor] 尾部高度占总高度的比例
+     */
+
+
+    function HalfSwallowTail() {
+      var _this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, HalfSwallowTail);
+
+      _this = _super.call(this, options);
+      _this._type = ComponentType.HALF_SWALLOW_TRAIL;
+      _this._controlPointsCount = [3, Infinity];
+      _this._heightFactor = defaultValue$2(options.heightFactor, 0.3);
+
+      _this.createNodes();
+
+      return _this;
+    }
+    /**
+     * 尾部高度因了
+     * @return {Number} 尾部高度占总高度的比例
+     */
+
+
+    _createClass$1(HalfSwallowTail, [{
+      key: "createNodes",
+      value: function createNodes() {
+        _get$1(_getPrototypeOf$1(HalfSwallowTail.prototype), "createNodes", this).call(this);
+
+        var baseLength = PlotUtil$1.baseLength(this.controls);
+        var height = this._heightFactor * baseLength;
+        var mid = PlotUtil$1.mid(this.get(0), this.get(1));
+        var headControl = PlotUtil$1.thirdPoint(this.get(2), mid, 0, height, this.inverse);
+        this.nodes = [headControl];
+        return this.nodes;
+      }
+    }, {
+      key: "heightFactor",
+      get: function get() {
+        return this._heightFactor;
+      }
+    }]);
+
+    return HalfSwallowTail;
+  }(Component);
+
+  function defineProperties(object) {
+    var _loop = function _loop(key) {
+      if (object.hasOwnProperty(key) && key.startsWith('_')) {
+        var newKey = key.replace('_', '');
+        Object.defineProperty(object, newKey, {
+          get: function get() {
+            return object[key];
+          },
+          set: function set(v) {
+            object[key] = v;
+          }
+        });
+      }
+    };
+
+    for (var key in object) {
+      _loop(key);
+    }
+  }
+
+  var StraightArrow = /*#__PURE__*/function (_Arrow) {
+    _inherits$1(StraightArrow, _Arrow);
+
+    var _super = _createSuper$1(StraightArrow);
+    /**
+     * 直线箭头
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Number} [options.headHeightFactor=0.18] 头部高度占箭头高度的比例
+     * @param {Number} [options.neckHeightFactor=0.13] 脖子高度占箭头高度的比例
+     * @param {Number} [options.headWidthFactor=0.2] 头部宽度占箭头高度的比例
+     * @param {Number} [options=neckWidthFactor=options.neckHeightFactor/2] 脖子宽度占箭头高度的比例
+     * @param {Number} [options.tailWidthFactor=0.3] 尾部宽度占箭头高度的比例
+     * @param {Number} [options.tailHeightFactor=0.2] 尾部高度占箭头高度的比例
+     */
+
+
+    function StraightArrow() {
+      var _this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, StraightArrow);
+
+      options = defaultValue$2(options, defaultValue$2.EMPTY_OBJECT);
+      _this = _super.call(this, options);
+      _this._tail = defaultValue$2(options.tail, false);
+
+      _this.init();
+
+      defineProperties(_assertThisInitialized$1(_this));
+
+      _this.merge();
+
+      return _this;
+    }
+
+    _createClass$1(StraightArrow, [{
+      key: "addControl",
+      value: function addControl(control) {
+        if (this.controls.length >= StraightArrow.MIN_CONTROL_COUNT) {
+          this.controls.pop();
+        }
+
+        this.controls.push(control);
+
+        if (this.controls.length >= StraightArrow.MIN_CONTROL_COUNT) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "popControl",
+      value: function popControl() {
+        return this.controls.pop();
+      }
+    }, {
+      key: "updateControl",
+      value: function updateControl(index, control) {
+        this.controls[index] = control;
+
+        if (this.controls.length >= StraightArrow.MIN_CONTROL_COUNT) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "init",
+      value: function init() {
+        if (this.controls.length < StraightArrow.MIN_CONTROL_COUNT) {
+          return;
+        }
+
+        this._headComponent = this.createHeadComponent();
+        this._bodyComponent = this.createBodyComponent();
+
+        if (this._tail) {
+          this._tailComponent = this.createTailComponent();
+        }
+      }
+    }, {
+      key: "update",
+      value: function update() {
+        this._headComponent = this.createHeadComponent();
+        this._bodyComponent = this.createBodyComponent();
+
+        if (this._tail) {
+          this._tailComponent = this.createTailComponent();
+        }
+
+        this.merge();
+      }
+    }, {
+      key: "createBodyComponent",
+      value: function createBodyComponent() {
+        return new TrapezoidComponent({
+          controls: this._controls,
+          heightFactor: 1 - this._neckHeightFactor,
+          headWidthFactor: this._neckWidthFactor,
+          tailWidthFactor: this._tailWidthFactor
+        });
+      }
+    }, {
+      key: "createHeadComponent",
+      value: function createHeadComponent() {
+        return new ArrowComponent({
+          controls: this._controls,
+          headWidthFactor: this._headWidthFactor,
+          neckHeightFactor: this._neckHeightFactor,
+          neckWidthFactor: this._neckWidthFactor,
+          headHeightFactor: this._headHeightFactor
+        });
+      }
+    }, {
+      key: "createTailComponent",
+      value: function createTailComponent() {
+        if (!this._bodyComponent) {
+          return;
+        }
+
+        var bodyNodes = this._bodyComponent.nodes;
+        return new HalfSwallowTail({
+          controls: [].concat(_toConsumableArray$1(bodyNodes), [this._controls[1]]),
+          heightFactor: this._tailHeightFactor
+        });
+      }
+    }, {
+      key: "tail",
+      set: function set(v) {
+        this._tail = v;
+      }
+    }]);
+
+    return StraightArrow;
+  }(Arrow);
+
+  _defineProperty$1(StraightArrow, "MIN_CONTROL_COUNT", 2);
+
+  var SplineComponent = /*#__PURE__*/function (_Component) {
+    _inherits$1(SplineComponent, _Component);
+
+    var _super = _createSuper$1(SplineComponent);
+    /**
+     * 样条曲线
+     * @param {Object} options 具有以下属性
+     * @param {Number} [options.headWidthFactor=0.1] 头部宽度占图形高度的比例
+     * @param {Number} [options.tailWidthFactor=0.3] 尾部宽度占图形高度的比例
+     */
+
+
+    function SplineComponent(options) {
+      var _this;
+
+      _classCallCheck$1(this, SplineComponent);
+
+      _this = _super.call(this, options);
+      _this._type = ComponentType.HALF_SPLINE;
+      _this._controlPointsCount = [2, Infinity];
+      _this._headWidthFactor = defaultValue$2(options.headWidthFactor, 0.1);
+      _this._tailWidthFactor = defaultValue$2(options.tailWidthFactor, 0.3);
+
+      _this.createNodes();
+
+      return _this;
+    }
+
+    _createClass$1(SplineComponent, [{
+      key: "createNodes",
+      value: function createNodes() {
+        _get$1(_getPrototypeOf$1(SplineComponent.prototype), "createNodes", this).call(this);
+
+        var controls = this.controls;
+        var length = PlotUtil$1.distance.apply(PlotUtil$1, _toConsumableArray$1(controls));
+        var baseLength = PlotUtil$1.baseLength(controls);
+        var tailWidth = this.tailWidthFactor * baseLength;
+        var headWidth = this.headWidthFactor * baseLength;
+        var offset = Math.abs(tailWidth - headWidth) / 2;
+        var distance = 0;
+        var cts = controls;
+        var u = [];
+
+        for (var i = 1; i < controls.length - 1; i++) {
+          var angle = PlotUtil$1.angleOfThreePoints(cts[i], cts[i - 1], cts[i + 1]) / 2;
+          distance += PlotUtil$1.distance(cts[i - 1], cts[i]);
+
+          if (!this.inverse) {
+            angle = Math.PI - angle;
+          }
+
+          var tmpDis = (tailWidth / 2 - distance / length * offset) / Math.sin(angle);
+          var point = PlotUtil$1.thirdPoint(cts[i - 1], cts[i], angle, tmpDis, this.inverse);
+          u.push(point);
+        }
+
+        this.completedNodes = new Map();
+        this.completedNodes.set(this.inverse, u);
+        this.nodes = u;
+        return u;
+      }
+    }, {
+      key: "linkArrow",
+      value: function linkArrow(options) {
+        var arrowNodes = options.arrowNodes,
+            bodyNodes = options.bodyNodes,
+            inverse = options.inverse,
+            target = options.target;
+        var nodes = [];
+
+        if (target._tail) {
+          nodes.push(target.controls[+!inverse]);
+        }
+
+        if (inverse) {
+          nodes.push.apply(nodes, _toConsumableArray$1(bodyNodes).concat([arrowNodes[0]]));
+
+          var _spline = PlotUtil$1.quadricBSpline(nodes);
+
+          return [].concat(_toConsumableArray$1(_spline), _toConsumableArray$1(arrowNodes));
+        }
+
+        nodes.push.apply(nodes, _toConsumableArray$1(bodyNodes).concat([arrowNodes[arrowNodes.length - 1]]));
+        var spline = PlotUtil$1.quadricBSpline(nodes);
+        return [].concat(_toConsumableArray$1(arrowNodes), _toConsumableArray$1(spline.reverse()));
+      }
+    }, {
+      key: "linkTail",
+      value: function linkTail() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var tailNodes = options.tailNodes,
+            bodyNodes = options.bodyNodes,
+            inverse = options.inverse;
+        return [].concat(_toConsumableArray$1(tailNodes), _toConsumableArray$1(bodyNodes));
+      }
+    }, {
+      key: "tailWidthFactor",
+      get: function get() {
+        return this._tailWidthFactor;
+      }
+    }, {
+      key: "headWidthFactor",
+      get: function get() {
+        return this._headWidthFactor;
+      }
+    }]);
+
+    return SplineComponent;
+  }(Component);
+
+  var SplineComponent$1 = /*#__PURE__*/function (_HalfSplineComponent) {
+    _inherits$1(SplineComponent, _HalfSplineComponent);
+
+    var _super = _createSuper$1(SplineComponent);
+
+    function SplineComponent() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck$1(this, SplineComponent);
+
+      return _super.call(this, options);
+    }
+
+    _createClass$1(SplineComponent, [{
+      key: "createNodes",
+      value: function createNodes() {
+        var completedNodes = new Map();
+        this.inverse = false;
+
+        var leftNodes = _get$1(_getPrototypeOf$1(SplineComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(leftNodes));
+        this.inverse = true;
+
+        var rightNodes = _get$1(_getPrototypeOf$1(SplineComponent.prototype), "createNodes", this).call(this);
+
+        completedNodes.set(this.inverse, _toConsumableArray$1(rightNodes));
+        this.inverse = undefined;
+        this.nodes = [].concat(_toConsumableArray$1(leftNodes), _toConsumableArray$1(rightNodes.reverse()));
+        this.completedNodes = completedNodes;
+        return [].concat(_toConsumableArray$1(leftNodes), _toConsumableArray$1(rightNodes.reverse()));
+      }
+    }]);
+
+    return SplineComponent;
+  }(SplineComponent);
+
+  var AttackArrow = /*#__PURE__*/function (_Arrow) {
+    _inherits$1(AttackArrow, _Arrow);
+
+    var _super = _createSuper$1(AttackArrow);
+
+    function AttackArrow(options) {
+      var _this;
+
+      _classCallCheck$1(this, AttackArrow);
+
+      options = defaultValue$2(options, {});
+      options.headHeightFactor = defaultValue$2(options.headHeightFactor, 0.15);
+      options.neckHeightFactor = defaultValue$2(options.headWidthFactor, 0.8);
+      options.neckWidthFactor = defaultValue$2(options.neckWidthFactor, 0.15);
+      options.headWidthFactor = defaultValue$2(options.headWidthFactor, 0.4);
+      options.tailWidthFactor = defaultValue$2(options.tailWidthFactor, 0.25);
+      _this = _super.call(this, options);
+      _this._headTailHeightFactor = defaultValue$2(options.headTailHeightFactor, 0.5);
+      _this._tail = defaultValue$2(options.tail, true);
+      _this._heightFactor = defaultValue$2(options.heightFactor, 0.8);
+      _this._tailHeightFactor = defaultValue$2(options.tailHeightFactor, 0.05);
+
+      _this.init();
+
+      defineProperties(_assertThisInitialized$1(_this));
+
+      _this.merge();
+
+      return _this;
+    }
+
+    _createClass$1(AttackArrow, [{
+      key: "addControl",
+      value: function addControl(control) {
+        var lastNode = this.controls[this.controls.length - 1]; // if (lastNode && lastNode[0] === control[0] && lastNode[1] === control[1]) {
+        //   return;
+        // }
+
+        this.controls.push(control);
+
+        if (!this.tail && this.controls.length >= AttackArrow.MIN_CONTROL_COUNT || this.controls.length >= AttackArrow.MIN_CONTROL_COUNT + 1) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "updateControl",
+      value: function updateControl(index, control) {
+        this.controls[index] = control;
+
+        if (!this.tail && this.controls.length >= AttackArrow.MIN_CONTROL_COUNT || this.controls.length >= AttackArrow.MIN_CONTROL_COUNT + 1) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "popControl",
+      value: function popControl() {
+        this.controls.pop();
+      }
+    }, {
+      key: "init",
+      value: function init() {
+        var _ref;
+
+        if (!this.tail && this.controls.length < AttackArrow.MIN_CONTROL_COUNT) {
+          return;
+        }
+
+        if (this.tail && this.controls.length < AttackArrow.MIN_CONTROL_COUNT + 1) {
+          return;
+        }
+
+        this._head1 = this.controls[0];
+        this._head2 = this.controls[1];
+        this.tail && PlotUtil$1.isClockWise(this.controls[0], this.controls[1], this.controls[2]) && (_ref = [this._head2, this._head1], this._head1 = _ref[0], this._head2 = _ref[1], _ref);
+        this._headComponent = this.createHeadComponent();
+        this._bodyComponent = this.createBodyComponent();
+
+        if (this._tail) {
+          this._tailComponent = this.createTailComponent();
+        }
+      }
+    }, {
+      key: "createHeadComponent",
+      value: function createHeadComponent() {
+        var controls, tailWidth;
+
+        if (this.tail) {
+          var mid = PlotUtil$1.mid(this._head1, this._head2);
+          controls = [mid].concat(_toConsumableArray$1(this.controls.slice(2)));
+          tailWidth = PlotUtil$1.distance(this._head1, this._head2);
+        } else {
+          controls = this.controls;
+        }
+
+        var count = controls.length;
+        return new ArrowComponent({
+          controls: controls,
+          heightFactor: this._headHeightFactor,
+          neckHeightFactor: this._neckHeightFactor,
+          headWidthFactor: this._headWidthFactor,
+          neckWidthFactor: this._neckWidthFactor,
+          headMaxHeight: this._headTailHeightFactor * tailWidth,
+          index: [count - 2, count - 1]
+        });
+      }
+    }, {
+      key: "createBodyComponent",
+      value: function createBodyComponent() {
+        var mid,
+            controls = this.controls.slice(2);
+        var neckWidth = PlotUtil$1.distance(this._headComponent.nodes[0], this._headComponent.nodes[4]);
+        var baseLength = PlotUtil$1.baseLength(controls);
+        var tailWidth;
+
+        if (this._tail) {
+          tailWidth = PlotUtil$1.distance(this.controls[0], this.controls[1]);
+          mid = PlotUtil$1.mid(this._head1, this._head2);
+          controls = [mid].concat(_toConsumableArray$1(controls));
+
+          var _baseLength = PlotUtil$1.baseLength(controls);
+
+          this._tailWidthFactor = tailWidth / _baseLength;
+        } else {
+          tailWidth = baseLength * this._tailWidthFactor;
+          controls = this.controls;
+        }
+
+        var headWidthFactor = neckWidth / baseLength;
+        return new SplineComponent$1({
+          controls: controls,
+          headWidthFactor: headWidthFactor,
+          tailWidthFactor: this._tailWidthFactor
+        });
+      }
+    }, {
+      key: "createTailComponent",
+      value: function createTailComponent() {
+        if (!this._bodyComponent) {
+          return;
+        } // const mid = Util.mid(this._head1, this._head2);
+
+
+        var controls = this.controls;
+        return new HalfSwallowTail({
+          controls: controls,
+          heightFactor: this._tailHeightFactor
+        });
+      }
+    }]);
+
+    return AttackArrow;
+  }(Arrow);
+
+  _defineProperty$1(AttackArrow, "MIN_CONTROL_COUNT", 2);
+
+  var DoubleArrow = /*#__PURE__*/function (_Arrow) {
+    _inherits$1(DoubleArrow, _Arrow);
+
+    var _super = _createSuper$1(DoubleArrow);
+
+    function DoubleArrow(options) {
+      var _this;
+
+      _classCallCheck$1(this, DoubleArrow);
+
+      options = defaultValue$2(options, {});
+      options.neckHeightFactor = defaultValue$2(options.neckHeightFactor, 0.8);
+      options.neckWidthFactor = defaultValue$2(options.neckWidthFactor, 0.2);
+      options.headWidthFactor = defaultValue$2(options.headWidthFactor, 0.5);
+      _this = _super.call(this, options);
+      _this._nodes = [];
+
+      _this.init();
+
+      defineProperties(_assertThisInitialized$1(_this));
+
+      _this.merge();
+
+      return _this;
+    }
+
+    _createClass$1(DoubleArrow, [{
+      key: "addControl",
+      value: function addControl(control) {
+        if (this.controls.length >= DoubleArrow.MAX_CONTROL_COUNT) {
+          this.popControl();
+        }
+
+        this.controls.push(control);
+
+        if (this.controls.length >= DoubleArrow.MIN_CONTROL_COUNT) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "updateControl",
+      value: function updateControl(index, control) {
+        this.controls[index] = control;
+
+        if (this.controls.length >= DoubleArrow.MIN_CONTROL_COUNT) {
+          this.init();
+          this.merge();
+        }
+      }
+    }, {
+      key: "popControl",
+      value: function popControl() {
+        return this.controls.pop();
+      }
+    }, {
+      key: "init",
+      value: function init() {
+        if (this.controls.length < DoubleArrow.MIN_CONTROL_COUNT) {
+          return;
+        }
+
+        this.getPoints();
+      }
+    }, {
+      key: "tempPoint4",
+      value: function tempPoint4(p1, p2, p3) {
+        var mid = PlotUtil$1.mid(p1, p2);
+        var distance = PlotUtil$1.distance(mid, p3);
+        var angle = PlotUtil$1.angleOfThreePoints(p1, mid, p3);
+        var x, y;
+        var rst;
+        if (angle < Math.PI / 2) ;else if (angle < Math.PI && angle >= Math.PI / 2) {
+          angle = Math.PI - angle;
+        } else if (angle >= Math.PI && angle < Math.PI * 1.5) {
+          angle = angle - Math.PI;
+        } else if (angle >= Math.PI * 1.5) {
+          angle = Math.PI * 2 - angle;
+        }
+        x = distance * Math.cos(angle);
+        y = distance * Math.sin(angle);
+        var tmp = PlotUtil$1.thirdPoint(p1, mid, Math.PI / 2, x, true);
+        rst = PlotUtil$1.thirdPoint(mid, tmp, Math.PI / 2, y, false);
+        return rst;
+      }
+    }, {
+      key: "getPoints",
+      value: function getPoints() {
+        var controls;
+        var controls_ = this.controls;
+
+        if (controls_ < 3) {
+          return;
+        }
+
+        var tmp, connectPoint;
+
+        if (controls_.length === 3) {
+          tmp = this.tempPoint4.apply(this, _toConsumableArray$1(controls_));
+        } else {
+          tmp = controls_[3];
+        }
+
+        if (controls_.length <= 4) {
+          connectPoint = PlotUtil$1.mid(controls_[0], controls_[1]);
+        } else {
+          connectPoint = controls_[4];
+        }
+
+        var head1, head2, bodyControls, radio;
+
+        if (PlotUtil$1.isClockWise.apply(PlotUtil$1, _toConsumableArray$1(this.controls.slice(0, 3)))) {
+          var _bodyControls;
+
+          controls = this.getArrowControls(controls_[0], connectPoint, tmp, true);
+          head1 = new ArrowComponent({
+            controls: controls,
+            index: [2, 3],
+            neckHeightFactor: this._neckHeightFactor,
+            neckWidthFactor: this._neckWidthFactor,
+            headWidthFactor: this._headWidthFactor
+          });
+          radio = PlotUtil$1.distance(controls_[0], connectPoint) / PlotUtil$1.baseLength(controls) / 2;
+          bodyControls = this.getBodyControls(controls, head1.nodes[0], head1.nodes[4], radio);
+          controls = this.getArrowControls(connectPoint, controls_[1], controls_[2], false);
+          head2 = new ArrowComponent({
+            controls: controls,
+            index: [2, 3],
+            neckHeightFactor: this._neckHeightFactor,
+            neckWidthFactor: this._neckWidthFactor,
+            headWidthFactor: this._headWidthFactor
+          });
+          radio = PlotUtil$1.distance(connectPoint, controls_[1]) / PlotUtil$1.baseLength(controls) / 2;
+
+          (_bodyControls = bodyControls).unshift.apply(_bodyControls, _toConsumableArray$1(this.getBodyControls(controls, head2.nodes[0], head2.nodes[4], radio)));
+
+          var bodyPoints = this.geoBodyPoints([head1, head2], bodyControls, connectPoint);
+          this._nodes = [].concat(_toConsumableArray$1(bodyPoints[0]), _toConsumableArray$1(head1.nodes), _toConsumableArray$1(bodyPoints[1]), _toConsumableArray$1(head2.nodes), _toConsumableArray$1(bodyPoints[2]));
+        } else {
+          var _bodyControls2;
+
+          controls = this.getArrowControls(controls_[0], connectPoint, tmp, false);
+          head1 = new ArrowComponent({
+            controls: controls,
+            index: [2, 3],
+            neckHeightFactor: this._neckHeightFactor,
+            neckWidthFactor: this._neckWidthFactor,
+            headWidthFactor: this._headWidthFactor
+          });
+          radio = PlotUtil$1.distance(controls_[0], connectPoint) / PlotUtil$1.baseLength(controls) / 2;
+          bodyControls = this.getBodyControls(controls, head1.nodes[0], head1.nodes[4], radio);
+          controls = this.getArrowControls(connectPoint, controls_[1], controls_[2], true);
+          head2 = new ArrowComponent({
+            controls: controls,
+            index: [2, 3],
+            neckHeightFactor: this._neckHeightFactor,
+            neckWidthFactor: this._neckWidthFactor,
+            headWidthFactor: this._headWidthFactor
+          });
+          radio = PlotUtil$1.distance(connectPoint, controls_[1]) / PlotUtil$1.baseLength(controls) / 2;
+
+          (_bodyControls2 = bodyControls).unshift.apply(_bodyControls2, _toConsumableArray$1(this.getBodyControls(controls, head2.nodes[0], head2.nodes[4], radio)));
+
+          var _bodyPoints = this.geoBodyPoints([head1, head2], bodyControls, connectPoint);
+
+          this._nodes = [].concat(_toConsumableArray$1(_bodyPoints[0]), _toConsumableArray$1(head1.nodes), _toConsumableArray$1(_bodyPoints[1]), _toConsumableArray$1(head2.nodes), _toConsumableArray$1(_bodyPoints[2]));
+        }
+      }
+    }, {
+      key: "getArrowControls",
+      value: function getArrowControls(p1, p2, p3, inverse) {
+        //t,o,e,r
+        var mid = PlotUtil$1.mid(p1, p2);
+        var distance = PlotUtil$1.distance(mid, p3);
+        var neckControl = PlotUtil$1.thirdPoint(p3, mid, 0, 0.3 * distance, false);
+        var headControl = PlotUtil$1.thirdPoint(p3, mid, 0, 0.5 * distance, false);
+        neckControl = PlotUtil$1.thirdPoint(mid, neckControl, Math.PI / 2, distance / 5, inverse);
+        headControl = PlotUtil$1.thirdPoint(mid, headControl, Math.PI / 2, distance / 4, inverse);
+        return [mid, neckControl, headControl, p3];
+      }
+    }, {
+      key: "geoBodyPoints",
+      value: function geoBodyPoints(head, body, connect) {
+        var body1 = PlotUtil$1.BezierCurve([this.controls[1], body[0], body[1], head[1].nodes[4]]);
+        var body2 = PlotUtil$1.BezierCurve([this.controls[0], body[6], body[7], head[0].nodes[0]]);
+        var body3 = PlotUtil$1.BezierCurve([head[0].nodes[4], body[5], body[4], connect, body[3], body[2], head[1].nodes[0]]);
+        return [body2, body3, body1.reverse()];
+      }
+    }, {
+      key: "getBodyControls",
+      value: function getBodyControls(points, neckControl1, neckControl2, radio) {
+        //t,o,e,r
+        var length = PlotUtil$1.distance.apply(PlotUtil$1, _toConsumableArray$1(points));
+        var baseLength = PlotUtil$1.baseLength(points);
+        var width = baseLength * radio;
+        var neckWidth = PlotUtil$1.distance(neckControl1, neckControl2);
+        var offset = (width - neckWidth) / 2;
+        var dis = 0;
+        var u = [],
+            c = [];
+
+        for (var i = 1; i < points.length - 1; i++) {
+          var angle = PlotUtil$1.angleOfThreePoints(points[i], points[i - 1], points[i + 1]) / 2;
+          dis += PlotUtil$1.distance(points[i - 1], points[i]);
+          var d = (width / 2 - dis / length * offset) / Math.sin(angle);
+          u.push(PlotUtil$1.thirdPoint(points[i - 1], points[i], Math.PI - angle, d, false));
+          c.push(PlotUtil$1.thirdPoint(points[i - 1], points[i], angle, d, true));
+        }
+
+        return u.concat(c);
+      }
+    }, {
+      key: "merge",
+      value: function merge() {
+        var _this$polygon, _this$polyline;
+
+        this.reset();
+
+        (_this$polygon = this.polygon).push.apply(_this$polygon, _toConsumableArray$1(_toConsumableArray$1(this.nodes).flat()));
+
+        (_this$polyline = this.polyline).push.apply(_this$polyline, _toConsumableArray$1(_toConsumableArray$1(this.nodes).flat()));
+      }
+    }]);
+
+    return DoubleArrow;
+  }(Arrow);
+
+  _defineProperty$1(DoubleArrow, "MIN_CONTROL_COUNT", 3);
+
+  _defineProperty$1(DoubleArrow, "MAX_CONTROL_COUNT", 5);
+
+  var ArrowType = {
+    "straightarrow": 'straightarrow',
+    'attackarrow': 'attackarrow',
+    'doublearrow': 'doublearrow'
+  };
+
+  ArrowType.validate = function (type) {
+    if (type === ArrowType.straightarrow || type === ArrowType.attackarrow || type === ArrowType.doublearrow) {
+      return true;
+    }
+
+    return false;
+  };
+
+  var ArrowGraphic = {
+    StraightArrow: StraightArrow,
+    AttackArrow: AttackArrow,
+    DoubleArrow: DoubleArrow,
+    ArrowType: ArrowType
+  };
+
+  var ArrowGraphic$1 = /*#__PURE__*/function (_Graphic) {
+    _inherits(ArrowGraphic, _Graphic);
+
+    var _super = _createSuper(ArrowGraphic);
+
+    function ArrowGraphic(viewer, entityOptions) {
+      var _this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      _classCallCheck(this, ArrowGraphic);
+
+      _this = _super.call(this, viewer, entityOptions);
+      _this._type = GraphicType$1.ARROW;
+      _this._entityOptions = entityOptions;
+      _this._positions = defaultValue(entityOptions.positions, []);
+      _this._arrowType = defaultValue(options.arrowType, 'straightarrow');
+
+      if (!ArrowType.validate(_this._arrowType)) {
+        throw new CesiumProError$1('无效的箭头图形.');
+      }
+
+      var positions = [];
+
+      var _iterator = _createForOfIteratorHelper(_this.positions),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var p = _step.value;
+          var ll = PointGraphic.toDegrees(p);
+          positions.push([ll.lon, ll.lat]);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      if (_this._arrowType === ArrowType.straightarrow) {
+        _this._arrow = new StraightArrow({
+          controls: positions
+        });
+      }
+
+      if (_this._arrowType === ArrowType.attackarrow) {
+        _this._arrow = new AttackArrow({
+          controls: positions
+        });
+      }
+
+      if (_this._arrowType === ArrowType.doublearrow) {
+        _this._arrow = new DoubleArrow({
+          controls: positions
+        });
+      }
+
+      _this._entity = _this.createEntity();
+
+      _this.add();
+
+      return _this;
+    }
+    /**
+     * 箭头图形
+     * @return {StraightArrow|AttackArrow|DoubleArrow}
+     */
+
+
+    _createClass(ArrowGraphic, [{
+      key: "getGeometry",
+
+      /**
+       * 该图形的几何描述，包括类型，经纬度等
+       * @return {Object}
+       */
+      value: function getGeometry() {
+        PolygonGraphic.getGeometry(this);
+      }
+    }, {
+      key: "createEntity",
+      value: function createEntity() {
+        _get(_getPrototypeOf(ArrowGraphic.prototype), "createEntity", this).call(this);
+
+        delete this._entityOptions.positions;
+        var options = {
+          id: this.id,
+          polygon: _objectSpread2({
+            hierarchy: Cesium.Cartesian3.fromDegreesArray(this._arrow.polygon)
+          }, this._entityOptions)
+        };
+
+        if (this._entityOptions.outline) {
+          options.polyline = {
+            positions: Cesium.Cartesian3.fromDegreesArray(this._arrow.polyline),
+            material: this._entityOptions.outlineColor,
+            width: this._entityOptions.outlineWidth
+          };
+          options.polygon.outline = false;
+        }
+
+        this._entityOptions = options;
+        return new Cesium.Entity(this._entityOptions);
+      }
+      /**
+       * 对图形几何编辑前调用
+       * @fires Graphic#preEdit
+       */
+
+    }, {
+      key: "startEdit",
+      value: function startEdit() {
+        var style = PointGraphic.defaultStyle;
+        this._node = new NodeGraphic(this._viewer, _objectSpread2({
+          positions: this.positions
+        }, style));
+      }
+      /**
+       * 图形几何信息编辑完成后调用
+       * @fires Graphic#postEdit
+       */
+
+    }, {
+      key: "stopEdit",
+      value: function stopEdit() {
+        this._node && this._node.destroy();
+        this._node = undefined;
+      }
+      /**
+       * 添加顶。
+       * @param {Cartesian} node 新顶点
+       */
+
+    }, {
+      key: "addNode",
+      value: function addNode(node) {
+        if (this.arrow) {
+          var ll = PointGraphic.toDegrees(node);
+          this.arrow.addControl([ll.lon, ll.lat]);
+          this.updatePositions();
+          this.updateEntity();
+        }
+      }
+      /**
+       * 删除最后一个顶点
+       */
+
+    }, {
+      key: "popNode",
+      value: function popNode() {
+        if (this.arrow) {
+          this.arrow.popControl();
+          this.updatePositions();
+          this.updateEntity();
+        }
+      }
+      /**
+       * 更新一个顶点
+       * @param  {Number} index 顶点编号
+       * @param  {Cartesian} node  将要更新的位置
+       */
+
+    }, {
+      key: "updateNode",
+      value: function updateNode(index, node) {
+        if (this.arrow) {
+          var ll = PointGraphic.toDegrees(node);
+          this.arrow.updateControl(index, [ll.lon, ll.lat]);
+          this.updatePositions();
+          this.updateEntity();
+        }
+      }
+      /**
+       * @private
+       */
+
+    }, {
+      key: "updatePositions",
+      value: function updatePositions() {
+        if (!defined(this.arrow)) {
+          return;
+        }
+
+        var controls = this.arrow.controls;
+
+        for (var i = 0; i < controls.length; i++) {
+          this.positions[i] = Cesium.Cartesian3.fromDegrees(controls[i][0], controls[i][1]);
+        }
+
+        if (this.positions.length > controls.length) {
+          this.positions.splice(controls.length);
+        }
+      }
+      /**
+       * @private
+       */
+
+    }, {
+      key: "updateEntity",
+      value: function updateEntity() {
+        if (this.entity && this.entity.polygon) {
+          this.entity.polygon.hierarchy = Cesium.Cartesian3.fromDegreesArray(this.arrow.polygon);
+        }
+      }
+    }, {
+      key: "arrow",
+      get: function get() {
+        return this._arrow;
+      }
+    }]);
+
+    return ArrowGraphic;
+  }(Graphic);
+
+  var PolylineGraphic = /*#__PURE__*/function (_Graphic) {
+    _inherits(PolylineGraphic, _Graphic);
+
+    var _super = _createSuper(PolylineGraphic);
+
+    /**
+     * 可编辑的线图形
+     * @extends Graphic
+     * @param {Cesium.Viewer} viewer
+     * @param {Object} entityOptions 和Cesium.PolylineGraphics具有相同的属性
+     * @param {Object} [options={}] 具有以下属性
+     */
+    function PolylineGraphic(viewer, entityOptions) {
+      var _this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      _classCallCheck(this, PolylineGraphic);
+
+      _this = _super.call(this, viewer, options);
+      _this._entityOptions = entityOptions;
+      _this._positions = entityOptions.positions;
+      _this._type = GraphicType$1.POLYLINE;
+      _this._entity = _this.createEntity();
+
+      _this.add();
+
+      return _this;
+    }
+    /**
+     * 该图形的几何描述，包括类型，经纬度等
+     * @return {Object}
+     */
+
+
+    _createClass(PolylineGraphic, [{
+      key: "getGeometry",
+      value: function getGeometry() {
+        var coordinates = [];
+        var type = GraphicType$1.getOGCType(this.type);
+
+        var _iterator = _createForOfIteratorHelper(this.positions),
+            _step;
+
+        try {
+          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+            var position = _step.value;
+            var lonlat = PointGraphic.toDegrees(position);
+            coordinates.push([lonlat.lon, lonlat.lat]);
+          }
+        } catch (err) {
+          _iterator.e(err);
+        } finally {
+          _iterator.f();
+        }
+
+        return {
+          type: type,
+          coordinates: coordinates
+        };
+      }
+      /**
+       * @private
+       */
+
+    }, {
+      key: "createEntity",
+      value: function createEntity() {
+        _get(_getPrototypeOf(PolylineGraphic.prototype), "createEntity", this).call(this);
+
+        var options = {
+          id: this.id,
+          polyline: this._entityOptions
+        };
+        this._entityOptions = options;
+        return new Cesium.Entity(this._entityOptions);
+      }
+    }, {
+      key: "toGeoJson",
+      value: function toGeoJson() {
+        return PolylineGraphic.toGeoJson(this);
+      }
+      /**
+       * 开始编辑几何信息，此时图形的顶点可以被修改、删除、移动。
+       * 属性信息的编辑不需要调用该方法。
+       * @fires Graphic#preEdit
+       */
+
+    }, {
+      key: "startEdit",
+      value: function startEdit() {
+        _get(_getPrototypeOf(PolylineGraphic.prototype), "startEdit", this).call(this);
+
+        var style = PointGraphic.defaultStyle;
+        this._node = new NodeGraphic(this._viewer, _objectSpread2({
+          positions: this.positions
+        }, style));
+      }
+      /**
+       * @fires Graphic#postEdit
+       * 几何要素编辑完成后调用该方法，以降低性能消耗。
+       * <p style='font-weight:bold'>建议在图形编辑完成后调用该方法，因为CallbackProperty对资源消耗比较大，虽然对单个图形来说，不调用此方法可能并不会有任何影响。</p>
+       */
+
+    }, {
+      key: "stopEdit",
+      value: function stopEdit() {
+        _get(_getPrototypeOf(PolylineGraphic.prototype), "stopEdit", this).call(this);
+
+        this._node && this._node.destroy();
+        this._node = undefined;
+      }
+      /**
+       * 添加顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param {Cartesian} node 新顶点
+       */
+
+    }, {
+      key: "addNode",
+      value: function addNode(node) {
+        this.positions.push(node);
+      }
+      /**
+       * 删除一个顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param  {Number} index 顶点编号
+       */
+
+    }, {
+      key: "removeNode",
+      value: function removeNode(index) {
+        if (index < 0 || index >= this.positions.length) {
+          return;
+        }
+
+        this.positions.splice(index, 1);
+      }
+      /**
+       * 更新一个顶点,如果在使用该函数前没有调用<code>startEdit()</code>，位置更新将不会立即生效,在下次调用<code>startEdit()</code>后，此操作将更新到图形。
+       * @param  {Number} index 顶点编号
+       * @param  {Cartesian} node  将要更新的位置
+       */
+
+    }, {
+      key: "updateNode",
+      value: function updateNode(index, node) {
+        if (index >= this.positions.length) {
+          return;
+        }
+
+        this.positions[index] = node;
+      }
+    }, {
+      key: "updateStyle",
+      value: function updateStyle(style) {
+        if (!style || !this.entity.model) {
+          return;
+        }
+
+        for (var s in style) {
+          if (style.hasOwnProperty(s)) {
+            this.entity.polyline[s] = style[s];
+          }
+        }
+      }
+      /**
+       * 将图形转为GeoJson
+       * @param  {PolylineGraphic} graphic
+       * @return {Object}  graphic的geojson格式
+       */
+
+    }], [{
+      key: "toGeoJson",
+      value: function toGeoJson(graphic) {
+        var type = GraphicType$1.getOGCType(graphic.type);
+        var properties = graphic.properties ? graphic.properties.toJson() : {};
+        properties.graphicType = graphic.type;
+        var features = {
+          type: 'Feature',
+          properties: properties,
+          geometry: graphic.getGeometry()
+        };
+        return features;
+      }
+      /**
+       * 利用GeoJson创建图形
+       * @param  {Cesium.Viewer} viewer
+       * @param  {String|Object} json   json对象或字符串
+       * @param  {Object} style  图形样式
+       * @return {PolylineGraphic}
+       */
+
+    }, {
+      key: "fromGeoJson",
+      value: function fromGeoJson(viewer, json, style) {
+        if (typeof json === 'string') {
+          json = JSON.parse(json);
+        }
+
+        if (!defined(json.geometry) || !defined(json.properties)) {
+          return;
+        }
+
+        var type = json.properties.graphicType;
+
+        if (type !== GraphicType$1.POLYLINE) {
+          throw new CesiumProError('json没有包含一个有效的PolylineGraphic.');
+        }
+
+        var coordinate = json.geometry && json.geometry.coordinates;
+        return PolylineGraphic.fromCoordinates(viewer, coordinate, json.properties, style);
+      }
+      /**
+       * 从坐标点生成点图形
+       * @param {Cesium.Viewer} viewer
+       * @param  {Number[]} coordinate  包含经纬和纬度的数组
+       * @param  {Style} [style=PointGraphic.defaultStyle] 点样式
+       * @return {PolylineGraphic}
+       */
+
+    }, {
+      key: "fromCoordinates",
+      value: function fromCoordinates(viewer, coordinates, properties) {
+        var style = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : PolylineGraphic.defaultStyle;
+        var positions = Cesium.Cartesian3.fromDegreesArray(coordinates.flat());
+
+        var options = _objectSpread2({
+          positions: positions,
+          properties: properties
+        }, style);
+
+        return new PolylineGraphic(viewer, options);
+      }
+      /**
+       * 默认样式
+       * @type {Object}
+       */
+
+    }]);
+
+    return PolylineGraphic;
+  }(Graphic);
+
+  _defineProperty(PolylineGraphic, "defaultStyle", {
+    clampToGround: true,
+    material: Cesium.Color.fromCssColorString('rgba(247,224,32,1)'),
+    width: 3
+  });
+
+  _defineProperty(PolylineGraphic, "highlightStyle", {
+    clampToGround: true,
+    material: Cesium.Color.AQUA,
+    width: 3
+  });
 
   var formatText = function formatText(value, mode, islast) {
     if (mode === CartometryType$1.SURFACE_DISTANCE || mode === CartometryType$1.SPACE_DISTANCE || mode === CartometryType$1.HEIGHT) {
@@ -10579,7 +17757,7 @@
      *
      * @param {*} options 具有以下属性
      * @param {Cesium.Viewer} options.viewer Cesium.Viewer对象
-     * @param {Object} [options.labelStyle=LabelGraphic.defaultStyle] 定义label样式,和Cesium.LabelGraphic具有相同的参数
+     * @param {Object} [options.labelStyle=PointGraphic.defaultLabelStyle] 定义label样式,和Cesium.LabelGraphic具有相同的参数
      * @param {Object} [options.polylineStyle=PolylineGraphic.defaultStyle] 定义线样式，和Cesium.PolylineGraphic具有相同的参数
      * @param {Object} [options.polygonStyle=PolygonGraphic.defaultStyle] 定义多边形样式,和Cesium.PolygonGraphic具有相同的参数
      * @param {Object} [options.pointStyle=PointGraphic.defaultStyle] 定义点样式,和Cesium.PointGraphic具有相同的参数
@@ -10695,7 +17873,7 @@
             _this.createAuxiliaryGraphic(positions, cartesian, mode);
           }
 
-          _this.addNode.emit(cartesian);
+          _this.addNode.raise(cartesian);
 
           if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
             if (positions.length === 1) {
@@ -10731,7 +17909,7 @@
               _this.createNode(cartesian);
             }
 
-            _this.addNode.emit(cartesian);
+            _this.addNode.raise(cartesian);
           }
 
           if (mode === CartometryType$1.SURFACE_DISTANCE || mode === CartometryType$1.SPACE_DISTANCE) {
@@ -10746,7 +17924,7 @@
             _this.createLabel(cartesian, _text);
           }
 
-          _this.stopMeasure.emit();
+          _this.stopMeasure.raise();
         };
 
         var onMousemove = function onMousemove(e) {
@@ -10936,7 +18114,7 @@
           this.tip.text = '单击地图添加节点，右击地图结束量算';
         }
 
-        this.startMeasure.emit(mode);
+        this.startMeasure.raise(mode);
         var options;
 
         if (mode === CartometryType$1.SPACE_DISTANCE || mode === CartometryType$1.HEIGHT) {
@@ -11307,8 +18485,7 @@
       }
       /**
        * 开始测量时触发的事件
-       * @Event
-       * @type {Event} [description]
+       * @type {Event}
        */
 
     }, {
@@ -11318,7 +18495,6 @@
       }
       /**
        * 结束测量时触发的事件
-       * @Event
        * @type {Event}
        */
 
@@ -11329,7 +18505,6 @@
       }
       /**
        * 添加节点时触发的事件
-       * @Event
        * @type {Event}
        */
 
@@ -11371,1671 +18546,1323 @@
     return CartometryManager;
   }();
 
-  /**
-   * 创建三维场景,修改了Cesium.Viewer的默认参数，隐藏了一些默认按钮,默认底图修改为google
-   *
-   * @exports createViewer
-   * @param {String|Element} container 用于创建三维场景的DOM或元素id
-   * @param {Object} options 同Cesium Viewer相同的参数
-   * @returns {Cesium.Viewer}
-   */
-  function createViewer(container) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var defaultOption = {
-      animation: false,
-      timeline: false,
-      geocoder: false,
-      homeButton: false,
-      navigationHelpButton: false,
-      baseLayerPicker: false,
-      fullscreenElement: 'cesiumContainer',
-      fullscreenButton: false,
-      shouldAnimate: true,
-      infoBox: false,
-      selectionIndicator: false,
-      sceneModePicker: false,
-      shadows: false,
-      imageryProvider: new Cesium.UrlTemplateImageryProvider({
-        url: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}&s=Gali'
-      }),
-      contextOptions: {
-        // cesium状态下允许canvas转图片convertToImage
-        webgl: {
-          alpha: true,
-          depth: false,
-          stencil: true,
-          antialias: true,
-          premultipliedAlpha: true,
-          preserveDrawingBuffer: true,
-          //截图时需要打开
-          failIfMajorPerformanceCaveat: true
-        },
-        allowTextureFilterAnisotropic: true
-      } // terrainProvider: Cesium.createWorldTerrain()
-      // terrainProvider: false
-
-    };
-    return new Cesium.Viewer(container, _objectSpread2(_objectSpread2({}, defaultOption), options));
-  }
-
-  /**
-   * 判断一个变量是否被定义
-   * @param value
-   * @exports defined
-   */
-  function defined(value) {
-    return value !== undefined && value !== null;
-  }
-
-  /**
-   * 坐标转换工具
-   * @namespace CVT
-   */
-
-  var CVT$1 = {};
-  /**
-   * 笛卡尔坐标转屏幕坐标
-   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-  CVT$1.cartesian2Pixel = function (cartesian, viewer) {
-    return Cesium.SceneTransforms.wgs84ToWindowCoordinates(viewer.scene, cartesian);
-  };
-  /**
-   * 屏幕坐标转笛卡尔坐标
-   * @param {Cesium.Cartesian2} pixel 屏幕坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.pixel2Cartesian = function (pixel, viewer) {
-    var ray = viewer.camera.getPickRay(pixel);
-    var cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-    return cartesian;
-  };
-  /**
-   * 屏幕坐标转笛卡尔坐标，此方法获得的坐标为二维坐标，即高度永远为0
-   * @param {Cesium.Cartesian2} pixel 屏幕坐标
-   * @param {Cesium.Viewer} [viewer] Viewer对象
-   */
-
-
-  CVT$1.pixel2Cartesian2D = function (pixel, viewer) {
-    var ellipsoid;
-
-    if (defined(viewer)) {
-      ellipsoid = viewer.scene.globe.ellipsoid;
-    } else {
-      ellipsoid = Cesium.Ellipsoid.WGS84;
-    }
-
-    var cartesian = viewer.camera.pickEllipsoid(pixel, ellipsoid);
-    return cartesian;
-  };
-  /**
-   * 笛卡尔坐标转经纬度（弧度）
-   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
-   * @param {Cesium.Viewer} [viewer] Viewer对象
-   */
-
-
-  CVT$1.cartesian2Radians = function (cartesian, viewer) {
-    var ellipsoid;
-
-    if (defined(viewer)) {
-      ellipsoid = viewer.scene.globe.ellipsoid;
-    } else {
-      ellipsoid = Cesium.Ellipsoid.WGS84;
-    }
-
-    var cartographic = Cesium.Cartographic.fromCartesian(cartesian, ellipsoid);
-    var lon = cartographic.longitude;
-    var lat = cartographic.latitude;
-    var height = cartographic.height;
-    return {
-      lon: lon,
-      lat: lat,
-      height: height
-    };
-  };
-  /**
-   * 笛卡尔坐标转经纬度（度）
-   * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.cartesian2Degrees = function (cartesian, viewer) {
-    var coords = CVT$1.cartesian2Radians(cartesian, viewer);
-    var lon = Cesium.Math.toDegrees(coords.lon);
-    var lat = Cesium.Math.toDegrees(coords.lat);
-    var height = coords.height;
-    return {
-      lon: lon,
-      lat: lat,
-      height: height
-    };
-  };
-  /**
-   * 屏幕坐标转经纬度（度）
-   * @param {Cesium.Cartesian2} pixel 屏幕坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.pixel2Degrees = function (pixel, viewer) {
-    var cartesian = CVT$1.pixel2Cartesian(pixel, viewer);
-
-    if (Cesium.defined(cartesian)) {
-      return CVT$1.cartesian2Degrees(cartesian, viewer);
-    }
-
-    return undefined;
-  };
-  /**
-   * 屏幕坐标转经纬度（弧度）
-   * @param {Cesium.Cartesian2} pixel 屏幕坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.pixel2Radians = function (pixel, viewer) {
-    var cartesian = CVT$1.pixel2Cartesian(pixel, viewer);
-
-    if (Cesium.defined(cartesian)) {
-      return CVT$1.cartesian2Radians(cartesian, viewer);
-    }
-
-    return undefined;
-  };
-  /**
-   * 获得经纬度坐标（度）
-   * @param {Cesium.Cartesian2|Cesium.Cartesian3|Cesium.Cartographic} position
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.toDegrees = function (position, viewer) {
-    if (position instanceof Cesium.Cartesian3) {
-      return CVT$1.cartesian2Degrees(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartesian2) {
-      return CVT$1.pixel2Degrees(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartographic) {
-      return {
-        lon: Cesium.Math.toDegrees(position.longitude),
-        lat: Cesium.Math.toDegrees(position.latitude),
-        height: position.height
-      };
-    }
-
-    return undefined;
-  };
-  /**
-   * 获得经纬度坐标（弧度）
-   * @param {Cesium.Cartesian2|Cesium.Cartesian3|Cesium.Cartographic} position
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.toRadians = function (position, viewer) {
-    if (position instanceof Cesium.Cartesian3) {
-      return CVT$1.cartesian2Radians(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartesian2) {
-      return CVT$1.pixel2Radians(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartographic) {
-      return {
-        lon: position.longitude,
-        lat: position.latitude,
-        height: position.height
-      };
-    }
-
-    return undefined;
-  };
-  /**
-   * 获得屏幕坐标
-   * @param {Cesium.Cartesian3|Cesium.Cartographic} position
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.toPixel = function (position, viewer) {
-    if (position instanceof Cesium.Cartesian3) {
-      return CVT$1.cartesian2Pixel(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartographic) {
-      var cartesian = Cesium.Cartographic.toCartesian(position);
-      return CVT$1.cartesian2Pixel(cartesian, viewer);
-    }
-
-    return undefined;
-  };
-  /**
-   * 获得笛卡尔坐标
-   * @param {Cesium.Cartesian2|Cesium.Cartographic} position
-   * @param {Cesium.Viewer} viewer Viewer对象
-   */
-
-
-  CVT$1.toCartesian = function (position, viewer) {
-    if (position instanceof Cesium.Cartesian2) {
-      return CVT$1.pixel2Cartesian(position, viewer);
-    }
-
-    if (position instanceof Cesium.Cartographic) {
-      return Cesium.Cartographic.toCartesian(position);
-    }
-
-    return undefined;
-  };
-
-  /**
-   * 各类数据加载
-   * @exports DataLoader
-   */
-  var DataLoader = {};
-  /**
-   * 加载gltf/glb模型。
-   * @param  {Cesium.Viewer} viewer  Cesium Viewer对象
-   * @param  {Cesium.Cartesian3} [position=new Cesium.Cartesian3] 模型的位置,如果options中定义了modelMatrix，将覆盖该参数
-   * @param  {Object} [options={}] 描述model的参数,同Cesium.Model.fromGltf
-   * @return {Cesium.Cesium3DTileset}
-   */
-
-  DataLoader.loadModel = function (viewer) {
-    var position = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Cesium.Cartesian3();
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-    if (!options.modelMatrix && position) {
-      var matrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
-      options.modelMatrix = matrix;
-    }
-
-    return viewer.scene.primitives.add(Cesium.Model.fromGltf(options));
-  };
-
-  function rotate(tileset, rotation) {
-    var transform = Cesium.Matrix3.fromRotationZ(Cesium.Math.toRadians(rotation));
-    Cesium.Matrix4.multiplyByMatrix3(tileset.root.transform, transform, tileset.root.transform);
-  }
-
-  function transform(tileset, translation) {
-    Cesium.Matrix4.multiplyByTranslation(tileset.modelMatrix, translation, tileset.modelMatrix);
-  }
-
-  function adjustHeight(tileset, height) {
-    var center = tileset.boundingSphere.center;
-    var coord = CVT.toDegrees(center, viewer);
-    var surface = Cesium.Cartesian3.fromDegrees(coord.lon, coord.lat, 0);
-    var offset = Cesium.Cartesian3.fromDegrees(coord.lon, coord.lat, height);
-    var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());
-    tileset.modelMatrix = Cesium.Matrix4.multiply(tileset.modelMatrix, Cesium.Matrix4.fromTranslation(translation), tileset.modelMatrix);
-  }
-
-  function adjustLocation(tileset, position) {
-    var matrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
-    tileset.root.transform = matrix;
-  }
-
-  DataLoader.loadTileset = function (viewer) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var kwargs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    var height = kwargs.height,
-        position = kwargs.position,
-        debug = kwargs.debug;
-    var cesium3dtileset = new Cesium.Cesium3DTileset(options);
-    cesium3dtileset.readyPromise.then(function (tileset) {
-      viewer.scene.primitives.add(tileset);
-
-      if (Cesium.defined(position)) {
-        adjustLocation(tileset, position);
-      }
-
-      if (Cesium.defined(height)) {
-        adjustHeight(tileset, height);
-      }
-
-      if (debug) {
-        height = (_readOnlyError("height"), height ? height : 0);
-        var height0 = 0,
-            translation = undefined,
-            rotation = undefined;
-
-        document.onkeypress = function (e) {
-          //升高
-          if (e.keyCode === 'Q'.charCodeAt() || e.keyCode === 'q'.charCodeAt()) {
-            height0 = 1;
-          } //降低
-          else if (e.keyCode === 'E'.charCodeAt() || e.keyCode === 'e'.charCodeAt()) {
-              height0 = -1;
-            } //平移
-            else if (e.keyCode === 'A'.charCodeAt() || e.keyCode === 'a'.charCodeAt()) {
-                translation = new Cesium.Cartesian3(-2, 0, 0);
-              } else if (e.keyCode === 'D'.charCodeAt() || e.keyCode === 'd'.charCodeAt()) {
-                translation = new Cesium.Cartesian3(2, 0, 0);
-              } else if (e.keyCode === 'W'.charCodeAt() || e.keyCode === 'w'.charCodeAt()) {
-                translation = new Cesium.Cartesian3(0, -2, 0);
-              } else if (e.keyCode === 'S'.charCodeAt() || e.keyCode === 's'.charCodeAt()) {
-                translation = new Cesium.Cartesian3(0, 2, 0);
-              } //旋转
-              else if (e.keyCode === 'Z'.charCodeAt() || e.keyCode === 'z'.charCodeAt()) {
-                  rotation = -1;
-                } else if (e.keyCode === 'X'.charCodeAt() || e.keyCode === 'x'.charCodeAt()) {
-                  rotation = 1;
-                }
-
-          adjustHeight(tileset, height0);
-
-          if (Cesium.defined(translation)) {
-            transform(tileset, translation);
-          }
-
-          if (Cesium.defined(rotation)) {
-            rotate(tileset, rotation);
-          }
-
-          rotation = undefined;
-          translation = undefined;
-        };
-      }
-    });
-    return cesium3dtileset;
-  };
-
-  /**
-   * 时间数据格式的扩展方法
-   *
-   * @exports dateFormat
-   * @param  {String} fmt  时间格式
-   * @param  {Date} date 时间
-   * @return {String}     格式化后的时间
-   *
-   * @example
-   * const date=new Date();
-   * dateFormat('yy-mm-dd HH:MM:SS',date)
-   * dateFormat('HH:MM:SS',date)
-   */
-  function dateFormat(fmt, date) {
-    var ret;
-    var opt = {
-      'y+': date.getFullYear().toString(),
-      // 年
-      'm+': (date.getMonth() + 1).toString(),
-      // 月
-      'd+': date.getDate().toString(),
-      // 日
-      'H+': date.getHours().toString(),
-      // 时
-      'M+': date.getMinutes().toString(),
-      // 分
-      'S+': date.getSeconds().toString() // 秒
-      // 有其他格式化字符需求可以继续添加，必须转化成字符串
-
-    };
-    var keys = Object.keys(opt);
-
-    for (var _i = 0, _keys = keys; _i < _keys.length; _i++) {
-      var k = _keys[_i];
-      ret = new RegExp("(".concat(k, ")")).exec(fmt);
-
-      if (ret) {
-        fmt = fmt.replace(ret[1], ret[1].length === 1 ? opt[k] : opt[k].padStart(ret[1].length, '0'));
-      }
-    }
-
-    return fmt;
-  }
-  /**
-   * 将时间格式化方法注册到原生的Date对象，注册名为format
-   *
-   * @type function
-   * @memberof dateFormat
-   *
-   * @example
-   *
-   * const date=new Date();
-   * date.format('yy-mm-dd')
-   */
-
-
-  dateFormat.register = function () {
-    window.Date.prototype.format = function (format) {
-      dateFormat(format, this);
-    };
-  };
-
-  var DraggableElement = /*#__PURE__*/function () {
+  var _Cesium$4 = Cesium,
+      Material = _Cesium$4.Material,
+      Color = _Cesium$4.Color,
+      Property = _Cesium$4.Property;
+
+  var DynamicFadeMaterialProperty = /*#__PURE__*/function () {
     /**
-     * 创建一个可拖拽的DOM元素,该元素的position必须为absolute或fixed;
-     * @param {String} container 要移到的元素的选择器
-     * @param {String} [target=container] 监听鼠标事件的元素，一般是标题栏
-     * @example
-     * new DraggableElement('#tool-panel')
-     * new DraggableElement('#tool-panel','.tool-header-class')
+     * 创建一个渐变材质
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.fadeInColor] 几何体在时间0~time时表现的颜色
+     * @param {Color} [options.fadeOutColor] 几何体在maximumDistance到time之间的颜色
+     * @param {Bool} [options.repeat=true] 如果要实现循环，此值应该为true
+     * @param {Object} [options.time=0] 具有x,y值的对象，在0~time处表现为fadeInColor
+     * @param {Object} [options.fadeDirection={x:true,y:false}] 具有x,y值的对象，指定是否在x或y方向上实现Fade效果
+     * @param {Number} [options.maximumDistance=0.5] 介于0~1之间的值，当值为0时，整个颜色为fadeOutColor，值为1时，整个颜色为fadeInColor
      */
-    function DraggableElement(container) {
-      var target = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : container;
-
-      _classCallCheck(this, DraggableElement);
-
-      if (!jQuery(container)) {
-        throw new Error('请指定要操作的元素');
-      }
-
-      if (!target) {
-        target = container;
-      }
-
-      this._target = target;
-      this._container = container;
-      var self = this;
-      jQuery(self.target).mousedown(function (e) // e鼠标事件
-      {
-        jQuery(self.target).css('cursor', 'move'); // 改变鼠标指针的形状
-        // let offset = $("#" + container).offset(); //DIV在页面的位置
-
-        var offset = jQuery(self.container).position(); // DIV在页面的位置
-
-        var x = e.pageX - offset.left; // 获得鼠标指针离DIV元素左边界的距离
-
-        var y = e.pageY - offset.top; // 获得鼠标指针离DIV元素上边界的距离
-
-        jQuery(document).bind('mousemove', function (ev) // 绑定鼠标的移动事件，因为光标在DIV元素外面也要有效果，所以要用doucment的事件，而不用DIV元素的事件
-        {
-          jQuery(self.target).css('cursor', 'move');
-          jQuery(self.container).stop(); // 加上这个之后
-
-          var _x = ev.pageX - x; // 获得X轴方向移动的值
-
-
-          var _y = ev.pageY - y; // 获得Y轴方向移动的值
-
-
-          jQuery(self.container).animate({
-            left: "".concat(_x, "px"),
-            top: "".concat(_y, "px")
-          }, 10);
-        });
-      });
-      jQuery(document).mouseup(function () {
-        jQuery(self.target).css('cursor', 'default');
-        jQuery(this).unbind('mousemove');
-      });
-    }
-    /**
-     * 触发事件的对象，返回的是对象的选择器
-     * @readonly
-     * @type String
-     */
-
-
-    _createClass(DraggableElement, [{
-      key: "destroy",
-
-      /**
-       * 销毁可拖拽对象，仅仅是移除拖拽事件，不会销毁DOM对象
-       */
-      value: function destroy() {
-        jQuery(this.target).unbind('mousedown');
-        this._container = undefined;
-        this._target = undefined;
-      }
-    }, {
-      key: "target",
-      get: function get() {
-        return this._target;
-      }
-      /**
-       * 拖拽的对象，返回的是对象的选择器
-       * @readonly
-       * @type String
-       */
-
-    }, {
-      key: "container",
-      get: function get() {
-        return this._container;
-      }
-    }]);
-
-    return DraggableElement;
-  }();
-
-  /**
-   * 此方法将定位分成3个步骤
-   * <ul>
-   * <li>step 1:调整位置</li>
-   * <li>step 2:调整高度</li>
-   * <li>step 3:调整角度</li>
-   * </ul>
-   *
-   * @param  {Cesium.Viewer} viewer  Cesium Viewer对象
-   * @param  {Object} [options={}] 具有以下参数
-   * @param  {Cesium.Cartesian3} options.destination目标位置
-   * @param  {Object} [options.orientation] 相机姿态
-   * @param  {Number} [options.step1Duration=3.0] 调整高度的持续时间
-   * @param  {Number} [options.step1Duration=3.0] 调整位置的持续时间
-   * @param  {Number} [options.step1Duration=3.0] 调整姿态的持续时间
-   * @return {Promise} 
-   */
-
-  function flyTo(viewer) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var camera = viewer.camera;
-    var step1 = defaultValue(options.step1Duration, 3);
-    var step2 = defaultValue(options.step2Duration, 3);
-    var step3 = defaultValue(options.step3Duration, 3);
-    var curHeight = camera.positionCartographic.height;
-    var cartographic = CVT$1.toDegrees(options.destination, viewer); //第一步改变位置
-
-    var step1Destination = Cesium.Cartesian3.fromDegrees(cartographic.lon, cartographic.lat, cur_height); //第二步改变高度
-
-    var step2Destination = options.destination;
-    return new Promise(function (resolve) {
-      camera.flyTo({
-        destination: step1Destination,
-        duration: step1,
-        complete: function complete() {
-          camera.flyTo({
-            destination: step2Destination,
-            duration: step2,
-            complete: function complete() {
-              camera.flyTo({
-                destination: step2Destination,
-                duration: step3,
-                complete: function complete() {
-                  resolve();
-                }
-              });
-            }
-          });
-        }
-      });
-    });
-  }
-
-  var shader = 'uniform samplerCube u_cubeMap;\n\
-  varying vec3 v_texCoord;\n\
-  void main()\n\
-  {\n\
-  vec4 color = textureCube(u_cubeMap, normalize(v_texCoord));\n\
-  gl_FragColor = vec4(czm_gammaCorrect(color).rgb, czm_morphTime);\n\
-  }\n\
-  ';
-
-  var shader$1 = 'attribute vec3 position;\n\
-  varying vec3 v_texCoord;\n\
-  uniform mat3 u_rotateMatrix;\n\
-  void main()\n\
-  {\n\
-  vec3 p = czm_viewRotation * u_rotateMatrix * (czm_temeToPseudoFixed * (czm_entireFrustum.y * position));\n\
-  gl_Position = czm_projection * vec4(p, 1.0);\n\
-  v_texCoord = position.xyz;\n\
-  }\n\
-  ';
-
-  /*
-   * Cesium近地天空盒
-   */
-
-  var SkyBoxFS = shader;
-  var SkyBoxVS = shader$1;
-
-  var GroundSkyBox = /*#__PURE__*/function () {
-    /**
-     * 近景天空盒
-     * @param {Object} options 同Cesium Skybox
-     */
-    function GroundSkyBox(options) {
-      _classCallCheck(this, GroundSkyBox);
-
-      var _Cesium = Cesium,
-          defaultValue = _Cesium.defaultValue,
-          Matrix4 = _Cesium.Matrix4,
-          DrawCommand = _Cesium.DrawCommand;
-      this.sources = options.sources;
-      this._sources = undefined;
-      /**
-       * 决定天空盒是否被显示.
-       *
-       * @type {Boolean}
-       * @default true
-       */
-
-      this.show = defaultValue(options.show, true);
-      this._command = new DrawCommand({
-        modelMatrix: Matrix4.clone(Matrix4.IDENTITY),
-        owner: this
-      });
-      this._cubeMap = undefined;
-      this._attributeLocations = undefined;
-      this._useHdr = undefined;
-      this._isDestroyed = false;
-    }
-    /**
-     *
-     * 当场景渲染的时候会自动调用该函数更新天空盒。
-     * <p>切勿主动调用该函数。</p>
-     */
-
-
-    _createClass(GroundSkyBox, [{
-      key: "update",
-      value: function update(frameState, useHdr) {
-        var _Cesium2 = Cesium,
-            BoxGeometry = _Cesium2.BoxGeometry,
-            Cartesian3 = _Cesium2.Cartesian3,
-            defined = _Cesium2.defined,
-            DeveloperError = _Cesium2.DeveloperError,
-            GeometryPipeline = _Cesium2.GeometryPipeline,
-            Matrix4 = _Cesium2.Matrix4,
-            Transforms = _Cesium2.Transforms,
-            VertexFormat = _Cesium2.VertexFormat,
-            BufferUsage = _Cesium2.BufferUsage,
-            CubeMap = _Cesium2.CubeMap,
-            loadCubeMap = _Cesium2.loadCubeMap,
-            RenderState = _Cesium2.RenderState,
-            VertexArray = _Cesium2.VertexArray,
-            BlendingState = _Cesium2.BlendingState,
-            SceneMode = _Cesium2.SceneMode,
-            ShaderProgram = _Cesium2.ShaderProgram,
-            ShaderSource = _Cesium2.ShaderSource,
-            Matrix3 = _Cesium2.Matrix3;
-        var skyboxMatrix3 = new Matrix3();
-        var that = this;
-
-        if (!this.show) {
-          return undefined;
-        }
-
-        if (frameState.mode !== SceneMode.SCENE3D && frameState.mode !== SceneMode.MORPHING) {
-          return undefined;
-        } // The sky box is only rendered during the render pass; it is not pickable,
-        // it doesn't cast shadows, etc.
-
-
-        if (!frameState.passes.render) {
-          return undefined;
-        }
-
-        var context = frameState.context;
-
-        if (this._sources !== this.sources) {
-          this._sources = this.sources;
-          var sources = this.sources;
-
-          if (!defined(sources.positiveX) || !defined(sources.negativeX) || !defined(sources.positiveY) || !defined(sources.negativeY) || !defined(sources.positiveZ) || !defined(sources.negativeZ)) {
-            throw new DeveloperError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
-          }
-
-          if (_typeof(sources.positiveX) !== _typeof(sources.negativeX) || _typeof(sources.positiveX) !== _typeof(sources.positiveY) || _typeof(sources.positiveX) !== _typeof(sources.negativeY) || _typeof(sources.positiveX) !== _typeof(sources.positiveZ) || _typeof(sources.positiveX) !== _typeof(sources.negativeZ)) {
-            throw new DeveloperError('this.sources properties must all be the same type.');
-          }
-
-          if (typeof sources.positiveX === 'string') {
-            // Given urls for cube-map images.  Load them.
-            loadCubeMap(context, this._sources).then(function (cubeMap) {
-              that._cubeMap = that._cubeMap && that._cubeMap.destroy();
-              that._cubeMap = cubeMap;
-            });
-          } else {
-            this._cubeMap = this._cubeMap && this._cubeMap.destroy();
-            this._cubeMap = new CubeMap({
-              context: context,
-              source: sources
-            });
-          }
-        }
-
-        var command = this._command;
-        command.modelMatrix = Transforms.eastNorthUpToFixedFrame(frameState.camera._positionWC);
-
-        if (!defined(command.vertexArray)) {
-          command.uniformMap = {
-            u_cubeMap: function u_cubeMap() {
-              return that._cubeMap;
-            },
-            u_rotateMatrix: function u_rotateMatrix() {
-              if (typeof Matrix4.getRotation === 'function') {
-                return Matrix4.getRotation(command.modelMatrix, skyboxMatrix3);
-              }
-
-              return Matrix4.getMatrix3(command.modelMatrix, skyboxMatrix3);
-            }
-          };
-          var geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-            dimensions: new Cartesian3(2.0, 2.0, 2.0),
-            vertexFormat: VertexFormat.POSITION_ONLY
-          }));
-          var attributeLocations = this._attributeLocations = GeometryPipeline.createAttributeLocations(geometry);
-          command.vertexArray = VertexArray.fromGeometry({
-            context: context,
-            geometry: geometry,
-            attributeLocations: attributeLocations,
-            bufferUsage: BufferUsage._DRAW
-          });
-          command.renderState = RenderState.fromCache({
-            blending: BlendingState.ALPHA_BLEND
-          });
-        }
-
-        if (!defined(command.shaderProgram) || this._useHdr !== useHdr) {
-          var fs = new ShaderSource({
-            defines: [useHdr ? 'HDR' : ''],
-            sources: [SkyBoxFS]
-          });
-          command.shaderProgram = ShaderProgram.fromCache({
-            context: context,
-            vertexShaderSource: SkyBoxVS,
-            fragmentShaderSource: fs,
-            attributeLocations: this._attributeLocations
-          });
-          this._useHdr = useHdr;
-        }
-
-        if (!defined(this._cubeMap)) {
-          return undefined;
-        }
-
-        return command;
-      }
-      /**
-       * 对象是否被销毁
-       */
-
-    }, {
-      key: "isDestroyed",
-      value: function isDestroyed() {
-        return this._isDestroyed;
-      }
-      /**
-       * 销毁对象
-       */
-
-    }, {
-      key: "destroy",
-      value: function destroy() {
-        var command = this._command;
-        command.vertexArray = command.vertexArray && command.vertexArray.destroy();
-        command.shaderProgram = command.shaderProgram && command.shaderProgram.destroy();
-        this._cubeMap = this._cubeMap && this._cubeMap.destroy();
-        return Cesium.destroyObject(this);
-      }
-    }]);
-
-    return GroundSkyBox;
-  }();
-
-  /*
-   * 移除Cesium 默认logo，并添加新logo
-   */
-  /**
-   * 移除Cesium 默认logo，并添加新logo
-   * @exports logo
-   * @param {Object} [options] 具有以下参数
-   * @param  {String} [options.url] 新logo的url，如果为空将仅移除默认logo，不添加新logo
-   * @param {Number} [options.width] logo图片的宽度
-   * @param {Number} [options.height] logo图片高度
-   */
-
-  function logo() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    jQuery('.cesium-widget-credits').empty();
-
-    if (options.url) {
-      var style = '';
-
-      if (options.width) {
-        style += "width=" + options.width;
-      }
-
-      if (options.height) {
-        style += " height=" + options.height;
-      }
-
-      jQuery('.cesium-widget-credits').append("<img src='".concat(options.url, "' ").concat(style, "/>"));
-    }
-  }
-
-  var ModelAttachVector = /*#__PURE__*/function () {
-    /**
-     * 创建模型的关联矢量，主要用于为模型附加属性信息，可以达到模型单体化的视觉效果。
-     * @param {Object} [options={}]具有以下属性
-     * @param {Cesium.Viewer} options.viewer Cesium.Viewer对象
-     * @param {String} options.vectorResource 矢量文件路径，目前只支持geojson
-     * @param {String} [options.key='id'] 将要作为关键字的属性字段，该字段必须在矢量文件的属性表中，且不重复
-     * @param {Cesium.Material} [options.material=Cesium.Color.GOLD.withAlpha(0.5)] 编辑模式下要素的材质
-     * @param {Cesium.Material} [options.highlightMaterial=Cesium.Color.AQUA] 高亮材质
-     * @param {String} [options.mode='edit'] 默认模式
-     */
-    function ModelAttachVector() {
-      var _this = this;
-
+    function DynamicFadeMaterialProperty() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      _classCallCheck(this, ModelAttachVector);
+      _classCallCheck(this, DynamicFadeMaterialProperty);
 
-      var viewer = options.viewer,
-          vectorResource = options.vectorResource,
-          key = options.key;
-      checkViewer(viewer);
-      this._materail = defaultValue(options.material, Cesium.Color.GOLD.withAlpha(0.5));
-      this._previewMaterial = Cesium.Color.RED.withAlpha(0.0);
-      this._highlightMaterial = defaultValue(options.highlightMaterial, Cesium.Color.AQUA);
-      this._viewer = viewer;
-      this._vectorResource = vectorResource;
-      this._key = defaultValue(key, 'id');
-      var feats = vectorResource.features; //以数组的形式保存了所有entity
-
-      this.entities = []; //以key-value的形式保存所有entity;
-
-      this.entityMap = new Map();
-      this._mode = defaultValue(options.mode, 'edit');
-      jQuery.ajax({
-        url: this._vectorResource,
-        method: 'get',
-        dataType: 'json',
-        success: function success(res) {
-          var feats = res.features;
-
-          var _iterator = _createForOfIteratorHelper(feats),
-              _step;
-
-          try {
-            for (_iterator.s(); !(_step = _iterator.n()).done;) {
-              var feat = _step.value;
-
-              if (feat.geometry.coordinates) {
-                var hierarchy = ModelAttachVector.coordinates2Hierarchy(feat.geometry.coordinates);
-                var center = PolygonGraphic.centerFromPonits(hierarchy.positions);
-
-                if (center) {
-                  feat.properties.center = JSON.stringify(center);
-                }
-
-                var entity = _this._viewer.entities.add({
-                  id: feat.properties[_this._key],
-                  properties: feat.properties,
-                  polygon: {
-                    hierarchy: hierarchy.positions,
-                    material: _this._mode === 'edit' ? _this._materail : _this._previewMaterial,
-                    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-                    outline: false,
-                    perPositionHeight: false
-                  }
-                });
-
-                _this.entities.push(entity);
-
-                _this.entityMap.set(entity.id, entity);
-              }
-            }
-          } catch (err) {
-            _iterator.e(err);
-          } finally {
-            _iterator.f();
-          }
-        },
-        error: function error(e) {
-          errorCatch(e);
-        }
+      this._fadeInColor = defaultValue(options.fadeInColor, Cesium.Color.RED);
+      this._fadeOutColor = defaultValue(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
+      this._time = defaultValue(options.time, new Cesium.Cartesian2(0, 0));
+      this._repeat = defaultValue(options.repeat, false);
+      this._duration = defaultValue(options.duration, 3000);
+      this._fadeDirection = defaultValue(options.fadeDirection, {
+        x: true,
+        y: false
       });
+      this._maximumDistance = defaultValue(options.maximumDistance, 0.5);
+      this._definitionChanged = new Event();
     }
     /**
-     * 要素的表现模式,edit-编辑模式,preview-预览模式
-     * @type {String}
+     * 几何体在0~time处的颜色。
+     * @type {Cesium.Color}
      */
 
 
-    _createClass(ModelAttachVector, [{
-      key: "setMaterial",
+    _createClass(DynamicFadeMaterialProperty, [{
+      key: "getType",
 
       /**
-       * 设置要素材质
-       * @private
+       * 此属性的类型。
+       * @type {String}
        */
-      value: function setMaterial(material) {
-        var values = this.entityMap.values();
-
-        var _iterator2 = _createForOfIteratorHelper(values),
-            _step2;
-
-        try {
-          for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-            var v = _step2.value;
-
-            if (v.polygon) {
-              v.polygon.material = material;
-            }
-          }
-        } catch (err) {
-          _iterator2.e(err);
-        } finally {
-          _iterator2.f();
-        }
+      value: function getType() {
+        return Material.FadeType;
       }
       /**
-       * 通过key设置高亮
-       * @param  {Cesium.Entity} key 
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
 
     }, {
-      key: "highLightByKey",
-      value: function highLightByKey(key) {
-        var entity = this.getByKey(key);
-        this.highLightByEntity(entity);
-      }
-      /**
-       * 通过Entity设置高亮
-       * @param  {Cesium.Entity} entity
-       */
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
 
-    }, {
-      key: "highLightByEntity",
-      value: function highLightByEntity(entity) {
-        if (entity && entity.polygon) {
-          entity.polygon.material = this._highlightMaterial;
-        }
-      }
-      /**
-       * 将Geojson的coordinates转为Cesium.Cartesian3数组
-       * @param  {Array} coors coordinates
-       * @return {Cesium.Cartesian3[]} 可以直接用于多边形hierarchy的Cestesian3数组
-       */
-
-    }, {
-      key: "zoomTo",
-
-      /**
-       * 定位到指定要素，如果未指定key将定位到所有要素
-       * @param  {String} [key=''] 要素的key值
-       */
-      value: function zoomTo() {
-        var id = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-        var entity = this.getByKey(id);
-
-        if (entity) {
-          this._viewer.zoomTo(entity);
-        } else {
-          this._viewer.zoomTo(this.getAll());
-        }
-      }
-      /**
-       * 通过key获得指定要素
-       * @param  {String} key key值
-       * @return {Cesium.Entity}
-       */
-
-    }, {
-      key: "getByKey",
-      value: function getByKey(key) {
-        var entity = this._viewer.entities.getById(key);
-
-        return entity;
-      }
-      /**
-       * 返回所有要素
-       * @return {Cesium.Entity[]} 矢量数据中的所有要素
-       */
-
-    }, {
-      key: "getAll",
-      value: function getAll() {
-        return Array.from(this.entityMap.values());
-      }
-      /**
-       * 删除所有要素
-       */
-
-    }, {
-      key: "removeAll",
-      value: function removeAll() {
-        var keys = this.entityMap.keys();
-
-        var _iterator3 = _createForOfIteratorHelper(keys),
-            _step3;
-
-        try {
-          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-            var k = _step3.value;
-            this.remove(k);
-          }
-        } catch (err) {
-          _iterator3.e(err);
-        } finally {
-          _iterator3.f();
+        if (this._time === undefined) {
+          this._time = {
+            x: time.secondsOfDay,
+            y: time.secondsOfDay
+          };
         }
 
-        this.entityMap.clear();
-      }
-      /**
-       * 删除指定key的几何要素
-       * @param  {String} key key值
-       */
-
-    }, {
-      key: "remove",
-      value: function remove(key) {
-        var entity = this.getByKey(key);
-
-        if (entity) {
-          this._viewer.entities.remove(entity);
-
-          this.entityMap["delete"](entity.id);
-        }
-      }
-      /**
-       * 销毁对象
-       */
-
-    }, {
-      key: "destroy",
-      value: function destroy() {
-        this.removeAll();
-        this._viewer = undefined;
-        this.entities = undefined;
-      }
-    }, {
-      key: "mode",
-      get: function get() {
-        return this._mode;
-      },
-      set: function set(v) {
-        this._mode = v;
-
-        if (this._mode === 'edit') {
-          this.setMaterial(this._materail);
-        } else if (this._mode === 'preview') {
-          this.setMaterial(this._previewMaterial);
-        } else {
-          console.console.warn('无效的模式');
-        }
-      }
-    }], [{
-      key: "coordinates2Hierarchy",
-      value: function coordinates2Hierarchy(coors) {
-        var positions = [];
-
-        var _iterator4 = _createForOfIteratorHelper(coors),
-            _step4;
-
-        try {
-          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-            var cs = _step4.value;
-
-            var _iterator5 = _createForOfIteratorHelper(cs),
-                _step5;
-
-            try {
-              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-                var c = _step5.value;
-                positions.push(c[0], c[1]);
-              }
-            } catch (err) {
-              _iterator5.e(err);
-            } finally {
-              _iterator5.f();
-            }
-          }
-        } catch (err) {
-          _iterator4.e(err);
-        } finally {
-          _iterator4.f();
+        if (this.fadeDirection.x) {
+          result.time.x = (time.secondsOfDay - this.time.x) * 1000 / this.duration % 1;
         }
 
-        var cartesian = Cesium.Cartesian3.fromDegreesArray(positions);
-        return new Cesium.PolygonHierarchy(cartesian);
-      }
-    }]);
-
-    return ModelAttachVector;
-  }();
-
-  var ModelGraphic = /*#__PURE__*/function (_Graphic) {
-    _inherits(ModelGraphic, _Graphic);
-
-    var _super = _createSuper(ModelGraphic);
-
-    function ModelGraphic() {
-      _classCallCheck(this, ModelGraphic);
-
-      return _super.call(this);
-    }
-
-    return ModelGraphic;
-  }(Graphic);
-
-  _defineProperty(ModelGraphic, "defaultStyle", {
-    colorBlendMode: Cesium.ColorBlendMode.HIGHLIGHT,
-    color: Cesium.Color.WHITE,
-    colorBlendAmount: 0.5,
-    minimumPixelSize: 64
-  });
-
-  /**
-   * 坐标拾取函数,如果pixel所在位置有Primitive或Entity，将获取Primitive或Entity上的位置，否则获取球面坐标。
-   * 简言之,如果点击在模型上将获得模型上的坐标，否则获取球面坐标。
-   * <p><span style="font-weight:bold">Note:</span>获取模型上的坐标时需要打开地形深度调整，否则获取的点位不准。</p>
-   *
-   * @exports pickPosition
-   * @see depthTest
-   * @param  {Cesium.Cartesian3} pixel 屏幕坐标
-   * @param {Cesium.Viewer} viewer Viewer对象
-   * @return {Cesium.Cartesian3}       笛卡尔坐标
-   */
-
-  function pickPosition(pixel, viewer) {
-    var cartesian;
-    elliposid = defaultValue(elliposid, Cesium.Ellipsoid.WGS84); // cartesian = viewer.camera.pickEllipsoid(pixel, elliposid);
-
-    var ray = viewer.camera.getPickRay(pixel);
-    cartesian = viewer.scene.globe.pick(ray);
-    var feat = viewer.scene.pick(pixel);
-
-    if (feat) {
-      if (viewer.scene.pickPositionSupported) {
-        cartesian = viewer.scene.pickPosition(pixel);
-      } else {
-        console.warn('This browser does not support pickPosition.');
-      }
-    }
-
-    return cartesian;
-  }
-
-  var cesiumScriptRegex = /((?:.*\/)|^)CesiumPro\.(esm|umd)\.js(?:\?|#|$)/;
-  var a;
-
-  function tryMakeAbsolute(url) {
-    if (typeof document === 'undefined') {
-      // Node.js and Web Workers. In both cases, the URL will already be absolute.
-      return url;
-    }
-
-    if (!defined(a)) {
-      a = document.createElement('a');
-    }
-
-    a.href = url; // IE only absolutizes href on get, not set
-    // eslint-disable-next-line no-self-assign
-
-    a.href = a.href;
-    return a.href;
-  }
-
-  var baseResource;
-  var implementation;
-
-  function getBaseUrlFromCesiumScript() {
-    var scripts = document.getElementsByTagName('script');
-
-    for (var i = 0, len = scripts.length; i < len; ++i) {
-      var src = scripts[i].getAttribute('src');
-      var result = cesiumScriptRegex.exec(src);
-
-      if (result !== null) {
-        return result[1];
-      }
-    }
-
-    return undefined;
-  }
-
-  function buildModuleUrlFromRequireToUrl(moduleID) {
-    // moduleID will be non-relative, so require it relative to this module, in Core.
-    return tryMakeAbsolute(require.toUrl("../".concat(moduleID)));
-  }
-
-  function getCesiumBaseUrl() {
-    if (defined(baseResource)) {
-      return baseResource;
-    }
-
-    var baseUrlString;
-
-    if (_typeof(window.define) === 'object' && defined(window.define.amd) && !window.define.amd.toUrlUndefined && defined(window.require.toUrl)) {
-      baseUrlString = Cesium.getAbsoluteUri('..', 'core/URL.js');
-    } else {
-      baseUrlString = getBaseUrlFromCesiumScript();
-    }
-
-    if (!defined(baseUrlString)) {
-      throw new CesiumProError$1('Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUM_BASE_URL.');
-    } // >>includeEnd('debug');
-
-
-    baseResource = new Cesium.Resource({
-      url: tryMakeAbsolute(baseUrlString)
-    });
-    baseResource.appendForwardSlash();
-    return baseResource;
-  }
-
-  function buildModuleUrlFromBaseUrl(moduleID) {
-    var resource = getCesiumBaseUrl().getDerivedResource({
-      url: moduleID
-    });
-    return resource.url;
-  }
-
-  function buildModuleUrl(relativeUrl) {
-    if (!defined(implementation)) {
-      // select implementation
-      if (_typeof(window.define) === 'object' && defined(window.define.amd) && !window.define.amd.toUrlUndefined && defined(require.toUrl)) {
-        implementation = buildModuleUrlFromRequireToUrl;
-      } else {
-        implementation = buildModuleUrlFromBaseUrl;
-      }
-    }
-
-    var url = implementation(relativeUrl);
-    return url;
-  }
-  /**
-   * URL相关工具
-   * @namespace URL
-   *
-   */
-
-
-  var URL = {};
-  /**
-   * 从多个字符串拼接url,以/为分割符
-   * @param  {...String} args
-   * @return {String}      url
-   *
-   * @example
-   *
-   * URL.join("www.baidu.com/",'/tieba/','cesium')
-   * //www.baidu.com/tieba/cesium
-   */
-
-  URL.join = function () {
-    var formatArgs = [];
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    for (var _i = 0, _args = args; _i < _args.length; _i++) {
-      var arg = _args[_i];
-
-      if (arg.startsWith('/')) {
-        arg = arg.substring(1);
-      }
-
-      if (arg.endsWith('/')) {
-        arg = arg.substring(0, arg.length - 1);
-      }
-
-      formatArgs.push(arg);
-    }
-
-    var urlstr = formatArgs.join('/'); // if (!(urlstr.startsWith('http') || urlstr.startsWith('ftp'))) {
-    //   urlstr = `http://${urlstr}`;
-    // }
-
-    return urlstr;
-  };
-  /**
-   * 获取CesiumPro静态资源的完整路径
-   * @param {String} path 指定文件
-   * @returns {String}
-   */
-
-
-  URL.buildModuleUrl = function (path) {
-    return buildModuleUrl(path);
-  };
-
-  var ViewerParams = /*#__PURE__*/function () {
-    /**
-     * 获取当前场景的参数，包括经纬度、海拔、视高、帧率、延迟以及相机参数heading、pitch、roll。
-     * 如果要更新帧率和延迟，应该在对象初始化后调用addPostRenderEvent()方法。
-     * @param {Cesium.Viewer} viewer
-     * @param {Boolean} [debug=false] 是否打开调试模式，打开开将在控制台打印参数
-     */
-    function ViewerParams(viewer) {
-      var debug = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      _classCallCheck(this, ViewerParams);
-
-      checkViewer(viewer);
-      this._viewer = viewer;
-      this._handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-      this._lastFpsSampleTime = 0;
-      this._fpsFrameCount = 0;
-      this._msFrameCount = 0;
-      this._fps = 0;
-      this._ms = 0;
-      this._lon = 0;
-      this._lat = 0;
-      this._height = 0;
-      this._alt = undefined;
-      this._heading = undefined;
-      this._pitch = undefined;
-      this._roll = undefined;
-      this.debug = debug;
-      this.addMousemoveEvent();
-    }
-    /**
-     * 开始监听鼠标移动事件，获取鼠标所在位置的经纬度及高程。
-     */
-
-
-    _createClass(ViewerParams, [{
-      key: "addMousemoveEvent",
-      value: function addMousemoveEvent() {
-        var _this = this;
-
-        this.removeMousemoveEvent();
-
-        this._handler.setInputAction(function (e) {
-          var coor = CVT$1.toDegrees(e.endPosition, _this._viewer);
-
-          if (!Cesium.defined(coor)) {
-            return;
-          }
-
-          _this._lon = coor.lon;
-          _this._lat = coor.lat;
-          _this._height = coor.height;
-          _this._alt = undefined;
-
-          if (_this._viewer.terrainProvider) {
-            var cartesian = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(_this._lon, _this._lat));
-            Cesium.sampleTerrainMostDetailed(_this._viewer.terrainProvider, [cartesian]).then(function (sampler) {
-              _this._alt = sampler[0].height;
-            });
-          }
-
-          _this.updateHeadingPitchRoll();
-
-          if (_this.debug) {
-            console.log(_this.params);
-          }
-        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-      }
-      /**
-       * 移除鼠标移动事件监听，经纬度、高程、视高将不会更新
-       */
-
-    }, {
-      key: "removeMousemoveEvent",
-      value: function removeMousemoveEvent() {
-        this._handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
-      }
-      /**
-       * 添加postRender事件监听，对象初始化后必须调用该方法帧率和延迟以及相机能数才会实时刷新
-       */
-
-    }, {
-      key: "addPostRenderEvent",
-      value: function addPostRenderEvent() {
-        var _this2 = this;
-
-        this.postRenderFunction = this._viewer.scene.postRender.addEventListener(function () {
-          _this2.updateFps();
-
-          _this2.updateHeadingPitchRoll();
-        });
-      }
-      /**
-       * 移除postRender事件监听,帧率和延迟以及相机能数将不会更新
-       */
-
-    }, {
-      key: "removePostRenderEvent",
-      value: function removePostRenderEvent() {
-        if (this.postRenderFunction) {
-          this.postRenderFunction();
-        }
-      }
-      /**
-       * 销毁对象
-       */
-
-    }, {
-      key: "destroy",
-      value: function destroy() {
-        this.removeMousemoveEvent();
-        this.removePostRenderEvent();
-
-        if (!this._handler.isDestroyed()) {
-          this._handler.destroy();
+        if (this.fadeDirection.y) {
+          result.time.y = (time.secondsOfDay - this.time.y) * 1000 / this.duration % 1;
         }
 
-        this._handler = undefined;
-        this._viewer = undefined;
-      }
-      /**
-       * 所有属性的集合
-       * @readonly
-       */
-
-    }, {
-      key: "updateFps",
-      value: function updateFps() {
-        var time = Cesium.getTimestamp();
-
-        if (!Cesium.defined(this._lastFpsSampleTime)) {
-          this._lastFpsSampleTime = Cesium.getTimestamp();
-        }
-
-        if (!Cesium.defined(this.lastMsSampleTime)) {
-          this.lastMsSampleTime = Cesium.getTimestamp();
-        }
-
-        this._fpsFrameCount++;
-        var fpsElapsedTime = time - this._lastFpsSampleTime;
-
-        if (fpsElapsedTime > 1000) {
-          var fps = 'N/A';
-          fps = this._fpsFrameCount * 1000 / fpsElapsedTime || 0;
-          this._fps = "".concat(fps.toFixed(0), " FPS");
-          this._lastFpsSampleTime = time;
-          this._fpsFrameCount = 0;
-        }
-
-        this._msFrameCount++;
-        var msElapsedTime = time - this.lastMsSampleTime;
-
-        if (msElapsedTime > 200) {
-          var ms = 'N/A';
-          ms = (msElapsedTime / this._msFrameCount).toFixed(2);
-          this._ms = "".concat(ms, " MS");
-          this.lastMsSampleTime = time;
-          this._msFrameCount = 0;
-        }
-      }
-      /**
-       * 更新相机参数
-       */
-
-    }, {
-      key: "updateHeadingPitchRoll",
-      value: function updateHeadingPitchRoll() {
-        var viewer = this._viewer;
-        this._heading = viewer.camera.heading;
-        this._pitch = viewer.camera.pitch;
-        this._roll = viewer.camera.roll;
-      }
-      /**
-       * 场景的中心坐标
-       * @param  {Boolean} [inWorldCoordinates=true] 是否转为世界坐标，如果为false,将返回相机参考系的坐标
-       * @param  {Cesium.Cartesian3}  [result] 结果的保存对象
-       * @return {Cesium.Cartesian3} 场景的中心坐标
-       */
-
-    }, {
-      key: "viewerCenter",
-      value: function viewerCenter() {
-        var inWorldCoordinates = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        var result = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Cesium.Cartesian3();
-        var _this$_viewer = this._viewer,
-            scene = _this$_viewer.scene,
-            camera = _this$_viewer.camera;
-        var unprojectedScratch = new Cesium.Cartographic();
-        var rayScratch = new Cesium.Ray();
-        var viewer = this._viewer;
-
-        if (scene.mode === Cesium.SceneMode.MORPHING) {
-          return undefined;
-        }
-
-        if (Cesium.defined(viewer.trackedEntity)) {
-          result = viewer.trackedEntity.position.getValue(viewer.clock.currentTime, result);
-        } else {
-          rayScratch.origin = camera.positionWC;
-          rayScratch.direction = camera.directionWC;
-          result = scene.globe.pick(rayScratch, scene, result);
-        }
-
-        if (!Cesium.defined(result)) {
-          return undefined;
-        }
-
-        if (scene.mode === Cesium.SceneMode.SCENE2D || scene.mode === Cesium.SceneMode.COLUMBUS_VIEW) {
-          result = camera.worldToCameraCoordinatesPoint(result, result);
-
-          if (inWorldCoordinates) {
-            result = scene.globe.ellipsoid.cartographicToCartesian(scene.mapProjection.unproject(result, unprojectedScratch), result);
-          }
-        } else if (!inWorldCoordinates) {
-          result = camera.worldToCameraCoordinatesPoint(result, result);
-        }
-
+        result.fadeInColor = this.fadeInColor;
+        result.fadeOutColor = this.fadeOutColor;
+        result.maximumDistance = this.maximumDistance;
+        result.repeat = this.repeat;
+        result.fadeDirection = this.fadeDirection;
         return result;
       }
+      /**
+       * 判断两个属性是否相同。
+       * @param  {DynamicFadeMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true，否则返回false
+       */
+
     }, {
-      key: "params",
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof DynamicFadeMaterialProperty && this.fadeInColor === other.fadeInColor && this.fadeOutColor === other.fadeOutColor && this.maximumDistance === other.maximumDistance && this.repeat === other.repeat && this.fadeDirection === other.fadeDirection;
+      }
+    }, {
+      key: "fadeInColor",
       get: function get() {
-        return {
-          lon: this.lon,
-          lat: this.lat,
-          height: this.height,
-          alt: this.alt,
-          heading: this.heading,
-          pitch: this.pitch,
-          roll: this.roll,
-          fps: this.fps,
-          ms: this.ms
-        };
+        return this._fadeInColor;
+      },
+      set: function set(v) {
+        this._fadeInColor = v;
       }
       /**
-       * 经度
+       * 几何体在time~maximumDistance处表现的颜色。
+       * @type {Cesium.Color}
+       */
+
+    }, {
+      key: "fadeOutColor",
+      get: function get() {
+        return this._fadeOutColor;
+      },
+      set: function set(v) {
+        this._fadeOutColor = v;
+      }
+      /**
+       * 渐变动画同期，决定了动画的速度，值越小，速度越快，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+      /**
+       * 具有x,y值的对象，在0~time处表现为fadeInColor
+       * @type {Object}
+       */
+
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 表示该属性是否是常量。
        * @readonly
        */
 
     }, {
-      key: "lon",
+      key: "isConstant",
       get: function get() {
-        return this._lon;
+        return false;
       }
       /**
-       * 纬度
-       * @readonly
+       * @Event
+       * 当此属性发生变化时触发的事件。
        */
 
     }, {
-      key: "lat",
+      key: "definitionChanged",
       get: function get() {
-        return this._lat;
+        return this._definitionChanged;
       }
       /**
-       * 视高
-       * @readonly
+       * 是否在x或y方向上实现渐变效果，如果x和y方向上具未实现渐变效果，将表现为fadeInColor。
+       * @type {Object}
        */
 
     }, {
-      key: "height",
+      key: "fadeDirection",
       get: function get() {
-        return this._height;
+        return this._fadeDirection;
+      },
+      set: function set(v) {
+        this._fadeDirection = v;
       }
       /**
-       * 地形高/海拔
-       * @readonly
+       * 是否重复渐变效果。
+       * @type {Bool} true表示重复渐变效果，false表示不重复。
        */
 
     }, {
-      key: "alt",
+      key: "repeat",
       get: function get() {
-        return this._alt;
+        return this._repeat;
+      },
+      set: function set(v) {
+        this._repeat = v;
       }
       /**
-       * 相机旋转角
-       * @readonly
+       * 介于0~1之间的值，当值为0时，整个颜色为fadeOutColor，值为1时，整个颜色为fadeInColor。
+       * @type {Number}
        */
 
     }, {
-      key: "heading",
+      key: "maximumDistance",
       get: function get() {
-        return Cesium.Math.toDegrees(this._heading);
-      }
-      /**
-       * 相机仰俯角
-       * @readonly
-       */
-
-    }, {
-      key: "pitch",
-      get: function get() {
-        return Cesium.Math.toDegrees(this._pitch);
-      }
-      /**
-       * 相机翻滚角
-       * @readonly
-       */
-
-    }, {
-      key: "roll",
-      get: function get() {
-        return Cesium.Math.toDegrees(this._roll);
-      }
-      /**
-       * 帧率
-       * @readonly
-       */
-
-    }, {
-      key: "fps",
-      get: function get() {
-        return this._fps;
-      }
-      /**
-       * 延迟
-       * @readonly
-       */
-
-    }, {
-      key: "ms",
-      get: function get() {
-        return this._ms;
-      }
-      /**
-       * 场景中心坐标
-       * @readonly
-       */
-
-    }, {
-      key: "center",
-      get: function get() {
-        return this.viewerCenter();
+        return this._maximumDistance;
+      },
+      set: function set(v) {
+        this._maximumDistance = v;
       }
     }]);
 
-    return ViewerParams;
+    return DynamicFadeMaterialProperty;
   }();
+
+  var shader$2 = "\nczm_material czm_getMaterial(czm_materialInput materialInput){\n  czm_material material=czm_getDefaultMaterial(materialInput);\n  float dis=distance(materialInput.st,vec2(0.5));\n  if(dis*time<0.8){\n    discard;\n  }\n}\n";
+
+  var _Cesium$5 = Cesium,
+      Material$1 = _Cesium$5.Material,
+      Color$1 = _Cesium$5.Color,
+      Property$1 = _Cesium$5.Property;
+  Material$1.DynamicScanType = "DynamicScan";
+
+  var DynamicScanMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 创建一个渐变材质
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color=Cesium.Color.RED] 颜色
+     * @param {count} [options.count=3] 波纹的条数
+     * @param {Number} [options.duration=1000] 动画周期，值越小，动画传播速度越快
+     */
+    function DynamicScanMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, DynamicScanMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, new Cesium.Cartesian2(0, 0));
+      this._duration = defaultValue(options.duration, 1000);
+      this._count = defaultValue(options.count, 3);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 材质的颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(DynamicScanMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @type {String}
+       */
+      value: function getType() {
+        return Material$1.DynamicScanType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+
+        if (this._time === undefined) {
+          this._time = {
+            x: time.secondsOfDay,
+            y: time.secondsOfDay
+          };
+        }
+
+        if (this.fadeDirection.x) {
+          result.time.x = (time.secondsOfDay - this.time.x) * 1000 / this.duration % 1;
+        }
+
+        if (this.fadeDirection.y) {
+          result.time.y = (time.secondsOfDay - this.time.y) * 1000 / this.duration % 1;
+        }
+
+        result.fadeInColor = this.fadeInColor;
+        result.fadeOutColor = this.fadeOutColor;
+        result.maximumDistance = this.maximumDistance;
+        result.repeat = this.repeat;
+        result.fadeDirection = this.fadeDirection;
+        return result;
+      }
+      /**
+       * 判断两个属性是否相同。
+       * @param  {DynamicScanMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true，否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof DynamicScanMaterialProperty && this.fadeInColor === other.fadeInColor && this.fadeOutColor === other.fadeOutColor && this.maximumDistance === other.maximumDistance && this.repeat === other.repeat && this.fadeDirection === other.fadeDirection;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画同期，决定了动画的传播速度，值越小，速度越快，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 表示该属性是否是常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+      /**
+       * @Event
+       * 当此属性发生变化时触发的事件。
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 条纹的个数
+       * @type {Number}
+       */
+
+    }, {
+      key: "count",
+      get: function get() {
+        return this._count;
+      },
+      set: function set(v) {
+        this._count = v;
+      }
+    }]);
+
+    return DynamicScanMaterialProperty;
+  }();
+
+  var shader$3 = "\nczm_material czm_getMaterial(czm_materialInput materialInput){\n  czm_material material =czm_getDefaultMaterial(materialInput);\n  float PI = 3.141592653589793;\n  float angle=2.0*PI*fract(time);\n  mat2 rotateMaterial=mat2(cos(angle),-sin(angle),sin(angle),cos(angle));\n  vec2 uv=materialInput.st-vec2(0.5);\n  materialInput.st=rotateMaterial*uv+vec2(0.5);\n  vec4 imageRgba=texture2D(image,materialInput.st);\n  material.alpha=imageRgba.a;\n  float dis=distance(materialInput.st,vec2(0.5));\n  material.diffuse=color.rgb;\n  return material;\n}\n";
+
+  var _Cesium$6 = Cesium,
+      Material$2 = _Cesium$6.Material,
+      Color$2 = _Cesium$6.Color,
+      Property$2 = _Cesium$6.Property;
+  Material$2.DynamicSectorFadeType = 'DynamicSectorFade';
+
+  Material$2._materialCache.addMaterial(Material$2.DynamicSectorFadeType, {
+    fabric: {
+      type: Material$2.DynamicSectorFadeType,
+      uniforms: {
+        color: new Color$2(1.0, 0.0, 0.0),
+        time: 0,
+        image: ''
+      },
+      source: shader$3
+    }
+  });
+
+  var DynamicSectorFadeMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 创建一个扇形动态渐变材质
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color] 图形颜色
+     * @param {Color} [options.duration=1000] 决定动画的速度，值越小，速度越快
+     */
+    function DynamicSectorFadeMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, DynamicSectorFadeMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, 0);
+      this._duration = defaultValue(options.duration, 1000);
+      this._image = defaultValue(options.image, URL.buildModuleUrl('./assets/images/circleScan.png'));
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 图形颜色。
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(DynamicSectorFadeMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型。
+       * @type {String}
+       */
+      value: function getType() {
+        return Material$2.DynamicSectorFadeType;
+      }
+      /**
+       * 获取指定时间的属性值
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+
+        if (this._time === undefined) {
+          this._time = time.secondsOfDay;
+        }
+
+        result.time = (time.secondsOfDay - this.time) * 1000 / this.duration;
+        result.color = this.color;
+        result.image = this.image;
+        return result;
+      }
+      /**
+       * 判断两个属性是否相同
+       * @param  {DynamicSectorFadeMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true,否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof DynamicSectorFadeMaterialProperty && this.color === other.color && this.image === other.image;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画周期，决定了动画执行的速度，值越小，速度越快,单位秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 将要映射到纹理的图形。
+       * @type {String|Resource}
+       */
+
+    }, {
+      key: "image",
+      get: function get() {
+        return this._image;
+      },
+      set: function set(v) {
+        this._image = v;
+      }
+      /**
+       * 表示该属性是否是常量
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+      /**
+       * @Event
+       * 当此属性发生变化时触发的事件
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+    }]);
+
+    return DynamicSectorFadeMaterialProperty;
+  }();
+
+  var shader$4 = "\nczm_material czm_getMaterial(czm_materialInput materialInput){\n  czm_material material=czm_getDefaultMaterial(materialInput);\n  vec2 st=materialInput.st;\n  float per=fract(time);\n  float dis=distance(st,vec2(0.5));\n  if(dis*2.0>per){\n    discard;\n  }else{\n    material.alpha=color.a*dis*2.0/per;\n    material.diffuse=color.rgb;\n  }\n  return material;\n}\n";
+
+  var _Cesium$7 = Cesium,
+      Material$3 = _Cesium$7.Material,
+      Color$3 = _Cesium$7.Color,
+      Property$3 = _Cesium$7.Property;
+  Material$3.DynamicSpreadType = 'DynamicSpread';
+
+  Material$3._materialCache.addMaterial(Material$3.DynamicSpreadType, {
+    fabric: {
+      type: Material$3.DynamicSpreadType,
+      uniforms: {
+        color: new Color$3(1.0, 0.0, 0.0),
+        time: 0
+      },
+      source: shader$4
+    }
+  });
+
+  var DynamicSpreadMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 用于生成具有扩散效果的材质，该属性适用于所有几何图形，包括点、线、面、体。
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Number} [options.duration=1000] 扩散动画周期，值越小扩散越快，单位毫秒
+     * @param {Color} [options.color=Cesium.Color.RED] 图形颜色
+     */
+    function DynamicSpreadMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, DynamicSpreadMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = 0;
+      this._duration = defaultValue(options.duration, 1000);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 线颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(DynamicSpreadMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @return {String}
+       */
+      value: function getType(time) {
+        return Material$3.DynamicSpreadType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+        result.color = this.color;
+
+        if (this._time === undefined) {
+          this._time = time.secondsOfDay;
+        }
+
+        result.time = (time.secondsOfDay - this.time) * 1000 / this.duration;
+        return result;
+      }
+      /**
+       * 判断两个材质是否相同
+       * @param  {DynamicSpreadMaterialProperty} other 作为对比的另一个材质
+       * @return {Bool}   两个材质相同返回true,否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof DynamicSpreadMaterialProperty && this.color === other.color;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画周期，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      }
+      /**
+       * 材质发生变化时触发的事件
+       * @Event
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 获取一个值，该值指示此属性是否恒定。如果getValue对于当前定义始终返回相同的结果，则该属性被视为常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }]);
+
+    return DynamicSpreadMaterialProperty;
+  }();
+
+  var shader$5 = "\nczm_material czm_getMaterial(czm_materialInput materialInput){\n  czm_material material=czm_getDefaultMaterial(materialInput);\n\n}\n";
+
+  var _Cesium$8 = Cesium,
+      Material$4 = _Cesium$8.Material,
+      Color$4 = _Cesium$8.Color,
+      Property$4 = _Cesium$8.Property;
+  Material$4.DynamicWareType = "DynamicWare";
+
+  var DynamicWareMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 创建一个渐变材质
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color=Cesium.Color.RED] 颜色
+     * @param {count} [options.count=3] 波纹的条数
+     * @param {Number} [options.duration=1000] 动画周期，值越小，动画传播速度越快
+     */
+    function DynamicWareMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, DynamicWareMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, new Cesium.Cartesian2(0, 0));
+      this._duration = defaultValue(options.duration, 1000);
+      this._count = defaultValue(options.count, 3);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 材质的颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(DynamicWareMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @type {String}
+       */
+      value: function getType() {
+        return Material$4.DynamicWareType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+
+        if (this._time === undefined) {
+          this._time = {
+            x: time.secondsOfDay,
+            y: time.secondsOfDay
+          };
+        }
+
+        if (this.fadeDirection.x) {
+          result.time.x = (time.secondsOfDay - this.time.x) * 1000 / this.duration % 1;
+        }
+
+        if (this.fadeDirection.y) {
+          result.time.y = (time.secondsOfDay - this.time.y) * 1000 / this.duration % 1;
+        }
+
+        result.fadeInColor = this.fadeInColor;
+        result.fadeOutColor = this.fadeOutColor;
+        result.maximumDistance = this.maximumDistance;
+        result.repeat = this.repeat;
+        result.fadeDirection = this.fadeDirection;
+        return result;
+      }
+      /**
+       * 判断两个属性是否相同。
+       * @param  {DynamicWareMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true，否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof DynamicWareMaterialProperty && this.fadeInColor === other.fadeInColor && this.fadeOutColor === other.fadeOutColor && this.maximumDistance === other.maximumDistance && this.repeat === other.repeat && this.fadeDirection === other.fadeDirection;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画同期，决定了动画的传播速度，值越小，速度越快，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 表示该属性是否是常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+      /**
+       * @Event
+       * 当此属性发生变化时触发的事件。
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 条纹的个数
+       * @type {Number}
+       */
+
+    }, {
+      key: "count",
+      get: function get() {
+        return this._count;
+      },
+      set: function set(v) {
+        this._count = v;
+      }
+    }]);
+
+    return DynamicWareMaterialProperty;
+  }();
+
+  var shader$6 = "\n  czm_material czm_getMaterial(czm_materialInput materialInput) {\n  czm_material material = czm_getDefaultMaterial(materialInput);\n  vec2 st = materialInput.st;\n  vec4 imageRgba=texture2D(image, vec2(1.0 - fract(time - st.s),st.t));\n  material.alpha =imageRgba.a * color.a;\n  material.diffuse = max(color.rgb * material.alpha * 3.0, color.rgb);\n  return material;\n}\n";
+
+  var _Cesium$9 = Cesium,
+      Material$5 = _Cesium$9.Material,
+      Color$5 = _Cesium$9.Color,
+      Property$5 = _Cesium$9.Property;
+  Material$5.PolylineFlowType = 'PolylineFlow';
+
+  Material$5._materialCache.addMaterial(Material$5.PolylineFlowType, {
+    fabric: {
+      type: Material$5.PolylineFlowType,
+      uniforms: {
+        color: new Color$5(1.0, 0.0, 0.0),
+        image: '',
+        time: 0
+      },
+      source: shader$6
+    }
+  });
+
+  var PolylineFlowMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 流动线，相比 {@link PolylineTrailLinkMaterialProperty},此材质仅仅会用到图片的alpha通道
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color=Cesium.Color.RED] 颜色
+     * @param {Number} [options.duration=1000] 动画的周期，值越小动画越快，单位毫秒
+     * @param {String|Resource} [options.image] 需要映射到材质的图片
+     *
+     * @see PolylineTrailLinkMaterialProperty
+     */
+    function PolylineFlowMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, PolylineFlowMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, 0);
+      this._image = defaultValue(options.image, URL.buildModuleUrl('./assets/images/LinkPulse.png'));
+      this._duration = defaultValue(options.duration, 1000);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 线颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(PolylineFlowMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @return {String}
+       */
+      value: function getType(time) {
+        return Material$5.PolylineFlowType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+        result.color = this.color;
+
+        if (this._time === undefined) {
+          this._time = time.secondsOfDay;
+        }
+
+        result.time = (time.secondsOfDay - this.time) * 1000 / this.duration;
+        result.image = this.image;
+        return result;
+      }
+      /**
+       * 判断两个材质是否相同
+       * @param  {PolylineFlowMaterialProperty} other 作为对比的另一个材质
+       * @return {Bool}   两个材质相同返回true,否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof PolylineFlowMaterialProperty && this.color === other.color && this.image === other.image;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画周期。
+       * @type {Number}
+       */
+
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      }
+      /**
+       * 将要映射到纹理的图形
+       * @type {String|Resource}
+       */
+
+    }, {
+      key: "image",
+      get: function get() {
+        return this._image;
+      },
+      set: function set(v) {
+        this._image = v;
+      }
+      /**
+       * 材质发生变化时触发的事件
+       * @Event
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 获取一个值，该值指示此属性是否恒定。如果getValue对于当前定义始终返回相同的结果，则该属性被视为常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }]);
+
+    return PolylineFlowMaterialProperty;
+  }();
+
+  var shader$7 = "\nczm_material czm_getMaterial(czm_materialInput materialInput)\n{\n    czm_material material = czm_getDefaultMaterial(materialInput);\n\n    vec2 st = materialInput.st;\n    float glow = glowPower / abs(st.t - 0.5) - (glowPower / 0.5);\n\n    if (taperPower <= 0.99999) {\n        glow *= min(1.0, taperPower / (0.5 - st.s * 0.5) - (taperPower / 0.5));\n    }\n\n    vec4 fragColor;\n    fragColor.rgb = max(vec3(glow - 1.0 + color.rgb), color.rgb);\n    fragColor.a = texture2D(image,vec2(fract(time-st.s),st.t)).a * color.a;\n    // fragColor = czm_gammaCorrect(fragColor);\n\n    material.emission = fragColor.rgb;\n    material.alpha = fragColor.a;\n\n    return material;\n}\n";
+
+  var _Cesium$a = Cesium,
+      Material$6 = _Cesium$a.Material,
+      Color$6 = _Cesium$a.Color,
+      Property$6 = _Cesium$a.Property;
+  Material$6.PolylineDynamicGlowType = "PolylineDynamicGlow";
+
+  Material$6._materialCache.addMaterial(Material$6.PolylineDynamicGlowType, {
+    fabric: {
+      type: Material$6.PolylineDynamicGlowType,
+      uniforms: {
+        color: new Color$6(1.0, 0.0, 0.0),
+        image: '',
+        time: 0,
+        glowPower: 0.2,
+        taperPower: 1.0
+      },
+      source: shader$7
+    }
+  });
+
+  var PolylineGlowMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 创建一个边缘发光的流动材质。
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color=Cesium.Color.RED] 该颜色将会和图片颜色做alpha混合
+     * @param {String|Resource} [options.image] 将要映射的图形纹理
+     * @param {Number} [options.duration=1000] 动画周期，值越小，动画传播速度越快
+     * @param {Number} [options.factor=0.0] alpha混合因子，0~1
+     *
+     * @see PolylineFlowMaterialProperty
+     * @see PolylineTrailLinkMaterialProperty
+     */
+    function PolylineGlowMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, PolylineGlowMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, 0);
+      this._image = defaultValue(options.image, URL.buildModuleUrl('./assets/images/lineClr2.png'));
+      this._duration = defaultValue(options.duration, 1000);
+      this._taperPower = defaultValue(options.taperPower, 1.0);
+      this._glowPower = defaultValue(options.glowPower, 0.2);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 材质的颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(PolylineGlowMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @type {String}
+       */
+      value: function getType() {
+        return Material$6.PolylineDynamicGlowType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+
+        if (this._time === undefined) {
+          this._time = time.secondsOfDay;
+        }
+
+        result.time = (time.secondsOfDay - this.time) * 1000 / this.duration;
+        result.color = this.color;
+        result.image = this.image;
+        result.glowPower = this._glowPower;
+        result.taperPower = this._taperPower;
+        return result;
+      }
+      /**
+       * 判断两个属性是否相同。
+       * @param  {PolylineGlowMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true，否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof PolylineGlowMaterialProperty && this.color === other.color && this.image === other.image;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画同期，决定了动画的传播速度，值越小，速度越快，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 表示该属性是否是常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+      /**
+       * @Event
+       * 当此属性发生变化时触发的事件。
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 将要映射到材质的图片纹理
+       * @type {String|Resource}
+       */
+
+    }, {
+      key: "image",
+      get: function get() {
+        return this._image;
+      },
+      set: function set(v) {
+        this._image = v;
+      }
+    }]);
+
+    return PolylineGlowMaterialProperty;
+  }();
+
+  var shader$8 = "czm_material czm_getMaterial(czm_materialInput materialInput)\n    {\n         czm_material material = czm_getDefaultMaterial(materialInput);\n         vec2 st = materialInput.st;\n         vec4 colorImage = texture2D(image, vec2(fract(st.s - time), st.t));\n         material.alpha=colorImage.a*color.a;\n         float factor=colorImage.a;\n         material.diffuse=mix(color.rgb,colorImage.rgb,factor);\n         return material;\n        }";
+
+  var _Cesium$b = Cesium,
+      Material$7 = _Cesium$b.Material,
+      Color$7 = _Cesium$b.Color,
+      Property$7 = _Cesium$b.Property;
+  Material$7.PolylineTrailLinkType = "PolylineTrailLink";
+
+  Material$7._materialCache.addMaterial(Material$7.PolylineTrailLinkType, {
+    fabric: {
+      type: Material$7.PolylineTrailLinkType,
+      uniforms: {
+        color: new Color$7(1.0, 0.0, 0.0),
+        image: '',
+        time: 0
+      },
+      source: shader$8
+    }
+  });
+
+  var PolylineTrailLinkMaterialProperty = /*#__PURE__*/function () {
+    /**
+     * 创建一个流动材质，和{@link PolylineFlowMaterialProperty}不同的是，它会映射图形的rgb值，而不仅仅是alpha。
+     * @param {Object} [options={}] 具有以下属性
+     * @param {Color} [options.color=Cesium.Color.RED] 该颜色将会和图片颜色做alpha混合
+     * @param {String|Resource} [options.image] 将要映射的图形纹理
+     * @param {Number} [options.duration=1000] 动画周期，值越小，动画传播速度越快
+     * @param {Number} [options.factor=0.0] alpha混合因子，0~1
+     *
+     * @see PolylineFlowMaterialProperty
+     */
+    function PolylineTrailLinkMaterialProperty() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _classCallCheck(this, PolylineTrailLinkMaterialProperty);
+
+      this._color = defaultValue(options.color, Cesium.Color.RED);
+      this._time = defaultValue(options.time, 0);
+      this._image = defaultValue(options.image, URL.buildModuleUrl('./assets/images/lineClr2.png'));
+      this._duration = defaultValue(options.duration, 1000);
+      this._definitionChanged = new Event();
+    }
+    /**
+     * 材质的颜色
+     * @type {Cesium.Color}
+     */
+
+
+    _createClass(PolylineTrailLinkMaterialProperty, [{
+      key: "getType",
+
+      /**
+       * 此属性的类型
+       * @type {String}
+       */
+      value: function getType() {
+        return Material$7.PolylineTrailLinkType;
+      }
+      /**
+       * 获取指定时间的属性值。
+       * @param  {JulianDate} time  时间
+       * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
+       * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+       */
+
+    }, {
+      key: "getValue",
+      value: function getValue(time, result) {
+        result = defaultValue(result, {});
+
+        if (this._time === undefined) {
+          this._time = time.secondsOfDay;
+        }
+
+        result.time = (time.secondsOfDay - this.time) * 1000 / this.duration;
+        result.color = this.color;
+        result.image = this.image;
+        return result;
+      }
+      /**
+       * 判断两个属性是否相同。
+       * @param  {PolylineTrailLinkMaterialProperty} other 另一个属性
+       * @return {Bool}   如果相同返回true，否则返回false
+       */
+
+    }, {
+      key: "equals",
+      value: function equals(other) {
+        return this === other || other instanceof PolylineTrailLinkMaterialProperty && this.color === other.color && this.image === other.image;
+      }
+    }, {
+      key: "color",
+      get: function get() {
+        return this._color;
+      },
+      set: function set(v) {
+        this._color = v;
+      }
+      /**
+       * 动画同期，决定了动画的传播速度，值越小，速度越快，单位毫秒。
+       * @type {Number}
+       */
+
+    }, {
+      key: "duration",
+      get: function get() {
+        return this._duration;
+      },
+      set: function set(v) {
+        this._duration = v;
+      }
+    }, {
+      key: "time",
+      get: function get() {
+        return this._time;
+      },
+      set: function set(v) {
+        this._time = v;
+      }
+      /**
+       * 表示该属性是否是常量。
+       * @readonly
+       */
+
+    }, {
+      key: "isConstant",
+      get: function get() {
+        return false;
+      }
+      /**
+       * @Event
+       * 当此属性发生变化时触发的事件。
+       */
+
+    }, {
+      key: "definitionChanged",
+      get: function get() {
+        return this._definitionChanged;
+      }
+      /**
+       * 将要映射到材质的图片纹理
+       * @type {String|Resource}
+       */
+
+    }, {
+      key: "image",
+      get: function get() {
+        return this._image;
+      },
+      set: function set(v) {
+        this._image = v;
+      }
+    }]);
+
+    return PolylineTrailLinkMaterialProperty;
+  }();
+
+  // import selectFrag from "./shaders/select";
+  // import blurFrag from "./shaders/seperableBlur";
+  // import bloomFrag from "./shaders/bloom";
+  var selectFrag = '';
+
+  var UnrealBloomPass = function UnrealBloomPass() {
+    _classCallCheck(this, UnrealBloomPass);
+
+    var kernelSizeArray = [3, 5, 7, 9, 11];
+    this.nMips = kernelSizeArray.length;
+    var array = [];
+    var selectPass = new Cesium.PostProcessStage({
+      fragmentShader: selectFrag
+    });
+    array.push(selectPass);
+    Object.defineProperties(uniforms, {
+      bloomStrength: {
+        get: function get() {
+          return bloomPass.uniforms.bloomStrength;
+        },
+        set: function set(value) {
+          bloomPass.uniforms.bloomStrength = value;
+        }
+      },
+      bloomRadius: {
+        get: function get() {
+          return bloomPass.uniforms.bloomRadius;
+        },
+        set: function set(value) {
+          array[2].uniforms.bloomRadius = value;
+          array[4].uniforms.bloomRadius = value;
+          array[6].uniforms.bloomRadius = value;
+          array[8].uniforms.bloomRadius = value;
+          array[10].uniforms.bloomRadius = value;
+          bloomPass.uniforms.bloomRadius = value;
+        }
+      }
+    });
+  };
+
+  var shader$9 = "\nczm_material czm_getMaterial(czm_materialInput materialInput){\n  czm_material material=czm_getDefaultMaterial(materialInput);\n  vec2 st=materialInput.st;\n  material.alpha=fract(time-st.s)*color.a;\n  material.diffuse=color.rgb;\n  return material;\n}\n";
 
   var tmp = {};
 
@@ -13220,6 +20047,8955 @@
   });
 
   var filesaver = tmp.saveAs;
+
+  /*!
+   * html2canvas 1.0.0-rc.7 <https://html2canvas.hertzen.com>
+   * Copyright (c) 2020 Niklas von Hertzen <https://hertzen.com>
+   * Released under MIT License
+   */
+  var html2canvas_default;
+
+  (function (global, factory) {
+    (typeof exports === "undefined" ? "undefined" : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = global || self, global.html2canvas = factory());
+  })(undefined, function () {
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+      THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+      See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+    /* global Reflect, Promise */
+
+    var _extendStatics = function extendStatics(d, b) {
+      _extendStatics = Object.setPrototypeOf || {
+        __proto__: []
+      } instanceof Array && function (d, b) {
+        d.__proto__ = b;
+      } || function (d, b) {
+        for (var p in b) {
+          if (b.hasOwnProperty(p)) d[p] = b[p];
+        }
+      };
+
+      return _extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+      _extendStatics(d, b);
+
+      function __() {
+        this.constructor = d;
+      }
+
+      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    var _assign = function __assign() {
+      _assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+
+          for (var p in s) {
+            if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+          }
+        }
+
+        return t;
+      };
+
+      return _assign.apply(this, arguments);
+    };
+
+    function __awaiter(thisArg, _arguments, P, generator) {
+      return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) {
+          try {
+            step(generator.next(value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+
+        function rejected(value) {
+          try {
+            step(generator["throw"](value));
+          } catch (e) {
+            reject(e);
+          }
+        }
+
+        function step(result) {
+          result.done ? resolve(result.value) : new P(function (resolve) {
+            resolve(result.value);
+          }).then(fulfilled, rejected);
+        }
+
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+    }
+
+    function __generator(thisArg, body) {
+      var _ = {
+        label: 0,
+        sent: function sent() {
+          if (t[0] & 1) throw t[1];
+          return t[1];
+        },
+        trys: [],
+        ops: []
+      },
+          f,
+          y,
+          t,
+          g;
+      return g = {
+        next: verb(0),
+        "throw": verb(1),
+        "return": verb(2)
+      }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
+        return this;
+      }), g;
+
+      function verb(n) {
+        return function (v) {
+          return step([n, v]);
+        };
+      }
+
+      function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+
+        while (_) {
+          try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+
+            switch (op[0]) {
+              case 0:
+              case 1:
+                t = op;
+                break;
+
+              case 4:
+                _.label++;
+                return {
+                  value: op[1],
+                  done: false
+                };
+
+              case 5:
+                _.label++;
+                y = op[1];
+                op = [0];
+                continue;
+
+              case 7:
+                op = _.ops.pop();
+
+                _.trys.pop();
+
+                continue;
+
+              default:
+                if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                  _ = 0;
+                  continue;
+                }
+
+                if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                  _.label = op[1];
+                  break;
+                }
+
+                if (op[0] === 6 && _.label < t[1]) {
+                  _.label = t[1];
+                  t = op;
+                  break;
+                }
+
+                if (t && _.label < t[2]) {
+                  _.label = t[2];
+
+                  _.ops.push(op);
+
+                  break;
+                }
+
+                if (t[2]) _.ops.pop();
+
+                _.trys.pop();
+
+                continue;
+            }
+
+            op = body.call(thisArg, _);
+          } catch (e) {
+            op = [6, e];
+            y = 0;
+          } finally {
+            f = t = 0;
+          }
+        }
+
+        if (op[0] & 5) throw op[1];
+        return {
+          value: op[0] ? op[1] : void 0,
+          done: true
+        };
+      }
+    }
+
+    var Bounds =
+    /** @class */
+    function () {
+      function Bounds(x, y, w, h) {
+        this.left = x;
+        this.top = y;
+        this.width = w;
+        this.height = h;
+      }
+
+      Bounds.prototype.add = function (x, y, w, h) {
+        return new Bounds(this.left + x, this.top + y, this.width + w, this.height + h);
+      };
+
+      Bounds.fromClientRect = function (clientRect) {
+        return new Bounds(clientRect.left, clientRect.top, clientRect.width, clientRect.height);
+      };
+
+      return Bounds;
+    }();
+
+    var parseBounds = function parseBounds(node) {
+      return Bounds.fromClientRect(node.getBoundingClientRect());
+    };
+
+    var parseDocumentSize = function parseDocumentSize(document) {
+      var body = document.body;
+      var documentElement = document.documentElement;
+
+      if (!body || !documentElement) {
+        throw new Error("Unable to get document size");
+      }
+
+      var width = Math.max(Math.max(body.scrollWidth, documentElement.scrollWidth), Math.max(body.offsetWidth, documentElement.offsetWidth), Math.max(body.clientWidth, documentElement.clientWidth));
+      var height = Math.max(Math.max(body.scrollHeight, documentElement.scrollHeight), Math.max(body.offsetHeight, documentElement.offsetHeight), Math.max(body.clientHeight, documentElement.clientHeight));
+      return new Bounds(0, 0, width, height);
+    };
+    /*
+     * css-line-break 1.1.1 <https://github.com/niklasvh/css-line-break#readme>
+     * Copyright (c) 2019 Niklas von Hertzen <https://hertzen.com>
+     * Released under MIT License
+     */
+
+
+    var toCodePoints = function toCodePoints(str) {
+      var codePoints = [];
+      var i = 0;
+      var length = str.length;
+
+      while (i < length) {
+        var value = str.charCodeAt(i++);
+
+        if (value >= 0xd800 && value <= 0xdbff && i < length) {
+          var extra = str.charCodeAt(i++);
+
+          if ((extra & 0xfc00) === 0xdc00) {
+            codePoints.push(((value & 0x3ff) << 10) + (extra & 0x3ff) + 0x10000);
+          } else {
+            codePoints.push(value);
+            i--;
+          }
+        } else {
+          codePoints.push(value);
+        }
+      }
+
+      return codePoints;
+    };
+
+    var fromCodePoint = function fromCodePoint() {
+      var codePoints = [];
+
+      for (var _i = 0; _i < arguments.length; _i++) {
+        codePoints[_i] = arguments[_i];
+      }
+
+      if (String.fromCodePoint) {
+        return String.fromCodePoint.apply(String, codePoints);
+      }
+
+      var length = codePoints.length;
+
+      if (!length) {
+        return '';
+      }
+
+      var codeUnits = [];
+      var index = -1;
+      var result = '';
+
+      while (++index < length) {
+        var codePoint = codePoints[index];
+
+        if (codePoint <= 0xffff) {
+          codeUnits.push(codePoint);
+        } else {
+          codePoint -= 0x10000;
+          codeUnits.push((codePoint >> 10) + 0xd800, codePoint % 0x400 + 0xdc00);
+        }
+
+        if (index + 1 === length || codeUnits.length > 0x4000) {
+          result += String.fromCharCode.apply(String, codeUnits);
+          codeUnits.length = 0;
+        }
+      }
+
+      return result;
+    };
+
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'; // Use a lookup table to find the index.
+
+    var lookup = typeof Uint8Array === 'undefined' ? [] : new Uint8Array(256);
+
+    for (var i = 0; i < chars.length; i++) {
+      lookup[chars.charCodeAt(i)] = i;
+    }
+
+    var decode = function decode(base64) {
+      var bufferLength = base64.length * 0.75,
+          len = base64.length,
+          i,
+          p = 0,
+          encoded1,
+          encoded2,
+          encoded3,
+          encoded4;
+
+      if (base64[base64.length - 1] === '=') {
+        bufferLength--;
+
+        if (base64[base64.length - 2] === '=') {
+          bufferLength--;
+        }
+      }
+
+      var buffer = typeof ArrayBuffer !== 'undefined' && typeof Uint8Array !== 'undefined' && typeof Uint8Array.prototype.slice !== 'undefined' ? new ArrayBuffer(bufferLength) : new Array(bufferLength);
+      var bytes = Array.isArray(buffer) ? buffer : new Uint8Array(buffer);
+
+      for (i = 0; i < len; i += 4) {
+        encoded1 = lookup[base64.charCodeAt(i)];
+        encoded2 = lookup[base64.charCodeAt(i + 1)];
+        encoded3 = lookup[base64.charCodeAt(i + 2)];
+        encoded4 = lookup[base64.charCodeAt(i + 3)];
+        bytes[p++] = encoded1 << 2 | encoded2 >> 4;
+        bytes[p++] = (encoded2 & 15) << 4 | encoded3 >> 2;
+        bytes[p++] = (encoded3 & 3) << 6 | encoded4 & 63;
+      }
+
+      return buffer;
+    };
+
+    var polyUint16Array = function polyUint16Array(buffer) {
+      var length = buffer.length;
+      var bytes = [];
+
+      for (var i = 0; i < length; i += 2) {
+        bytes.push(buffer[i + 1] << 8 | buffer[i]);
+      }
+
+      return bytes;
+    };
+
+    var polyUint32Array = function polyUint32Array(buffer) {
+      var length = buffer.length;
+      var bytes = [];
+
+      for (var i = 0; i < length; i += 4) {
+        bytes.push(buffer[i + 3] << 24 | buffer[i + 2] << 16 | buffer[i + 1] << 8 | buffer[i]);
+      }
+
+      return bytes;
+    };
+    /** Shift size for getting the index-2 table offset. */
+
+
+    var UTRIE2_SHIFT_2 = 5;
+    /** Shift size for getting the index-1 table offset. */
+
+    var UTRIE2_SHIFT_1 = 6 + 5;
+    /**
+     * Shift size for shifting left the index array values.
+     * Increases possible data size with 16-bit index values at the cost
+     * of compactability.
+     * This requires data blocks to be aligned by UTRIE2_DATA_GRANULARITY.
+     */
+
+    var UTRIE2_INDEX_SHIFT = 2;
+    /**
+     * Difference between the two shift sizes,
+     * for getting an index-1 offset from an index-2 offset. 6=11-5
+     */
+
+    var UTRIE2_SHIFT_1_2 = UTRIE2_SHIFT_1 - UTRIE2_SHIFT_2;
+    /**
+     * The part of the index-2 table for U+D800..U+DBFF stores values for
+     * lead surrogate code _units_ not code _points_.
+     * Values for lead surrogate code _points_ are indexed with this portion of the table.
+     * Length=32=0x20=0x400>>UTRIE2_SHIFT_2. (There are 1024=0x400 lead surrogates.)
+     */
+
+    var UTRIE2_LSCP_INDEX_2_OFFSET = 0x10000 >> UTRIE2_SHIFT_2;
+    /** Number of entries in a data block. 32=0x20 */
+
+    var UTRIE2_DATA_BLOCK_LENGTH = 1 << UTRIE2_SHIFT_2;
+    /** Mask for getting the lower bits for the in-data-block offset. */
+
+    var UTRIE2_DATA_MASK = UTRIE2_DATA_BLOCK_LENGTH - 1;
+    var UTRIE2_LSCP_INDEX_2_LENGTH = 0x400 >> UTRIE2_SHIFT_2;
+    /** Count the lengths of both BMP pieces. 2080=0x820 */
+
+    var UTRIE2_INDEX_2_BMP_LENGTH = UTRIE2_LSCP_INDEX_2_OFFSET + UTRIE2_LSCP_INDEX_2_LENGTH;
+    /**
+     * The 2-byte UTF-8 version of the index-2 table follows at offset 2080=0x820.
+     * Length 32=0x20 for lead bytes C0..DF, regardless of UTRIE2_SHIFT_2.
+     */
+
+    var UTRIE2_UTF8_2B_INDEX_2_OFFSET = UTRIE2_INDEX_2_BMP_LENGTH;
+    var UTRIE2_UTF8_2B_INDEX_2_LENGTH = 0x800 >> 6;
+    /* U+0800 is the first code point after 2-byte UTF-8 */
+
+    /**
+     * The index-1 table, only used for supplementary code points, at offset 2112=0x840.
+     * Variable length, for code points up to highStart, where the last single-value range starts.
+     * Maximum length 512=0x200=0x100000>>UTRIE2_SHIFT_1.
+     * (For 0x100000 supplementary code points U+10000..U+10ffff.)
+     *
+     * The part of the index-2 table for supplementary code points starts
+     * after this index-1 table.
+     *
+     * Both the index-1 table and the following part of the index-2 table
+     * are omitted completely if there is only BMP data.
+     */
+
+    var UTRIE2_INDEX_1_OFFSET = UTRIE2_UTF8_2B_INDEX_2_OFFSET + UTRIE2_UTF8_2B_INDEX_2_LENGTH;
+    /**
+     * Number of index-1 entries for the BMP. 32=0x20
+     * This part of the index-1 table is omitted from the serialized form.
+     */
+
+    var UTRIE2_OMITTED_BMP_INDEX_1_LENGTH = 0x10000 >> UTRIE2_SHIFT_1;
+    /** Number of entries in an index-2 block. 64=0x40 */
+
+    var UTRIE2_INDEX_2_BLOCK_LENGTH = 1 << UTRIE2_SHIFT_1_2;
+    /** Mask for getting the lower bits for the in-index-2-block offset. */
+
+    var UTRIE2_INDEX_2_MASK = UTRIE2_INDEX_2_BLOCK_LENGTH - 1;
+
+    var slice16 = function slice16(view, start, end) {
+      if (view.slice) {
+        return view.slice(start, end);
+      }
+
+      return new Uint16Array(Array.prototype.slice.call(view, start, end));
+    };
+
+    var slice32 = function slice32(view, start, end) {
+      if (view.slice) {
+        return view.slice(start, end);
+      }
+
+      return new Uint32Array(Array.prototype.slice.call(view, start, end));
+    };
+
+    var createTrieFromBase64 = function createTrieFromBase64(base64) {
+      var buffer = decode(base64);
+      var view32 = Array.isArray(buffer) ? polyUint32Array(buffer) : new Uint32Array(buffer);
+      var view16 = Array.isArray(buffer) ? polyUint16Array(buffer) : new Uint16Array(buffer);
+      var headerLength = 24;
+      var index = slice16(view16, headerLength / 2, view32[4] / 2);
+      var data = view32[5] === 2 ? slice16(view16, (headerLength + view32[4]) / 2) : slice32(view32, Math.ceil((headerLength + view32[4]) / 4));
+      return new Trie(view32[0], view32[1], view32[2], view32[3], index, data);
+    };
+
+    var Trie =
+    /** @class */
+    function () {
+      function Trie(initialValue, errorValue, highStart, highValueIndex, index, data) {
+        this.initialValue = initialValue;
+        this.errorValue = errorValue;
+        this.highStart = highStart;
+        this.highValueIndex = highValueIndex;
+        this.index = index;
+        this.data = data;
+      }
+      /**
+       * Get the value for a code point as stored in the Trie.
+       *
+       * @param codePoint the code point
+       * @return the value
+       */
+
+
+      Trie.prototype.get = function (codePoint) {
+        var ix;
+
+        if (codePoint >= 0) {
+          if (codePoint < 0x0d800 || codePoint > 0x0dbff && codePoint <= 0x0ffff) {
+            // Ordinary BMP code point, excluding leading surrogates.
+            // BMP uses a single level lookup.  BMP index starts at offset 0 in the Trie2 index.
+            // 16 bit data is stored in the index array itself.
+            ix = this.index[codePoint >> UTRIE2_SHIFT_2];
+            ix = (ix << UTRIE2_INDEX_SHIFT) + (codePoint & UTRIE2_DATA_MASK);
+            return this.data[ix];
+          }
+
+          if (codePoint <= 0xffff) {
+            // Lead Surrogate Code Point.  A Separate index section is stored for
+            // lead surrogate code units and code points.
+            //   The main index has the code unit data.
+            //   For this function, we need the code point data.
+            // Note: this expression could be refactored for slightly improved efficiency, but
+            //       surrogate code points will be so rare in practice that it's not worth it.
+            ix = this.index[UTRIE2_LSCP_INDEX_2_OFFSET + (codePoint - 0xd800 >> UTRIE2_SHIFT_2)];
+            ix = (ix << UTRIE2_INDEX_SHIFT) + (codePoint & UTRIE2_DATA_MASK);
+            return this.data[ix];
+          }
+
+          if (codePoint < this.highStart) {
+            // Supplemental code point, use two-level lookup.
+            ix = UTRIE2_INDEX_1_OFFSET - UTRIE2_OMITTED_BMP_INDEX_1_LENGTH + (codePoint >> UTRIE2_SHIFT_1);
+            ix = this.index[ix];
+            ix += codePoint >> UTRIE2_SHIFT_2 & UTRIE2_INDEX_2_MASK;
+            ix = this.index[ix];
+            ix = (ix << UTRIE2_INDEX_SHIFT) + (codePoint & UTRIE2_DATA_MASK);
+            return this.data[ix];
+          }
+
+          if (codePoint <= 0x10ffff) {
+            return this.data[this.highValueIndex];
+          }
+        } // Fall through.  The code point is outside of the legal range of 0..0x10ffff.
+
+
+        return this.errorValue;
+      };
+
+      return Trie;
+    }();
+
+    var base64 = 'KwAAAAAAAAAACA4AIDoAAPAfAAACAAAAAAAIABAAGABAAEgAUABYAF4AZgBeAGYAYABoAHAAeABeAGYAfACEAIAAiACQAJgAoACoAK0AtQC9AMUAXgBmAF4AZgBeAGYAzQDVAF4AZgDRANkA3gDmAOwA9AD8AAQBDAEUARoBIgGAAIgAJwEvATcBPwFFAU0BTAFUAVwBZAFsAXMBewGDATAAiwGTAZsBogGkAawBtAG8AcIBygHSAdoB4AHoAfAB+AH+AQYCDgIWAv4BHgImAi4CNgI+AkUCTQJTAlsCYwJrAnECeQKBAk0CiQKRApkCoQKoArACuALAAsQCzAIwANQC3ALkAjAA7AL0AvwCAQMJAxADGAMwACADJgMuAzYDPgOAAEYDSgNSA1IDUgNaA1oDYANiA2IDgACAAGoDgAByA3YDfgOAAIQDgACKA5IDmgOAAIAAogOqA4AAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAK8DtwOAAIAAvwPHA88D1wPfAyAD5wPsA/QD/AOAAIAABAQMBBIEgAAWBB4EJgQuBDMEIAM7BEEEXgBJBCADUQRZBGEEaQQwADAAcQQ+AXkEgQSJBJEEgACYBIAAoASoBK8EtwQwAL8ExQSAAIAAgACAAIAAgACgAM0EXgBeAF4AXgBeAF4AXgBeANUEXgDZBOEEXgDpBPEE+QQBBQkFEQUZBSEFKQUxBTUFPQVFBUwFVAVcBV4AYwVeAGsFcwV7BYMFiwWSBV4AmgWgBacFXgBeAF4AXgBeAKsFXgCyBbEFugW7BcIFwgXIBcIFwgXQBdQF3AXkBesF8wX7BQMGCwYTBhsGIwYrBjMGOwZeAD8GRwZNBl4AVAZbBl4AXgBeAF4AXgBeAF4AXgBeAF4AXgBeAGMGXgBqBnEGXgBeAF4AXgBeAF4AXgBeAF4AXgB5BoAG4wSGBo4GkwaAAIADHgR5AF4AXgBeAJsGgABGA4AAowarBrMGswagALsGwwbLBjAA0wbaBtoG3QbaBtoG2gbaBtoG2gblBusG8wb7BgMHCwcTBxsHCwcjBysHMAc1BzUHOgdCB9oGSgdSB1oHYAfaBloHaAfaBlIH2gbaBtoG2gbaBtoG2gbaBjUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHbQdeAF4ANQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQd1B30HNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1B4MH2gaKB68EgACAAIAAgACAAIAAgACAAI8HlwdeAJ8HpweAAIAArwe3B14AXgC/B8UHygcwANAH2AfgB4AA6AfwBz4B+AcACFwBCAgPCBcIogEYAR8IJwiAAC8INwg/CCADRwhPCFcIXwhnCEoDGgSAAIAAgABvCHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIfQh3CHgIeQh6CHsIfAh9CHcIeAh5CHoIewh8CH0Idwh4CHkIegh7CHwIhAiLCI4IMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwAJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlggwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAANQc1BzUHNQc1BzUHNQc1BzUHNQc1B54INQc1B6II2gaqCLIIugiAAIAAvgjGCIAAgACAAIAAgACAAIAAgACAAIAAywiHAYAA0wiAANkI3QjlCO0I9Aj8CIAAgACAAAIJCgkSCRoJIgknCTYHLwk3CZYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiWCJYIlgiAAIAAAAFAAXgBeAGAAcABeAHwAQACQAKAArQC9AJ4AXgBeAE0A3gBRAN4A7AD8AMwBGgEAAKcBNwEFAUwBXAF4QkhCmEKnArcCgAHHAsABz4LAAcABwAHAAd+C6ABoAG+C/4LAAcABwAHAAc+DF4MAAcAB54M3gweDV4Nng3eDaABoAGgAaABoAGgAaABoAGgAaABoAGgAaABoAGgAaABoAGgAaABoAEeDqABVg6WDqABoQ6gAaABoAHXDvcONw/3DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DvcO9w73DncPAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcABwAHAAcAB7cPPwlGCU4JMACAAIAAgABWCV4JYQmAAGkJcAl4CXwJgAkwADAAMAAwAIgJgACLCZMJgACZCZ8JowmrCYAAswkwAF4AXgB8AIAAuwkABMMJyQmAAM4JgADVCTAAMAAwADAAgACAAIAAgACAAIAAgACAAIAAqwYWBNkIMAAwADAAMADdCeAJ6AnuCR4E9gkwAP4JBQoNCjAAMACAABUK0wiAAB0KJAosCjQKgAAwADwKQwqAAEsKvQmdCVMKWwowADAAgACAALcEMACAAGMKgABrCjAAMAAwADAAMAAwADAAMAAwADAAMAAeBDAAMAAwADAAMAAwADAAMAAwADAAMAAwAIkEPQFzCnoKiQSCCooKkAqJBJgKoAqkCokEGAGsCrQKvArBCjAAMADJCtEKFQHZCuEK/gHpCvEKMAAwADAAMACAAIwE+QowAIAAPwEBCzAAMAAwADAAMACAAAkLEQswAIAAPwEZCyELgAAOCCkLMAAxCzkLMAAwADAAMAAwADAAXgBeAEELMAAwADAAMAAwADAAMAAwAEkLTQtVC4AAXAtkC4AAiQkwADAAMAAwADAAMAAwADAAbAtxC3kLgAuFC4sLMAAwAJMLlwufCzAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAApwswADAAMACAAIAAgACvC4AAgACAAIAAgACAALcLMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAvwuAAMcLgACAAIAAgACAAIAAyguAAIAAgACAAIAA0QswADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAANkLgACAAIAA4AswADAAMAAwADAAMAAwADAAMAAwADAAMAAwAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACJCR4E6AswADAAhwHwC4AA+AsADAgMEAwwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMACAAIAAGAwdDCUMMAAwAC0MNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQw1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHPQwwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADUHNQc1BzUHNQc1BzUHNQc2BzAAMAA5DDUHNQc1BzUHNQc1BzUHNQc1BzUHNQdFDDAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAgACAAIAATQxSDFoMMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwAF4AXgBeAF4AXgBeAF4AYgxeAGoMXgBxDHkMfwxeAIUMXgBeAI0MMAAwADAAMAAwAF4AXgCVDJ0MMAAwADAAMABeAF4ApQxeAKsMswy7DF4Awgy9DMoMXgBeAF4AXgBeAF4AXgBeAF4AXgDRDNkMeQBqCeAM3Ax8AOYM7Az0DPgMXgBeAF4AXgBeAF4AXgBeAF4AXgBeAF4AXgBeAF4AXgCgAAANoAAHDQ4NFg0wADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAeDSYNMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwAIAAgACAAIAAgACAAC4NMABeAF4ANg0wADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwAD4NRg1ODVYNXg1mDTAAbQ0wADAAMAAwADAAMAAwADAA2gbaBtoG2gbaBtoG2gbaBnUNeg3CBYANwgWFDdoGjA3aBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gaUDZwNpA2oDdoG2gawDbcNvw3HDdoG2gbPDdYN3A3fDeYN2gbsDfMN2gbaBvoN/g3aBgYODg7aBl4AXgBeABYOXgBeACUG2gYeDl4AJA5eACwO2w3aBtoGMQ45DtoG2gbaBtoGQQ7aBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gZJDjUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1B1EO2gY1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQdZDjUHNQc1BzUHNQc1B2EONQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHaA41BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1B3AO2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gY1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1BzUHNQc1B2EO2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gZJDtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBtoG2gbaBkkOeA6gAKAAoAAwADAAMAAwAKAAoACgAKAAoACgAKAAgA4wADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAAwADAAMAD//wQABAAEAAQABAAEAAQABAAEAA0AAwABAAEAAgAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAKABMAFwAeABsAGgAeABcAFgASAB4AGwAYAA8AGAAcAEsASwBLAEsASwBLAEsASwBLAEsAGAAYAB4AHgAeABMAHgBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAFgAbABIAHgAeAB4AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQABYADQARAB4ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsABAAEAAQABAAEAAUABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAkAFgAaABsAGwAbAB4AHQAdAB4ATwAXAB4ADQAeAB4AGgAbAE8ATwAOAFAAHQAdAB0ATwBPABcATwBPAE8AFgBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB0AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgBQAB4AHgAeAB4AUABQAFAAUAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAB4AHgAeAFAATwBAAE8ATwBPAEAATwBQAFAATwBQAB4AHgAeAB4AHgAeAB0AHQAdAB0AHgAdAB4ADgBQAFAAUABQAFAAHgAeAB4AHgAeAB4AHgBQAB4AUAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4ABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAJAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAkACQAJAAkACQAJAAkABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAeAB4AHgAeAFAAHgAeAB4AKwArAFAAUABQAFAAGABQACsAKwArACsAHgAeAFAAHgBQAFAAUAArAFAAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4ABAAEAAQABAAEAAQABAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAUAAeAB4AHgAeAB4AHgArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwAYAA0AKwArAB4AHgAbACsABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQADQAEAB4ABAAEAB4ABAAEABMABAArACsAKwArACsAKwArACsAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAKwArACsAKwArAFYAVgBWAB4AHgArACsAKwArACsAKwArACsAKwArACsAHgAeAB4AHgAeAB4AHgAeAB4AGgAaABoAGAAYAB4AHgAEAAQABAAEAAQABAAEAAQABAAEAAQAEwAEACsAEwATAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABABLAEsASwBLAEsASwBLAEsASwBLABoAGQAZAB4AUABQAAQAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQABMAUAAEAAQABAAEAAQABAAEAB4AHgAEAAQABAAEAAQABABQAFAABAAEAB4ABAAEAAQABABQAFAASwBLAEsASwBLAEsASwBLAEsASwBQAFAAUAAeAB4AUAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwAeAFAABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAAQABAAEAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAAQAUABQAB4AHgAYABMAUAArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAFAABAAEAAQABAAEAFAABAAEAAQAUAAEAAQABAAEAAQAKwArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAArACsAHgArAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAeAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABABQAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAFAABAAEAAQABAAEAAQABABQAFAAUABQAFAAUABQAFAAUABQAAQABAANAA0ASwBLAEsASwBLAEsASwBLAEsASwAeAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQAKwBQAFAAUABQAFAAUABQAFAAKwArAFAAUAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUAArAFAAKwArACsAUABQAFAAUAArACsABABQAAQABAAEAAQABAAEAAQAKwArAAQABAArACsABAAEAAQAUAArACsAKwArACsAKwArACsABAArACsAKwArAFAAUAArAFAAUABQAAQABAArACsASwBLAEsASwBLAEsASwBLAEsASwBQAFAAGgAaAFAAUABQAFAAUABMAB4AGwBQAB4AKwArACsABAAEAAQAKwBQAFAAUABQAFAAUAArACsAKwArAFAAUAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUAArAFAAUAArAFAAUAArAFAAUAArACsABAArAAQABAAEAAQABAArACsAKwArAAQABAArACsABAAEAAQAKwArACsABAArACsAKwArACsAKwArAFAAUABQAFAAKwBQACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwAEAAQAUABQAFAABAArACsAKwArACsAKwArACsAKwArACsABAAEAAQAKwBQAFAAUABQAFAAUABQAFAAUAArAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUAArAFAAUAArAFAAUABQAFAAUAArACsABABQAAQABAAEAAQABAAEAAQABAArAAQABAAEACsABAAEAAQAKwArAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAUABQAAQABAArACsASwBLAEsASwBLAEsASwBLAEsASwAeABsAKwArACsAKwArACsAKwBQAAQABAAEAAQABAAEACsABAAEAAQAKwBQAFAAUABQAFAAUABQAFAAKwArAFAAUAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQAKwArAAQABAArACsABAAEAAQAKwArACsAKwArACsAKwArAAQABAArACsAKwArAFAAUAArAFAAUABQAAQABAArACsASwBLAEsASwBLAEsASwBLAEsASwAeAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwAEAFAAKwBQAFAAUABQAFAAUAArACsAKwBQAFAAUAArAFAAUABQAFAAKwArACsAUABQACsAUAArAFAAUAArACsAKwBQAFAAKwArACsAUABQAFAAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwAEAAQABAAEAAQAKwArACsABAAEAAQAKwAEAAQABAAEACsAKwBQACsAKwArACsAKwArAAQAKwArACsAKwArACsAKwArACsAKwBLAEsASwBLAEsASwBLAEsASwBLAFAAUABQAB4AHgAeAB4AHgAeABsAHgArACsAKwArACsABAAEAAQABAArAFAAUABQAFAAUABQAFAAUAArAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArAFAABAAEAAQABAAEAAQABAArAAQABAAEACsABAAEAAQABAArACsAKwArACsAKwArAAQABAArAFAAUABQACsAKwArACsAKwBQAFAABAAEACsAKwBLAEsASwBLAEsASwBLAEsASwBLACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAB4AUAAEAAQABAArAFAAUABQAFAAUABQAFAAUAArAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQACsAKwAEAFAABAAEAAQABAAEAAQABAArAAQABAAEACsABAAEAAQABAArACsAKwArACsAKwArAAQABAArACsAKwArACsAKwArAFAAKwBQAFAABAAEACsAKwBLAEsASwBLAEsASwBLAEsASwBLACsAUABQACsAKwArACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAFAABAAEAAQABAAEAAQABAArAAQABAAEACsABAAEAAQABABQAB4AKwArACsAKwBQAFAAUAAEAFAAUABQAFAAUABQAFAAUABQAFAABAAEACsAKwBLAEsASwBLAEsASwBLAEsASwBLAFAAUABQAFAAUABQAFAAUABQABoAUABQAFAAUABQAFAAKwArAAQABAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQACsAUAArACsAUABQAFAAUABQAFAAUAArACsAKwAEACsAKwArACsABAAEAAQABAAEAAQAKwAEACsABAAEAAQABAAEAAQABAAEACsAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArAAQABAAeACsAKwArACsAKwArACsAKwArACsAKwArAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXAAqAFwAXAAqACoAKgAqACoAKgAqACsAKwArACsAGwBcAFwAXABcAFwAXABcACoAKgAqACoAKgAqACoAKgAeAEsASwBLAEsASwBLAEsASwBLAEsADQANACsAKwArACsAKwBcAFwAKwBcACsAKwBcAFwAKwBcACsAKwBcACsAKwArACsAKwArAFwAXABcAFwAKwBcAFwAXABcAFwAXABcACsAXABcAFwAKwBcACsAXAArACsAXABcACsAXABcAFwAXAAqAFwAXAAqACoAKgAqACoAKgArACoAKgBcACsAKwBcAFwAXABcAFwAKwBcACsAKgAqACoAKgAqACoAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArAFwAXABcAFwAUAAOAA4ADgAOAB4ADgAOAAkADgAOAA0ACQATABMAEwATABMACQAeABMAHgAeAB4ABAAEAB4AHgAeAB4AHgAeAEsASwBLAEsASwBLAEsASwBLAEsAUABQAFAAUABQAFAAUABQAFAAUAANAAQAHgAEAB4ABAAWABEAFgARAAQABABQAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAANAAQABAAEAAQABAANAAQABABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAAQABAAEACsABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsADQANAB4AHgAeAB4AHgAeAAQAHgAeAB4AHgAeAB4AKwAeAB4ADgAOAA0ADgAeAB4AHgAeAB4ACQAJACsAKwArACsAKwBcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqAFwASwBLAEsASwBLAEsASwBLAEsASwANAA0AHgAeAB4AHgBcAFwAXABcAFwAXAAqACoAKgAqAFwAXABcAFwAKgAqACoAXAAqACoAKgBcAFwAKgAqACoAKgAqACoAKgBcAFwAXAAqACoAKgAqAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAKgAqACoAKgAqACoAKgAqACoAKgAqACoAXAAqAEsASwBLAEsASwBLAEsASwBLAEsAKgAqACoAKgAqACoAUABQAFAAUABQAFAAKwBQACsAKwArACsAKwBQACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAFAAUABQAFAAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAUABQAFAAUABQAFAAUABQAFAAKwBQAFAAUABQACsAKwBQAFAAUABQAFAAUABQACsAUAArAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUAArACsAUABQAFAAUABQAFAAUAArAFAAKwBQAFAAUABQACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwAEAAQABAAeAA0AHgAeAB4AHgAeAB4AHgBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAB4AHgAeAB4AHgAeAB4AHgAeACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAFAAUABQAFAAUABQACsAKwANAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAB4AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAA0AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQABYAEQArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAADQANAA0AUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAABAAEAAQAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAA0ADQArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQAKwArACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQACsABAAEACsAKwArACsAKwArACsAKwArACsAKwArAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXAAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoADQANABUAXAANAB4ADQAbAFwAKgArACsASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArAB4AHgATABMADQANAA4AHgATABMAHgAEAAQABAAJACsASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAUABQAFAAUABQAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABABQACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwArACsABAAEAAQABAAEAAQABAAEAAQABAAEAAQAKwArACsAKwAeACsAKwArABMAEwBLAEsASwBLAEsASwBLAEsASwBLAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcACsAKwBcAFwAXABcAFwAKwArACsAKwArACsAKwArACsAKwArAFwAXABcAFwAXABcAFwAXABcAFwAXABcACsAKwArACsAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwBcACsAKwArACoAKgBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEACsAKwAeAB4AXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAKgAqACoAKgAqACoAKgAqACoAKgArACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgArACsABABLAEsASwBLAEsASwBLAEsASwBLACsAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwArACsAKgAqACoAKgAqACoAKgBcACoAKgAqACoAKgAqACsAKwAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArAAQABAAEAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQAUABQAFAAUABQAFAAUAArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsADQANAB4ADQANAA0ADQAeAB4AHgAeAB4AHgAeAB4AHgAeAAQABAAEAAQABAAEAAQABAAEAB4AHgAeAB4AHgAeAB4AHgAeACsAKwArAAQABAAEAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAUABQAEsASwBLAEsASwBLAEsASwBLAEsAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArACsAKwArACsAKwArACsAHgAeAB4AHgBQAFAAUABQAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArACsAKwANAA0ADQANAA0ASwBLAEsASwBLAEsASwBLAEsASwArACsAKwBQAFAAUABLAEsASwBLAEsASwBLAEsASwBLAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAANAA0AUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgAeAB4AHgAeAB4AHgArACsAKwArACsAKwArACsABAAEAAQAHgAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAFAAUABQAFAABABQAFAAUABQAAQABAAEAFAAUAAEAAQABAArACsAKwArACsAKwAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAKwAEAAQABAAEAAQAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArACsAUABQAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUAArAFAAKwBQACsAUAArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACsAHgAeAB4AHgAeAB4AHgAeAFAAHgAeAB4AUABQAFAAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAFAAUABQAFAAKwArAB4AHgAeAB4AHgAeACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArACsAUABQAFAAKwAeAB4AHgAeAB4AHgAeAA4AHgArAA0ADQANAA0ADQANAA0ACQANAA0ADQAIAAQACwAEAAQADQAJAA0ADQAMAB0AHQAeABcAFwAWABcAFwAXABYAFwAdAB0AHgAeABQAFAAUAA0AAQABAAQABAAEAAQABAAJABoAGgAaABoAGgAaABoAGgAeABcAFwAdABUAFQAeAB4AHgAeAB4AHgAYABYAEQAVABUAFQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgANAB4ADQANAA0ADQAeAA0ADQANAAcAHgAeAB4AHgArAAQABAAEAAQABAAEAAQABAAEAAQAUABQACsAKwBPAFAAUABQAFAAUAAeAB4AHgAWABEATwBQAE8ATwBPAE8AUABQAFAAUABQAB4AHgAeABYAEQArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAGwAbABsAGwAbABsAGwAaABsAGwAbABsAGwAbABsAGwAbABsAGwAbABsAGwAaABsAGwAbABsAGgAbABsAGgAbABsAGwAbABsAGwAbABsAGwAbABsAGwAbABsAGwAbABsABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgBQABoAHgAdAB4AUAAeABoAHgAeAB4AHgAeAB4AHgAeAB4ATwAeAFAAGwAeAB4AUABQAFAAUABQAB4AHgAeAB0AHQAeAFAAHgBQAB4AUAAeAFAATwBQAFAAHgAeAB4AHgAeAB4AHgBQAFAAUABQAFAAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgBQAB4AUABQAFAAUABPAE8AUABQAFAAUABQAE8AUABQAE8AUABPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBQAFAAUABQAE8ATwBPAE8ATwBPAE8ATwBPAE8AUABQAFAAUABQAFAAUABQAFAAHgAeAFAAUABQAFAATwAeAB4AKwArACsAKwAdAB0AHQAdAB0AHQAdAB0AHQAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAdAB4AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAeAB0AHQAeAB4AHgAdAB0AHgAeAB0AHgAeAB4AHQAeAB0AGwAbAB4AHQAeAB4AHgAeAB0AHgAeAB0AHQAdAB0AHgAeAB0AHgAdAB4AHQAdAB0AHQAdAB0AHgAdAB4AHgAeAB4AHgAdAB0AHQAdAB4AHgAeAB4AHQAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAeAB4AHgAdAB4AHgAeAB4AHgAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAdAB4AHgAdAB0AHQAdAB4AHgAdAB0AHgAeAB0AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAdAB0AHgAeAB0AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB0AHgAeAB4AHQAeAB4AHgAeAB4AHgAeAB0AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeABQAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAWABEAFgARAB4AHgAeAB4AHgAeAB0AHgAeAB4AHgAeAB4AHgAlACUAHgAeAB4AHgAeAB4AHgAeAB4AFgARAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACUAJQAlACUAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBQAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB4AHgAeAB4AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHgAeAB0AHQAdAB0AHgAeAB4AHgAeAB4AHgAeAB4AHgAdAB0AHgAdAB0AHQAdAB0AHQAdAB4AHgAeAB4AHgAeAB4AHgAdAB0AHgAeAB0AHQAeAB4AHgAeAB0AHQAeAB4AHgAeAB0AHQAdAB4AHgAdAB4AHgAdAB0AHQAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAdAB0AHQAeAB4AHgAeAB4AHgAeAB4AHgAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAeAB0AHQAeAB4AHQAeAB4AHgAeAB0AHQAeAB4AHgAeACUAJQAdAB0AJQAeACUAJQAlACAAJQAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAHgAeAB4AHgAdAB4AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAdAB4AHQAdAB0AHgAdACUAHQAdAB4AHQAdAB4AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB0AHQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAlACUAJQAlACUAJQAlACUAHQAdAB0AHQAlAB4AJQAlACUAHQAlACUAHQAdAB0AJQAlAB0AHQAlAB0AHQAlACUAJQAeAB0AHgAeAB4AHgAdAB0AJQAdAB0AHQAdAB0AHQAlACUAJQAlACUAHQAlACUAIAAlAB0AHQAlACUAJQAlACUAJQAlACUAHgAeAB4AJQAlACAAIAAgACAAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAdAB4AHgAeABcAFwAXABcAFwAXAB4AEwATACUAHgAeAB4AFgARABYAEQAWABEAFgARABYAEQAWABEAFgARAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAWABEAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AFgARABYAEQAWABEAFgARABYAEQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeABYAEQAWABEAFgARABYAEQAWABEAFgARABYAEQAWABEAFgARABYAEQAWABEAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AFgARABYAEQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeABYAEQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHQAdAB0AHQAdAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwAeAB4AHgAeAB4AHgAeAB4AHgArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAEAAQABAAeAB4AKwArACsAKwArABMADQANAA0AUAATAA0AUABQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAUAANACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAEAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQACsAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXAA0ADQANAA0ADQANAA0ADQAeAA0AFgANAB4AHgAXABcAHgAeABcAFwAWABEAFgARABYAEQAWABEADQANAA0ADQATAFAADQANAB4ADQANAB4AHgAeAB4AHgAMAAwADQANAA0AHgANAA0AFgANAA0ADQANAA0ADQANACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACsAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAKwArACsAKwArACsAKwArACsAKwArACsAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAlACUAJQAlACUAJQAlACUAJQAlACUAJQArACsAKwArAA0AEQARACUAJQBHAFcAVwAWABEAFgARABYAEQAWABEAFgARACUAJQAWABEAFgARABYAEQAWABEAFQAWABEAEQAlAFcAVwBXAFcAVwBXAFcAVwBXAAQABAAEAAQABAAEACUAVwBXAFcAVwA2ACUAJQBXAFcAVwBHAEcAJQAlACUAKwBRAFcAUQBXAFEAVwBRAFcAUQBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFEAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBRAFcAUQBXAFEAVwBXAFcAVwBXAFcAUQBXAFcAVwBXAFcAVwBRAFEAKwArAAQABAAVABUARwBHAFcAFQBRAFcAUQBXAFEAVwBRAFcAUQBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFEAVwBRAFcAUQBXAFcAVwBXAFcAVwBRAFcAVwBXAFcAVwBXAFEAUQBXAFcAVwBXABUAUQBHAEcAVwArACsAKwArACsAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAKwArAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwArACUAJQBXAFcAVwBXACUAJQAlACUAJQAlACUAJQAlACUAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAKwArACsAKwArACUAJQAlACUAKwArACsAKwArACsAKwArACsAKwArACsAUQBRAFEAUQBRAFEAUQBRAFEAUQBRAFEAUQBRAFEAUQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACsAVwBXAFcAVwBXAFcAVwBXAFcAVwAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAE8ATwBPAE8ATwBPAE8ATwAlAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACUAJQAlACUAJQAlACUAJQAlACUAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAEcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAKwArACsAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAADQATAA0AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABLAEsASwBLAEsASwBLAEsASwBLAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAFAABAAEAAQABAAeAAQABAAEAAQABAAEAAQABAAEAAQAHgBQAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AUABQAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAeAA0ADQANAA0ADQArACsAKwArACsAKwArACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAFAAUABQAFAAUABQAFAAUABQAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AUAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgBQAB4AHgAeAB4AHgAeAFAAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArAB4AHgAeAB4AHgAeAB4AHgArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAAQAUABQAFAABABQAFAAUABQAAQAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAeAB4AHgAeACsAKwArACsAUABQAFAAUABQAFAAHgAeABoAHgArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAADgAOABMAEwArACsAKwArACsAKwArACsABAAEAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEACsAKwArACsAKwArACsAKwANAA0ASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABABQAFAAUABQAFAAUAAeAB4AHgBQAA4AUAArACsAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAA0ADQBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAKwArACsAKwArACsAKwArACsAKwArAB4AWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYAFgAWABYACsAKwArAAQAHgAeAB4AHgAeAB4ADQANAA0AHgAeAB4AHgArAFAASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArAB4AHgBcAFwAXABcAFwAKgBcAFwAXABcAFwAXABcAFwAXABcAEsASwBLAEsASwBLAEsASwBLAEsAXABcAFwAXABcACsAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwArACsAKwArACsAKwArAFAAUABQAAQAUABQAFAAUABQAFAAUABQAAQABAArACsASwBLAEsASwBLAEsASwBLAEsASwArACsAHgANAA0ADQBcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAKgAqACoAXAAqACoAKgBcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXAAqAFwAKgAqACoAXABcACoAKgBcAFwAXABcAFwAKgAqAFwAKgBcACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAFwAXABcACoAKgBQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEAA0ADQBQAFAAUAAEAAQAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUAArACsAUABQAFAAUABQAFAAKwArAFAAUABQAFAAUABQACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAAQADQAEAAQAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwArACsAVABVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBUAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVAFUAVQBVACsAKwArACsAKwArACsAKwArACsAKwArAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAWQBZAFkAKwArACsAKwBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAWgBaAFoAKwArACsAKwAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYABgAGAAYAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACUAJQBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAJQAlACUAJQAlACUAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAKwArACsAKwArAFYABABWAFYAVgBWAFYAVgBWAFYAVgBWAB4AVgBWAFYAVgBWAFYAVgBWAFYAVgBWAFYAVgArAFYAVgBWAFYAVgArAFYAKwBWAFYAKwBWAFYAKwBWAFYAVgBWAFYAVgBWAFYAVgBWAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAEQAWAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUAAaAB4AKwArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAGAARABEAGAAYABMAEwAWABEAFAArACsAKwArACsAKwAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACUAJQAlACUAJQAWABEAFgARABYAEQAWABEAFgARABYAEQAlACUAFgARACUAJQAlACUAJQAlACUAEQAlABEAKwAVABUAEwATACUAFgARABYAEQAWABEAJQAlACUAJQAlACUAJQAlACsAJQAbABoAJQArACsAKwArAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAAcAKwATACUAJQAbABoAJQAlABYAEQAlACUAEQAlABEAJQBXAFcAVwBXAFcAVwBXAFcAVwBXABUAFQAlACUAJQATACUAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXABYAJQARACUAJQAlAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwAWACUAEQAlABYAEQARABYAEQARABUAVwBRAFEAUQBRAFEAUQBRAFEAUQBRAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAEcARwArACsAVwBXAFcAVwBXAFcAKwArAFcAVwBXAFcAVwBXACsAKwBXAFcAVwBXAFcAVwArACsAVwBXAFcAKwArACsAGgAbACUAJQAlABsAGwArAB4AHgAeAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAKwAEAAQABAAQAB0AKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwBQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsADQANAA0AKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArAB4AHgAeAB4AHgAeAB4AHgAeAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgBQAFAAHgAeAB4AKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArACsAKwArAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4ABAArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAAQAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsADQBQAFAAUABQACsAKwArACsAUABQAFAAUABQAFAAUABQAA0AUABQAFAAUABQACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUAArACsAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQACsAKwArAFAAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAA0AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAB4AHgBQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsADQBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArAB4AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwBQAFAAUABQAFAABAAEAAQAKwAEAAQAKwArACsAKwArAAQABAAEAAQAUABQAFAAUAArAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsABAAEAAQAKwArACsAKwAEAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsADQANAA0ADQANAA0ADQANAB4AKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAB4AUABQAFAAUABQAFAAUABQAB4AUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEACsAKwArACsAUABQAFAAUABQAA0ADQANAA0ADQANABQAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwANAA0ADQANAA0ADQANAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAHgAeAB4AHgArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwBQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAA0ADQAeAB4AHgAeAB4AKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEAAQABAAEAAQABAAeAB4AHgANAA0ADQANACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwBLAEsASwBLAEsASwBLAEsASwBLACsAKwArACsAKwArAFAAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsASwBLAEsASwBLAEsASwBLAEsASwANAA0ADQANACsAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAeAA4AUAArACsAKwArACsAKwArACsAKwAEAFAAUABQAFAADQANAB4ADQAeAAQABAAEAB4AKwArAEsASwBLAEsASwBLAEsASwBLAEsAUAAOAFAADQANAA0AKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAAQABAAEAAQABAANAA0AHgANAA0AHgAEACsAUABQAFAAUABQAFAAUAArAFAAKwBQAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAA0AKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAAQABAAEAAQAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwArACsABAAEAAQABAArAFAAUABQAFAAUABQAFAAUAArACsAUABQACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAArACsABAAEACsAKwAEAAQABAArACsAUAArACsAKwArACsAKwAEACsAKwArACsAKwBQAFAAUABQAFAABAAEACsAKwAEAAQABAAEAAQABAAEACsAKwArAAQABAAEAAQABAArACsAKwArACsAKwArACsAKwArACsABAAEAAQABAAEAAQABABQAFAAUABQAA0ADQANAA0AHgBLAEsASwBLAEsASwBLAEsASwBLACsADQArAB4AKwArAAQABAAEAAQAUABQAB4AUAArACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEACsAKwAEAAQABAAEAAQABAAEAAQABAAOAA0ADQATABMAHgAeAB4ADQANAA0ADQANAA0ADQANAA0ADQANAA0ADQANAA0AUABQAFAAUAAEAAQAKwArAAQADQANAB4AUAArACsAKwArACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwAOAA4ADgAOAA4ADgAOAA4ADgAOAA4ADgAOACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXABcAFwAXAArACsAKwAqACoAKgAqACoAKgAqACoAKgAqACoAKgAqACoAKgArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAXABcAA0ADQANACoASwBLAEsASwBLAEsASwBLAEsASwBQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwBQAFAABAAEAAQABAAEAAQABAAEAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAFAABAAEAAQABAAOAB4ADQANAA0ADQAOAB4ABAArACsAKwArACsAKwArACsAUAAEAAQABAAEAAQABAAEAAQABAAEAAQAUABQAFAAUAArACsAUABQAFAAUAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAA0ADQANACsADgAOAA4ADQANACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAABAAEAAQABAAEAAQABAAEACsABAAEAAQABAAEAAQABAAEAFAADQANAA0ADQANACsAKwArACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwAOABMAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQACsAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAArACsAKwAEACsABAAEACsABAAEAAQABAAEAAQABABQAAQAKwArACsAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsADQANAA0ADQANACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAASABIAEgAQwBDAEMAUABQAFAAUABDAFAAUABQAEgAQwBIAEMAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAASABDAEMAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABIAEMAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAEsASwBLAEsASwBLAEsASwBLAEsAKwArACsAKwANAA0AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArAAQABAAEAAQABAANACsAKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAEAAQABAAEAAQABAAEAA0ADQANAB4AHgAeAB4AHgAeAFAAUABQAFAADQAeACsAKwArACsAKwArACsAKwArACsASwBLAEsASwBLAEsASwBLAEsASwArAFAAUABQAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAUAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsABAAEAAQABABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAEcARwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwArACsAKwArACsAKwArACsAKwArACsAKwArAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwBQAFAAUABQAFAAUABQAFAAUABQACsAKwAeAAQABAANAAQABAAEAAQAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACsAKwArACsAKwArACsAKwArACsAHgAeAB4AHgAeAB4AHgArACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4ABAAEAAQABAAEAB4AHgAeAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQAHgAeAAQABAAEAAQABAAEAAQAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAEAAQABAAEAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgAEAAQABAAeACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwArACsAKwArACsAKwArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAKwArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArAFAAUAArACsAUAArACsAUABQACsAKwBQAFAAUABQACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AKwBQACsAUABQAFAAUABQAFAAUAArAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAKwAeAB4AUABQAFAAUABQACsAUAArACsAKwBQAFAAUABQAFAAUABQACsAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgArACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAFAAUABQAFAAUABQAFAAUABQAFAAUAAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAHgAeAB4AHgAeAB4AHgAeAB4AKwArAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsASwBLAEsABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAB4AHgAeAB4ABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAB4AHgAeAB4AHgAeAB4AHgAEAB4AHgAeAB4AHgAeAB4AHgAeAB4ABAAeAB4ADQANAA0ADQAeACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAAQABAAEAAQABAArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsABAAEAAQABAAEAAQABAArAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArACsABAAEAAQABAAEAAQABAArAAQABAArAAQABAAEAAQABAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwBQAFAAUABQAFAAKwArAFAAUABQAFAAUABQAFAAUABQAAQABAAEAAQABAAEAAQAKwArACsAKwArACsAKwArACsAHgAeAB4AHgAEAAQABAAEAAQABAAEACsAKwArACsAKwBLAEsASwBLAEsASwBLAEsASwBLACsAKwArACsAFgAWAFAAUABQAFAAKwBQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArAFAAUAArAFAAKwArAFAAKwBQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUAArAFAAKwBQACsAKwArACsAKwArAFAAKwArACsAKwBQACsAUAArAFAAKwBQAFAAUAArAFAAUAArAFAAKwArAFAAKwBQACsAUAArAFAAKwBQACsAUABQACsAUAArACsAUABQAFAAUAArAFAAUABQAFAAUABQAFAAKwBQAFAAUABQACsAUABQAFAAUAArAFAAKwBQAFAAUABQAFAAUABQAFAAUABQACsAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQACsAKwArACsAKwBQAFAAUAArAFAAUABQAFAAUAArAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUABQAFAAUAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArAB4AHgArACsAKwArACsAKwArACsAKwArACsAKwArACsATwBPAE8ATwBPAE8ATwBPAE8ATwBPAE8ATwAlACUAJQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAeACUAHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHgAeACUAJQAlACUAHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdAB0AHQAdACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACkAKQApACkAKQApACkAKQApACkAKQApACkAKQApACkAKQApACkAKQApACkAKQApACkAKQAlACUAJQAlACUAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAB4AHgAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAHgAeACUAJQAlACUAJQAeACUAJQAlACUAJQAgACAAIAAlACUAIAAlACUAIAAgACAAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAIQAhACEAIQAhACUAJQAgACAAJQAlACAAIAAgACAAIAAgACAAIAAgACAAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAIAAgACAAIAAlACUAJQAlACAAJQAgACAAIAAgACAAIAAgACAAIAAlACUAJQAgACUAJQAlACUAIAAgACAAJQAgACAAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAeACUAHgAlAB4AJQAlACUAJQAlACAAJQAlACUAJQAeACUAHgAeACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAHgAeAB4AHgAeAB4AHgAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAIAAgACUAJQAlACUAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAIAAlACUAJQAlACAAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAB4AHgAeAB4AHgAeACUAJQAlACUAJQAlACUAIAAgACAAJQAlACUAIAAgACAAIAAgAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AFwAXABcAFQAVABUAHgAeAB4AHgAlACUAJQAgACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAIAAgACAAJQAlACUAJQAlACUAJQAlACUAIAAlACUAJQAlACUAJQAlACUAJQAlACUAIAAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAlACUAJQAlACUAJQAlACUAJQAlACUAJQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAlACUAJQAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAlACUAJQAlAB4AHgAeAB4AHgAeAB4AHgAeAB4AJQAlACUAJQAlACUAHgAeAB4AHgAeAB4AHgAeACUAJQAlACUAJQAlACUAJQAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeAB4AHgAeACUAJQAlACUAJQAlACUAJQAlACUAJQAlACAAIAAgACAAIAAlACAAIAAlACUAJQAlACUAJQAgACUAJQAlACUAJQAlACUAJQAlACAAIAAgACAAIAAgACAAIAAgACAAJQAlACUAIAAgACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACsAKwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAJQAlACUAJQAlACUAJQAlACUAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAJQAlACUAJQAlACUAJQAlACUAJQAlAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAVwBXAFcAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQAlACUAJQArAAQAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsAKwArACsA';
+    /* @flow */
+
+    var LETTER_NUMBER_MODIFIER = 50; // Non-tailorable Line Breaking Classes
+
+    var BK = 1; //  Cause a line break (after)
+
+    var CR = 2; //  Cause a line break (after), except between CR and LF
+
+    var LF = 3; //  Cause a line break (after)
+
+    var CM = 4; //  Prohibit a line break between the character and the preceding character
+
+    var NL = 5; //  Cause a line break (after)
+
+    var WJ = 7; //  Prohibit line breaks before and after
+
+    var ZW = 8; //  Provide a break opportunity
+
+    var GL = 9; //  Prohibit line breaks before and after
+
+    var SP = 10; // Enable indirect line breaks
+
+    var ZWJ = 11; // Prohibit line breaks within joiner sequences
+    // Break Opportunities
+
+    var B2 = 12; //  Provide a line break opportunity before and after the character
+
+    var BA = 13; //  Generally provide a line break opportunity after the character
+
+    var BB = 14; //  Generally provide a line break opportunity before the character
+
+    var HY = 15; //  Provide a line break opportunity after the character, except in numeric context
+
+    var CB = 16; //   Provide a line break opportunity contingent on additional information
+    // Characters Prohibiting Certain Breaks
+
+    var CL = 17; //  Prohibit line breaks before
+
+    var CP = 18; //  Prohibit line breaks before
+
+    var EX = 19; //  Prohibit line breaks before
+
+    var IN = 20; //  Allow only indirect line breaks between pairs
+
+    var NS = 21; //  Allow only indirect line breaks before
+
+    var OP = 22; //  Prohibit line breaks after
+
+    var QU = 23; //  Act like they are both opening and closing
+    // Numeric Context
+
+    var IS = 24; //  Prevent breaks after any and before numeric
+
+    var NU = 25; //  Form numeric expressions for line breaking purposes
+
+    var PO = 26; //  Do not break following a numeric expression
+
+    var PR = 27; //  Do not break in front of a numeric expression
+
+    var SY = 28; //  Prevent a break before; and allow a break after
+    // Other Characters
+
+    var AI = 29; //  Act like AL when the resolvedEAW is N; otherwise; act as ID
+
+    var AL = 30; //  Are alphabetic characters or symbols that are used with alphabetic characters
+
+    var CJ = 31; //  Treat as NS or ID for strict or normal breaking.
+
+    var EB = 32; //  Do not break from following Emoji Modifier
+
+    var EM = 33; //  Do not break from preceding Emoji Base
+
+    var H2 = 34; //  Form Korean syllable blocks
+
+    var H3 = 35; //  Form Korean syllable blocks
+
+    var HL = 36; //  Do not break around a following hyphen; otherwise act as Alphabetic
+
+    var ID = 37; //  Break before or after; except in some numeric context
+
+    var JL = 38; //  Form Korean syllable blocks
+
+    var JV = 39; //  Form Korean syllable blocks
+
+    var JT = 40; //  Form Korean syllable blocks
+
+    var RI = 41; //  Keep pairs together. For pairs; break before and after other classes
+
+    var SA = 42; //  Provide a line break opportunity contingent on additional, language-specific context analysis
+
+    var XX = 43; //  Have as yet unknown line breaking behavior or unassigned code positions
+
+    var BREAK_MANDATORY = '!';
+    var BREAK_NOT_ALLOWED = '×';
+    var BREAK_ALLOWED = '÷';
+    var UnicodeTrie = createTrieFromBase64(base64);
+    var ALPHABETICS = [AL, HL];
+    var HARD_LINE_BREAKS = [BK, CR, LF, NL];
+    var SPACE = [SP, ZW];
+    var PREFIX_POSTFIX = [PR, PO];
+    var LINE_BREAKS = HARD_LINE_BREAKS.concat(SPACE);
+    var KOREAN_SYLLABLE_BLOCK = [JL, JV, JT, H2, H3];
+    var HYPHEN = [HY, BA];
+
+    var codePointsToCharacterClasses = function codePointsToCharacterClasses(codePoints, lineBreak) {
+      if (lineBreak === void 0) {
+        lineBreak = 'strict';
+      }
+
+      var types = [];
+      var indicies = [];
+      var categories = [];
+      codePoints.forEach(function (codePoint, index) {
+        var classType = UnicodeTrie.get(codePoint);
+
+        if (classType > LETTER_NUMBER_MODIFIER) {
+          categories.push(true);
+          classType -= LETTER_NUMBER_MODIFIER;
+        } else {
+          categories.push(false);
+        }
+
+        if (['normal', 'auto', 'loose'].indexOf(lineBreak) !== -1) {
+          // U+2010, – U+2013, 〜 U+301C, ゠ U+30A0
+          if ([0x2010, 0x2013, 0x301c, 0x30a0].indexOf(codePoint) !== -1) {
+            indicies.push(index);
+            return types.push(CB);
+          }
+        }
+
+        if (classType === CM || classType === ZWJ) {
+          // LB10 Treat any remaining combining mark or ZWJ as AL.
+          if (index === 0) {
+            indicies.push(index);
+            return types.push(AL);
+          } // LB9 Do not break a combining character sequence; treat it as if it has the line breaking class of
+          // the base character in all of the following rules. Treat ZWJ as if it were CM.
+
+
+          var prev = types[index - 1];
+
+          if (LINE_BREAKS.indexOf(prev) === -1) {
+            indicies.push(indicies[index - 1]);
+            return types.push(prev);
+          }
+
+          indicies.push(index);
+          return types.push(AL);
+        }
+
+        indicies.push(index);
+
+        if (classType === CJ) {
+          return types.push(lineBreak === 'strict' ? NS : ID);
+        }
+
+        if (classType === SA) {
+          return types.push(AL);
+        }
+
+        if (classType === AI) {
+          return types.push(AL);
+        } // For supplementary characters, a useful default is to treat characters in the range 10000..1FFFD as AL
+        // and characters in the ranges 20000..2FFFD and 30000..3FFFD as ID, until the implementation can be revised
+        // to take into account the actual line breaking properties for these characters.
+
+
+        if (classType === XX) {
+          if (codePoint >= 0x20000 && codePoint <= 0x2fffd || codePoint >= 0x30000 && codePoint <= 0x3fffd) {
+            return types.push(ID);
+          } else {
+            return types.push(AL);
+          }
+        }
+
+        types.push(classType);
+      });
+      return [indicies, types, categories];
+    };
+
+    var isAdjacentWithSpaceIgnored = function isAdjacentWithSpaceIgnored(a, b, currentIndex, classTypes) {
+      var current = classTypes[currentIndex];
+
+      if (Array.isArray(a) ? a.indexOf(current) !== -1 : a === current) {
+        var i = currentIndex;
+
+        while (i <= classTypes.length) {
+          i++;
+          var next = classTypes[i];
+
+          if (next === b) {
+            return true;
+          }
+
+          if (next !== SP) {
+            break;
+          }
+        }
+      }
+
+      if (current === SP) {
+        var i = currentIndex;
+
+        while (i > 0) {
+          i--;
+          var prev = classTypes[i];
+
+          if (Array.isArray(a) ? a.indexOf(prev) !== -1 : a === prev) {
+            var n = currentIndex;
+
+            while (n <= classTypes.length) {
+              n++;
+              var next = classTypes[n];
+
+              if (next === b) {
+                return true;
+              }
+
+              if (next !== SP) {
+                break;
+              }
+            }
+          }
+
+          if (prev !== SP) {
+            break;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    var previousNonSpaceClassType = function previousNonSpaceClassType(currentIndex, classTypes) {
+      var i = currentIndex;
+
+      while (i >= 0) {
+        var type = classTypes[i];
+
+        if (type === SP) {
+          i--;
+        } else {
+          return type;
+        }
+      }
+
+      return 0;
+    };
+
+    var _lineBreakAtIndex = function _lineBreakAtIndex(codePoints, classTypes, indicies, index, forbiddenBreaks) {
+      if (indicies[index] === 0) {
+        return BREAK_NOT_ALLOWED;
+      }
+
+      var currentIndex = index - 1;
+
+      if (Array.isArray(forbiddenBreaks) && forbiddenBreaks[currentIndex] === true) {
+        return BREAK_NOT_ALLOWED;
+      }
+
+      var beforeIndex = currentIndex - 1;
+      var afterIndex = currentIndex + 1;
+      var current = classTypes[currentIndex]; // LB4 Always break after hard line breaks.
+      // LB5 Treat CR followed by LF, as well as CR, LF, and NL as hard line breaks.
+
+      var before = beforeIndex >= 0 ? classTypes[beforeIndex] : 0;
+      var next = classTypes[afterIndex];
+
+      if (current === CR && next === LF) {
+        return BREAK_NOT_ALLOWED;
+      }
+
+      if (HARD_LINE_BREAKS.indexOf(current) !== -1) {
+        return BREAK_MANDATORY;
+      } // LB6 Do not break before hard line breaks.
+
+
+      if (HARD_LINE_BREAKS.indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB7 Do not break before spaces or zero width space.
+
+
+      if (SPACE.indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB8 Break before any character following a zero-width space, even if one or more spaces intervene.
+
+
+      if (previousNonSpaceClassType(currentIndex, classTypes) === ZW) {
+        return BREAK_ALLOWED;
+      } // LB8a Do not break between a zero width joiner and an ideograph, emoji base or emoji modifier.
+
+
+      if (UnicodeTrie.get(codePoints[currentIndex]) === ZWJ && (next === ID || next === EB || next === EM)) {
+        return BREAK_NOT_ALLOWED;
+      } // LB11 Do not break before or after Word joiner and related characters.
+
+
+      if (current === WJ || next === WJ) {
+        return BREAK_NOT_ALLOWED;
+      } // LB12 Do not break after NBSP and related characters.
+
+
+      if (current === GL) {
+        return BREAK_NOT_ALLOWED;
+      } // LB12a Do not break before NBSP and related characters, except after spaces and hyphens.
+
+
+      if ([SP, BA, HY].indexOf(current) === -1 && next === GL) {
+        return BREAK_NOT_ALLOWED;
+      } // LB13 Do not break before ‘]’ or ‘!’ or ‘;’ or ‘/’, even after spaces.
+
+
+      if ([CL, CP, EX, IS, SY].indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB14 Do not break after ‘[’, even after spaces.
+
+
+      if (previousNonSpaceClassType(currentIndex, classTypes) === OP) {
+        return BREAK_NOT_ALLOWED;
+      } // LB15 Do not break within ‘”[’, even with intervening spaces.
+
+
+      if (isAdjacentWithSpaceIgnored(QU, OP, currentIndex, classTypes)) {
+        return BREAK_NOT_ALLOWED;
+      } // LB16 Do not break between closing punctuation and a nonstarter (lb=NS), even with intervening spaces.
+
+
+      if (isAdjacentWithSpaceIgnored([CL, CP], NS, currentIndex, classTypes)) {
+        return BREAK_NOT_ALLOWED;
+      } // LB17 Do not break within ‘——’, even with intervening spaces.
+
+
+      if (isAdjacentWithSpaceIgnored(B2, B2, currentIndex, classTypes)) {
+        return BREAK_NOT_ALLOWED;
+      } // LB18 Break after spaces.
+
+
+      if (current === SP) {
+        return BREAK_ALLOWED;
+      } // LB19 Do not break before or after quotation marks, such as ‘ ” ’.
+
+
+      if (current === QU || next === QU) {
+        return BREAK_NOT_ALLOWED;
+      } // LB20 Break before and after unresolved CB.
+
+
+      if (next === CB || current === CB) {
+        return BREAK_ALLOWED;
+      } // LB21 Do not break before hyphen-minus, other hyphens, fixed-width spaces, small kana, and other non-starters, or after acute accents.
+
+
+      if ([BA, HY, NS].indexOf(next) !== -1 || current === BB) {
+        return BREAK_NOT_ALLOWED;
+      } // LB21a Don't break after Hebrew + Hyphen.
+
+
+      if (before === HL && HYPHEN.indexOf(current) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB21b Don’t break between Solidus and Hebrew letters.
+
+
+      if (current === SY && next === HL) {
+        return BREAK_NOT_ALLOWED;
+      } // LB22 Do not break between two ellipses, or between letters, numbers or exclamations and ellipsis.
+
+
+      if (next === IN && ALPHABETICS.concat(IN, EX, NU, ID, EB, EM).indexOf(current) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB23 Do not break between digits and letters.
+
+
+      if (ALPHABETICS.indexOf(next) !== -1 && current === NU || ALPHABETICS.indexOf(current) !== -1 && next === NU) {
+        return BREAK_NOT_ALLOWED;
+      } // LB23a Do not break between numeric prefixes and ideographs, or between ideographs and numeric postfixes.
+
+
+      if (current === PR && [ID, EB, EM].indexOf(next) !== -1 || [ID, EB, EM].indexOf(current) !== -1 && next === PO) {
+        return BREAK_NOT_ALLOWED;
+      } // LB24 Do not break between numeric prefix/postfix and letters, or between letters and prefix/postfix.
+
+
+      if (ALPHABETICS.indexOf(current) !== -1 && PREFIX_POSTFIX.indexOf(next) !== -1 || PREFIX_POSTFIX.indexOf(current) !== -1 && ALPHABETICS.indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB25 Do not break between the following pairs of classes relevant to numbers:
+
+
+      if ( // (PR | PO) × ( OP | HY )? NU
+      [PR, PO].indexOf(current) !== -1 && (next === NU || [OP, HY].indexOf(next) !== -1 && classTypes[afterIndex + 1] === NU) || // ( OP | HY ) × NU
+      [OP, HY].indexOf(current) !== -1 && next === NU || // NU ×	(NU | SY | IS)
+      current === NU && [NU, SY, IS].indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // NU (NU | SY | IS)* × (NU | SY | IS | CL | CP)
+
+
+      if ([NU, SY, IS, CL, CP].indexOf(next) !== -1) {
+        var prevIndex = currentIndex;
+
+        while (prevIndex >= 0) {
+          var type = classTypes[prevIndex];
+
+          if (type === NU) {
+            return BREAK_NOT_ALLOWED;
+          } else if ([SY, IS].indexOf(type) !== -1) {
+            prevIndex--;
+          } else {
+            break;
+          }
+        }
+      } // NU (NU | SY | IS)* (CL | CP)? × (PO | PR))
+
+
+      if ([PR, PO].indexOf(next) !== -1) {
+        var prevIndex = [CL, CP].indexOf(current) !== -1 ? beforeIndex : currentIndex;
+
+        while (prevIndex >= 0) {
+          var type = classTypes[prevIndex];
+
+          if (type === NU) {
+            return BREAK_NOT_ALLOWED;
+          } else if ([SY, IS].indexOf(type) !== -1) {
+            prevIndex--;
+          } else {
+            break;
+          }
+        }
+      } // LB26 Do not break a Korean syllable.
+
+
+      if (JL === current && [JL, JV, H2, H3].indexOf(next) !== -1 || [JV, H2].indexOf(current) !== -1 && [JV, JT].indexOf(next) !== -1 || [JT, H3].indexOf(current) !== -1 && next === JT) {
+        return BREAK_NOT_ALLOWED;
+      } // LB27 Treat a Korean Syllable Block the same as ID.
+
+
+      if (KOREAN_SYLLABLE_BLOCK.indexOf(current) !== -1 && [IN, PO].indexOf(next) !== -1 || KOREAN_SYLLABLE_BLOCK.indexOf(next) !== -1 && current === PR) {
+        return BREAK_NOT_ALLOWED;
+      } // LB28 Do not break between alphabetics (“at”).
+
+
+      if (ALPHABETICS.indexOf(current) !== -1 && ALPHABETICS.indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB29 Do not break between numeric punctuation and alphabetics (“e.g.”).
+
+
+      if (current === IS && ALPHABETICS.indexOf(next) !== -1) {
+        return BREAK_NOT_ALLOWED;
+      } // LB30 Do not break between letters, numbers, or ordinary symbols and opening or closing parentheses.
+
+
+      if (ALPHABETICS.concat(NU).indexOf(current) !== -1 && next === OP || ALPHABETICS.concat(NU).indexOf(next) !== -1 && current === CP) {
+        return BREAK_NOT_ALLOWED;
+      } // LB30a Break between two regional indicator symbols if and only if there are an even number of regional
+      // indicators preceding the position of the break.
+
+
+      if (current === RI && next === RI) {
+        var i = indicies[currentIndex];
+        var count = 1;
+
+        while (i > 0) {
+          i--;
+
+          if (classTypes[i] === RI) {
+            count++;
+          } else {
+            break;
+          }
+        }
+
+        if (count % 2 !== 0) {
+          return BREAK_NOT_ALLOWED;
+        }
+      } // LB30b Do not break between an emoji base and an emoji modifier.
+
+
+      if (current === EB && next === EM) {
+        return BREAK_NOT_ALLOWED;
+      }
+
+      return BREAK_ALLOWED;
+    };
+
+    var cssFormattedClasses = function cssFormattedClasses(codePoints, options) {
+      if (!options) {
+        options = {
+          lineBreak: 'normal',
+          wordBreak: 'normal'
+        };
+      }
+
+      var _a = codePointsToCharacterClasses(codePoints, options.lineBreak),
+          indicies = _a[0],
+          classTypes = _a[1],
+          isLetterNumber = _a[2];
+
+      if (options.wordBreak === 'break-all' || options.wordBreak === 'break-word') {
+        classTypes = classTypes.map(function (type) {
+          return [NU, AL, SA].indexOf(type) !== -1 ? ID : type;
+        });
+      }
+
+      var forbiddenBreakpoints = options.wordBreak === 'keep-all' ? isLetterNumber.map(function (letterNumber, i) {
+        return letterNumber && codePoints[i] >= 0x4e00 && codePoints[i] <= 0x9fff;
+      }) : undefined;
+      return [indicies, classTypes, forbiddenBreakpoints];
+    };
+
+    var Break =
+    /** @class */
+    function () {
+      function Break(codePoints, lineBreak, start, end) {
+        this.codePoints = codePoints;
+        this.required = lineBreak === BREAK_MANDATORY;
+        this.start = start;
+        this.end = end;
+      }
+
+      Break.prototype.slice = function () {
+        return fromCodePoint.apply(void 0, this.codePoints.slice(this.start, this.end));
+      };
+
+      return Break;
+    }();
+
+    var LineBreaker = function LineBreaker(str, options) {
+      var codePoints = toCodePoints(str);
+
+      var _a = cssFormattedClasses(codePoints, options),
+          indicies = _a[0],
+          classTypes = _a[1],
+          forbiddenBreakpoints = _a[2];
+
+      var length = codePoints.length;
+      var lastEnd = 0;
+      var nextIndex = 0;
+      return {
+        next: function next() {
+          if (nextIndex >= length) {
+            return {
+              done: true,
+              value: null
+            };
+          }
+
+          var lineBreak = BREAK_NOT_ALLOWED;
+
+          while (nextIndex < length && (lineBreak = _lineBreakAtIndex(codePoints, classTypes, indicies, ++nextIndex, forbiddenBreakpoints)) === BREAK_NOT_ALLOWED) {}
+
+          if (lineBreak !== BREAK_NOT_ALLOWED || nextIndex === length) {
+            var value = new Break(codePoints, lineBreak, lastEnd, nextIndex);
+            lastEnd = nextIndex;
+            return {
+              value: value,
+              done: false
+            };
+          }
+
+          return {
+            done: true,
+            value: null
+          };
+        }
+      };
+    }; // https://www.w3.org/TR/css-syntax-3
+
+
+    var TokenType;
+
+    (function (TokenType) {
+      TokenType[TokenType["STRING_TOKEN"] = 0] = "STRING_TOKEN";
+      TokenType[TokenType["BAD_STRING_TOKEN"] = 1] = "BAD_STRING_TOKEN";
+      TokenType[TokenType["LEFT_PARENTHESIS_TOKEN"] = 2] = "LEFT_PARENTHESIS_TOKEN";
+      TokenType[TokenType["RIGHT_PARENTHESIS_TOKEN"] = 3] = "RIGHT_PARENTHESIS_TOKEN";
+      TokenType[TokenType["COMMA_TOKEN"] = 4] = "COMMA_TOKEN";
+      TokenType[TokenType["HASH_TOKEN"] = 5] = "HASH_TOKEN";
+      TokenType[TokenType["DELIM_TOKEN"] = 6] = "DELIM_TOKEN";
+      TokenType[TokenType["AT_KEYWORD_TOKEN"] = 7] = "AT_KEYWORD_TOKEN";
+      TokenType[TokenType["PREFIX_MATCH_TOKEN"] = 8] = "PREFIX_MATCH_TOKEN";
+      TokenType[TokenType["DASH_MATCH_TOKEN"] = 9] = "DASH_MATCH_TOKEN";
+      TokenType[TokenType["INCLUDE_MATCH_TOKEN"] = 10] = "INCLUDE_MATCH_TOKEN";
+      TokenType[TokenType["LEFT_CURLY_BRACKET_TOKEN"] = 11] = "LEFT_CURLY_BRACKET_TOKEN";
+      TokenType[TokenType["RIGHT_CURLY_BRACKET_TOKEN"] = 12] = "RIGHT_CURLY_BRACKET_TOKEN";
+      TokenType[TokenType["SUFFIX_MATCH_TOKEN"] = 13] = "SUFFIX_MATCH_TOKEN";
+      TokenType[TokenType["SUBSTRING_MATCH_TOKEN"] = 14] = "SUBSTRING_MATCH_TOKEN";
+      TokenType[TokenType["DIMENSION_TOKEN"] = 15] = "DIMENSION_TOKEN";
+      TokenType[TokenType["PERCENTAGE_TOKEN"] = 16] = "PERCENTAGE_TOKEN";
+      TokenType[TokenType["NUMBER_TOKEN"] = 17] = "NUMBER_TOKEN";
+      TokenType[TokenType["FUNCTION"] = 18] = "FUNCTION";
+      TokenType[TokenType["FUNCTION_TOKEN"] = 19] = "FUNCTION_TOKEN";
+      TokenType[TokenType["IDENT_TOKEN"] = 20] = "IDENT_TOKEN";
+      TokenType[TokenType["COLUMN_TOKEN"] = 21] = "COLUMN_TOKEN";
+      TokenType[TokenType["URL_TOKEN"] = 22] = "URL_TOKEN";
+      TokenType[TokenType["BAD_URL_TOKEN"] = 23] = "BAD_URL_TOKEN";
+      TokenType[TokenType["CDC_TOKEN"] = 24] = "CDC_TOKEN";
+      TokenType[TokenType["CDO_TOKEN"] = 25] = "CDO_TOKEN";
+      TokenType[TokenType["COLON_TOKEN"] = 26] = "COLON_TOKEN";
+      TokenType[TokenType["SEMICOLON_TOKEN"] = 27] = "SEMICOLON_TOKEN";
+      TokenType[TokenType["LEFT_SQUARE_BRACKET_TOKEN"] = 28] = "LEFT_SQUARE_BRACKET_TOKEN";
+      TokenType[TokenType["RIGHT_SQUARE_BRACKET_TOKEN"] = 29] = "RIGHT_SQUARE_BRACKET_TOKEN";
+      TokenType[TokenType["UNICODE_RANGE_TOKEN"] = 30] = "UNICODE_RANGE_TOKEN";
+      TokenType[TokenType["WHITESPACE_TOKEN"] = 31] = "WHITESPACE_TOKEN";
+      TokenType[TokenType["EOF_TOKEN"] = 32] = "EOF_TOKEN";
+    })(TokenType || (TokenType = {}));
+
+    var FLAG_UNRESTRICTED = 1 << 0;
+    var FLAG_ID = 1 << 1;
+    var FLAG_INTEGER = 1 << 2;
+    var FLAG_NUMBER = 1 << 3;
+    var LINE_FEED = 0x000a;
+    var SOLIDUS = 0x002f;
+    var REVERSE_SOLIDUS = 0x005c;
+    var CHARACTER_TABULATION = 0x0009;
+    var SPACE$1 = 0x0020;
+    var QUOTATION_MARK = 0x0022;
+    var EQUALS_SIGN = 0x003d;
+    var NUMBER_SIGN = 0x0023;
+    var DOLLAR_SIGN = 0x0024;
+    var PERCENTAGE_SIGN = 0x0025;
+    var APOSTROPHE = 0x0027;
+    var LEFT_PARENTHESIS = 0x0028;
+    var RIGHT_PARENTHESIS = 0x0029;
+    var LOW_LINE = 0x005f;
+    var HYPHEN_MINUS = 0x002d;
+    var EXCLAMATION_MARK = 0x0021;
+    var LESS_THAN_SIGN = 0x003c;
+    var GREATER_THAN_SIGN = 0x003e;
+    var COMMERCIAL_AT = 0x0040;
+    var LEFT_SQUARE_BRACKET = 0x005b;
+    var RIGHT_SQUARE_BRACKET = 0x005d;
+    var CIRCUMFLEX_ACCENT = 0x003d;
+    var LEFT_CURLY_BRACKET = 0x007b;
+    var QUESTION_MARK = 0x003f;
+    var RIGHT_CURLY_BRACKET = 0x007d;
+    var VERTICAL_LINE = 0x007c;
+    var TILDE = 0x007e;
+    var CONTROL = 0x0080;
+    var REPLACEMENT_CHARACTER = 0xfffd;
+    var ASTERISK = 0x002a;
+    var PLUS_SIGN = 0x002b;
+    var COMMA = 0x002c;
+    var COLON = 0x003a;
+    var SEMICOLON = 0x003b;
+    var FULL_STOP = 0x002e;
+    var NULL = 0x0000;
+    var BACKSPACE = 0x0008;
+    var LINE_TABULATION = 0x000b;
+    var SHIFT_OUT = 0x000e;
+    var INFORMATION_SEPARATOR_ONE = 0x001f;
+    var DELETE = 0x007f;
+    var EOF = -1;
+    var ZERO = 0x0030;
+    var a = 0x0061;
+    var e = 0x0065;
+    var f = 0x0066;
+    var u = 0x0075;
+    var z = 0x007a;
+    var A = 0x0041;
+    var E = 0x0045;
+    var F = 0x0046;
+    var U = 0x0055;
+    var Z = 0x005a;
+
+    var isDigit = function isDigit(codePoint) {
+      return codePoint >= ZERO && codePoint <= 0x0039;
+    };
+
+    var isSurrogateCodePoint = function isSurrogateCodePoint(codePoint) {
+      return codePoint >= 0xd800 && codePoint <= 0xdfff;
+    };
+
+    var isHex = function isHex(codePoint) {
+      return isDigit(codePoint) || codePoint >= A && codePoint <= F || codePoint >= a && codePoint <= f;
+    };
+
+    var isLowerCaseLetter = function isLowerCaseLetter(codePoint) {
+      return codePoint >= a && codePoint <= z;
+    };
+
+    var isUpperCaseLetter = function isUpperCaseLetter(codePoint) {
+      return codePoint >= A && codePoint <= Z;
+    };
+
+    var isLetter = function isLetter(codePoint) {
+      return isLowerCaseLetter(codePoint) || isUpperCaseLetter(codePoint);
+    };
+
+    var isNonASCIICodePoint = function isNonASCIICodePoint(codePoint) {
+      return codePoint >= CONTROL;
+    };
+
+    var isWhiteSpace = function isWhiteSpace(codePoint) {
+      return codePoint === LINE_FEED || codePoint === CHARACTER_TABULATION || codePoint === SPACE$1;
+    };
+
+    var isNameStartCodePoint = function isNameStartCodePoint(codePoint) {
+      return isLetter(codePoint) || isNonASCIICodePoint(codePoint) || codePoint === LOW_LINE;
+    };
+
+    var isNameCodePoint = function isNameCodePoint(codePoint) {
+      return isNameStartCodePoint(codePoint) || isDigit(codePoint) || codePoint === HYPHEN_MINUS;
+    };
+
+    var isNonPrintableCodePoint = function isNonPrintableCodePoint(codePoint) {
+      return codePoint >= NULL && codePoint <= BACKSPACE || codePoint === LINE_TABULATION || codePoint >= SHIFT_OUT && codePoint <= INFORMATION_SEPARATOR_ONE || codePoint === DELETE;
+    };
+
+    var isValidEscape = function isValidEscape(c1, c2) {
+      if (c1 !== REVERSE_SOLIDUS) {
+        return false;
+      }
+
+      return c2 !== LINE_FEED;
+    };
+
+    var isIdentifierStart = function isIdentifierStart(c1, c2, c3) {
+      if (c1 === HYPHEN_MINUS) {
+        return isNameStartCodePoint(c2) || isValidEscape(c2, c3);
+      } else if (isNameStartCodePoint(c1)) {
+        return true;
+      } else if (c1 === REVERSE_SOLIDUS && isValidEscape(c1, c2)) {
+        return true;
+      }
+
+      return false;
+    };
+
+    var isNumberStart = function isNumberStart(c1, c2, c3) {
+      if (c1 === PLUS_SIGN || c1 === HYPHEN_MINUS) {
+        if (isDigit(c2)) {
+          return true;
+        }
+
+        return c2 === FULL_STOP && isDigit(c3);
+      }
+
+      if (c1 === FULL_STOP) {
+        return isDigit(c2);
+      }
+
+      return isDigit(c1);
+    };
+
+    var stringToNumber = function stringToNumber(codePoints) {
+      var c = 0;
+      var sign = 1;
+
+      if (codePoints[c] === PLUS_SIGN || codePoints[c] === HYPHEN_MINUS) {
+        if (codePoints[c] === HYPHEN_MINUS) {
+          sign = -1;
+        }
+
+        c++;
+      }
+
+      var integers = [];
+
+      while (isDigit(codePoints[c])) {
+        integers.push(codePoints[c++]);
+      }
+
+      var _int = integers.length ? parseInt(fromCodePoint.apply(void 0, integers), 10) : 0;
+
+      if (codePoints[c] === FULL_STOP) {
+        c++;
+      }
+
+      var fraction = [];
+
+      while (isDigit(codePoints[c])) {
+        fraction.push(codePoints[c++]);
+      }
+
+      var fracd = fraction.length;
+      var frac = fracd ? parseInt(fromCodePoint.apply(void 0, fraction), 10) : 0;
+
+      if (codePoints[c] === E || codePoints[c] === e) {
+        c++;
+      }
+
+      var expsign = 1;
+
+      if (codePoints[c] === PLUS_SIGN || codePoints[c] === HYPHEN_MINUS) {
+        if (codePoints[c] === HYPHEN_MINUS) {
+          expsign = -1;
+        }
+
+        c++;
+      }
+
+      var exponent = [];
+
+      while (isDigit(codePoints[c])) {
+        exponent.push(codePoints[c++]);
+      }
+
+      var exp = exponent.length ? parseInt(fromCodePoint.apply(void 0, exponent), 10) : 0;
+      return sign * (_int + frac * Math.pow(10, -fracd)) * Math.pow(10, expsign * exp);
+    };
+
+    var LEFT_PARENTHESIS_TOKEN = {
+      type: TokenType.LEFT_PARENTHESIS_TOKEN
+    };
+    var RIGHT_PARENTHESIS_TOKEN = {
+      type: TokenType.RIGHT_PARENTHESIS_TOKEN
+    };
+    var COMMA_TOKEN = {
+      type: TokenType.COMMA_TOKEN
+    };
+    var SUFFIX_MATCH_TOKEN = {
+      type: TokenType.SUFFIX_MATCH_TOKEN
+    };
+    var PREFIX_MATCH_TOKEN = {
+      type: TokenType.PREFIX_MATCH_TOKEN
+    };
+    var COLUMN_TOKEN = {
+      type: TokenType.COLUMN_TOKEN
+    };
+    var DASH_MATCH_TOKEN = {
+      type: TokenType.DASH_MATCH_TOKEN
+    };
+    var INCLUDE_MATCH_TOKEN = {
+      type: TokenType.INCLUDE_MATCH_TOKEN
+    };
+    var LEFT_CURLY_BRACKET_TOKEN = {
+      type: TokenType.LEFT_CURLY_BRACKET_TOKEN
+    };
+    var RIGHT_CURLY_BRACKET_TOKEN = {
+      type: TokenType.RIGHT_CURLY_BRACKET_TOKEN
+    };
+    var SUBSTRING_MATCH_TOKEN = {
+      type: TokenType.SUBSTRING_MATCH_TOKEN
+    };
+    var BAD_URL_TOKEN = {
+      type: TokenType.BAD_URL_TOKEN
+    };
+    var BAD_STRING_TOKEN = {
+      type: TokenType.BAD_STRING_TOKEN
+    };
+    var CDO_TOKEN = {
+      type: TokenType.CDO_TOKEN
+    };
+    var CDC_TOKEN = {
+      type: TokenType.CDC_TOKEN
+    };
+    var COLON_TOKEN = {
+      type: TokenType.COLON_TOKEN
+    };
+    var SEMICOLON_TOKEN = {
+      type: TokenType.SEMICOLON_TOKEN
+    };
+    var LEFT_SQUARE_BRACKET_TOKEN = {
+      type: TokenType.LEFT_SQUARE_BRACKET_TOKEN
+    };
+    var RIGHT_SQUARE_BRACKET_TOKEN = {
+      type: TokenType.RIGHT_SQUARE_BRACKET_TOKEN
+    };
+    var WHITESPACE_TOKEN = {
+      type: TokenType.WHITESPACE_TOKEN
+    };
+    var EOF_TOKEN = {
+      type: TokenType.EOF_TOKEN
+    };
+
+    var Tokenizer =
+    /** @class */
+    function () {
+      function Tokenizer() {
+        this._value = [];
+      }
+
+      Tokenizer.prototype.write = function (chunk) {
+        this._value = this._value.concat(toCodePoints(chunk));
+      };
+
+      Tokenizer.prototype.read = function () {
+        var tokens = [];
+        var token = this.consumeToken();
+
+        while (token !== EOF_TOKEN) {
+          tokens.push(token);
+          token = this.consumeToken();
+        }
+
+        return tokens;
+      };
+
+      Tokenizer.prototype.consumeToken = function () {
+        var codePoint = this.consumeCodePoint();
+
+        switch (codePoint) {
+          case QUOTATION_MARK:
+            return this.consumeStringToken(QUOTATION_MARK);
+
+          case NUMBER_SIGN:
+            var c1 = this.peekCodePoint(0);
+            var c2 = this.peekCodePoint(1);
+            var c3 = this.peekCodePoint(2);
+
+            if (isNameCodePoint(c1) || isValidEscape(c2, c3)) {
+              var flags = isIdentifierStart(c1, c2, c3) ? FLAG_ID : FLAG_UNRESTRICTED;
+              var value = this.consumeName();
+              return {
+                type: TokenType.HASH_TOKEN,
+                value: value,
+                flags: flags
+              };
+            }
+
+            break;
+
+          case DOLLAR_SIGN:
+            if (this.peekCodePoint(0) === EQUALS_SIGN) {
+              this.consumeCodePoint();
+              return SUFFIX_MATCH_TOKEN;
+            }
+
+            break;
+
+          case APOSTROPHE:
+            return this.consumeStringToken(APOSTROPHE);
+
+          case LEFT_PARENTHESIS:
+            return LEFT_PARENTHESIS_TOKEN;
+
+          case RIGHT_PARENTHESIS:
+            return RIGHT_PARENTHESIS_TOKEN;
+
+          case ASTERISK:
+            if (this.peekCodePoint(0) === EQUALS_SIGN) {
+              this.consumeCodePoint();
+              return SUBSTRING_MATCH_TOKEN;
+            }
+
+            break;
+
+          case PLUS_SIGN:
+            if (isNumberStart(codePoint, this.peekCodePoint(0), this.peekCodePoint(1))) {
+              this.reconsumeCodePoint(codePoint);
+              return this.consumeNumericToken();
+            }
+
+            break;
+
+          case COMMA:
+            return COMMA_TOKEN;
+
+          case HYPHEN_MINUS:
+            var e1 = codePoint;
+            var e2 = this.peekCodePoint(0);
+            var e3 = this.peekCodePoint(1);
+
+            if (isNumberStart(e1, e2, e3)) {
+              this.reconsumeCodePoint(codePoint);
+              return this.consumeNumericToken();
+            }
+
+            if (isIdentifierStart(e1, e2, e3)) {
+              this.reconsumeCodePoint(codePoint);
+              return this.consumeIdentLikeToken();
+            }
+
+            if (e2 === HYPHEN_MINUS && e3 === GREATER_THAN_SIGN) {
+              this.consumeCodePoint();
+              this.consumeCodePoint();
+              return CDC_TOKEN;
+            }
+
+            break;
+
+          case FULL_STOP:
+            if (isNumberStart(codePoint, this.peekCodePoint(0), this.peekCodePoint(1))) {
+              this.reconsumeCodePoint(codePoint);
+              return this.consumeNumericToken();
+            }
+
+            break;
+
+          case SOLIDUS:
+            if (this.peekCodePoint(0) === ASTERISK) {
+              this.consumeCodePoint();
+
+              while (true) {
+                var c = this.consumeCodePoint();
+
+                if (c === ASTERISK) {
+                  c = this.consumeCodePoint();
+
+                  if (c === SOLIDUS) {
+                    return this.consumeToken();
+                  }
+                }
+
+                if (c === EOF) {
+                  return this.consumeToken();
+                }
+              }
+            }
+
+            break;
+
+          case COLON:
+            return COLON_TOKEN;
+
+          case SEMICOLON:
+            return SEMICOLON_TOKEN;
+
+          case LESS_THAN_SIGN:
+            if (this.peekCodePoint(0) === EXCLAMATION_MARK && this.peekCodePoint(1) === HYPHEN_MINUS && this.peekCodePoint(2) === HYPHEN_MINUS) {
+              this.consumeCodePoint();
+              this.consumeCodePoint();
+              return CDO_TOKEN;
+            }
+
+            break;
+
+          case COMMERCIAL_AT:
+            var a1 = this.peekCodePoint(0);
+            var a2 = this.peekCodePoint(1);
+            var a3 = this.peekCodePoint(2);
+
+            if (isIdentifierStart(a1, a2, a3)) {
+              var value = this.consumeName();
+              return {
+                type: TokenType.AT_KEYWORD_TOKEN,
+                value: value
+              };
+            }
+
+            break;
+
+          case LEFT_SQUARE_BRACKET:
+            return LEFT_SQUARE_BRACKET_TOKEN;
+
+          case REVERSE_SOLIDUS:
+            if (isValidEscape(codePoint, this.peekCodePoint(0))) {
+              this.reconsumeCodePoint(codePoint);
+              return this.consumeIdentLikeToken();
+            }
+
+            break;
+
+          case RIGHT_SQUARE_BRACKET:
+            return RIGHT_SQUARE_BRACKET_TOKEN;
+
+          case CIRCUMFLEX_ACCENT:
+            if (this.peekCodePoint(0) === EQUALS_SIGN) {
+              this.consumeCodePoint();
+              return PREFIX_MATCH_TOKEN;
+            }
+
+            break;
+
+          case LEFT_CURLY_BRACKET:
+            return LEFT_CURLY_BRACKET_TOKEN;
+
+          case RIGHT_CURLY_BRACKET:
+            return RIGHT_CURLY_BRACKET_TOKEN;
+
+          case u:
+          case U:
+            var u1 = this.peekCodePoint(0);
+            var u2 = this.peekCodePoint(1);
+
+            if (u1 === PLUS_SIGN && (isHex(u2) || u2 === QUESTION_MARK)) {
+              this.consumeCodePoint();
+              this.consumeUnicodeRangeToken();
+            }
+
+            this.reconsumeCodePoint(codePoint);
+            return this.consumeIdentLikeToken();
+
+          case VERTICAL_LINE:
+            if (this.peekCodePoint(0) === EQUALS_SIGN) {
+              this.consumeCodePoint();
+              return DASH_MATCH_TOKEN;
+            }
+
+            if (this.peekCodePoint(0) === VERTICAL_LINE) {
+              this.consumeCodePoint();
+              return COLUMN_TOKEN;
+            }
+
+            break;
+
+          case TILDE:
+            if (this.peekCodePoint(0) === EQUALS_SIGN) {
+              this.consumeCodePoint();
+              return INCLUDE_MATCH_TOKEN;
+            }
+
+            break;
+
+          case EOF:
+            return EOF_TOKEN;
+        }
+
+        if (isWhiteSpace(codePoint)) {
+          this.consumeWhiteSpace();
+          return WHITESPACE_TOKEN;
+        }
+
+        if (isDigit(codePoint)) {
+          this.reconsumeCodePoint(codePoint);
+          return this.consumeNumericToken();
+        }
+
+        if (isNameStartCodePoint(codePoint)) {
+          this.reconsumeCodePoint(codePoint);
+          return this.consumeIdentLikeToken();
+        }
+
+        return {
+          type: TokenType.DELIM_TOKEN,
+          value: fromCodePoint(codePoint)
+        };
+      };
+
+      Tokenizer.prototype.consumeCodePoint = function () {
+        var value = this._value.shift();
+
+        return typeof value === 'undefined' ? -1 : value;
+      };
+
+      Tokenizer.prototype.reconsumeCodePoint = function (codePoint) {
+        this._value.unshift(codePoint);
+      };
+
+      Tokenizer.prototype.peekCodePoint = function (delta) {
+        if (delta >= this._value.length) {
+          return -1;
+        }
+
+        return this._value[delta];
+      };
+
+      Tokenizer.prototype.consumeUnicodeRangeToken = function () {
+        var digits = [];
+        var codePoint = this.consumeCodePoint();
+
+        while (isHex(codePoint) && digits.length < 6) {
+          digits.push(codePoint);
+          codePoint = this.consumeCodePoint();
+        }
+
+        var questionMarks = false;
+
+        while (codePoint === QUESTION_MARK && digits.length < 6) {
+          digits.push(codePoint);
+          codePoint = this.consumeCodePoint();
+          questionMarks = true;
+        }
+
+        if (questionMarks) {
+          var start_1 = parseInt(fromCodePoint.apply(void 0, digits.map(function (digit) {
+            return digit === QUESTION_MARK ? ZERO : digit;
+          })), 16);
+          var end = parseInt(fromCodePoint.apply(void 0, digits.map(function (digit) {
+            return digit === QUESTION_MARK ? F : digit;
+          })), 16);
+          return {
+            type: TokenType.UNICODE_RANGE_TOKEN,
+            start: start_1,
+            end: end
+          };
+        }
+
+        var start = parseInt(fromCodePoint.apply(void 0, digits), 16);
+
+        if (this.peekCodePoint(0) === HYPHEN_MINUS && isHex(this.peekCodePoint(1))) {
+          this.consumeCodePoint();
+          codePoint = this.consumeCodePoint();
+          var endDigits = [];
+
+          while (isHex(codePoint) && endDigits.length < 6) {
+            endDigits.push(codePoint);
+            codePoint = this.consumeCodePoint();
+          }
+
+          var end = parseInt(fromCodePoint.apply(void 0, endDigits), 16);
+          return {
+            type: TokenType.UNICODE_RANGE_TOKEN,
+            start: start,
+            end: end
+          };
+        } else {
+          return {
+            type: TokenType.UNICODE_RANGE_TOKEN,
+            start: start,
+            end: start
+          };
+        }
+      };
+
+      Tokenizer.prototype.consumeIdentLikeToken = function () {
+        var value = this.consumeName();
+
+        if (value.toLowerCase() === 'url' && this.peekCodePoint(0) === LEFT_PARENTHESIS) {
+          this.consumeCodePoint();
+          return this.consumeUrlToken();
+        } else if (this.peekCodePoint(0) === LEFT_PARENTHESIS) {
+          this.consumeCodePoint();
+          return {
+            type: TokenType.FUNCTION_TOKEN,
+            value: value
+          };
+        }
+
+        return {
+          type: TokenType.IDENT_TOKEN,
+          value: value
+        };
+      };
+
+      Tokenizer.prototype.consumeUrlToken = function () {
+        var value = [];
+        this.consumeWhiteSpace();
+
+        if (this.peekCodePoint(0) === EOF) {
+          return {
+            type: TokenType.URL_TOKEN,
+            value: ''
+          };
+        }
+
+        var next = this.peekCodePoint(0);
+
+        if (next === APOSTROPHE || next === QUOTATION_MARK) {
+          var stringToken = this.consumeStringToken(this.consumeCodePoint());
+
+          if (stringToken.type === TokenType.STRING_TOKEN) {
+            this.consumeWhiteSpace();
+
+            if (this.peekCodePoint(0) === EOF || this.peekCodePoint(0) === RIGHT_PARENTHESIS) {
+              this.consumeCodePoint();
+              return {
+                type: TokenType.URL_TOKEN,
+                value: stringToken.value
+              };
+            }
+          }
+
+          this.consumeBadUrlRemnants();
+          return BAD_URL_TOKEN;
+        }
+
+        while (true) {
+          var codePoint = this.consumeCodePoint();
+
+          if (codePoint === EOF || codePoint === RIGHT_PARENTHESIS) {
+            return {
+              type: TokenType.URL_TOKEN,
+              value: fromCodePoint.apply(void 0, value)
+            };
+          } else if (isWhiteSpace(codePoint)) {
+            this.consumeWhiteSpace();
+
+            if (this.peekCodePoint(0) === EOF || this.peekCodePoint(0) === RIGHT_PARENTHESIS) {
+              this.consumeCodePoint();
+              return {
+                type: TokenType.URL_TOKEN,
+                value: fromCodePoint.apply(void 0, value)
+              };
+            }
+
+            this.consumeBadUrlRemnants();
+            return BAD_URL_TOKEN;
+          } else if (codePoint === QUOTATION_MARK || codePoint === APOSTROPHE || codePoint === LEFT_PARENTHESIS || isNonPrintableCodePoint(codePoint)) {
+            this.consumeBadUrlRemnants();
+            return BAD_URL_TOKEN;
+          } else if (codePoint === REVERSE_SOLIDUS) {
+            if (isValidEscape(codePoint, this.peekCodePoint(0))) {
+              value.push(this.consumeEscapedCodePoint());
+            } else {
+              this.consumeBadUrlRemnants();
+              return BAD_URL_TOKEN;
+            }
+          } else {
+            value.push(codePoint);
+          }
+        }
+      };
+
+      Tokenizer.prototype.consumeWhiteSpace = function () {
+        while (isWhiteSpace(this.peekCodePoint(0))) {
+          this.consumeCodePoint();
+        }
+      };
+
+      Tokenizer.prototype.consumeBadUrlRemnants = function () {
+        while (true) {
+          var codePoint = this.consumeCodePoint();
+
+          if (codePoint === RIGHT_PARENTHESIS || codePoint === EOF) {
+            return;
+          }
+
+          if (isValidEscape(codePoint, this.peekCodePoint(0))) {
+            this.consumeEscapedCodePoint();
+          }
+        }
+      };
+
+      Tokenizer.prototype.consumeStringSlice = function (count) {
+        var SLICE_STACK_SIZE = 60000;
+        var value = '';
+
+        while (count > 0) {
+          var amount = Math.min(SLICE_STACK_SIZE, count);
+          value += fromCodePoint.apply(void 0, this._value.splice(0, amount));
+          count -= amount;
+        }
+
+        this._value.shift();
+
+        return value;
+      };
+
+      Tokenizer.prototype.consumeStringToken = function (endingCodePoint) {
+        var value = '';
+        var i = 0;
+
+        do {
+          var codePoint = this._value[i];
+
+          if (codePoint === EOF || codePoint === undefined || codePoint === endingCodePoint) {
+            value += this.consumeStringSlice(i);
+            return {
+              type: TokenType.STRING_TOKEN,
+              value: value
+            };
+          }
+
+          if (codePoint === LINE_FEED) {
+            this._value.splice(0, i);
+
+            return BAD_STRING_TOKEN;
+          }
+
+          if (codePoint === REVERSE_SOLIDUS) {
+            var next = this._value[i + 1];
+
+            if (next !== EOF && next !== undefined) {
+              if (next === LINE_FEED) {
+                value += this.consumeStringSlice(i);
+                i = -1;
+
+                this._value.shift();
+              } else if (isValidEscape(codePoint, next)) {
+                value += this.consumeStringSlice(i);
+                value += fromCodePoint(this.consumeEscapedCodePoint());
+                i = -1;
+              }
+            }
+          }
+
+          i++;
+        } while (true);
+      };
+
+      Tokenizer.prototype.consumeNumber = function () {
+        var repr = [];
+        var type = FLAG_INTEGER;
+        var c1 = this.peekCodePoint(0);
+
+        if (c1 === PLUS_SIGN || c1 === HYPHEN_MINUS) {
+          repr.push(this.consumeCodePoint());
+        }
+
+        while (isDigit(this.peekCodePoint(0))) {
+          repr.push(this.consumeCodePoint());
+        }
+
+        c1 = this.peekCodePoint(0);
+        var c2 = this.peekCodePoint(1);
+
+        if (c1 === FULL_STOP && isDigit(c2)) {
+          repr.push(this.consumeCodePoint(), this.consumeCodePoint());
+          type = FLAG_NUMBER;
+
+          while (isDigit(this.peekCodePoint(0))) {
+            repr.push(this.consumeCodePoint());
+          }
+        }
+
+        c1 = this.peekCodePoint(0);
+        c2 = this.peekCodePoint(1);
+        var c3 = this.peekCodePoint(2);
+
+        if ((c1 === E || c1 === e) && ((c2 === PLUS_SIGN || c2 === HYPHEN_MINUS) && isDigit(c3) || isDigit(c2))) {
+          repr.push(this.consumeCodePoint(), this.consumeCodePoint());
+          type = FLAG_NUMBER;
+
+          while (isDigit(this.peekCodePoint(0))) {
+            repr.push(this.consumeCodePoint());
+          }
+        }
+
+        return [stringToNumber(repr), type];
+      };
+
+      Tokenizer.prototype.consumeNumericToken = function () {
+        var _a = this.consumeNumber(),
+            number = _a[0],
+            flags = _a[1];
+
+        var c1 = this.peekCodePoint(0);
+        var c2 = this.peekCodePoint(1);
+        var c3 = this.peekCodePoint(2);
+
+        if (isIdentifierStart(c1, c2, c3)) {
+          var unit = this.consumeName();
+          return {
+            type: TokenType.DIMENSION_TOKEN,
+            number: number,
+            flags: flags,
+            unit: unit
+          };
+        }
+
+        if (c1 === PERCENTAGE_SIGN) {
+          this.consumeCodePoint();
+          return {
+            type: TokenType.PERCENTAGE_TOKEN,
+            number: number,
+            flags: flags
+          };
+        }
+
+        return {
+          type: TokenType.NUMBER_TOKEN,
+          number: number,
+          flags: flags
+        };
+      };
+
+      Tokenizer.prototype.consumeEscapedCodePoint = function () {
+        var codePoint = this.consumeCodePoint();
+
+        if (isHex(codePoint)) {
+          var hex = fromCodePoint(codePoint);
+
+          while (isHex(this.peekCodePoint(0)) && hex.length < 6) {
+            hex += fromCodePoint(this.consumeCodePoint());
+          }
+
+          if (isWhiteSpace(this.peekCodePoint(0))) {
+            this.consumeCodePoint();
+          }
+
+          var hexCodePoint = parseInt(hex, 16);
+
+          if (hexCodePoint === 0 || isSurrogateCodePoint(hexCodePoint) || hexCodePoint > 0x10ffff) {
+            return REPLACEMENT_CHARACTER;
+          }
+
+          return hexCodePoint;
+        }
+
+        if (codePoint === EOF) {
+          return REPLACEMENT_CHARACTER;
+        }
+
+        return codePoint;
+      };
+
+      Tokenizer.prototype.consumeName = function () {
+        var result = '';
+
+        while (true) {
+          var codePoint = this.consumeCodePoint();
+
+          if (isNameCodePoint(codePoint)) {
+            result += fromCodePoint(codePoint);
+          } else if (isValidEscape(codePoint, this.peekCodePoint(0))) {
+            result += fromCodePoint(this.consumeEscapedCodePoint());
+          } else {
+            this.reconsumeCodePoint(codePoint);
+            return result;
+          }
+        }
+      };
+
+      return Tokenizer;
+    }();
+
+    var Parser =
+    /** @class */
+    function () {
+      function Parser(tokens) {
+        this._tokens = tokens;
+      }
+
+      Parser.create = function (value) {
+        var tokenizer = new Tokenizer();
+        tokenizer.write(value);
+        return new Parser(tokenizer.read());
+      };
+
+      Parser.parseValue = function (value) {
+        return Parser.create(value).parseComponentValue();
+      };
+
+      Parser.parseValues = function (value) {
+        return Parser.create(value).parseComponentValues();
+      };
+
+      Parser.prototype.parseComponentValue = function () {
+        var token = this.consumeToken();
+
+        while (token.type === TokenType.WHITESPACE_TOKEN) {
+          token = this.consumeToken();
+        }
+
+        if (token.type === TokenType.EOF_TOKEN) {
+          throw new SyntaxError("Error parsing CSS component value, unexpected EOF");
+        }
+
+        this.reconsumeToken(token);
+        var value = this.consumeComponentValue();
+
+        do {
+          token = this.consumeToken();
+        } while (token.type === TokenType.WHITESPACE_TOKEN);
+
+        if (token.type === TokenType.EOF_TOKEN) {
+          return value;
+        }
+
+        throw new SyntaxError("Error parsing CSS component value, multiple values found when expecting only one");
+      };
+
+      Parser.prototype.parseComponentValues = function () {
+        var values = [];
+
+        while (true) {
+          var value = this.consumeComponentValue();
+
+          if (value.type === TokenType.EOF_TOKEN) {
+            return values;
+          }
+
+          values.push(value);
+          values.push();
+        }
+      };
+
+      Parser.prototype.consumeComponentValue = function () {
+        var token = this.consumeToken();
+
+        switch (token.type) {
+          case TokenType.LEFT_CURLY_BRACKET_TOKEN:
+          case TokenType.LEFT_SQUARE_BRACKET_TOKEN:
+          case TokenType.LEFT_PARENTHESIS_TOKEN:
+            return this.consumeSimpleBlock(token.type);
+
+          case TokenType.FUNCTION_TOKEN:
+            return this.consumeFunction(token);
+        }
+
+        return token;
+      };
+
+      Parser.prototype.consumeSimpleBlock = function (type) {
+        var block = {
+          type: type,
+          values: []
+        };
+        var token = this.consumeToken();
+
+        while (true) {
+          if (token.type === TokenType.EOF_TOKEN || isEndingTokenFor(token, type)) {
+            return block;
+          }
+
+          this.reconsumeToken(token);
+          block.values.push(this.consumeComponentValue());
+          token = this.consumeToken();
+        }
+      };
+
+      Parser.prototype.consumeFunction = function (functionToken) {
+        var cssFunction = {
+          name: functionToken.value,
+          values: [],
+          type: TokenType.FUNCTION
+        };
+
+        while (true) {
+          var token = this.consumeToken();
+
+          if (token.type === TokenType.EOF_TOKEN || token.type === TokenType.RIGHT_PARENTHESIS_TOKEN) {
+            return cssFunction;
+          }
+
+          this.reconsumeToken(token);
+          cssFunction.values.push(this.consumeComponentValue());
+        }
+      };
+
+      Parser.prototype.consumeToken = function () {
+        var token = this._tokens.shift();
+
+        return typeof token === 'undefined' ? EOF_TOKEN : token;
+      };
+
+      Parser.prototype.reconsumeToken = function (token) {
+        this._tokens.unshift(token);
+      };
+
+      return Parser;
+    }();
+
+    var isDimensionToken = function isDimensionToken(token) {
+      return token.type === TokenType.DIMENSION_TOKEN;
+    };
+
+    var isNumberToken = function isNumberToken(token) {
+      return token.type === TokenType.NUMBER_TOKEN;
+    };
+
+    var isIdentToken = function isIdentToken(token) {
+      return token.type === TokenType.IDENT_TOKEN;
+    };
+
+    var isStringToken = function isStringToken(token) {
+      return token.type === TokenType.STRING_TOKEN;
+    };
+
+    var isIdentWithValue = function isIdentWithValue(token, value) {
+      return isIdentToken(token) && token.value === value;
+    };
+
+    var nonWhiteSpace = function nonWhiteSpace(token) {
+      return token.type !== TokenType.WHITESPACE_TOKEN;
+    };
+
+    var nonFunctionArgSeparator = function nonFunctionArgSeparator(token) {
+      return token.type !== TokenType.WHITESPACE_TOKEN && token.type !== TokenType.COMMA_TOKEN;
+    };
+
+    var parseFunctionArgs = function parseFunctionArgs(tokens) {
+      var args = [];
+      var arg = [];
+      tokens.forEach(function (token) {
+        if (token.type === TokenType.COMMA_TOKEN) {
+          if (arg.length === 0) {
+            throw new Error("Error parsing function args, zero tokens for arg");
+          }
+
+          args.push(arg);
+          arg = [];
+          return;
+        }
+
+        if (token.type !== TokenType.WHITESPACE_TOKEN) {
+          arg.push(token);
+        }
+      });
+
+      if (arg.length) {
+        args.push(arg);
+      }
+
+      return args;
+    };
+
+    var isEndingTokenFor = function isEndingTokenFor(token, type) {
+      if (type === TokenType.LEFT_CURLY_BRACKET_TOKEN && token.type === TokenType.RIGHT_CURLY_BRACKET_TOKEN) {
+        return true;
+      }
+
+      if (type === TokenType.LEFT_SQUARE_BRACKET_TOKEN && token.type === TokenType.RIGHT_SQUARE_BRACKET_TOKEN) {
+        return true;
+      }
+
+      return type === TokenType.LEFT_PARENTHESIS_TOKEN && token.type === TokenType.RIGHT_PARENTHESIS_TOKEN;
+    };
+
+    var isLength = function isLength(token) {
+      return token.type === TokenType.NUMBER_TOKEN || token.type === TokenType.DIMENSION_TOKEN;
+    };
+
+    var isLengthPercentage = function isLengthPercentage(token) {
+      return token.type === TokenType.PERCENTAGE_TOKEN || isLength(token);
+    };
+
+    var parseLengthPercentageTuple = function parseLengthPercentageTuple(tokens) {
+      return tokens.length > 1 ? [tokens[0], tokens[1]] : [tokens[0]];
+    };
+
+    var ZERO_LENGTH = {
+      type: TokenType.NUMBER_TOKEN,
+      number: 0,
+      flags: FLAG_INTEGER
+    };
+    var FIFTY_PERCENT = {
+      type: TokenType.PERCENTAGE_TOKEN,
+      number: 50,
+      flags: FLAG_INTEGER
+    };
+    var HUNDRED_PERCENT = {
+      type: TokenType.PERCENTAGE_TOKEN,
+      number: 100,
+      flags: FLAG_INTEGER
+    };
+
+    var getAbsoluteValueForTuple = function getAbsoluteValueForTuple(tuple, width, height) {
+      var x = tuple[0],
+          y = tuple[1];
+      return [getAbsoluteValue(x, width), getAbsoluteValue(typeof y !== 'undefined' ? y : x, height)];
+    };
+
+    var getAbsoluteValue = function getAbsoluteValue(token, parent) {
+      if (token.type === TokenType.PERCENTAGE_TOKEN) {
+        return token.number / 100 * parent;
+      }
+
+      if (isDimensionToken(token)) {
+        switch (token.unit) {
+          case 'rem':
+          case 'em':
+            return 16 * token.number;
+          // TODO use correct font-size
+
+          case 'px':
+          default:
+            return token.number;
+        }
+      }
+
+      return token.number;
+    };
+
+    var DEG = 'deg';
+    var GRAD = 'grad';
+    var RAD = 'rad';
+    var TURN = 'turn';
+    var angle = {
+      name: 'angle',
+      parse: function parse(value) {
+        if (value.type === TokenType.DIMENSION_TOKEN) {
+          switch (value.unit) {
+            case DEG:
+              return Math.PI * value.number / 180;
+
+            case GRAD:
+              return Math.PI / 200 * value.number;
+
+            case RAD:
+              return value.number;
+
+            case TURN:
+              return Math.PI * 2 * value.number;
+          }
+        }
+
+        throw new Error("Unsupported angle type");
+      }
+    };
+
+    var isAngle = function isAngle(value) {
+      if (value.type === TokenType.DIMENSION_TOKEN) {
+        if (value.unit === DEG || value.unit === GRAD || value.unit === RAD || value.unit === TURN) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    var parseNamedSide = function parseNamedSide(tokens) {
+      var sideOrCorner = tokens.filter(isIdentToken).map(function (ident) {
+        return ident.value;
+      }).join(' ');
+
+      switch (sideOrCorner) {
+        case 'to bottom right':
+        case 'to right bottom':
+        case 'left top':
+        case 'top left':
+          return [ZERO_LENGTH, ZERO_LENGTH];
+
+        case 'to top':
+        case 'bottom':
+          return deg(0);
+
+        case 'to bottom left':
+        case 'to left bottom':
+        case 'right top':
+        case 'top right':
+          return [ZERO_LENGTH, HUNDRED_PERCENT];
+
+        case 'to right':
+        case 'left':
+          return deg(90);
+
+        case 'to top left':
+        case 'to left top':
+        case 'right bottom':
+        case 'bottom right':
+          return [HUNDRED_PERCENT, HUNDRED_PERCENT];
+
+        case 'to bottom':
+        case 'top':
+          return deg(180);
+
+        case 'to top right':
+        case 'to right top':
+        case 'left bottom':
+        case 'bottom left':
+          return [HUNDRED_PERCENT, ZERO_LENGTH];
+
+        case 'to left':
+        case 'right':
+          return deg(270);
+      }
+
+      return 0;
+    };
+
+    var deg = function deg(_deg) {
+      return Math.PI * _deg / 180;
+    };
+
+    var color = {
+      name: 'color',
+      parse: function parse(value) {
+        if (value.type === TokenType.FUNCTION) {
+          var colorFunction = SUPPORTED_COLOR_FUNCTIONS[value.name];
+
+          if (typeof colorFunction === 'undefined') {
+            throw new Error("Attempting to parse an unsupported color function \"" + value.name + "\"");
+          }
+
+          return colorFunction(value.values);
+        }
+
+        if (value.type === TokenType.HASH_TOKEN) {
+          if (value.value.length === 3) {
+            var r = value.value.substring(0, 1);
+            var g = value.value.substring(1, 2);
+            var b = value.value.substring(2, 3);
+            return pack(parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16), 1);
+          }
+
+          if (value.value.length === 4) {
+            var r = value.value.substring(0, 1);
+            var g = value.value.substring(1, 2);
+            var b = value.value.substring(2, 3);
+            var a = value.value.substring(3, 4);
+            return pack(parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16), parseInt(a + a, 16) / 255);
+          }
+
+          if (value.value.length === 6) {
+            var r = value.value.substring(0, 2);
+            var g = value.value.substring(2, 4);
+            var b = value.value.substring(4, 6);
+            return pack(parseInt(r, 16), parseInt(g, 16), parseInt(b, 16), 1);
+          }
+
+          if (value.value.length === 8) {
+            var r = value.value.substring(0, 2);
+            var g = value.value.substring(2, 4);
+            var b = value.value.substring(4, 6);
+            var a = value.value.substring(6, 8);
+            return pack(parseInt(r, 16), parseInt(g, 16), parseInt(b, 16), parseInt(a, 16) / 255);
+          }
+        }
+
+        if (value.type === TokenType.IDENT_TOKEN) {
+          var namedColor = COLORS[value.value.toUpperCase()];
+
+          if (typeof namedColor !== 'undefined') {
+            return namedColor;
+          }
+        }
+
+        return COLORS.TRANSPARENT;
+      }
+    };
+
+    var isTransparent = function isTransparent(color) {
+      return (0xff & color) === 0;
+    };
+
+    var asString = function asString(color) {
+      var alpha = 0xff & color;
+      var blue = 0xff & color >> 8;
+      var green = 0xff & color >> 16;
+      var red = 0xff & color >> 24;
+      return alpha < 255 ? "rgba(" + red + "," + green + "," + blue + "," + alpha / 255 + ")" : "rgb(" + red + "," + green + "," + blue + ")";
+    };
+
+    var pack = function pack(r, g, b, a) {
+      return (r << 24 | g << 16 | b << 8 | Math.round(a * 255) << 0) >>> 0;
+    };
+
+    var getTokenColorValue = function getTokenColorValue(token, i) {
+      if (token.type === TokenType.NUMBER_TOKEN) {
+        return token.number;
+      }
+
+      if (token.type === TokenType.PERCENTAGE_TOKEN) {
+        var max = i === 3 ? 1 : 255;
+        return i === 3 ? token.number / 100 * max : Math.round(token.number / 100 * max);
+      }
+
+      return 0;
+    };
+
+    var rgb = function rgb(args) {
+      var tokens = args.filter(nonFunctionArgSeparator);
+
+      if (tokens.length === 3) {
+        var _a = tokens.map(getTokenColorValue),
+            r = _a[0],
+            g = _a[1],
+            b = _a[2];
+
+        return pack(r, g, b, 1);
+      }
+
+      if (tokens.length === 4) {
+        var _b = tokens.map(getTokenColorValue),
+            r = _b[0],
+            g = _b[1],
+            b = _b[2],
+            a = _b[3];
+
+        return pack(r, g, b, a);
+      }
+
+      return 0;
+    };
+
+    function hue2rgb(t1, t2, hue) {
+      if (hue < 0) {
+        hue += 1;
+      }
+
+      if (hue >= 1) {
+        hue -= 1;
+      }
+
+      if (hue < 1 / 6) {
+        return (t2 - t1) * hue * 6 + t1;
+      } else if (hue < 1 / 2) {
+        return t2;
+      } else if (hue < 2 / 3) {
+        return (t2 - t1) * 6 * (2 / 3 - hue) + t1;
+      } else {
+        return t1;
+      }
+    }
+
+    var hsl = function hsl(args) {
+      var tokens = args.filter(nonFunctionArgSeparator);
+      var hue = tokens[0],
+          saturation = tokens[1],
+          lightness = tokens[2],
+          alpha = tokens[3];
+      var h = (hue.type === TokenType.NUMBER_TOKEN ? deg(hue.number) : angle.parse(hue)) / (Math.PI * 2);
+      var s = isLengthPercentage(saturation) ? saturation.number / 100 : 0;
+      var l = isLengthPercentage(lightness) ? lightness.number / 100 : 0;
+      var a = typeof alpha !== 'undefined' && isLengthPercentage(alpha) ? getAbsoluteValue(alpha, 1) : 1;
+
+      if (s === 0) {
+        return pack(l * 255, l * 255, l * 255, 1);
+      }
+
+      var t2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
+      var t1 = l * 2 - t2;
+      var r = hue2rgb(t1, t2, h + 1 / 3);
+      var g = hue2rgb(t1, t2, h);
+      var b = hue2rgb(t1, t2, h - 1 / 3);
+      return pack(r * 255, g * 255, b * 255, a);
+    };
+
+    var SUPPORTED_COLOR_FUNCTIONS = {
+      hsl: hsl,
+      hsla: hsl,
+      rgb: rgb,
+      rgba: rgb
+    };
+    var COLORS = {
+      ALICEBLUE: 0xf0f8ffff,
+      ANTIQUEWHITE: 0xfaebd7ff,
+      AQUA: 0x00ffffff,
+      AQUAMARINE: 0x7fffd4ff,
+      AZURE: 0xf0ffffff,
+      BEIGE: 0xf5f5dcff,
+      BISQUE: 0xffe4c4ff,
+      BLACK: 0x000000ff,
+      BLANCHEDALMOND: 0xffebcdff,
+      BLUE: 0x0000ffff,
+      BLUEVIOLET: 0x8a2be2ff,
+      BROWN: 0xa52a2aff,
+      BURLYWOOD: 0xdeb887ff,
+      CADETBLUE: 0x5f9ea0ff,
+      CHARTREUSE: 0x7fff00ff,
+      CHOCOLATE: 0xd2691eff,
+      CORAL: 0xff7f50ff,
+      CORNFLOWERBLUE: 0x6495edff,
+      CORNSILK: 0xfff8dcff,
+      CRIMSON: 0xdc143cff,
+      CYAN: 0x00ffffff,
+      DARKBLUE: 0x00008bff,
+      DARKCYAN: 0x008b8bff,
+      DARKGOLDENROD: 0xb886bbff,
+      DARKGRAY: 0xa9a9a9ff,
+      DARKGREEN: 0x006400ff,
+      DARKGREY: 0xa9a9a9ff,
+      DARKKHAKI: 0xbdb76bff,
+      DARKMAGENTA: 0x8b008bff,
+      DARKOLIVEGREEN: 0x556b2fff,
+      DARKORANGE: 0xff8c00ff,
+      DARKORCHID: 0x9932ccff,
+      DARKRED: 0x8b0000ff,
+      DARKSALMON: 0xe9967aff,
+      DARKSEAGREEN: 0x8fbc8fff,
+      DARKSLATEBLUE: 0x483d8bff,
+      DARKSLATEGRAY: 0x2f4f4fff,
+      DARKSLATEGREY: 0x2f4f4fff,
+      DARKTURQUOISE: 0x00ced1ff,
+      DARKVIOLET: 0x9400d3ff,
+      DEEPPINK: 0xff1493ff,
+      DEEPSKYBLUE: 0x00bfffff,
+      DIMGRAY: 0x696969ff,
+      DIMGREY: 0x696969ff,
+      DODGERBLUE: 0x1e90ffff,
+      FIREBRICK: 0xb22222ff,
+      FLORALWHITE: 0xfffaf0ff,
+      FORESTGREEN: 0x228b22ff,
+      FUCHSIA: 0xff00ffff,
+      GAINSBORO: 0xdcdcdcff,
+      GHOSTWHITE: 0xf8f8ffff,
+      GOLD: 0xffd700ff,
+      GOLDENROD: 0xdaa520ff,
+      GRAY: 0x808080ff,
+      GREEN: 0x008000ff,
+      GREENYELLOW: 0xadff2fff,
+      GREY: 0x808080ff,
+      HONEYDEW: 0xf0fff0ff,
+      HOTPINK: 0xff69b4ff,
+      INDIANRED: 0xcd5c5cff,
+      INDIGO: 0x4b0082ff,
+      IVORY: 0xfffff0ff,
+      KHAKI: 0xf0e68cff,
+      LAVENDER: 0xe6e6faff,
+      LAVENDERBLUSH: 0xfff0f5ff,
+      LAWNGREEN: 0x7cfc00ff,
+      LEMONCHIFFON: 0xfffacdff,
+      LIGHTBLUE: 0xadd8e6ff,
+      LIGHTCORAL: 0xf08080ff,
+      LIGHTCYAN: 0xe0ffffff,
+      LIGHTGOLDENRODYELLOW: 0xfafad2ff,
+      LIGHTGRAY: 0xd3d3d3ff,
+      LIGHTGREEN: 0x90ee90ff,
+      LIGHTGREY: 0xd3d3d3ff,
+      LIGHTPINK: 0xffb6c1ff,
+      LIGHTSALMON: 0xffa07aff,
+      LIGHTSEAGREEN: 0x20b2aaff,
+      LIGHTSKYBLUE: 0x87cefaff,
+      LIGHTSLATEGRAY: 0x778899ff,
+      LIGHTSLATEGREY: 0x778899ff,
+      LIGHTSTEELBLUE: 0xb0c4deff,
+      LIGHTYELLOW: 0xffffe0ff,
+      LIME: 0x00ff00ff,
+      LIMEGREEN: 0x32cd32ff,
+      LINEN: 0xfaf0e6ff,
+      MAGENTA: 0xff00ffff,
+      MAROON: 0x800000ff,
+      MEDIUMAQUAMARINE: 0x66cdaaff,
+      MEDIUMBLUE: 0x0000cdff,
+      MEDIUMORCHID: 0xba55d3ff,
+      MEDIUMPURPLE: 0x9370dbff,
+      MEDIUMSEAGREEN: 0x3cb371ff,
+      MEDIUMSLATEBLUE: 0x7b68eeff,
+      MEDIUMSPRINGGREEN: 0x00fa9aff,
+      MEDIUMTURQUOISE: 0x48d1ccff,
+      MEDIUMVIOLETRED: 0xc71585ff,
+      MIDNIGHTBLUE: 0x191970ff,
+      MINTCREAM: 0xf5fffaff,
+      MISTYROSE: 0xffe4e1ff,
+      MOCCASIN: 0xffe4b5ff,
+      NAVAJOWHITE: 0xffdeadff,
+      NAVY: 0x000080ff,
+      OLDLACE: 0xfdf5e6ff,
+      OLIVE: 0x808000ff,
+      OLIVEDRAB: 0x6b8e23ff,
+      ORANGE: 0xffa500ff,
+      ORANGERED: 0xff4500ff,
+      ORCHID: 0xda70d6ff,
+      PALEGOLDENROD: 0xeee8aaff,
+      PALEGREEN: 0x98fb98ff,
+      PALETURQUOISE: 0xafeeeeff,
+      PALEVIOLETRED: 0xdb7093ff,
+      PAPAYAWHIP: 0xffefd5ff,
+      PEACHPUFF: 0xffdab9ff,
+      PERU: 0xcd853fff,
+      PINK: 0xffc0cbff,
+      PLUM: 0xdda0ddff,
+      POWDERBLUE: 0xb0e0e6ff,
+      PURPLE: 0x800080ff,
+      REBECCAPURPLE: 0x663399ff,
+      RED: 0xff0000ff,
+      ROSYBROWN: 0xbc8f8fff,
+      ROYALBLUE: 0x4169e1ff,
+      SADDLEBROWN: 0x8b4513ff,
+      SALMON: 0xfa8072ff,
+      SANDYBROWN: 0xf4a460ff,
+      SEAGREEN: 0x2e8b57ff,
+      SEASHELL: 0xfff5eeff,
+      SIENNA: 0xa0522dff,
+      SILVER: 0xc0c0c0ff,
+      SKYBLUE: 0x87ceebff,
+      SLATEBLUE: 0x6a5acdff,
+      SLATEGRAY: 0x708090ff,
+      SLATEGREY: 0x708090ff,
+      SNOW: 0xfffafaff,
+      SPRINGGREEN: 0x00ff7fff,
+      STEELBLUE: 0x4682b4ff,
+      TAN: 0xd2b48cff,
+      TEAL: 0x008080ff,
+      THISTLE: 0xd8bfd8ff,
+      TOMATO: 0xff6347ff,
+      TRANSPARENT: 0x00000000,
+      TURQUOISE: 0x40e0d0ff,
+      VIOLET: 0xee82eeff,
+      WHEAT: 0xf5deb3ff,
+      WHITE: 0xffffffff,
+      WHITESMOKE: 0xf5f5f5ff,
+      YELLOW: 0xffff00ff,
+      YELLOWGREEN: 0x9acd32ff
+    };
+    var PropertyDescriptorParsingType;
+
+    (function (PropertyDescriptorParsingType) {
+      PropertyDescriptorParsingType[PropertyDescriptorParsingType["VALUE"] = 0] = "VALUE";
+      PropertyDescriptorParsingType[PropertyDescriptorParsingType["LIST"] = 1] = "LIST";
+      PropertyDescriptorParsingType[PropertyDescriptorParsingType["IDENT_VALUE"] = 2] = "IDENT_VALUE";
+      PropertyDescriptorParsingType[PropertyDescriptorParsingType["TYPE_VALUE"] = 3] = "TYPE_VALUE";
+      PropertyDescriptorParsingType[PropertyDescriptorParsingType["TOKEN_VALUE"] = 4] = "TOKEN_VALUE";
+    })(PropertyDescriptorParsingType || (PropertyDescriptorParsingType = {}));
+
+    var BACKGROUND_CLIP;
+
+    (function (BACKGROUND_CLIP) {
+      BACKGROUND_CLIP[BACKGROUND_CLIP["BORDER_BOX"] = 0] = "BORDER_BOX";
+      BACKGROUND_CLIP[BACKGROUND_CLIP["PADDING_BOX"] = 1] = "PADDING_BOX";
+      BACKGROUND_CLIP[BACKGROUND_CLIP["CONTENT_BOX"] = 2] = "CONTENT_BOX";
+    })(BACKGROUND_CLIP || (BACKGROUND_CLIP = {}));
+
+    var backgroundClip = {
+      name: 'background-clip',
+      initialValue: 'border-box',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return tokens.map(function (token) {
+          if (isIdentToken(token)) {
+            switch (token.value) {
+              case 'padding-box':
+                return BACKGROUND_CLIP.PADDING_BOX;
+
+              case 'content-box':
+                return BACKGROUND_CLIP.CONTENT_BOX;
+            }
+          }
+
+          return BACKGROUND_CLIP.BORDER_BOX;
+        });
+      }
+    };
+    var backgroundColor = {
+      name: "background-color",
+      initialValue: 'transparent',
+      prefix: false,
+      type: PropertyDescriptorParsingType.TYPE_VALUE,
+      format: 'color'
+    };
+
+    var parseColorStop = function parseColorStop(args) {
+      var color$1 = color.parse(args[0]);
+      var stop = args[1];
+      return stop && isLengthPercentage(stop) ? {
+        color: color$1,
+        stop: stop
+      } : {
+        color: color$1,
+        stop: null
+      };
+    };
+
+    var processColorStops = function processColorStops(stops, lineLength) {
+      var first = stops[0];
+      var last = stops[stops.length - 1];
+
+      if (first.stop === null) {
+        first.stop = ZERO_LENGTH;
+      }
+
+      if (last.stop === null) {
+        last.stop = HUNDRED_PERCENT;
+      }
+
+      var processStops = [];
+      var previous = 0;
+
+      for (var i = 0; i < stops.length; i++) {
+        var stop_1 = stops[i].stop;
+
+        if (stop_1 !== null) {
+          var absoluteValue = getAbsoluteValue(stop_1, lineLength);
+
+          if (absoluteValue > previous) {
+            processStops.push(absoluteValue);
+          } else {
+            processStops.push(previous);
+          }
+
+          previous = absoluteValue;
+        } else {
+          processStops.push(null);
+        }
+      }
+
+      var gapBegin = null;
+
+      for (var i = 0; i < processStops.length; i++) {
+        var stop_2 = processStops[i];
+
+        if (stop_2 === null) {
+          if (gapBegin === null) {
+            gapBegin = i;
+          }
+        } else if (gapBegin !== null) {
+          var gapLength = i - gapBegin;
+          var beforeGap = processStops[gapBegin - 1];
+          var gapValue = (stop_2 - beforeGap) / (gapLength + 1);
+
+          for (var g = 1; g <= gapLength; g++) {
+            processStops[gapBegin + g - 1] = gapValue * g;
+          }
+
+          gapBegin = null;
+        }
+      }
+
+      return stops.map(function (_a, i) {
+        var color = _a.color;
+        return {
+          color: color,
+          stop: Math.max(Math.min(1, processStops[i] / lineLength), 0)
+        };
+      });
+    };
+
+    var getAngleFromCorner = function getAngleFromCorner(corner, width, height) {
+      var centerX = width / 2;
+      var centerY = height / 2;
+      var x = getAbsoluteValue(corner[0], width) - centerX;
+      var y = centerY - getAbsoluteValue(corner[1], height);
+      return (Math.atan2(y, x) + Math.PI * 2) % (Math.PI * 2);
+    };
+
+    var calculateGradientDirection = function calculateGradientDirection(angle, width, height) {
+      var radian = typeof angle === 'number' ? angle : getAngleFromCorner(angle, width, height);
+      var lineLength = Math.abs(width * Math.sin(radian)) + Math.abs(height * Math.cos(radian));
+      var halfWidth = width / 2;
+      var halfHeight = height / 2;
+      var halfLineLength = lineLength / 2;
+      var yDiff = Math.sin(radian - Math.PI / 2) * halfLineLength;
+      var xDiff = Math.cos(radian - Math.PI / 2) * halfLineLength;
+      return [lineLength, halfWidth - xDiff, halfWidth + xDiff, halfHeight - yDiff, halfHeight + yDiff];
+    };
+
+    var distance = function distance(a, b) {
+      return Math.sqrt(a * a + b * b);
+    };
+
+    var findCorner = function findCorner(width, height, x, y, closest) {
+      var corners = [[0, 0], [0, height], [width, 0], [width, height]];
+      return corners.reduce(function (stat, corner) {
+        var cx = corner[0],
+            cy = corner[1];
+        var d = distance(x - cx, y - cy);
+
+        if (closest ? d < stat.optimumDistance : d > stat.optimumDistance) {
+          return {
+            optimumCorner: corner,
+            optimumDistance: d
+          };
+        }
+
+        return stat;
+      }, {
+        optimumDistance: closest ? Infinity : -Infinity,
+        optimumCorner: null
+      }).optimumCorner;
+    };
+
+    var calculateRadius = function calculateRadius(gradient, x, y, width, height) {
+      var rx = 0;
+      var ry = 0;
+
+      switch (gradient.size) {
+        case CSSRadialExtent.CLOSEST_SIDE:
+          // The ending shape is sized so that that it exactly meets the side of the gradient box closest to the gradient’s center.
+          // If the shape is an ellipse, it exactly meets the closest side in each dimension.
+          if (gradient.shape === CSSRadialShape.CIRCLE) {
+            rx = ry = Math.min(Math.abs(x), Math.abs(x - width), Math.abs(y), Math.abs(y - height));
+          } else if (gradient.shape === CSSRadialShape.ELLIPSE) {
+            rx = Math.min(Math.abs(x), Math.abs(x - width));
+            ry = Math.min(Math.abs(y), Math.abs(y - height));
+          }
+
+          break;
+
+        case CSSRadialExtent.CLOSEST_CORNER:
+          // The ending shape is sized so that that it passes through the corner of the gradient box closest to the gradient’s center.
+          // If the shape is an ellipse, the ending shape is given the same aspect-ratio it would have if closest-side were specified.
+          if (gradient.shape === CSSRadialShape.CIRCLE) {
+            rx = ry = Math.min(distance(x, y), distance(x, y - height), distance(x - width, y), distance(x - width, y - height));
+          } else if (gradient.shape === CSSRadialShape.ELLIPSE) {
+            // Compute the ratio ry/rx (which is to be the same as for "closest-side")
+            var c = Math.min(Math.abs(y), Math.abs(y - height)) / Math.min(Math.abs(x), Math.abs(x - width));
+
+            var _a = findCorner(width, height, x, y, true),
+                cx = _a[0],
+                cy = _a[1];
+
+            rx = distance(cx - x, (cy - y) / c);
+            ry = c * rx;
+          }
+
+          break;
+
+        case CSSRadialExtent.FARTHEST_SIDE:
+          // Same as closest-side, except the ending shape is sized based on the farthest side(s)
+          if (gradient.shape === CSSRadialShape.CIRCLE) {
+            rx = ry = Math.max(Math.abs(x), Math.abs(x - width), Math.abs(y), Math.abs(y - height));
+          } else if (gradient.shape === CSSRadialShape.ELLIPSE) {
+            rx = Math.max(Math.abs(x), Math.abs(x - width));
+            ry = Math.max(Math.abs(y), Math.abs(y - height));
+          }
+
+          break;
+
+        case CSSRadialExtent.FARTHEST_CORNER:
+          // Same as closest-corner, except the ending shape is sized based on the farthest corner.
+          // If the shape is an ellipse, the ending shape is given the same aspect ratio it would have if farthest-side were specified.
+          if (gradient.shape === CSSRadialShape.CIRCLE) {
+            rx = ry = Math.max(distance(x, y), distance(x, y - height), distance(x - width, y), distance(x - width, y - height));
+          } else if (gradient.shape === CSSRadialShape.ELLIPSE) {
+            // Compute the ratio ry/rx (which is to be the same as for "farthest-side")
+            var c = Math.max(Math.abs(y), Math.abs(y - height)) / Math.max(Math.abs(x), Math.abs(x - width));
+
+            var _b = findCorner(width, height, x, y, false),
+                cx = _b[0],
+                cy = _b[1];
+
+            rx = distance(cx - x, (cy - y) / c);
+            ry = c * rx;
+          }
+
+          break;
+      }
+
+      if (Array.isArray(gradient.size)) {
+        rx = getAbsoluteValue(gradient.size[0], width);
+        ry = gradient.size.length === 2 ? getAbsoluteValue(gradient.size[1], height) : rx;
+      }
+
+      return [rx, ry];
+    };
+
+    var linearGradient = function linearGradient(tokens) {
+      var angle$1 = deg(180);
+      var stops = [];
+      parseFunctionArgs(tokens).forEach(function (arg, i) {
+        if (i === 0) {
+          var firstToken = arg[0];
+
+          if (firstToken.type === TokenType.IDENT_TOKEN && firstToken.value === 'to') {
+            angle$1 = parseNamedSide(arg);
+            return;
+          } else if (isAngle(firstToken)) {
+            angle$1 = angle.parse(firstToken);
+            return;
+          }
+        }
+
+        var colorStop = parseColorStop(arg);
+        stops.push(colorStop);
+      });
+      return {
+        angle: angle$1,
+        stops: stops,
+        type: CSSImageType.LINEAR_GRADIENT
+      };
+    };
+
+    var prefixLinearGradient = function prefixLinearGradient(tokens) {
+      var angle$1 = deg(180);
+      var stops = [];
+      parseFunctionArgs(tokens).forEach(function (arg, i) {
+        if (i === 0) {
+          var firstToken = arg[0];
+
+          if (firstToken.type === TokenType.IDENT_TOKEN && ['top', 'left', 'right', 'bottom'].indexOf(firstToken.value) !== -1) {
+            angle$1 = parseNamedSide(arg);
+            return;
+          } else if (isAngle(firstToken)) {
+            angle$1 = (angle.parse(firstToken) + deg(270)) % deg(360);
+            return;
+          }
+        }
+
+        var colorStop = parseColorStop(arg);
+        stops.push(colorStop);
+      });
+      return {
+        angle: angle$1,
+        stops: stops,
+        type: CSSImageType.LINEAR_GRADIENT
+      };
+    };
+
+    var testRangeBounds = function testRangeBounds(document) {
+      var TEST_HEIGHT = 123;
+
+      if (document.createRange) {
+        var range = document.createRange();
+
+        if (range.getBoundingClientRect) {
+          var testElement = document.createElement('boundtest');
+          testElement.style.height = TEST_HEIGHT + "px";
+          testElement.style.display = 'block';
+          document.body.appendChild(testElement);
+          range.selectNode(testElement);
+          var rangeBounds = range.getBoundingClientRect();
+          var rangeHeight = Math.round(rangeBounds.height);
+          document.body.removeChild(testElement);
+
+          if (rangeHeight === TEST_HEIGHT) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    var testCORS = function testCORS() {
+      return typeof new Image().crossOrigin !== 'undefined';
+    };
+
+    var testResponseType = function testResponseType() {
+      return typeof new XMLHttpRequest().responseType === 'string';
+    };
+
+    var testSVG = function testSVG(document) {
+      var img = new Image();
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        return false;
+      }
+
+      img.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>";
+
+      try {
+        ctx.drawImage(img, 0, 0);
+        canvas.toDataURL();
+      } catch (e) {
+        return false;
+      }
+
+      return true;
+    };
+
+    var isGreenPixel = function isGreenPixel(data) {
+      return data[0] === 0 && data[1] === 255 && data[2] === 0 && data[3] === 255;
+    };
+
+    var testForeignObject = function testForeignObject(document) {
+      var canvas = document.createElement('canvas');
+      var size = 100;
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        return Promise.reject(false);
+      }
+
+      ctx.fillStyle = 'rgb(0, 255, 0)';
+      ctx.fillRect(0, 0, size, size);
+      var img = new Image();
+      var greenImageSrc = canvas.toDataURL();
+      img.src = greenImageSrc;
+      var svg = createForeignObjectSVG(size, size, 0, 0, img);
+      ctx.fillStyle = 'red';
+      ctx.fillRect(0, 0, size, size);
+      return loadSerializedSVG(svg).then(function (img) {
+        ctx.drawImage(img, 0, 0);
+        var data = ctx.getImageData(0, 0, size, size).data;
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, size, size);
+        var node = document.createElement('div');
+        node.style.backgroundImage = "url(" + greenImageSrc + ")";
+        node.style.height = size + "px"; // Firefox 55 does not render inline <img /> tags
+
+        return isGreenPixel(data) ? loadSerializedSVG(createForeignObjectSVG(size, size, 0, 0, node)) : Promise.reject(false);
+      }).then(function (img) {
+        ctx.drawImage(img, 0, 0); // Edge does not render background-images
+
+        return isGreenPixel(ctx.getImageData(0, 0, size, size).data);
+      })["catch"](function () {
+        return false;
+      });
+    };
+
+    var createForeignObjectSVG = function createForeignObjectSVG(width, height, x, y, node) {
+      var xmlns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(xmlns, 'svg');
+      var foreignObject = document.createElementNS(xmlns, 'foreignObject');
+      svg.setAttributeNS(null, 'width', width.toString());
+      svg.setAttributeNS(null, 'height', height.toString());
+      foreignObject.setAttributeNS(null, 'width', '100%');
+      foreignObject.setAttributeNS(null, 'height', '100%');
+      foreignObject.setAttributeNS(null, 'x', x.toString());
+      foreignObject.setAttributeNS(null, 'y', y.toString());
+      foreignObject.setAttributeNS(null, 'externalResourcesRequired', 'true');
+      svg.appendChild(foreignObject);
+      foreignObject.appendChild(node);
+      return svg;
+    };
+
+    var loadSerializedSVG = function loadSerializedSVG(svg) {
+      return new Promise(function (resolve, reject) {
+        var img = new Image();
+
+        img.onload = function () {
+          return resolve(img);
+        };
+
+        img.onerror = reject;
+        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+      });
+    };
+
+    var FEATURES = {
+      get SUPPORT_RANGE_BOUNDS() {
+        var value = testRangeBounds(document);
+        Object.defineProperty(FEATURES, 'SUPPORT_RANGE_BOUNDS', {
+          value: value
+        });
+        return value;
+      },
+
+      get SUPPORT_SVG_DRAWING() {
+        var value = testSVG(document);
+        Object.defineProperty(FEATURES, 'SUPPORT_SVG_DRAWING', {
+          value: value
+        });
+        return value;
+      },
+
+      get SUPPORT_FOREIGNOBJECT_DRAWING() {
+        var value = typeof Array.from === 'function' && typeof window.fetch === 'function' ? testForeignObject(document) : Promise.resolve(false);
+        Object.defineProperty(FEATURES, 'SUPPORT_FOREIGNOBJECT_DRAWING', {
+          value: value
+        });
+        return value;
+      },
+
+      get SUPPORT_CORS_IMAGES() {
+        var value = testCORS();
+        Object.defineProperty(FEATURES, 'SUPPORT_CORS_IMAGES', {
+          value: value
+        });
+        return value;
+      },
+
+      get SUPPORT_RESPONSE_TYPE() {
+        var value = testResponseType();
+        Object.defineProperty(FEATURES, 'SUPPORT_RESPONSE_TYPE', {
+          value: value
+        });
+        return value;
+      },
+
+      get SUPPORT_CORS_XHR() {
+        var value = ('withCredentials' in new XMLHttpRequest());
+        Object.defineProperty(FEATURES, 'SUPPORT_CORS_XHR', {
+          value: value
+        });
+        return value;
+      }
+
+    };
+
+    var Logger =
+    /** @class */
+    function () {
+      function Logger(_a) {
+        var id = _a.id,
+            enabled = _a.enabled;
+        this.id = id;
+        this.enabled = enabled;
+        this.start = Date.now();
+      } // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+      Logger.prototype.debug = function () {
+        var args = [];
+
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+
+        if (this.enabled) {
+          // eslint-disable-next-line no-console
+          if (typeof window !== 'undefined' && window.console && typeof console.debug === 'function') {
+            // eslint-disable-next-line no-console
+            console.debug.apply(console, [this.id, this.getTime() + "ms"].concat(args));
+          } else {
+            this.info.apply(this, args);
+          }
+        }
+      };
+
+      Logger.prototype.getTime = function () {
+        return Date.now() - this.start;
+      };
+
+      Logger.create = function (options) {
+        Logger.instances[options.id] = new Logger(options);
+      };
+
+      Logger.destroy = function (id) {
+        delete Logger.instances[id];
+      };
+
+      Logger.getInstance = function (id) {
+        var instance = Logger.instances[id];
+
+        if (typeof instance === 'undefined') {
+          throw new Error("No logger instance found with id " + id);
+        }
+
+        return instance;
+      }; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+      Logger.prototype.info = function () {
+        var args = [];
+
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+
+        if (this.enabled) {
+          // eslint-disable-next-line no-console
+          if (typeof window !== 'undefined' && window.console && typeof console.info === 'function') {
+            // eslint-disable-next-line no-console
+            console.info.apply(console, [this.id, this.getTime() + "ms"].concat(args));
+          }
+        }
+      }; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+      Logger.prototype.error = function () {
+        var args = [];
+
+        for (var _i = 0; _i < arguments.length; _i++) {
+          args[_i] = arguments[_i];
+        }
+
+        if (this.enabled) {
+          // eslint-disable-next-line no-console
+          if (typeof window !== 'undefined' && window.console && typeof console.error === 'function') {
+            // eslint-disable-next-line no-console
+            console.error.apply(console, [this.id, this.getTime() + "ms"].concat(args));
+          } else {
+            this.info.apply(this, args);
+          }
+        }
+      };
+
+      Logger.instances = {};
+      return Logger;
+    }();
+
+    var CacheStorage =
+    /** @class */
+    function () {
+      function CacheStorage() {}
+
+      CacheStorage.create = function (name, options) {
+        return CacheStorage._caches[name] = new Cache(name, options);
+      };
+
+      CacheStorage.destroy = function (name) {
+        delete CacheStorage._caches[name];
+      };
+
+      CacheStorage.open = function (name) {
+        var cache = CacheStorage._caches[name];
+
+        if (typeof cache !== 'undefined') {
+          return cache;
+        }
+
+        throw new Error("Cache with key \"" + name + "\" not found");
+      };
+
+      CacheStorage.getOrigin = function (url) {
+        var link = CacheStorage._link;
+
+        if (!link) {
+          return 'about:blank';
+        }
+
+        link.href = url;
+        link.href = link.href; // IE9, LOL! - http://jsfiddle.net/niklasvh/2e48b/
+
+        return link.protocol + link.hostname + link.port;
+      };
+
+      CacheStorage.isSameOrigin = function (src) {
+        return CacheStorage.getOrigin(src) === CacheStorage._origin;
+      };
+
+      CacheStorage.setContext = function (window) {
+        CacheStorage._link = window.document.createElement('a');
+        CacheStorage._origin = CacheStorage.getOrigin(window.location.href);
+      };
+
+      CacheStorage.getInstance = function () {
+        var current = CacheStorage._current;
+
+        if (current === null) {
+          throw new Error("No cache instance attached");
+        }
+
+        return current;
+      };
+
+      CacheStorage.attachInstance = function (cache) {
+        CacheStorage._current = cache;
+      };
+
+      CacheStorage.detachInstance = function () {
+        CacheStorage._current = null;
+      };
+
+      CacheStorage._caches = {};
+      CacheStorage._origin = 'about:blank';
+      CacheStorage._current = null;
+      return CacheStorage;
+    }();
+
+    var Cache =
+    /** @class */
+    function () {
+      function Cache(id, options) {
+        this.id = id;
+        this._options = options;
+        this._cache = {};
+      }
+
+      Cache.prototype.addImage = function (src) {
+        var result = Promise.resolve();
+
+        if (this.has(src)) {
+          return result;
+        }
+
+        if (isBlobImage(src) || isRenderable(src)) {
+          this._cache[src] = this.loadImage(src);
+          return result;
+        }
+
+        return result;
+      }; // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+      Cache.prototype.match = function (src) {
+        return this._cache[src];
+      };
+
+      Cache.prototype.loadImage = function (key) {
+        return __awaiter(this, void 0, void 0, function () {
+          var isSameOrigin, useCORS, useProxy, src;
+
+          var _this = this;
+
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                isSameOrigin = CacheStorage.isSameOrigin(key);
+                useCORS = !isInlineImage(key) && this._options.useCORS === true && FEATURES.SUPPORT_CORS_IMAGES && !isSameOrigin;
+                useProxy = !isInlineImage(key) && !isSameOrigin && typeof this._options.proxy === 'string' && FEATURES.SUPPORT_CORS_XHR && !useCORS;
+
+                if (!isSameOrigin && this._options.allowTaint === false && !isInlineImage(key) && !useProxy && !useCORS) {
+                  return [2
+                  /*return*/
+                  ];
+                }
+
+                src = key;
+                if (!useProxy) return [3
+                /*break*/
+                , 2];
+                return [4
+                /*yield*/
+                , this.proxy(src)];
+
+              case 1:
+                src = _a.sent();
+                _a.label = 2;
+
+              case 2:
+                Logger.getInstance(this.id).debug("Added image " + key.substring(0, 256));
+                return [4
+                /*yield*/
+                , new Promise(function (resolve, reject) {
+                  var img = new Image();
+
+                  img.onload = function () {
+                    return resolve(img);
+                  };
+
+                  img.onerror = reject; //ios safari 10.3 taints canvas with data urls unless crossOrigin is set to anonymous
+
+                  if (isInlineBase64Image(src) || useCORS) {
+                    img.crossOrigin = 'anonymous';
+                  }
+
+                  img.src = src;
+
+                  if (img.complete === true) {
+                    // Inline XML images may fail to parse, throwing an Error later on
+                    setTimeout(function () {
+                      return resolve(img);
+                    }, 500);
+                  }
+
+                  if (_this._options.imageTimeout > 0) {
+                    setTimeout(function () {
+                      return reject("Timed out (" + _this._options.imageTimeout + "ms) loading image");
+                    }, _this._options.imageTimeout);
+                  }
+                })];
+
+              case 3:
+                return [2
+                /*return*/
+                , _a.sent()];
+            }
+          });
+        });
+      };
+
+      Cache.prototype.has = function (key) {
+        return typeof this._cache[key] !== 'undefined';
+      };
+
+      Cache.prototype.keys = function () {
+        return Promise.resolve(Object.keys(this._cache));
+      };
+
+      Cache.prototype.proxy = function (src) {
+        var _this = this;
+
+        var proxy = this._options.proxy;
+
+        if (!proxy) {
+          throw new Error('No proxy defined');
+        }
+
+        var key = src.substring(0, 256);
+        return new Promise(function (resolve, reject) {
+          var responseType = FEATURES.SUPPORT_RESPONSE_TYPE ? 'blob' : 'text';
+          var xhr = new XMLHttpRequest();
+
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              if (responseType === 'text') {
+                resolve(xhr.response);
+              } else {
+                var reader_1 = new FileReader();
+                reader_1.addEventListener('load', function () {
+                  return resolve(reader_1.result);
+                }, false);
+                reader_1.addEventListener('error', function (e) {
+                  return reject(e);
+                }, false);
+                reader_1.readAsDataURL(xhr.response);
+              }
+            } else {
+              reject("Failed to proxy resource " + key + " with status code " + xhr.status);
+            }
+          };
+
+          xhr.onerror = reject;
+          xhr.open('GET', proxy + "?url=" + encodeURIComponent(src) + "&responseType=" + responseType);
+
+          if (responseType !== 'text' && xhr instanceof XMLHttpRequest) {
+            xhr.responseType = responseType;
+          }
+
+          if (_this._options.imageTimeout) {
+            var timeout_1 = _this._options.imageTimeout;
+            xhr.timeout = timeout_1;
+
+            xhr.ontimeout = function () {
+              return reject("Timed out (" + timeout_1 + "ms) proxying " + key);
+            };
+          }
+
+          xhr.send();
+        });
+      };
+
+      return Cache;
+    }();
+
+    var INLINE_SVG = /^data:image\/svg\+xml/i;
+    var INLINE_BASE64 = /^data:image\/.*;base64,/i;
+    var INLINE_IMG = /^data:image\/.*/i;
+
+    var isRenderable = function isRenderable(src) {
+      return FEATURES.SUPPORT_SVG_DRAWING || !isSVG(src);
+    };
+
+    var isInlineImage = function isInlineImage(src) {
+      return INLINE_IMG.test(src);
+    };
+
+    var isInlineBase64Image = function isInlineBase64Image(src) {
+      return INLINE_BASE64.test(src);
+    };
+
+    var isBlobImage = function isBlobImage(src) {
+      return src.substr(0, 4) === 'blob';
+    };
+
+    var isSVG = function isSVG(src) {
+      return src.substr(-3).toLowerCase() === 'svg' || INLINE_SVG.test(src);
+    };
+
+    var webkitGradient = function webkitGradient(tokens) {
+      var angle = deg(180);
+      var stops = [];
+      var type = CSSImageType.LINEAR_GRADIENT;
+      var shape = CSSRadialShape.CIRCLE;
+      var size = CSSRadialExtent.FARTHEST_CORNER;
+      var position = [];
+      parseFunctionArgs(tokens).forEach(function (arg, i) {
+        var firstToken = arg[0];
+
+        if (i === 0) {
+          if (isIdentToken(firstToken) && firstToken.value === 'linear') {
+            type = CSSImageType.LINEAR_GRADIENT;
+            return;
+          } else if (isIdentToken(firstToken) && firstToken.value === 'radial') {
+            type = CSSImageType.RADIAL_GRADIENT;
+            return;
+          }
+        }
+
+        if (firstToken.type === TokenType.FUNCTION) {
+          if (firstToken.name === 'from') {
+            var color$1 = color.parse(firstToken.values[0]);
+            stops.push({
+              stop: ZERO_LENGTH,
+              color: color$1
+            });
+          } else if (firstToken.name === 'to') {
+            var color$1 = color.parse(firstToken.values[0]);
+            stops.push({
+              stop: HUNDRED_PERCENT,
+              color: color$1
+            });
+          } else if (firstToken.name === 'color-stop') {
+            var values = firstToken.values.filter(nonFunctionArgSeparator);
+
+            if (values.length === 2) {
+              var color$1 = color.parse(values[1]);
+              var stop_1 = values[0];
+
+              if (isNumberToken(stop_1)) {
+                stops.push({
+                  stop: {
+                    type: TokenType.PERCENTAGE_TOKEN,
+                    number: stop_1.number * 100,
+                    flags: stop_1.flags
+                  },
+                  color: color$1
+                });
+              }
+            }
+          }
+        }
+      });
+      return type === CSSImageType.LINEAR_GRADIENT ? {
+        angle: (angle + deg(180)) % deg(360),
+        stops: stops,
+        type: type
+      } : {
+        size: size,
+        shape: shape,
+        stops: stops,
+        position: position,
+        type: type
+      };
+    };
+
+    var CLOSEST_SIDE = 'closest-side';
+    var FARTHEST_SIDE = 'farthest-side';
+    var CLOSEST_CORNER = 'closest-corner';
+    var FARTHEST_CORNER = 'farthest-corner';
+    var CIRCLE = 'circle';
+    var ELLIPSE = 'ellipse';
+    var COVER = 'cover';
+    var CONTAIN = 'contain';
+
+    var radialGradient = function radialGradient(tokens) {
+      var shape = CSSRadialShape.CIRCLE;
+      var size = CSSRadialExtent.FARTHEST_CORNER;
+      var stops = [];
+      var position = [];
+      parseFunctionArgs(tokens).forEach(function (arg, i) {
+        var isColorStop = true;
+
+        if (i === 0) {
+          var isAtPosition_1 = false;
+          isColorStop = arg.reduce(function (acc, token) {
+            if (isAtPosition_1) {
+              if (isIdentToken(token)) {
+                switch (token.value) {
+                  case 'center':
+                    position.push(FIFTY_PERCENT);
+                    return acc;
+
+                  case 'top':
+                  case 'left':
+                    position.push(ZERO_LENGTH);
+                    return acc;
+
+                  case 'right':
+                  case 'bottom':
+                    position.push(HUNDRED_PERCENT);
+                    return acc;
+                }
+              } else if (isLengthPercentage(token) || isLength(token)) {
+                position.push(token);
+              }
+            } else if (isIdentToken(token)) {
+              switch (token.value) {
+                case CIRCLE:
+                  shape = CSSRadialShape.CIRCLE;
+                  return false;
+
+                case ELLIPSE:
+                  shape = CSSRadialShape.ELLIPSE;
+                  return false;
+
+                case 'at':
+                  isAtPosition_1 = true;
+                  return false;
+
+                case CLOSEST_SIDE:
+                  size = CSSRadialExtent.CLOSEST_SIDE;
+                  return false;
+
+                case COVER:
+                case FARTHEST_SIDE:
+                  size = CSSRadialExtent.FARTHEST_SIDE;
+                  return false;
+
+                case CONTAIN:
+                case CLOSEST_CORNER:
+                  size = CSSRadialExtent.CLOSEST_CORNER;
+                  return false;
+
+                case FARTHEST_CORNER:
+                  size = CSSRadialExtent.FARTHEST_CORNER;
+                  return false;
+              }
+            } else if (isLength(token) || isLengthPercentage(token)) {
+              if (!Array.isArray(size)) {
+                size = [];
+              }
+
+              size.push(token);
+              return false;
+            }
+
+            return acc;
+          }, isColorStop);
+        }
+
+        if (isColorStop) {
+          var colorStop = parseColorStop(arg);
+          stops.push(colorStop);
+        }
+      });
+      return {
+        size: size,
+        shape: shape,
+        stops: stops,
+        position: position,
+        type: CSSImageType.RADIAL_GRADIENT
+      };
+    };
+
+    var prefixRadialGradient = function prefixRadialGradient(tokens) {
+      var shape = CSSRadialShape.CIRCLE;
+      var size = CSSRadialExtent.FARTHEST_CORNER;
+      var stops = [];
+      var position = [];
+      parseFunctionArgs(tokens).forEach(function (arg, i) {
+        var isColorStop = true;
+
+        if (i === 0) {
+          isColorStop = arg.reduce(function (acc, token) {
+            if (isIdentToken(token)) {
+              switch (token.value) {
+                case 'center':
+                  position.push(FIFTY_PERCENT);
+                  return false;
+
+                case 'top':
+                case 'left':
+                  position.push(ZERO_LENGTH);
+                  return false;
+
+                case 'right':
+                case 'bottom':
+                  position.push(HUNDRED_PERCENT);
+                  return false;
+              }
+            } else if (isLengthPercentage(token) || isLength(token)) {
+              position.push(token);
+              return false;
+            }
+
+            return acc;
+          }, isColorStop);
+        } else if (i === 1) {
+          isColorStop = arg.reduce(function (acc, token) {
+            if (isIdentToken(token)) {
+              switch (token.value) {
+                case CIRCLE:
+                  shape = CSSRadialShape.CIRCLE;
+                  return false;
+
+                case ELLIPSE:
+                  shape = CSSRadialShape.ELLIPSE;
+                  return false;
+
+                case CONTAIN:
+                case CLOSEST_SIDE:
+                  size = CSSRadialExtent.CLOSEST_SIDE;
+                  return false;
+
+                case FARTHEST_SIDE:
+                  size = CSSRadialExtent.FARTHEST_SIDE;
+                  return false;
+
+                case CLOSEST_CORNER:
+                  size = CSSRadialExtent.CLOSEST_CORNER;
+                  return false;
+
+                case COVER:
+                case FARTHEST_CORNER:
+                  size = CSSRadialExtent.FARTHEST_CORNER;
+                  return false;
+              }
+            } else if (isLength(token) || isLengthPercentage(token)) {
+              if (!Array.isArray(size)) {
+                size = [];
+              }
+
+              size.push(token);
+              return false;
+            }
+
+            return acc;
+          }, isColorStop);
+        }
+
+        if (isColorStop) {
+          var colorStop = parseColorStop(arg);
+          stops.push(colorStop);
+        }
+      });
+      return {
+        size: size,
+        shape: shape,
+        stops: stops,
+        position: position,
+        type: CSSImageType.RADIAL_GRADIENT
+      };
+    };
+
+    var CSSImageType;
+
+    (function (CSSImageType) {
+      CSSImageType[CSSImageType["URL"] = 0] = "URL";
+      CSSImageType[CSSImageType["LINEAR_GRADIENT"] = 1] = "LINEAR_GRADIENT";
+      CSSImageType[CSSImageType["RADIAL_GRADIENT"] = 2] = "RADIAL_GRADIENT";
+    })(CSSImageType || (CSSImageType = {}));
+
+    var isLinearGradient = function isLinearGradient(background) {
+      return background.type === CSSImageType.LINEAR_GRADIENT;
+    };
+
+    var isRadialGradient = function isRadialGradient(background) {
+      return background.type === CSSImageType.RADIAL_GRADIENT;
+    };
+
+    var CSSRadialShape;
+
+    (function (CSSRadialShape) {
+      CSSRadialShape[CSSRadialShape["CIRCLE"] = 0] = "CIRCLE";
+      CSSRadialShape[CSSRadialShape["ELLIPSE"] = 1] = "ELLIPSE";
+    })(CSSRadialShape || (CSSRadialShape = {}));
+
+    var CSSRadialExtent;
+
+    (function (CSSRadialExtent) {
+      CSSRadialExtent[CSSRadialExtent["CLOSEST_SIDE"] = 0] = "CLOSEST_SIDE";
+      CSSRadialExtent[CSSRadialExtent["FARTHEST_SIDE"] = 1] = "FARTHEST_SIDE";
+      CSSRadialExtent[CSSRadialExtent["CLOSEST_CORNER"] = 2] = "CLOSEST_CORNER";
+      CSSRadialExtent[CSSRadialExtent["FARTHEST_CORNER"] = 3] = "FARTHEST_CORNER";
+    })(CSSRadialExtent || (CSSRadialExtent = {}));
+
+    var image = {
+      name: 'image',
+      parse: function parse(value) {
+        if (value.type === TokenType.URL_TOKEN) {
+          var image_1 = {
+            url: value.value,
+            type: CSSImageType.URL
+          };
+          CacheStorage.getInstance().addImage(value.value);
+          return image_1;
+        }
+
+        if (value.type === TokenType.FUNCTION) {
+          var imageFunction = SUPPORTED_IMAGE_FUNCTIONS[value.name];
+
+          if (typeof imageFunction === 'undefined') {
+            throw new Error("Attempting to parse an unsupported image function \"" + value.name + "\"");
+          }
+
+          return imageFunction(value.values);
+        }
+
+        throw new Error("Unsupported image type");
+      }
+    };
+
+    function isSupportedImage(value) {
+      return value.type !== TokenType.FUNCTION || SUPPORTED_IMAGE_FUNCTIONS[value.name];
+    }
+
+    var SUPPORTED_IMAGE_FUNCTIONS = {
+      'linear-gradient': linearGradient,
+      '-moz-linear-gradient': prefixLinearGradient,
+      '-ms-linear-gradient': prefixLinearGradient,
+      '-o-linear-gradient': prefixLinearGradient,
+      '-webkit-linear-gradient': prefixLinearGradient,
+      'radial-gradient': radialGradient,
+      '-moz-radial-gradient': prefixRadialGradient,
+      '-ms-radial-gradient': prefixRadialGradient,
+      '-o-radial-gradient': prefixRadialGradient,
+      '-webkit-radial-gradient': prefixRadialGradient,
+      '-webkit-gradient': webkitGradient
+    };
+    var backgroundImage = {
+      name: 'background-image',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        if (tokens.length === 0) {
+          return [];
+        }
+
+        var first = tokens[0];
+
+        if (first.type === TokenType.IDENT_TOKEN && first.value === 'none') {
+          return [];
+        }
+
+        return tokens.filter(function (value) {
+          return nonFunctionArgSeparator(value) && isSupportedImage(value);
+        }).map(image.parse);
+      }
+    };
+    var backgroundOrigin = {
+      name: 'background-origin',
+      initialValue: 'border-box',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return tokens.map(function (token) {
+          if (isIdentToken(token)) {
+            switch (token.value) {
+              case 'padding-box':
+                return 1
+                /* PADDING_BOX */
+                ;
+
+              case 'content-box':
+                return 2
+                /* CONTENT_BOX */
+                ;
+            }
+          }
+
+          return 0
+          /* BORDER_BOX */
+          ;
+        });
+      }
+    };
+    var backgroundPosition = {
+      name: 'background-position',
+      initialValue: '0% 0%',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        return parseFunctionArgs(tokens).map(function (values) {
+          return values.filter(isLengthPercentage);
+        }).map(parseLengthPercentageTuple);
+      }
+    };
+    var BACKGROUND_REPEAT;
+
+    (function (BACKGROUND_REPEAT) {
+      BACKGROUND_REPEAT[BACKGROUND_REPEAT["REPEAT"] = 0] = "REPEAT";
+      BACKGROUND_REPEAT[BACKGROUND_REPEAT["NO_REPEAT"] = 1] = "NO_REPEAT";
+      BACKGROUND_REPEAT[BACKGROUND_REPEAT["REPEAT_X"] = 2] = "REPEAT_X";
+      BACKGROUND_REPEAT[BACKGROUND_REPEAT["REPEAT_Y"] = 3] = "REPEAT_Y";
+    })(BACKGROUND_REPEAT || (BACKGROUND_REPEAT = {}));
+
+    var backgroundRepeat = {
+      name: 'background-repeat',
+      initialValue: 'repeat',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return parseFunctionArgs(tokens).map(function (values) {
+          return values.filter(isIdentToken).map(function (token) {
+            return token.value;
+          }).join(' ');
+        }).map(parseBackgroundRepeat);
+      }
+    };
+
+    var parseBackgroundRepeat = function parseBackgroundRepeat(value) {
+      switch (value) {
+        case 'no-repeat':
+          return BACKGROUND_REPEAT.NO_REPEAT;
+
+        case 'repeat-x':
+        case 'repeat no-repeat':
+          return BACKGROUND_REPEAT.REPEAT_X;
+
+        case 'repeat-y':
+        case 'no-repeat repeat':
+          return BACKGROUND_REPEAT.REPEAT_Y;
+
+        case 'repeat':
+        default:
+          return BACKGROUND_REPEAT.REPEAT;
+      }
+    };
+
+    var BACKGROUND_SIZE;
+
+    (function (BACKGROUND_SIZE) {
+      BACKGROUND_SIZE["AUTO"] = "auto";
+      BACKGROUND_SIZE["CONTAIN"] = "contain";
+      BACKGROUND_SIZE["COVER"] = "cover";
+    })(BACKGROUND_SIZE || (BACKGROUND_SIZE = {}));
+
+    var backgroundSize = {
+      name: 'background-size',
+      initialValue: '0',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return parseFunctionArgs(tokens).map(function (values) {
+          return values.filter(isBackgroundSizeInfoToken);
+        });
+      }
+    };
+
+    var isBackgroundSizeInfoToken = function isBackgroundSizeInfoToken(value) {
+      return isIdentToken(value) || isLengthPercentage(value);
+    };
+
+    var borderColorForSide = function borderColorForSide(side) {
+      return {
+        name: "border-" + side + "-color",
+        initialValue: 'transparent',
+        prefix: false,
+        type: PropertyDescriptorParsingType.TYPE_VALUE,
+        format: 'color'
+      };
+    };
+
+    var borderTopColor = borderColorForSide('top');
+    var borderRightColor = borderColorForSide('right');
+    var borderBottomColor = borderColorForSide('bottom');
+    var borderLeftColor = borderColorForSide('left');
+
+    var borderRadiusForSide = function borderRadiusForSide(side) {
+      return {
+        name: "border-radius-" + side,
+        initialValue: '0 0',
+        prefix: false,
+        type: PropertyDescriptorParsingType.LIST,
+        parse: function parse(tokens) {
+          return parseLengthPercentageTuple(tokens.filter(isLengthPercentage));
+        }
+      };
+    };
+
+    var borderTopLeftRadius = borderRadiusForSide('top-left');
+    var borderTopRightRadius = borderRadiusForSide('top-right');
+    var borderBottomRightRadius = borderRadiusForSide('bottom-right');
+    var borderBottomLeftRadius = borderRadiusForSide('bottom-left');
+    var BORDER_STYLE;
+
+    (function (BORDER_STYLE) {
+      BORDER_STYLE[BORDER_STYLE["NONE"] = 0] = "NONE";
+      BORDER_STYLE[BORDER_STYLE["SOLID"] = 1] = "SOLID";
+    })(BORDER_STYLE || (BORDER_STYLE = {}));
+
+    var borderStyleForSide = function borderStyleForSide(side) {
+      return {
+        name: "border-" + side + "-style",
+        initialValue: 'solid',
+        prefix: false,
+        type: PropertyDescriptorParsingType.IDENT_VALUE,
+        parse: function parse(style) {
+          switch (style) {
+            case 'none':
+              return BORDER_STYLE.NONE;
+          }
+
+          return BORDER_STYLE.SOLID;
+        }
+      };
+    };
+
+    var borderTopStyle = borderStyleForSide('top');
+    var borderRightStyle = borderStyleForSide('right');
+    var borderBottomStyle = borderStyleForSide('bottom');
+    var borderLeftStyle = borderStyleForSide('left');
+
+    var borderWidthForSide = function borderWidthForSide(side) {
+      return {
+        name: "border-" + side + "-width",
+        initialValue: '0',
+        type: PropertyDescriptorParsingType.VALUE,
+        prefix: false,
+        parse: function parse(token) {
+          if (isDimensionToken(token)) {
+            return token.number;
+          }
+
+          return 0;
+        }
+      };
+    };
+
+    var borderTopWidth = borderWidthForSide('top');
+    var borderRightWidth = borderWidthForSide('right');
+    var borderBottomWidth = borderWidthForSide('bottom');
+    var borderLeftWidth = borderWidthForSide('left');
+    var color$1 = {
+      name: "color",
+      initialValue: 'transparent',
+      prefix: false,
+      type: PropertyDescriptorParsingType.TYPE_VALUE,
+      format: 'color'
+    };
+    var display = {
+      name: 'display',
+      initialValue: 'inline-block',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return tokens.filter(isIdentToken).reduce(function (bit, token) {
+          return bit | parseDisplayValue(token.value);
+        }, 0
+        /* NONE */
+        );
+      }
+    };
+
+    var parseDisplayValue = function parseDisplayValue(display) {
+      switch (display) {
+        case 'block':
+          return 2
+          /* BLOCK */
+          ;
+
+        case 'inline':
+          return 4
+          /* INLINE */
+          ;
+
+        case 'run-in':
+          return 8
+          /* RUN_IN */
+          ;
+
+        case 'flow':
+          return 16
+          /* FLOW */
+          ;
+
+        case 'flow-root':
+          return 32
+          /* FLOW_ROOT */
+          ;
+
+        case 'table':
+          return 64
+          /* TABLE */
+          ;
+
+        case 'flex':
+        case '-webkit-flex':
+          return 128
+          /* FLEX */
+          ;
+
+        case 'grid':
+        case '-ms-grid':
+          return 256
+          /* GRID */
+          ;
+
+        case 'ruby':
+          return 512
+          /* RUBY */
+          ;
+
+        case 'subgrid':
+          return 1024
+          /* SUBGRID */
+          ;
+
+        case 'list-item':
+          return 2048
+          /* LIST_ITEM */
+          ;
+
+        case 'table-row-group':
+          return 4096
+          /* TABLE_ROW_GROUP */
+          ;
+
+        case 'table-header-group':
+          return 8192
+          /* TABLE_HEADER_GROUP */
+          ;
+
+        case 'table-footer-group':
+          return 16384
+          /* TABLE_FOOTER_GROUP */
+          ;
+
+        case 'table-row':
+          return 32768
+          /* TABLE_ROW */
+          ;
+
+        case 'table-cell':
+          return 65536
+          /* TABLE_CELL */
+          ;
+
+        case 'table-column-group':
+          return 131072
+          /* TABLE_COLUMN_GROUP */
+          ;
+
+        case 'table-column':
+          return 262144
+          /* TABLE_COLUMN */
+          ;
+
+        case 'table-caption':
+          return 524288
+          /* TABLE_CAPTION */
+          ;
+
+        case 'ruby-base':
+          return 1048576
+          /* RUBY_BASE */
+          ;
+
+        case 'ruby-text':
+          return 2097152
+          /* RUBY_TEXT */
+          ;
+
+        case 'ruby-base-container':
+          return 4194304
+          /* RUBY_BASE_CONTAINER */
+          ;
+
+        case 'ruby-text-container':
+          return 8388608
+          /* RUBY_TEXT_CONTAINER */
+          ;
+
+        case 'contents':
+          return 16777216
+          /* CONTENTS */
+          ;
+
+        case 'inline-block':
+          return 33554432
+          /* INLINE_BLOCK */
+          ;
+
+        case 'inline-list-item':
+          return 67108864
+          /* INLINE_LIST_ITEM */
+          ;
+
+        case 'inline-table':
+          return 134217728
+          /* INLINE_TABLE */
+          ;
+
+        case 'inline-flex':
+          return 268435456
+          /* INLINE_FLEX */
+          ;
+
+        case 'inline-grid':
+          return 536870912
+          /* INLINE_GRID */
+          ;
+      }
+
+      return 0
+      /* NONE */
+      ;
+    };
+
+    var FLOAT;
+
+    (function (FLOAT) {
+      FLOAT[FLOAT["NONE"] = 0] = "NONE";
+      FLOAT[FLOAT["LEFT"] = 1] = "LEFT";
+      FLOAT[FLOAT["RIGHT"] = 2] = "RIGHT";
+      FLOAT[FLOAT["INLINE_START"] = 3] = "INLINE_START";
+      FLOAT[FLOAT["INLINE_END"] = 4] = "INLINE_END";
+    })(FLOAT || (FLOAT = {}));
+
+    var _float = {
+      name: 'float',
+      initialValue: 'none',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(_float2) {
+        switch (_float2) {
+          case 'left':
+            return FLOAT.LEFT;
+
+          case 'right':
+            return FLOAT.RIGHT;
+
+          case 'inline-start':
+            return FLOAT.INLINE_START;
+
+          case 'inline-end':
+            return FLOAT.INLINE_END;
+        }
+
+        return FLOAT.NONE;
+      }
+    };
+    var letterSpacing = {
+      name: 'letter-spacing',
+      initialValue: '0',
+      prefix: false,
+      type: PropertyDescriptorParsingType.VALUE,
+      parse: function parse(token) {
+        if (token.type === TokenType.IDENT_TOKEN && token.value === 'normal') {
+          return 0;
+        }
+
+        if (token.type === TokenType.NUMBER_TOKEN) {
+          return token.number;
+        }
+
+        if (token.type === TokenType.DIMENSION_TOKEN) {
+          return token.number;
+        }
+
+        return 0;
+      }
+    };
+    var LINE_BREAK;
+
+    (function (LINE_BREAK) {
+      LINE_BREAK["NORMAL"] = "normal";
+      LINE_BREAK["STRICT"] = "strict";
+    })(LINE_BREAK || (LINE_BREAK = {}));
+
+    var lineBreak = {
+      name: 'line-break',
+      initialValue: 'normal',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(lineBreak) {
+        switch (lineBreak) {
+          case 'strict':
+            return LINE_BREAK.STRICT;
+
+          case 'normal':
+          default:
+            return LINE_BREAK.NORMAL;
+        }
+      }
+    };
+    var lineHeight = {
+      name: 'line-height',
+      initialValue: 'normal',
+      prefix: false,
+      type: PropertyDescriptorParsingType.TOKEN_VALUE
+    };
+
+    var computeLineHeight = function computeLineHeight(token, fontSize) {
+      if (isIdentToken(token) && token.value === 'normal') {
+        return 1.2 * fontSize;
+      } else if (token.type === TokenType.NUMBER_TOKEN) {
+        return fontSize * token.number;
+      } else if (isLengthPercentage(token)) {
+        return getAbsoluteValue(token, fontSize);
+      }
+
+      return fontSize;
+    };
+
+    var listStyleImage = {
+      name: 'list-style-image',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.VALUE,
+      prefix: false,
+      parse: function parse(token) {
+        if (token.type === TokenType.IDENT_TOKEN && token.value === 'none') {
+          return null;
+        }
+
+        return image.parse(token);
+      }
+    };
+    var LIST_STYLE_POSITION;
+
+    (function (LIST_STYLE_POSITION) {
+      LIST_STYLE_POSITION[LIST_STYLE_POSITION["INSIDE"] = 0] = "INSIDE";
+      LIST_STYLE_POSITION[LIST_STYLE_POSITION["OUTSIDE"] = 1] = "OUTSIDE";
+    })(LIST_STYLE_POSITION || (LIST_STYLE_POSITION = {}));
+
+    var listStylePosition = {
+      name: 'list-style-position',
+      initialValue: 'outside',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(position) {
+        switch (position) {
+          case 'inside':
+            return LIST_STYLE_POSITION.INSIDE;
+
+          case 'outside':
+          default:
+            return LIST_STYLE_POSITION.OUTSIDE;
+        }
+      }
+    };
+    var LIST_STYLE_TYPE;
+
+    (function (LIST_STYLE_TYPE) {
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["NONE"] = -1] = "NONE";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DISC"] = 0] = "DISC";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CIRCLE"] = 1] = "CIRCLE";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["SQUARE"] = 2] = "SQUARE";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DECIMAL"] = 3] = "DECIMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CJK_DECIMAL"] = 4] = "CJK_DECIMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DECIMAL_LEADING_ZERO"] = 5] = "DECIMAL_LEADING_ZERO";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["LOWER_ROMAN"] = 6] = "LOWER_ROMAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["UPPER_ROMAN"] = 7] = "UPPER_ROMAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["LOWER_GREEK"] = 8] = "LOWER_GREEK";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["LOWER_ALPHA"] = 9] = "LOWER_ALPHA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["UPPER_ALPHA"] = 10] = "UPPER_ALPHA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["ARABIC_INDIC"] = 11] = "ARABIC_INDIC";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["ARMENIAN"] = 12] = "ARMENIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["BENGALI"] = 13] = "BENGALI";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CAMBODIAN"] = 14] = "CAMBODIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CJK_EARTHLY_BRANCH"] = 15] = "CJK_EARTHLY_BRANCH";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CJK_HEAVENLY_STEM"] = 16] = "CJK_HEAVENLY_STEM";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["CJK_IDEOGRAPHIC"] = 17] = "CJK_IDEOGRAPHIC";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DEVANAGARI"] = 18] = "DEVANAGARI";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["ETHIOPIC_NUMERIC"] = 19] = "ETHIOPIC_NUMERIC";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["GEORGIAN"] = 20] = "GEORGIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["GUJARATI"] = 21] = "GUJARATI";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["GURMUKHI"] = 22] = "GURMUKHI";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["HEBREW"] = 22] = "HEBREW";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["HIRAGANA"] = 23] = "HIRAGANA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["HIRAGANA_IROHA"] = 24] = "HIRAGANA_IROHA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["JAPANESE_FORMAL"] = 25] = "JAPANESE_FORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["JAPANESE_INFORMAL"] = 26] = "JAPANESE_INFORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KANNADA"] = 27] = "KANNADA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KATAKANA"] = 28] = "KATAKANA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KATAKANA_IROHA"] = 29] = "KATAKANA_IROHA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KHMER"] = 30] = "KHMER";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KOREAN_HANGUL_FORMAL"] = 31] = "KOREAN_HANGUL_FORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KOREAN_HANJA_FORMAL"] = 32] = "KOREAN_HANJA_FORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["KOREAN_HANJA_INFORMAL"] = 33] = "KOREAN_HANJA_INFORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["LAO"] = 34] = "LAO";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["LOWER_ARMENIAN"] = 35] = "LOWER_ARMENIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["MALAYALAM"] = 36] = "MALAYALAM";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["MONGOLIAN"] = 37] = "MONGOLIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["MYANMAR"] = 38] = "MYANMAR";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["ORIYA"] = 39] = "ORIYA";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["PERSIAN"] = 40] = "PERSIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["SIMP_CHINESE_FORMAL"] = 41] = "SIMP_CHINESE_FORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["SIMP_CHINESE_INFORMAL"] = 42] = "SIMP_CHINESE_INFORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["TAMIL"] = 43] = "TAMIL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["TELUGU"] = 44] = "TELUGU";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["THAI"] = 45] = "THAI";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["TIBETAN"] = 46] = "TIBETAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["TRAD_CHINESE_FORMAL"] = 47] = "TRAD_CHINESE_FORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["TRAD_CHINESE_INFORMAL"] = 48] = "TRAD_CHINESE_INFORMAL";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["UPPER_ARMENIAN"] = 49] = "UPPER_ARMENIAN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DISCLOSURE_OPEN"] = 50] = "DISCLOSURE_OPEN";
+      LIST_STYLE_TYPE[LIST_STYLE_TYPE["DISCLOSURE_CLOSED"] = 51] = "DISCLOSURE_CLOSED";
+    })(LIST_STYLE_TYPE || (LIST_STYLE_TYPE = {}));
+
+    var listStyleType = {
+      name: 'list-style-type',
+      initialValue: 'none',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(type) {
+        switch (type) {
+          case 'disc':
+            return LIST_STYLE_TYPE.DISC;
+
+          case 'circle':
+            return LIST_STYLE_TYPE.CIRCLE;
+
+          case 'square':
+            return LIST_STYLE_TYPE.SQUARE;
+
+          case 'decimal':
+            return LIST_STYLE_TYPE.DECIMAL;
+
+          case 'cjk-decimal':
+            return LIST_STYLE_TYPE.CJK_DECIMAL;
+
+          case 'decimal-leading-zero':
+            return LIST_STYLE_TYPE.DECIMAL_LEADING_ZERO;
+
+          case 'lower-roman':
+            return LIST_STYLE_TYPE.LOWER_ROMAN;
+
+          case 'upper-roman':
+            return LIST_STYLE_TYPE.UPPER_ROMAN;
+
+          case 'lower-greek':
+            return LIST_STYLE_TYPE.LOWER_GREEK;
+
+          case 'lower-alpha':
+            return LIST_STYLE_TYPE.LOWER_ALPHA;
+
+          case 'upper-alpha':
+            return LIST_STYLE_TYPE.UPPER_ALPHA;
+
+          case 'arabic-indic':
+            return LIST_STYLE_TYPE.ARABIC_INDIC;
+
+          case 'armenian':
+            return LIST_STYLE_TYPE.ARMENIAN;
+
+          case 'bengali':
+            return LIST_STYLE_TYPE.BENGALI;
+
+          case 'cambodian':
+            return LIST_STYLE_TYPE.CAMBODIAN;
+
+          case 'cjk-earthly-branch':
+            return LIST_STYLE_TYPE.CJK_EARTHLY_BRANCH;
+
+          case 'cjk-heavenly-stem':
+            return LIST_STYLE_TYPE.CJK_HEAVENLY_STEM;
+
+          case 'cjk-ideographic':
+            return LIST_STYLE_TYPE.CJK_IDEOGRAPHIC;
+
+          case 'devanagari':
+            return LIST_STYLE_TYPE.DEVANAGARI;
+
+          case 'ethiopic-numeric':
+            return LIST_STYLE_TYPE.ETHIOPIC_NUMERIC;
+
+          case 'georgian':
+            return LIST_STYLE_TYPE.GEORGIAN;
+
+          case 'gujarati':
+            return LIST_STYLE_TYPE.GUJARATI;
+
+          case 'gurmukhi':
+            return LIST_STYLE_TYPE.GURMUKHI;
+
+          case 'hebrew':
+            return LIST_STYLE_TYPE.HEBREW;
+
+          case 'hiragana':
+            return LIST_STYLE_TYPE.HIRAGANA;
+
+          case 'hiragana-iroha':
+            return LIST_STYLE_TYPE.HIRAGANA_IROHA;
+
+          case 'japanese-formal':
+            return LIST_STYLE_TYPE.JAPANESE_FORMAL;
+
+          case 'japanese-informal':
+            return LIST_STYLE_TYPE.JAPANESE_INFORMAL;
+
+          case 'kannada':
+            return LIST_STYLE_TYPE.KANNADA;
+
+          case 'katakana':
+            return LIST_STYLE_TYPE.KATAKANA;
+
+          case 'katakana-iroha':
+            return LIST_STYLE_TYPE.KATAKANA_IROHA;
+
+          case 'khmer':
+            return LIST_STYLE_TYPE.KHMER;
+
+          case 'korean-hangul-formal':
+            return LIST_STYLE_TYPE.KOREAN_HANGUL_FORMAL;
+
+          case 'korean-hanja-formal':
+            return LIST_STYLE_TYPE.KOREAN_HANJA_FORMAL;
+
+          case 'korean-hanja-informal':
+            return LIST_STYLE_TYPE.KOREAN_HANJA_INFORMAL;
+
+          case 'lao':
+            return LIST_STYLE_TYPE.LAO;
+
+          case 'lower-armenian':
+            return LIST_STYLE_TYPE.LOWER_ARMENIAN;
+
+          case 'malayalam':
+            return LIST_STYLE_TYPE.MALAYALAM;
+
+          case 'mongolian':
+            return LIST_STYLE_TYPE.MONGOLIAN;
+
+          case 'myanmar':
+            return LIST_STYLE_TYPE.MYANMAR;
+
+          case 'oriya':
+            return LIST_STYLE_TYPE.ORIYA;
+
+          case 'persian':
+            return LIST_STYLE_TYPE.PERSIAN;
+
+          case 'simp-chinese-formal':
+            return LIST_STYLE_TYPE.SIMP_CHINESE_FORMAL;
+
+          case 'simp-chinese-informal':
+            return LIST_STYLE_TYPE.SIMP_CHINESE_INFORMAL;
+
+          case 'tamil':
+            return LIST_STYLE_TYPE.TAMIL;
+
+          case 'telugu':
+            return LIST_STYLE_TYPE.TELUGU;
+
+          case 'thai':
+            return LIST_STYLE_TYPE.THAI;
+
+          case 'tibetan':
+            return LIST_STYLE_TYPE.TIBETAN;
+
+          case 'trad-chinese-formal':
+            return LIST_STYLE_TYPE.TRAD_CHINESE_FORMAL;
+
+          case 'trad-chinese-informal':
+            return LIST_STYLE_TYPE.TRAD_CHINESE_INFORMAL;
+
+          case 'upper-armenian':
+            return LIST_STYLE_TYPE.UPPER_ARMENIAN;
+
+          case 'disclosure-open':
+            return LIST_STYLE_TYPE.DISCLOSURE_OPEN;
+
+          case 'disclosure-closed':
+            return LIST_STYLE_TYPE.DISCLOSURE_CLOSED;
+
+          case 'none':
+          default:
+            return LIST_STYLE_TYPE.NONE;
+        }
+      }
+    };
+
+    var marginForSide = function marginForSide(side) {
+      return {
+        name: "margin-" + side,
+        initialValue: '0',
+        prefix: false,
+        type: PropertyDescriptorParsingType.TOKEN_VALUE
+      };
+    };
+
+    var marginTop = marginForSide('top');
+    var marginRight = marginForSide('right');
+    var marginBottom = marginForSide('bottom');
+    var marginLeft = marginForSide('left');
+    var OVERFLOW;
+
+    (function (OVERFLOW) {
+      OVERFLOW[OVERFLOW["VISIBLE"] = 0] = "VISIBLE";
+      OVERFLOW[OVERFLOW["HIDDEN"] = 1] = "HIDDEN";
+      OVERFLOW[OVERFLOW["SCROLL"] = 2] = "SCROLL";
+      OVERFLOW[OVERFLOW["AUTO"] = 3] = "AUTO";
+    })(OVERFLOW || (OVERFLOW = {}));
+
+    var overflow = {
+      name: 'overflow',
+      initialValue: 'visible',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return tokens.filter(isIdentToken).map(function (overflow) {
+          switch (overflow.value) {
+            case 'hidden':
+              return OVERFLOW.HIDDEN;
+
+            case 'scroll':
+              return OVERFLOW.SCROLL;
+
+            case 'auto':
+              return OVERFLOW.AUTO;
+
+            case 'visible':
+            default:
+              return OVERFLOW.VISIBLE;
+          }
+        });
+      }
+    };
+    var OVERFLOW_WRAP;
+
+    (function (OVERFLOW_WRAP) {
+      OVERFLOW_WRAP["NORMAL"] = "normal";
+      OVERFLOW_WRAP["BREAK_WORD"] = "break-word";
+    })(OVERFLOW_WRAP || (OVERFLOW_WRAP = {}));
+
+    var overflowWrap = {
+      name: 'overflow-wrap',
+      initialValue: 'normal',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(overflow) {
+        switch (overflow) {
+          case 'break-word':
+            return OVERFLOW_WRAP.BREAK_WORD;
+
+          case 'normal':
+          default:
+            return OVERFLOW_WRAP.NORMAL;
+        }
+      }
+    };
+
+    var paddingForSide = function paddingForSide(side) {
+      return {
+        name: "padding-" + side,
+        initialValue: '0',
+        prefix: false,
+        type: PropertyDescriptorParsingType.TYPE_VALUE,
+        format: 'length-percentage'
+      };
+    };
+
+    var paddingTop = paddingForSide('top');
+    var paddingRight = paddingForSide('right');
+    var paddingBottom = paddingForSide('bottom');
+    var paddingLeft = paddingForSide('left');
+    var TEXT_ALIGN;
+
+    (function (TEXT_ALIGN) {
+      TEXT_ALIGN[TEXT_ALIGN["LEFT"] = 0] = "LEFT";
+      TEXT_ALIGN[TEXT_ALIGN["CENTER"] = 1] = "CENTER";
+      TEXT_ALIGN[TEXT_ALIGN["RIGHT"] = 2] = "RIGHT";
+    })(TEXT_ALIGN || (TEXT_ALIGN = {}));
+
+    var textAlign = {
+      name: 'text-align',
+      initialValue: 'left',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(textAlign) {
+        switch (textAlign) {
+          case 'right':
+            return TEXT_ALIGN.RIGHT;
+
+          case 'center':
+          case 'justify':
+            return TEXT_ALIGN.CENTER;
+
+          case 'left':
+          default:
+            return TEXT_ALIGN.LEFT;
+        }
+      }
+    };
+    var POSITION;
+
+    (function (POSITION) {
+      POSITION[POSITION["STATIC"] = 0] = "STATIC";
+      POSITION[POSITION["RELATIVE"] = 1] = "RELATIVE";
+      POSITION[POSITION["ABSOLUTE"] = 2] = "ABSOLUTE";
+      POSITION[POSITION["FIXED"] = 3] = "FIXED";
+      POSITION[POSITION["STICKY"] = 4] = "STICKY";
+    })(POSITION || (POSITION = {}));
+
+    var position = {
+      name: 'position',
+      initialValue: 'static',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(position) {
+        switch (position) {
+          case 'relative':
+            return POSITION.RELATIVE;
+
+          case 'absolute':
+            return POSITION.ABSOLUTE;
+
+          case 'fixed':
+            return POSITION.FIXED;
+
+          case 'sticky':
+            return POSITION.STICKY;
+        }
+
+        return POSITION.STATIC;
+      }
+    };
+    var textShadow = {
+      name: 'text-shadow',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        if (tokens.length === 1 && isIdentWithValue(tokens[0], 'none')) {
+          return [];
+        }
+
+        return parseFunctionArgs(tokens).map(function (values) {
+          var shadow = {
+            color: COLORS.TRANSPARENT,
+            offsetX: ZERO_LENGTH,
+            offsetY: ZERO_LENGTH,
+            blur: ZERO_LENGTH
+          };
+          var c = 0;
+
+          for (var i = 0; i < values.length; i++) {
+            var token = values[i];
+
+            if (isLength(token)) {
+              if (c === 0) {
+                shadow.offsetX = token;
+              } else if (c === 1) {
+                shadow.offsetY = token;
+              } else {
+                shadow.blur = token;
+              }
+
+              c++;
+            } else {
+              shadow.color = color.parse(token);
+            }
+          }
+
+          return shadow;
+        });
+      }
+    };
+    var TEXT_TRANSFORM;
+
+    (function (TEXT_TRANSFORM) {
+      TEXT_TRANSFORM[TEXT_TRANSFORM["NONE"] = 0] = "NONE";
+      TEXT_TRANSFORM[TEXT_TRANSFORM["LOWERCASE"] = 1] = "LOWERCASE";
+      TEXT_TRANSFORM[TEXT_TRANSFORM["UPPERCASE"] = 2] = "UPPERCASE";
+      TEXT_TRANSFORM[TEXT_TRANSFORM["CAPITALIZE"] = 3] = "CAPITALIZE";
+    })(TEXT_TRANSFORM || (TEXT_TRANSFORM = {}));
+
+    var textTransform = {
+      name: 'text-transform',
+      initialValue: 'none',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(textTransform) {
+        switch (textTransform) {
+          case 'uppercase':
+            return TEXT_TRANSFORM.UPPERCASE;
+
+          case 'lowercase':
+            return TEXT_TRANSFORM.LOWERCASE;
+
+          case 'capitalize':
+            return TEXT_TRANSFORM.CAPITALIZE;
+        }
+
+        return TEXT_TRANSFORM.NONE;
+      }
+    };
+    var transform = {
+      name: 'transform',
+      initialValue: 'none',
+      prefix: true,
+      type: PropertyDescriptorParsingType.VALUE,
+      parse: function parse(token) {
+        if (token.type === TokenType.IDENT_TOKEN && token.value === 'none') {
+          return null;
+        }
+
+        if (token.type === TokenType.FUNCTION) {
+          var transformFunction = SUPPORTED_TRANSFORM_FUNCTIONS[token.name];
+
+          if (typeof transformFunction === 'undefined') {
+            throw new Error("Attempting to parse an unsupported transform function \"" + token.name + "\"");
+          }
+
+          return transformFunction(token.values);
+        }
+
+        return null;
+      }
+    };
+
+    var matrix = function matrix(args) {
+      var values = args.filter(function (arg) {
+        return arg.type === TokenType.NUMBER_TOKEN;
+      }).map(function (arg) {
+        return arg.number;
+      });
+      return values.length === 6 ? values : null;
+    }; // doesn't support 3D transforms at the moment
+
+
+    var matrix3d = function matrix3d(args) {
+      var values = args.filter(function (arg) {
+        return arg.type === TokenType.NUMBER_TOKEN;
+      }).map(function (arg) {
+        return arg.number;
+      });
+      var a1 = values[0],
+          b1 = values[1],
+          _a = values[2],
+          _b = values[3],
+          a2 = values[4],
+          b2 = values[5],
+          _c = values[6],
+          _d = values[7],
+          _e = values[8],
+          _f = values[9],
+          _g = values[10],
+          _h = values[11],
+          a4 = values[12],
+          b4 = values[13],
+          _j = values[14],
+          _k = values[15];
+      return values.length === 16 ? [a1, b1, a2, b2, a4, b4] : null;
+    };
+
+    var SUPPORTED_TRANSFORM_FUNCTIONS = {
+      matrix: matrix,
+      matrix3d: matrix3d
+    };
+    var DEFAULT_VALUE = {
+      type: TokenType.PERCENTAGE_TOKEN,
+      number: 50,
+      flags: FLAG_INTEGER
+    };
+    var DEFAULT = [DEFAULT_VALUE, DEFAULT_VALUE];
+    var transformOrigin = {
+      name: 'transform-origin',
+      initialValue: '50% 50%',
+      prefix: true,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        var origins = tokens.filter(isLengthPercentage);
+
+        if (origins.length !== 2) {
+          return DEFAULT;
+        }
+
+        return [origins[0], origins[1]];
+      }
+    };
+    var VISIBILITY;
+
+    (function (VISIBILITY) {
+      VISIBILITY[VISIBILITY["VISIBLE"] = 0] = "VISIBLE";
+      VISIBILITY[VISIBILITY["HIDDEN"] = 1] = "HIDDEN";
+      VISIBILITY[VISIBILITY["COLLAPSE"] = 2] = "COLLAPSE";
+    })(VISIBILITY || (VISIBILITY = {}));
+
+    var visibility = {
+      name: 'visible',
+      initialValue: 'none',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(visibility) {
+        switch (visibility) {
+          case 'hidden':
+            return VISIBILITY.HIDDEN;
+
+          case 'collapse':
+            return VISIBILITY.COLLAPSE;
+
+          case 'visible':
+          default:
+            return VISIBILITY.VISIBLE;
+        }
+      }
+    };
+    var WORD_BREAK;
+
+    (function (WORD_BREAK) {
+      WORD_BREAK["NORMAL"] = "normal";
+      WORD_BREAK["BREAK_ALL"] = "break-all";
+      WORD_BREAK["KEEP_ALL"] = "keep-all";
+    })(WORD_BREAK || (WORD_BREAK = {}));
+
+    var wordBreak = {
+      name: 'word-break',
+      initialValue: 'normal',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(wordBreak) {
+        switch (wordBreak) {
+          case 'break-all':
+            return WORD_BREAK.BREAK_ALL;
+
+          case 'keep-all':
+            return WORD_BREAK.KEEP_ALL;
+
+          case 'normal':
+          default:
+            return WORD_BREAK.NORMAL;
+        }
+      }
+    };
+    var zIndex = {
+      name: 'z-index',
+      initialValue: 'auto',
+      prefix: false,
+      type: PropertyDescriptorParsingType.VALUE,
+      parse: function parse(token) {
+        if (token.type === TokenType.IDENT_TOKEN) {
+          return {
+            auto: true,
+            order: 0
+          };
+        }
+
+        if (isNumberToken(token)) {
+          return {
+            auto: false,
+            order: token.number
+          };
+        }
+
+        throw new Error("Invalid z-index number parsed");
+      }
+    };
+    var opacity = {
+      name: 'opacity',
+      initialValue: '1',
+      type: PropertyDescriptorParsingType.VALUE,
+      prefix: false,
+      parse: function parse(token) {
+        if (isNumberToken(token)) {
+          return token.number;
+        }
+
+        return 1;
+      }
+    };
+    var textDecorationColor = {
+      name: "text-decoration-color",
+      initialValue: 'transparent',
+      prefix: false,
+      type: PropertyDescriptorParsingType.TYPE_VALUE,
+      format: 'color'
+    };
+    var textDecorationLine = {
+      name: 'text-decoration-line',
+      initialValue: 'none',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        return tokens.filter(isIdentToken).map(function (token) {
+          switch (token.value) {
+            case 'underline':
+              return 1
+              /* UNDERLINE */
+              ;
+
+            case 'overline':
+              return 2
+              /* OVERLINE */
+              ;
+
+            case 'line-through':
+              return 3
+              /* LINE_THROUGH */
+              ;
+
+            case 'none':
+              return 4
+              /* BLINK */
+              ;
+          }
+
+          return 0
+          /* NONE */
+          ;
+        }).filter(function (line) {
+          return line !== 0
+          /* NONE */
+          ;
+        });
+      }
+    };
+    var fontFamily = {
+      name: "font-family",
+      initialValue: '',
+      prefix: false,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        var accumulator = [];
+        var results = [];
+        tokens.forEach(function (token) {
+          switch (token.type) {
+            case TokenType.IDENT_TOKEN:
+            case TokenType.STRING_TOKEN:
+              accumulator.push(token.value);
+              break;
+
+            case TokenType.NUMBER_TOKEN:
+              accumulator.push(token.number.toString());
+              break;
+
+            case TokenType.COMMA_TOKEN:
+              results.push(accumulator.join(' '));
+              accumulator.length = 0;
+              break;
+          }
+        });
+
+        if (accumulator.length) {
+          results.push(accumulator.join(' '));
+        }
+
+        return results.map(function (result) {
+          return result.indexOf(' ') === -1 ? result : "'" + result + "'";
+        });
+      }
+    };
+    var fontSize = {
+      name: "font-size",
+      initialValue: '0',
+      prefix: false,
+      type: PropertyDescriptorParsingType.TYPE_VALUE,
+      format: 'length'
+    };
+    var fontWeight = {
+      name: 'font-weight',
+      initialValue: 'normal',
+      type: PropertyDescriptorParsingType.VALUE,
+      prefix: false,
+      parse: function parse(token) {
+        if (isNumberToken(token)) {
+          return token.number;
+        }
+
+        if (isIdentToken(token)) {
+          switch (token.value) {
+            case 'bold':
+              return 700;
+
+            case 'normal':
+            default:
+              return 400;
+          }
+        }
+
+        return 400;
+      }
+    };
+    var fontVariant = {
+      name: 'font-variant',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        return tokens.filter(isIdentToken).map(function (token) {
+          return token.value;
+        });
+      }
+    };
+    var FONT_STYLE;
+
+    (function (FONT_STYLE) {
+      FONT_STYLE["NORMAL"] = "normal";
+      FONT_STYLE["ITALIC"] = "italic";
+      FONT_STYLE["OBLIQUE"] = "oblique";
+    })(FONT_STYLE || (FONT_STYLE = {}));
+
+    var fontStyle = {
+      name: 'font-style',
+      initialValue: 'normal',
+      prefix: false,
+      type: PropertyDescriptorParsingType.IDENT_VALUE,
+      parse: function parse(overflow) {
+        switch (overflow) {
+          case 'oblique':
+            return FONT_STYLE.OBLIQUE;
+
+          case 'italic':
+            return FONT_STYLE.ITALIC;
+
+          case 'normal':
+          default:
+            return FONT_STYLE.NORMAL;
+        }
+      }
+    };
+
+    var contains = function contains(bit, value) {
+      return (bit & value) !== 0;
+    };
+
+    var content = {
+      name: 'content',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        if (tokens.length === 0) {
+          return [];
+        }
+
+        var first = tokens[0];
+
+        if (first.type === TokenType.IDENT_TOKEN && first.value === 'none') {
+          return [];
+        }
+
+        return tokens;
+      }
+    };
+    var counterIncrement = {
+      name: 'counter-increment',
+      initialValue: 'none',
+      prefix: true,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        if (tokens.length === 0) {
+          return null;
+        }
+
+        var first = tokens[0];
+
+        if (first.type === TokenType.IDENT_TOKEN && first.value === 'none') {
+          return null;
+        }
+
+        var increments = [];
+        var filtered = tokens.filter(nonWhiteSpace);
+
+        for (var i = 0; i < filtered.length; i++) {
+          var counter = filtered[i];
+          var next = filtered[i + 1];
+
+          if (counter.type === TokenType.IDENT_TOKEN) {
+            var increment = next && isNumberToken(next) ? next.number : 1;
+            increments.push({
+              counter: counter.value,
+              increment: increment
+            });
+          }
+        }
+
+        return increments;
+      }
+    };
+    var counterReset = {
+      name: 'counter-reset',
+      initialValue: 'none',
+      prefix: true,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        if (tokens.length === 0) {
+          return [];
+        }
+
+        var resets = [];
+        var filtered = tokens.filter(nonWhiteSpace);
+
+        for (var i = 0; i < filtered.length; i++) {
+          var counter = filtered[i];
+          var next = filtered[i + 1];
+
+          if (isIdentToken(counter) && counter.value !== 'none') {
+            var reset = next && isNumberToken(next) ? next.number : 0;
+            resets.push({
+              counter: counter.value,
+              reset: reset
+            });
+          }
+        }
+
+        return resets;
+      }
+    };
+    var quotes = {
+      name: 'quotes',
+      initialValue: 'none',
+      prefix: true,
+      type: PropertyDescriptorParsingType.LIST,
+      parse: function parse(tokens) {
+        if (tokens.length === 0) {
+          return null;
+        }
+
+        var first = tokens[0];
+
+        if (first.type === TokenType.IDENT_TOKEN && first.value === 'none') {
+          return null;
+        }
+
+        var quotes = [];
+        var filtered = tokens.filter(isStringToken);
+
+        if (filtered.length % 2 !== 0) {
+          return null;
+        }
+
+        for (var i = 0; i < filtered.length; i += 2) {
+          var open_1 = filtered[i].value;
+          var close_1 = filtered[i + 1].value;
+          quotes.push({
+            open: open_1,
+            close: close_1
+          });
+        }
+
+        return quotes;
+      }
+    };
+
+    var getQuote = function getQuote(quotes, depth, open) {
+      if (!quotes) {
+        return '';
+      }
+
+      var quote = quotes[Math.min(depth, quotes.length - 1)];
+
+      if (!quote) {
+        return '';
+      }
+
+      return open ? quote.open : quote.close;
+    };
+
+    var boxShadow = {
+      name: 'box-shadow',
+      initialValue: 'none',
+      type: PropertyDescriptorParsingType.LIST,
+      prefix: false,
+      parse: function parse(tokens) {
+        if (tokens.length === 1 && isIdentWithValue(tokens[0], 'none')) {
+          return [];
+        }
+
+        return parseFunctionArgs(tokens).map(function (values) {
+          var shadow = {
+            color: 0x000000ff,
+            offsetX: ZERO_LENGTH,
+            offsetY: ZERO_LENGTH,
+            blur: ZERO_LENGTH,
+            spread: ZERO_LENGTH,
+            inset: false
+          };
+          var c = 0;
+
+          for (var i = 0; i < values.length; i++) {
+            var token = values[i];
+
+            if (isIdentWithValue(token, 'inset')) {
+              shadow.inset = true;
+            } else if (isLength(token)) {
+              if (c === 0) {
+                shadow.offsetX = token;
+              } else if (c === 1) {
+                shadow.offsetY = token;
+              } else if (c === 2) {
+                shadow.blur = token;
+              } else {
+                shadow.spread = token;
+              }
+
+              c++;
+            } else {
+              shadow.color = color.parse(token);
+            }
+          }
+
+          return shadow;
+        });
+      }
+    };
+
+    var CSSParsedDeclaration =
+    /** @class */
+    function () {
+      function CSSParsedDeclaration(declaration) {
+        this.backgroundClip = parse(backgroundClip, declaration.backgroundClip);
+        this.backgroundColor = parse(backgroundColor, declaration.backgroundColor);
+        this.backgroundImage = parse(backgroundImage, declaration.backgroundImage);
+        this.backgroundOrigin = parse(backgroundOrigin, declaration.backgroundOrigin);
+        this.backgroundPosition = parse(backgroundPosition, declaration.backgroundPosition);
+        this.backgroundRepeat = parse(backgroundRepeat, declaration.backgroundRepeat);
+        this.backgroundSize = parse(backgroundSize, declaration.backgroundSize);
+        this.borderTopColor = parse(borderTopColor, declaration.borderTopColor);
+        this.borderRightColor = parse(borderRightColor, declaration.borderRightColor);
+        this.borderBottomColor = parse(borderBottomColor, declaration.borderBottomColor);
+        this.borderLeftColor = parse(borderLeftColor, declaration.borderLeftColor);
+        this.borderTopLeftRadius = parse(borderTopLeftRadius, declaration.borderTopLeftRadius);
+        this.borderTopRightRadius = parse(borderTopRightRadius, declaration.borderTopRightRadius);
+        this.borderBottomRightRadius = parse(borderBottomRightRadius, declaration.borderBottomRightRadius);
+        this.borderBottomLeftRadius = parse(borderBottomLeftRadius, declaration.borderBottomLeftRadius);
+        this.borderTopStyle = parse(borderTopStyle, declaration.borderTopStyle);
+        this.borderRightStyle = parse(borderRightStyle, declaration.borderRightStyle);
+        this.borderBottomStyle = parse(borderBottomStyle, declaration.borderBottomStyle);
+        this.borderLeftStyle = parse(borderLeftStyle, declaration.borderLeftStyle);
+        this.borderTopWidth = parse(borderTopWidth, declaration.borderTopWidth);
+        this.borderRightWidth = parse(borderRightWidth, declaration.borderRightWidth);
+        this.borderBottomWidth = parse(borderBottomWidth, declaration.borderBottomWidth);
+        this.borderLeftWidth = parse(borderLeftWidth, declaration.borderLeftWidth);
+        this.boxShadow = parse(boxShadow, declaration.boxShadow);
+        this.color = parse(color$1, declaration.color);
+        this.display = parse(display, declaration.display);
+        this["float"] = parse(_float, declaration.cssFloat);
+        this.fontFamily = parse(fontFamily, declaration.fontFamily);
+        this.fontSize = parse(fontSize, declaration.fontSize);
+        this.fontStyle = parse(fontStyle, declaration.fontStyle);
+        this.fontVariant = parse(fontVariant, declaration.fontVariant);
+        this.fontWeight = parse(fontWeight, declaration.fontWeight);
+        this.letterSpacing = parse(letterSpacing, declaration.letterSpacing);
+        this.lineBreak = parse(lineBreak, declaration.lineBreak);
+        this.lineHeight = parse(lineHeight, declaration.lineHeight);
+        this.listStyleImage = parse(listStyleImage, declaration.listStyleImage);
+        this.listStylePosition = parse(listStylePosition, declaration.listStylePosition);
+        this.listStyleType = parse(listStyleType, declaration.listStyleType);
+        this.marginTop = parse(marginTop, declaration.marginTop);
+        this.marginRight = parse(marginRight, declaration.marginRight);
+        this.marginBottom = parse(marginBottom, declaration.marginBottom);
+        this.marginLeft = parse(marginLeft, declaration.marginLeft);
+        this.opacity = parse(opacity, declaration.opacity);
+        var overflowTuple = parse(overflow, declaration.overflow);
+        this.overflowX = overflowTuple[0];
+        this.overflowY = overflowTuple[overflowTuple.length > 1 ? 1 : 0];
+        this.overflowWrap = parse(overflowWrap, declaration.overflowWrap);
+        this.paddingTop = parse(paddingTop, declaration.paddingTop);
+        this.paddingRight = parse(paddingRight, declaration.paddingRight);
+        this.paddingBottom = parse(paddingBottom, declaration.paddingBottom);
+        this.paddingLeft = parse(paddingLeft, declaration.paddingLeft);
+        this.position = parse(position, declaration.position);
+        this.textAlign = parse(textAlign, declaration.textAlign);
+        this.textDecorationColor = parse(textDecorationColor, declaration.textDecorationColor || declaration.color);
+        this.textDecorationLine = parse(textDecorationLine, declaration.textDecorationLine);
+        this.textShadow = parse(textShadow, declaration.textShadow);
+        this.textTransform = parse(textTransform, declaration.textTransform);
+        this.transform = parse(transform, declaration.transform);
+        this.transformOrigin = parse(transformOrigin, declaration.transformOrigin);
+        this.visibility = parse(visibility, declaration.visibility);
+        this.wordBreak = parse(wordBreak, declaration.wordBreak);
+        this.zIndex = parse(zIndex, declaration.zIndex);
+      }
+
+      CSSParsedDeclaration.prototype.isVisible = function () {
+        return this.display > 0 && this.opacity > 0 && this.visibility === VISIBILITY.VISIBLE;
+      };
+
+      CSSParsedDeclaration.prototype.isTransparent = function () {
+        return isTransparent(this.backgroundColor);
+      };
+
+      CSSParsedDeclaration.prototype.isTransformed = function () {
+        return this.transform !== null;
+      };
+
+      CSSParsedDeclaration.prototype.isPositioned = function () {
+        return this.position !== POSITION.STATIC;
+      };
+
+      CSSParsedDeclaration.prototype.isPositionedWithZIndex = function () {
+        return this.isPositioned() && !this.zIndex.auto;
+      };
+
+      CSSParsedDeclaration.prototype.isFloating = function () {
+        return this["float"] !== FLOAT.NONE;
+      };
+
+      CSSParsedDeclaration.prototype.isInlineLevel = function () {
+        return contains(this.display, 4
+        /* INLINE */
+        ) || contains(this.display, 33554432
+        /* INLINE_BLOCK */
+        ) || contains(this.display, 268435456
+        /* INLINE_FLEX */
+        ) || contains(this.display, 536870912
+        /* INLINE_GRID */
+        ) || contains(this.display, 67108864
+        /* INLINE_LIST_ITEM */
+        ) || contains(this.display, 134217728
+        /* INLINE_TABLE */
+        );
+      };
+
+      return CSSParsedDeclaration;
+    }();
+
+    var CSSParsedPseudoDeclaration =
+    /** @class */
+    function () {
+      function CSSParsedPseudoDeclaration(declaration) {
+        this.content = parse(content, declaration.content);
+        this.quotes = parse(quotes, declaration.quotes);
+      }
+
+      return CSSParsedPseudoDeclaration;
+    }();
+
+    var CSSParsedCounterDeclaration =
+    /** @class */
+    function () {
+      function CSSParsedCounterDeclaration(declaration) {
+        this.counterIncrement = parse(counterIncrement, declaration.counterIncrement);
+        this.counterReset = parse(counterReset, declaration.counterReset);
+      }
+
+      return CSSParsedCounterDeclaration;
+    }(); // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+    var parse = function parse(descriptor, style) {
+      var tokenizer = new Tokenizer();
+      var value = style !== null && typeof style !== 'undefined' ? style.toString() : descriptor.initialValue;
+      tokenizer.write(value);
+      var parser = new Parser(tokenizer.read());
+
+      switch (descriptor.type) {
+        case PropertyDescriptorParsingType.IDENT_VALUE:
+          var token = parser.parseComponentValue();
+          return descriptor.parse(isIdentToken(token) ? token.value : descriptor.initialValue);
+
+        case PropertyDescriptorParsingType.VALUE:
+          return descriptor.parse(parser.parseComponentValue());
+
+        case PropertyDescriptorParsingType.LIST:
+          return descriptor.parse(parser.parseComponentValues());
+
+        case PropertyDescriptorParsingType.TOKEN_VALUE:
+          return parser.parseComponentValue();
+
+        case PropertyDescriptorParsingType.TYPE_VALUE:
+          switch (descriptor.format) {
+            case 'angle':
+              return angle.parse(parser.parseComponentValue());
+
+            case 'color':
+              return color.parse(parser.parseComponentValue());
+
+            case 'image':
+              return image.parse(parser.parseComponentValue());
+
+            case 'length':
+              var length_1 = parser.parseComponentValue();
+              return isLength(length_1) ? length_1 : ZERO_LENGTH;
+
+            case 'length-percentage':
+              var value_1 = parser.parseComponentValue();
+              return isLengthPercentage(value_1) ? value_1 : ZERO_LENGTH;
+          }
+
+      }
+
+      throw new Error("Attempting to parse unsupported css format type " + descriptor.format);
+    };
+
+    var ElementContainer =
+    /** @class */
+    function () {
+      function ElementContainer(element) {
+        this.styles = new CSSParsedDeclaration(window.getComputedStyle(element, null));
+        this.textNodes = [];
+        this.elements = [];
+
+        if (this.styles.transform !== null && isHTMLElementNode(element)) {
+          // getBoundingClientRect takes transforms into account
+          element.style.transform = 'none';
+        }
+
+        this.bounds = parseBounds(element);
+        this.flags = 0;
+      }
+
+      return ElementContainer;
+    }();
+
+    var TextBounds =
+    /** @class */
+    function () {
+      function TextBounds(text, bounds) {
+        this.text = text;
+        this.bounds = bounds;
+      }
+
+      return TextBounds;
+    }();
+
+    var parseTextBounds = function parseTextBounds(value, styles, node) {
+      var textList = breakText(value, styles);
+      var textBounds = [];
+      var offset = 0;
+      textList.forEach(function (text) {
+        if (styles.textDecorationLine.length || text.trim().length > 0) {
+          if (FEATURES.SUPPORT_RANGE_BOUNDS) {
+            textBounds.push(new TextBounds(text, getRangeBounds(node, offset, text.length)));
+          } else {
+            var replacementNode = node.splitText(text.length);
+            textBounds.push(new TextBounds(text, getWrapperBounds(node)));
+            node = replacementNode;
+          }
+        } else if (!FEATURES.SUPPORT_RANGE_BOUNDS) {
+          node = node.splitText(text.length);
+        }
+
+        offset += text.length;
+      });
+      return textBounds;
+    };
+
+    var getWrapperBounds = function getWrapperBounds(node) {
+      var ownerDocument = node.ownerDocument;
+
+      if (ownerDocument) {
+        var wrapper = ownerDocument.createElement('html2canvaswrapper');
+        wrapper.appendChild(node.cloneNode(true));
+        var parentNode = node.parentNode;
+
+        if (parentNode) {
+          parentNode.replaceChild(wrapper, node);
+          var bounds = parseBounds(wrapper);
+
+          if (wrapper.firstChild) {
+            parentNode.replaceChild(wrapper.firstChild, wrapper);
+          }
+
+          return bounds;
+        }
+      }
+
+      return new Bounds(0, 0, 0, 0);
+    };
+
+    var getRangeBounds = function getRangeBounds(node, offset, length) {
+      var ownerDocument = node.ownerDocument;
+
+      if (!ownerDocument) {
+        throw new Error('Node has no owner document');
+      }
+
+      var range = ownerDocument.createRange();
+      range.setStart(node, offset);
+      range.setEnd(node, offset + length);
+      return Bounds.fromClientRect(range.getBoundingClientRect());
+    };
+
+    var breakText = function breakText(value, styles) {
+      return styles.letterSpacing !== 0 ? toCodePoints(value).map(function (i) {
+        return fromCodePoint(i);
+      }) : breakWords(value, styles);
+    };
+
+    var breakWords = function breakWords(str, styles) {
+      var breaker = LineBreaker(str, {
+        lineBreak: styles.lineBreak,
+        wordBreak: styles.overflowWrap === OVERFLOW_WRAP.BREAK_WORD ? 'break-word' : styles.wordBreak
+      });
+      var words = [];
+      var bk;
+
+      while (!(bk = breaker.next()).done) {
+        if (bk.value) {
+          words.push(bk.value.slice());
+        }
+      }
+
+      return words;
+    };
+
+    var TextContainer =
+    /** @class */
+    function () {
+      function TextContainer(node, styles) {
+        this.text = transform$1(node.data, styles.textTransform);
+        this.textBounds = parseTextBounds(this.text, styles, node);
+      }
+
+      return TextContainer;
+    }();
+
+    var transform$1 = function transform$1(text, transform) {
+      switch (transform) {
+        case TEXT_TRANSFORM.LOWERCASE:
+          return text.toLowerCase();
+
+        case TEXT_TRANSFORM.CAPITALIZE:
+          return text.replace(CAPITALIZE, capitalize);
+
+        case TEXT_TRANSFORM.UPPERCASE:
+          return text.toUpperCase();
+
+        default:
+          return text;
+      }
+    };
+
+    var CAPITALIZE = /(^|\s|:|-|\(|\))([a-z])/g;
+
+    var capitalize = function capitalize(m, p1, p2) {
+      if (m.length > 0) {
+        return p1 + p2.toUpperCase();
+      }
+
+      return m;
+    };
+
+    var ImageElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(ImageElementContainer, _super);
+
+      function ImageElementContainer(img) {
+        var _this = _super.call(this, img) || this;
+
+        _this.src = img.currentSrc || img.src;
+        _this.intrinsicWidth = img.naturalWidth;
+        _this.intrinsicHeight = img.naturalHeight;
+        CacheStorage.getInstance().addImage(_this.src);
+        return _this;
+      }
+
+      return ImageElementContainer;
+    }(ElementContainer);
+
+    var CanvasElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(CanvasElementContainer, _super);
+
+      function CanvasElementContainer(canvas) {
+        var _this = _super.call(this, canvas) || this;
+
+        _this.canvas = canvas;
+        _this.intrinsicWidth = canvas.width;
+        _this.intrinsicHeight = canvas.height;
+        return _this;
+      }
+
+      return CanvasElementContainer;
+    }(ElementContainer);
+
+    var SVGElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(SVGElementContainer, _super);
+
+      function SVGElementContainer(img) {
+        var _this = _super.call(this, img) || this;
+
+        var s = new XMLSerializer();
+        _this.svg = "data:image/svg+xml," + encodeURIComponent(s.serializeToString(img));
+        _this.intrinsicWidth = img.width.baseVal.value;
+        _this.intrinsicHeight = img.height.baseVal.value;
+        CacheStorage.getInstance().addImage(_this.svg);
+        return _this;
+      }
+
+      return SVGElementContainer;
+    }(ElementContainer);
+
+    var LIElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(LIElementContainer, _super);
+
+      function LIElementContainer(element) {
+        var _this = _super.call(this, element) || this;
+
+        _this.value = element.value;
+        return _this;
+      }
+
+      return LIElementContainer;
+    }(ElementContainer);
+
+    var OLElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(OLElementContainer, _super);
+
+      function OLElementContainer(element) {
+        var _this = _super.call(this, element) || this;
+
+        _this.start = element.start;
+        _this.reversed = typeof element.reversed === 'boolean' && element.reversed === true;
+        return _this;
+      }
+
+      return OLElementContainer;
+    }(ElementContainer);
+
+    var CHECKBOX_BORDER_RADIUS = [{
+      type: TokenType.DIMENSION_TOKEN,
+      flags: 0,
+      unit: 'px',
+      number: 3
+    }];
+    var RADIO_BORDER_RADIUS = [{
+      type: TokenType.PERCENTAGE_TOKEN,
+      flags: 0,
+      number: 50
+    }];
+
+    var reformatInputBounds = function reformatInputBounds(bounds) {
+      if (bounds.width > bounds.height) {
+        return new Bounds(bounds.left + (bounds.width - bounds.height) / 2, bounds.top, bounds.height, bounds.height);
+      } else if (bounds.width < bounds.height) {
+        return new Bounds(bounds.left, bounds.top + (bounds.height - bounds.width) / 2, bounds.width, bounds.width);
+      }
+
+      return bounds;
+    };
+
+    var getInputValue = function getInputValue(node) {
+      var value = node.type === PASSWORD ? new Array(node.value.length + 1).join("\u2022") : node.value;
+      return value.length === 0 ? node.placeholder || '' : value;
+    };
+
+    var CHECKBOX = 'checkbox';
+    var RADIO = 'radio';
+    var PASSWORD = 'password';
+    var INPUT_COLOR = 0x2a2a2aff;
+
+    var InputElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(InputElementContainer, _super);
+
+      function InputElementContainer(input) {
+        var _this = _super.call(this, input) || this;
+
+        _this.type = input.type.toLowerCase();
+        _this.checked = input.checked;
+        _this.value = getInputValue(input);
+
+        if (_this.type === CHECKBOX || _this.type === RADIO) {
+          _this.styles.backgroundColor = 0xdededeff;
+          _this.styles.borderTopColor = _this.styles.borderRightColor = _this.styles.borderBottomColor = _this.styles.borderLeftColor = 0xa5a5a5ff;
+          _this.styles.borderTopWidth = _this.styles.borderRightWidth = _this.styles.borderBottomWidth = _this.styles.borderLeftWidth = 1;
+          _this.styles.borderTopStyle = _this.styles.borderRightStyle = _this.styles.borderBottomStyle = _this.styles.borderLeftStyle = BORDER_STYLE.SOLID;
+          _this.styles.backgroundClip = [BACKGROUND_CLIP.BORDER_BOX];
+          _this.styles.backgroundOrigin = [0
+          /* BORDER_BOX */
+          ];
+          _this.bounds = reformatInputBounds(_this.bounds);
+        }
+
+        switch (_this.type) {
+          case CHECKBOX:
+            _this.styles.borderTopRightRadius = _this.styles.borderTopLeftRadius = _this.styles.borderBottomRightRadius = _this.styles.borderBottomLeftRadius = CHECKBOX_BORDER_RADIUS;
+            break;
+
+          case RADIO:
+            _this.styles.borderTopRightRadius = _this.styles.borderTopLeftRadius = _this.styles.borderBottomRightRadius = _this.styles.borderBottomLeftRadius = RADIO_BORDER_RADIUS;
+            break;
+        }
+
+        return _this;
+      }
+
+      return InputElementContainer;
+    }(ElementContainer);
+
+    var SelectElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(SelectElementContainer, _super);
+
+      function SelectElementContainer(element) {
+        var _this = _super.call(this, element) || this;
+
+        var option = element.options[element.selectedIndex || 0];
+        _this.value = option ? option.text || '' : '';
+        return _this;
+      }
+
+      return SelectElementContainer;
+    }(ElementContainer);
+
+    var TextareaElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(TextareaElementContainer, _super);
+
+      function TextareaElementContainer(element) {
+        var _this = _super.call(this, element) || this;
+
+        _this.value = element.value;
+        return _this;
+      }
+
+      return TextareaElementContainer;
+    }(ElementContainer);
+
+    var parseColor = function parseColor(value) {
+      return color.parse(Parser.create(value).parseComponentValue());
+    };
+
+    var IFrameElementContainer =
+    /** @class */
+    function (_super) {
+      __extends(IFrameElementContainer, _super);
+
+      function IFrameElementContainer(iframe) {
+        var _this = _super.call(this, iframe) || this;
+
+        _this.src = iframe.src;
+        _this.width = parseInt(iframe.width, 10) || 0;
+        _this.height = parseInt(iframe.height, 10) || 0;
+        _this.backgroundColor = _this.styles.backgroundColor;
+
+        try {
+          if (iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.documentElement) {
+            _this.tree = parseTree(iframe.contentWindow.document.documentElement); // http://www.w3.org/TR/css3-background/#special-backgrounds
+
+            var documentBackgroundColor = iframe.contentWindow.document.documentElement ? parseColor(getComputedStyle(iframe.contentWindow.document.documentElement).backgroundColor) : COLORS.TRANSPARENT;
+            var bodyBackgroundColor = iframe.contentWindow.document.body ? parseColor(getComputedStyle(iframe.contentWindow.document.body).backgroundColor) : COLORS.TRANSPARENT;
+            _this.backgroundColor = isTransparent(documentBackgroundColor) ? isTransparent(bodyBackgroundColor) ? _this.styles.backgroundColor : bodyBackgroundColor : documentBackgroundColor;
+          }
+        } catch (e) {}
+
+        return _this;
+      }
+
+      return IFrameElementContainer;
+    }(ElementContainer);
+
+    var LIST_OWNERS = ['OL', 'UL', 'MENU'];
+
+    var parseNodeTree = function parseNodeTree(node, parent, root) {
+      for (var childNode = node.firstChild, nextNode = void 0; childNode; childNode = nextNode) {
+        nextNode = childNode.nextSibling;
+
+        if (isTextNode(childNode) && childNode.data.trim().length > 0) {
+          parent.textNodes.push(new TextContainer(childNode, parent.styles));
+        } else if (isElementNode(childNode)) {
+          var container = createContainer(childNode);
+
+          if (container.styles.isVisible()) {
+            if (createsRealStackingContext(childNode, container, root)) {
+              container.flags |= 4
+              /* CREATES_REAL_STACKING_CONTEXT */
+              ;
+            } else if (createsStackingContext(container.styles)) {
+              container.flags |= 2
+              /* CREATES_STACKING_CONTEXT */
+              ;
+            }
+
+            if (LIST_OWNERS.indexOf(childNode.tagName) !== -1) {
+              container.flags |= 8
+              /* IS_LIST_OWNER */
+              ;
+            }
+
+            parent.elements.push(container);
+
+            if (!isTextareaElement(childNode) && !isSVGElement(childNode) && !isSelectElement(childNode)) {
+              parseNodeTree(childNode, container, root);
+            }
+          }
+        }
+      }
+    };
+
+    var createContainer = function createContainer(element) {
+      if (isImageElement(element)) {
+        return new ImageElementContainer(element);
+      }
+
+      if (isCanvasElement(element)) {
+        return new CanvasElementContainer(element);
+      }
+
+      if (isSVGElement(element)) {
+        return new SVGElementContainer(element);
+      }
+
+      if (isLIElement(element)) {
+        return new LIElementContainer(element);
+      }
+
+      if (isOLElement(element)) {
+        return new OLElementContainer(element);
+      }
+
+      if (isInputElement(element)) {
+        return new InputElementContainer(element);
+      }
+
+      if (isSelectElement(element)) {
+        return new SelectElementContainer(element);
+      }
+
+      if (isTextareaElement(element)) {
+        return new TextareaElementContainer(element);
+      }
+
+      if (isIFrameElement(element)) {
+        return new IFrameElementContainer(element);
+      }
+
+      return new ElementContainer(element);
+    };
+
+    var parseTree = function parseTree(element) {
+      var container = createContainer(element);
+      container.flags |= 4
+      /* CREATES_REAL_STACKING_CONTEXT */
+      ;
+      parseNodeTree(element, container, container);
+      return container;
+    };
+
+    var createsRealStackingContext = function createsRealStackingContext(node, container, root) {
+      return container.styles.isPositionedWithZIndex() || container.styles.opacity < 1 || container.styles.isTransformed() || isBodyElement(node) && root.styles.isTransparent();
+    };
+
+    var createsStackingContext = function createsStackingContext(styles) {
+      return styles.isPositioned() || styles.isFloating();
+    };
+
+    var isTextNode = function isTextNode(node) {
+      return node.nodeType === Node.TEXT_NODE;
+    };
+
+    var isElementNode = function isElementNode(node) {
+      return node.nodeType === Node.ELEMENT_NODE;
+    };
+
+    var isHTMLElementNode = function isHTMLElementNode(node) {
+      return isElementNode(node) && typeof node.style !== 'undefined' && !isSVGElementNode(node);
+    };
+
+    var isSVGElementNode = function isSVGElementNode(element) {
+      return _typeof(element.className) === 'object';
+    };
+
+    var isLIElement = function isLIElement(node) {
+      return node.tagName === 'LI';
+    };
+
+    var isOLElement = function isOLElement(node) {
+      return node.tagName === 'OL';
+    };
+
+    var isInputElement = function isInputElement(node) {
+      return node.tagName === 'INPUT';
+    };
+
+    var isHTMLElement = function isHTMLElement(node) {
+      return node.tagName === 'HTML';
+    };
+
+    var isSVGElement = function isSVGElement(node) {
+      return node.tagName === 'svg';
+    };
+
+    var isBodyElement = function isBodyElement(node) {
+      return node.tagName === 'BODY';
+    };
+
+    var isCanvasElement = function isCanvasElement(node) {
+      return node.tagName === 'CANVAS';
+    };
+
+    var isImageElement = function isImageElement(node) {
+      return node.tagName === 'IMG';
+    };
+
+    var isIFrameElement = function isIFrameElement(node) {
+      return node.tagName === 'IFRAME';
+    };
+
+    var isStyleElement = function isStyleElement(node) {
+      return node.tagName === 'STYLE';
+    };
+
+    var isScriptElement = function isScriptElement(node) {
+      return node.tagName === 'SCRIPT';
+    };
+
+    var isTextareaElement = function isTextareaElement(node) {
+      return node.tagName === 'TEXTAREA';
+    };
+
+    var isSelectElement = function isSelectElement(node) {
+      return node.tagName === 'SELECT';
+    };
+
+    var CounterState =
+    /** @class */
+    function () {
+      function CounterState() {
+        this.counters = {};
+      }
+
+      CounterState.prototype.getCounterValue = function (name) {
+        var counter = this.counters[name];
+
+        if (counter && counter.length) {
+          return counter[counter.length - 1];
+        }
+
+        return 1;
+      };
+
+      CounterState.prototype.getCounterValues = function (name) {
+        var counter = this.counters[name];
+        return counter ? counter : [];
+      };
+
+      CounterState.prototype.pop = function (counters) {
+        var _this = this;
+
+        counters.forEach(function (counter) {
+          return _this.counters[counter].pop();
+        });
+      };
+
+      CounterState.prototype.parse = function (style) {
+        var _this = this;
+
+        var counterIncrement = style.counterIncrement;
+        var counterReset = style.counterReset;
+        var canReset = true;
+
+        if (counterIncrement !== null) {
+          counterIncrement.forEach(function (entry) {
+            var counter = _this.counters[entry.counter];
+
+            if (counter && entry.increment !== 0) {
+              canReset = false;
+              counter[Math.max(0, counter.length - 1)] += entry.increment;
+            }
+          });
+        }
+
+        var counterNames = [];
+
+        if (canReset) {
+          counterReset.forEach(function (entry) {
+            var counter = _this.counters[entry.counter];
+            counterNames.push(entry.counter);
+
+            if (!counter) {
+              counter = _this.counters[entry.counter] = [];
+            }
+
+            counter.push(entry.reset);
+          });
+        }
+
+        return counterNames;
+      };
+
+      return CounterState;
+    }();
+
+    var ROMAN_UPPER = {
+      integers: [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1],
+      values: ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I']
+    };
+    var ARMENIAN = {
+      integers: [9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+      values: ['Ք', 'Փ', 'Ւ', 'Ց', 'Ր', 'Տ', 'Վ', 'Ս', 'Ռ', 'Ջ', 'Պ', 'Չ', 'Ո', 'Շ', 'Ն', 'Յ', 'Մ', 'Ճ', 'Ղ', 'Ձ', 'Հ', 'Կ', 'Ծ', 'Խ', 'Լ', 'Ի', 'Ժ', 'Թ', 'Ը', 'Է', 'Զ', 'Ե', 'Դ', 'Գ', 'Բ', 'Ա']
+    };
+    var HEBREW = {
+      integers: [10000, 9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000, 400, 300, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 19, 18, 17, 16, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+      values: ['י׳', 'ט׳', 'ח׳', 'ז׳', 'ו׳', 'ה׳', 'ד׳', 'ג׳', 'ב׳', 'א׳', 'ת', 'ש', 'ר', 'ק', 'צ', 'פ', 'ע', 'ס', 'נ', 'מ', 'ל', 'כ', 'יט', 'יח', 'יז', 'טז', 'טו', 'י', 'ט', 'ח', 'ז', 'ו', 'ה', 'ד', 'ג', 'ב', 'א']
+    };
+    var GEORGIAN = {
+      integers: [10000, 9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+      values: ['ჵ', 'ჰ', 'ჯ', 'ჴ', 'ხ', 'ჭ', 'წ', 'ძ', 'ც', 'ჩ', 'შ', 'ყ', 'ღ', 'ქ', 'ფ', 'ჳ', 'ტ', 'ს', 'რ', 'ჟ', 'პ', 'ო', 'ჲ', 'ნ', 'მ', 'ლ', 'კ', 'ი', 'თ', 'ჱ', 'ზ', 'ვ', 'ე', 'დ', 'გ', 'ბ', 'ა']
+    };
+
+    var createAdditiveCounter = function createAdditiveCounter(value, min, max, symbols, fallback, suffix) {
+      if (value < min || value > max) {
+        return createCounterText(value, fallback, suffix.length > 0);
+      }
+
+      return symbols.integers.reduce(function (string, integer, index) {
+        while (value >= integer) {
+          value -= integer;
+          string += symbols.values[index];
+        }
+
+        return string;
+      }, '') + suffix;
+    };
+
+    var createCounterStyleWithSymbolResolver = function createCounterStyleWithSymbolResolver(value, codePointRangeLength, isNumeric, resolver) {
+      var string = '';
+
+      do {
+        if (!isNumeric) {
+          value--;
+        }
+
+        string = resolver(value) + string;
+        value /= codePointRangeLength;
+      } while (value * codePointRangeLength >= codePointRangeLength);
+
+      return string;
+    };
+
+    var createCounterStyleFromRange = function createCounterStyleFromRange(value, codePointRangeStart, codePointRangeEnd, isNumeric, suffix) {
+      var codePointRangeLength = codePointRangeEnd - codePointRangeStart + 1;
+      return (value < 0 ? '-' : '') + (createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, isNumeric, function (codePoint) {
+        return fromCodePoint(Math.floor(codePoint % codePointRangeLength) + codePointRangeStart);
+      }) + suffix);
+    };
+
+    var createCounterStyleFromSymbols = function createCounterStyleFromSymbols(value, symbols, suffix) {
+      if (suffix === void 0) {
+        suffix = '. ';
+      }
+
+      var codePointRangeLength = symbols.length;
+      return createCounterStyleWithSymbolResolver(Math.abs(value), codePointRangeLength, false, function (codePoint) {
+        return symbols[Math.floor(codePoint % codePointRangeLength)];
+      }) + suffix;
+    };
+
+    var CJK_ZEROS = 1 << 0;
+    var CJK_TEN_COEFFICIENTS = 1 << 1;
+    var CJK_TEN_HIGH_COEFFICIENTS = 1 << 2;
+    var CJK_HUNDRED_COEFFICIENTS = 1 << 3;
+
+    var createCJKCounter = function createCJKCounter(value, numbers, multipliers, negativeSign, suffix, flags) {
+      if (value < -9999 || value > 9999) {
+        return createCounterText(value, LIST_STYLE_TYPE.CJK_DECIMAL, suffix.length > 0);
+      }
+
+      var tmp = Math.abs(value);
+      var string = suffix;
+
+      if (tmp === 0) {
+        return numbers[0] + string;
+      }
+
+      for (var digit = 0; tmp > 0 && digit <= 4; digit++) {
+        var coefficient = tmp % 10;
+
+        if (coefficient === 0 && contains(flags, CJK_ZEROS) && string !== '') {
+          string = numbers[coefficient] + string;
+        } else if (coefficient > 1 || coefficient === 1 && digit === 0 || coefficient === 1 && digit === 1 && contains(flags, CJK_TEN_COEFFICIENTS) || coefficient === 1 && digit === 1 && contains(flags, CJK_TEN_HIGH_COEFFICIENTS) && value > 100 || coefficient === 1 && digit > 1 && contains(flags, CJK_HUNDRED_COEFFICIENTS)) {
+          string = numbers[coefficient] + (digit > 0 ? multipliers[digit - 1] : '') + string;
+        } else if (coefficient === 1 && digit > 0) {
+          string = multipliers[digit - 1] + string;
+        }
+
+        tmp = Math.floor(tmp / 10);
+      }
+
+      return (value < 0 ? negativeSign : '') + string;
+    };
+
+    var CHINESE_INFORMAL_MULTIPLIERS = '十百千萬';
+    var CHINESE_FORMAL_MULTIPLIERS = '拾佰仟萬';
+    var JAPANESE_NEGATIVE = 'マイナス';
+    var KOREAN_NEGATIVE = '마이너스';
+
+    var createCounterText = function createCounterText(value, type, appendSuffix) {
+      var defaultSuffix = appendSuffix ? '. ' : '';
+      var cjkSuffix = appendSuffix ? '、' : '';
+      var koreanSuffix = appendSuffix ? ', ' : '';
+      var spaceSuffix = appendSuffix ? ' ' : '';
+
+      switch (type) {
+        case LIST_STYLE_TYPE.DISC:
+          return '•' + spaceSuffix;
+
+        case LIST_STYLE_TYPE.CIRCLE:
+          return '◦' + spaceSuffix;
+
+        case LIST_STYLE_TYPE.SQUARE:
+          return '◾' + spaceSuffix;
+
+        case LIST_STYLE_TYPE.DECIMAL_LEADING_ZERO:
+          var string = createCounterStyleFromRange(value, 48, 57, true, defaultSuffix);
+          return string.length < 4 ? "0" + string : string;
+
+        case LIST_STYLE_TYPE.CJK_DECIMAL:
+          return createCounterStyleFromSymbols(value, '〇一二三四五六七八九', cjkSuffix);
+
+        case LIST_STYLE_TYPE.LOWER_ROMAN:
+          return createAdditiveCounter(value, 1, 3999, ROMAN_UPPER, LIST_STYLE_TYPE.DECIMAL, defaultSuffix).toLowerCase();
+
+        case LIST_STYLE_TYPE.UPPER_ROMAN:
+          return createAdditiveCounter(value, 1, 3999, ROMAN_UPPER, LIST_STYLE_TYPE.DECIMAL, defaultSuffix);
+
+        case LIST_STYLE_TYPE.LOWER_GREEK:
+          return createCounterStyleFromRange(value, 945, 969, false, defaultSuffix);
+
+        case LIST_STYLE_TYPE.LOWER_ALPHA:
+          return createCounterStyleFromRange(value, 97, 122, false, defaultSuffix);
+
+        case LIST_STYLE_TYPE.UPPER_ALPHA:
+          return createCounterStyleFromRange(value, 65, 90, false, defaultSuffix);
+
+        case LIST_STYLE_TYPE.ARABIC_INDIC:
+          return createCounterStyleFromRange(value, 1632, 1641, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.ARMENIAN:
+        case LIST_STYLE_TYPE.UPPER_ARMENIAN:
+          return createAdditiveCounter(value, 1, 9999, ARMENIAN, LIST_STYLE_TYPE.DECIMAL, defaultSuffix);
+
+        case LIST_STYLE_TYPE.LOWER_ARMENIAN:
+          return createAdditiveCounter(value, 1, 9999, ARMENIAN, LIST_STYLE_TYPE.DECIMAL, defaultSuffix).toLowerCase();
+
+        case LIST_STYLE_TYPE.BENGALI:
+          return createCounterStyleFromRange(value, 2534, 2543, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.CAMBODIAN:
+        case LIST_STYLE_TYPE.KHMER:
+          return createCounterStyleFromRange(value, 6112, 6121, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.CJK_EARTHLY_BRANCH:
+          return createCounterStyleFromSymbols(value, '子丑寅卯辰巳午未申酉戌亥', cjkSuffix);
+
+        case LIST_STYLE_TYPE.CJK_HEAVENLY_STEM:
+          return createCounterStyleFromSymbols(value, '甲乙丙丁戊己庚辛壬癸', cjkSuffix);
+
+        case LIST_STYLE_TYPE.CJK_IDEOGRAPHIC:
+        case LIST_STYLE_TYPE.TRAD_CHINESE_INFORMAL:
+          return createCJKCounter(value, '零一二三四五六七八九', CHINESE_INFORMAL_MULTIPLIERS, '負', cjkSuffix, CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS | CJK_HUNDRED_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.TRAD_CHINESE_FORMAL:
+          return createCJKCounter(value, '零壹貳參肆伍陸柒捌玖', CHINESE_FORMAL_MULTIPLIERS, '負', cjkSuffix, CJK_ZEROS | CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS | CJK_HUNDRED_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.SIMP_CHINESE_INFORMAL:
+          return createCJKCounter(value, '零一二三四五六七八九', CHINESE_INFORMAL_MULTIPLIERS, '负', cjkSuffix, CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS | CJK_HUNDRED_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.SIMP_CHINESE_FORMAL:
+          return createCJKCounter(value, '零壹贰叁肆伍陆柒捌玖', CHINESE_FORMAL_MULTIPLIERS, '负', cjkSuffix, CJK_ZEROS | CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS | CJK_HUNDRED_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.JAPANESE_INFORMAL:
+          return createCJKCounter(value, '〇一二三四五六七八九', '十百千万', JAPANESE_NEGATIVE, cjkSuffix, 0);
+
+        case LIST_STYLE_TYPE.JAPANESE_FORMAL:
+          return createCJKCounter(value, '零壱弐参四伍六七八九', '拾百千万', JAPANESE_NEGATIVE, cjkSuffix, CJK_ZEROS | CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.KOREAN_HANGUL_FORMAL:
+          return createCJKCounter(value, '영일이삼사오육칠팔구', '십백천만', KOREAN_NEGATIVE, koreanSuffix, CJK_ZEROS | CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.KOREAN_HANJA_INFORMAL:
+          return createCJKCounter(value, '零一二三四五六七八九', '十百千萬', KOREAN_NEGATIVE, koreanSuffix, 0);
+
+        case LIST_STYLE_TYPE.KOREAN_HANJA_FORMAL:
+          return createCJKCounter(value, '零壹貳參四五六七八九', '拾百千', KOREAN_NEGATIVE, koreanSuffix, CJK_ZEROS | CJK_TEN_COEFFICIENTS | CJK_TEN_HIGH_COEFFICIENTS);
+
+        case LIST_STYLE_TYPE.DEVANAGARI:
+          return createCounterStyleFromRange(value, 0x966, 0x96f, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.GEORGIAN:
+          return createAdditiveCounter(value, 1, 19999, GEORGIAN, LIST_STYLE_TYPE.DECIMAL, defaultSuffix);
+
+        case LIST_STYLE_TYPE.GUJARATI:
+          return createCounterStyleFromRange(value, 0xae6, 0xaef, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.GURMUKHI:
+          return createCounterStyleFromRange(value, 0xa66, 0xa6f, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.HEBREW:
+          return createAdditiveCounter(value, 1, 10999, HEBREW, LIST_STYLE_TYPE.DECIMAL, defaultSuffix);
+
+        case LIST_STYLE_TYPE.HIRAGANA:
+          return createCounterStyleFromSymbols(value, 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわゐゑをん');
+
+        case LIST_STYLE_TYPE.HIRAGANA_IROHA:
+          return createCounterStyleFromSymbols(value, 'いろはにほへとちりぬるをわかよたれそつねならむうゐのおくやまけふこえてあさきゆめみしゑひもせす');
+
+        case LIST_STYLE_TYPE.KANNADA:
+          return createCounterStyleFromRange(value, 0xce6, 0xcef, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.KATAKANA:
+          return createCounterStyleFromSymbols(value, 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヰヱヲン', cjkSuffix);
+
+        case LIST_STYLE_TYPE.KATAKANA_IROHA:
+          return createCounterStyleFromSymbols(value, 'イロハニホヘトチリヌルヲワカヨタレソツネナラムウヰノオクヤマケフコエテアサキユメミシヱヒモセス', cjkSuffix);
+
+        case LIST_STYLE_TYPE.LAO:
+          return createCounterStyleFromRange(value, 0xed0, 0xed9, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.MONGOLIAN:
+          return createCounterStyleFromRange(value, 0x1810, 0x1819, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.MYANMAR:
+          return createCounterStyleFromRange(value, 0x1040, 0x1049, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.ORIYA:
+          return createCounterStyleFromRange(value, 0xb66, 0xb6f, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.PERSIAN:
+          return createCounterStyleFromRange(value, 0x6f0, 0x6f9, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.TAMIL:
+          return createCounterStyleFromRange(value, 0xbe6, 0xbef, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.TELUGU:
+          return createCounterStyleFromRange(value, 0xc66, 0xc6f, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.THAI:
+          return createCounterStyleFromRange(value, 0xe50, 0xe59, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.TIBETAN:
+          return createCounterStyleFromRange(value, 0xf20, 0xf29, true, defaultSuffix);
+
+        case LIST_STYLE_TYPE.DECIMAL:
+        default:
+          return createCounterStyleFromRange(value, 48, 57, true, defaultSuffix);
+      }
+    };
+
+    var IGNORE_ATTRIBUTE = 'data-html2canvas-ignore';
+
+    var DocumentCloner =
+    /** @class */
+    function () {
+      function DocumentCloner(element, options) {
+        this.options = options;
+        this.scrolledElements = [];
+        this.referenceElement = element;
+        this.counters = new CounterState();
+        this.quoteDepth = 0;
+
+        if (!element.ownerDocument) {
+          throw new Error('Cloned element does not have an owner document');
+        }
+
+        this.documentElement = this.cloneNode(element.ownerDocument.documentElement);
+      }
+
+      DocumentCloner.prototype.toIFrame = function (ownerDocument, windowSize) {
+        var _this = this;
+
+        var iframe = createIFrameContainer(ownerDocument, windowSize);
+
+        if (!iframe.contentWindow) {
+          return Promise.reject("Unable to find iframe window");
+        }
+
+        var scrollX = ownerDocument.defaultView.pageXOffset;
+        var scrollY = ownerDocument.defaultView.pageYOffset;
+        var cloneWindow = iframe.contentWindow;
+        var documentClone = cloneWindow.document;
+        /* Chrome doesn't detect relative background-images assigned in inline <style> sheets when fetched through getComputedStyle
+         if window url is about:blank, we can assign the url to current by writing onto the document
+         */
+
+        var iframeLoad = iframeLoader(iframe).then(function () {
+          return __awaiter(_this, void 0, void 0, function () {
+            var onclone;
+            return __generator(this, function (_a) {
+              switch (_a.label) {
+                case 0:
+                  this.scrolledElements.forEach(restoreNodeScroll);
+
+                  if (cloneWindow) {
+                    cloneWindow.scrollTo(windowSize.left, windowSize.top);
+
+                    if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent) && (cloneWindow.scrollY !== windowSize.top || cloneWindow.scrollX !== windowSize.left)) {
+                      documentClone.documentElement.style.top = -windowSize.top + 'px';
+                      documentClone.documentElement.style.left = -windowSize.left + 'px';
+                      documentClone.documentElement.style.position = 'absolute';
+                    }
+                  }
+
+                  onclone = this.options.onclone;
+
+                  if (typeof this.clonedReferenceElement === 'undefined') {
+                    return [2
+                    /*return*/
+                    , Promise.reject("Error finding the " + this.referenceElement.nodeName + " in the cloned document")];
+                  }
+
+                  if (!(documentClone.fonts && documentClone.fonts.ready)) return [3
+                  /*break*/
+                  , 2];
+                  return [4
+                  /*yield*/
+                  , documentClone.fonts.ready];
+
+                case 1:
+                  _a.sent();
+
+                  _a.label = 2;
+
+                case 2:
+                  if (typeof onclone === 'function') {
+                    return [2
+                    /*return*/
+                    , Promise.resolve().then(function () {
+                      return onclone(documentClone);
+                    }).then(function () {
+                      return iframe;
+                    })];
+                  }
+
+                  return [2
+                  /*return*/
+                  , iframe];
+              }
+            });
+          });
+        });
+        documentClone.open();
+        documentClone.write(serializeDoctype(document.doctype) + "<html></html>"); // Chrome scrolls the parent document for some reason after the write to the cloned window???
+
+        restoreOwnerScroll(this.referenceElement.ownerDocument, scrollX, scrollY);
+        documentClone.replaceChild(documentClone.adoptNode(this.documentElement), documentClone.documentElement);
+        documentClone.close();
+        return iframeLoad;
+      };
+
+      DocumentCloner.prototype.createElementClone = function (node) {
+        if (isCanvasElement(node)) {
+          return this.createCanvasClone(node);
+        }
+        /*
+              if (isIFrameElement(node)) {
+                  return this.createIFrameClone(node);
+              }
+        */
+
+
+        if (isStyleElement(node)) {
+          return this.createStyleClone(node);
+        }
+
+        var clone = node.cloneNode(false); // @ts-ignore
+
+        if (isImageElement(clone) && clone.loading === 'lazy') {
+          // @ts-ignore
+          clone.loading = 'eager';
+        }
+
+        return clone;
+      };
+
+      DocumentCloner.prototype.createStyleClone = function (node) {
+        try {
+          var sheet = node.sheet;
+
+          if (sheet && sheet.cssRules) {
+            var css = [].slice.call(sheet.cssRules, 0).reduce(function (css, rule) {
+              if (rule && typeof rule.cssText === 'string') {
+                return css + rule.cssText;
+              }
+
+              return css;
+            }, '');
+            var style = node.cloneNode(false);
+            style.textContent = css;
+            return style;
+          }
+        } catch (e) {
+          // accessing node.sheet.cssRules throws a DOMException
+          Logger.getInstance(this.options.id).error('Unable to access cssRules property', e);
+
+          if (e.name !== 'SecurityError') {
+            throw e;
+          }
+        }
+
+        return node.cloneNode(false);
+      };
+
+      DocumentCloner.prototype.createCanvasClone = function (canvas) {
+        if (this.options.inlineImages && canvas.ownerDocument) {
+          var img = canvas.ownerDocument.createElement('img');
+
+          try {
+            img.src = canvas.toDataURL();
+            return img;
+          } catch (e) {
+            Logger.getInstance(this.options.id).info("Unable to clone canvas contents, canvas is tainted");
+          }
+        }
+
+        var clonedCanvas = canvas.cloneNode(false);
+
+        try {
+          clonedCanvas.width = canvas.width;
+          clonedCanvas.height = canvas.height;
+          var ctx = canvas.getContext('2d');
+          var clonedCtx = clonedCanvas.getContext('2d');
+
+          if (clonedCtx) {
+            if (ctx) {
+              clonedCtx.putImageData(ctx.getImageData(0, 0, canvas.width, canvas.height), 0, 0);
+            } else {
+              clonedCtx.drawImage(canvas, 0, 0);
+            }
+          }
+
+          return clonedCanvas;
+        } catch (e) {}
+
+        return clonedCanvas;
+      };
+      /*
+          createIFrameClone(iframe: HTMLIFrameElement) {
+              const tempIframe = <HTMLIFrameElement>iframe.cloneNode(false);
+              const iframeKey = generateIframeKey();
+              tempIframe.setAttribute('data-html2canvas-internal-iframe-key', iframeKey);
+                const {width, height} = parseBounds(iframe);
+                this.resourceLoader.cache[iframeKey] = getIframeDocumentElement(iframe, this.options)
+                  .then(documentElement => {
+                      return this.renderer(
+                          documentElement,
+                          {
+                              allowTaint: this.options.allowTaint,
+                              backgroundColor: '#ffffff',
+                              canvas: null,
+                              imageTimeout: this.options.imageTimeout,
+                              logging: this.options.logging,
+                              proxy: this.options.proxy,
+                              removeContainer: this.options.removeContainer,
+                              scale: this.options.scale,
+                              foreignObjectRendering: this.options.foreignObjectRendering,
+                              useCORS: this.options.useCORS,
+                              target: new CanvasRenderer(),
+                              width,
+                              height,
+                              x: 0,
+                              y: 0,
+                              windowWidth: documentElement.ownerDocument.defaultView.innerWidth,
+                              windowHeight: documentElement.ownerDocument.defaultView.innerHeight,
+                              scrollX: documentElement.ownerDocument.defaultView.pageXOffset,
+                              scrollY: documentElement.ownerDocument.defaultView.pageYOffset
+                          },
+                      );
+                  })
+                  .then(
+                      (canvas: HTMLCanvasElement) =>
+                          new Promise((resolve, reject) => {
+                              const iframeCanvas = document.createElement('img');
+                              iframeCanvas.onload = () => resolve(canvas);
+                              iframeCanvas.onerror = (event) => {
+                                  // Empty iframes may result in empty "data:," URLs, which are invalid from the <img>'s point of view
+                                  // and instead of `onload` cause `onerror` and unhandled rejection warnings
+                                  // https://github.com/niklasvh/html2canvas/issues/1502
+                                  iframeCanvas.src == 'data:,' ? resolve(canvas) : reject(event);
+                              };
+                              iframeCanvas.src = canvas.toDataURL();
+                              if (tempIframe.parentNode && iframe.ownerDocument && iframe.ownerDocument.defaultView) {
+                                  tempIframe.parentNode.replaceChild(
+                                      copyCSSStyles(
+                                          iframe.ownerDocument.defaultView.getComputedStyle(iframe),
+                                          iframeCanvas
+                                      ),
+                                      tempIframe
+                                  );
+                              }
+                          })
+                  );
+              return tempIframe;
+          }
+      */
+
+
+      DocumentCloner.prototype.cloneNode = function (node) {
+        if (isTextNode(node)) {
+          return document.createTextNode(node.data);
+        }
+
+        if (!node.ownerDocument) {
+          return node.cloneNode(false);
+        }
+
+        var window = node.ownerDocument.defaultView;
+
+        if (window && isElementNode(node) && (isHTMLElementNode(node) || isSVGElementNode(node))) {
+          var clone = this.createElementClone(node);
+          var style = window.getComputedStyle(node);
+          var styleBefore = window.getComputedStyle(node, ':before');
+          var styleAfter = window.getComputedStyle(node, ':after');
+
+          if (this.referenceElement === node && isHTMLElementNode(clone)) {
+            this.clonedReferenceElement = clone;
+          }
+
+          if (isBodyElement(clone)) {
+            createPseudoHideStyles(clone);
+          }
+
+          var counters = this.counters.parse(new CSSParsedCounterDeclaration(style));
+          var before = this.resolvePseudoContent(node, clone, styleBefore, PseudoElementType.BEFORE);
+
+          for (var child = node.firstChild; child; child = child.nextSibling) {
+            if (!isElementNode(child) || !isScriptElement(child) && !child.hasAttribute(IGNORE_ATTRIBUTE) && (typeof this.options.ignoreElements !== 'function' || !this.options.ignoreElements(child))) {
+              if (!this.options.copyStyles || !isElementNode(child) || !isStyleElement(child)) {
+                clone.appendChild(this.cloneNode(child));
+              }
+            }
+          }
+
+          if (before) {
+            clone.insertBefore(before, clone.firstChild);
+          }
+
+          var after = this.resolvePseudoContent(node, clone, styleAfter, PseudoElementType.AFTER);
+
+          if (after) {
+            clone.appendChild(after);
+          }
+
+          this.counters.pop(counters);
+
+          if (style && (this.options.copyStyles || isSVGElementNode(node)) && !isIFrameElement(node)) {
+            copyCSSStyles(style, clone);
+          } //this.inlineAllImages(clone);
+
+
+          if (node.scrollTop !== 0 || node.scrollLeft !== 0) {
+            this.scrolledElements.push([clone, node.scrollLeft, node.scrollTop]);
+          }
+
+          if ((isTextareaElement(node) || isSelectElement(node)) && (isTextareaElement(clone) || isSelectElement(clone))) {
+            clone.value = node.value;
+          }
+
+          return clone;
+        }
+
+        return node.cloneNode(false);
+      };
+
+      DocumentCloner.prototype.resolvePseudoContent = function (node, clone, style, pseudoElt) {
+        var _this = this;
+
+        if (!style) {
+          return;
+        }
+
+        var value = style.content;
+        var document = clone.ownerDocument;
+
+        if (!document || !value || value === 'none' || value === '-moz-alt-content' || style.display === 'none') {
+          return;
+        }
+
+        this.counters.parse(new CSSParsedCounterDeclaration(style));
+        var declaration = new CSSParsedPseudoDeclaration(style);
+        var anonymousReplacedElement = document.createElement('html2canvaspseudoelement');
+        copyCSSStyles(style, anonymousReplacedElement);
+        declaration.content.forEach(function (token) {
+          if (token.type === TokenType.STRING_TOKEN) {
+            anonymousReplacedElement.appendChild(document.createTextNode(token.value));
+          } else if (token.type === TokenType.URL_TOKEN) {
+            var img = document.createElement('img');
+            img.src = token.value;
+            img.style.opacity = '1';
+            anonymousReplacedElement.appendChild(img);
+          } else if (token.type === TokenType.FUNCTION) {
+            if (token.name === 'attr') {
+              var attr = token.values.filter(isIdentToken);
+
+              if (attr.length) {
+                anonymousReplacedElement.appendChild(document.createTextNode(node.getAttribute(attr[0].value) || ''));
+              }
+            } else if (token.name === 'counter') {
+              var _a = token.values.filter(nonFunctionArgSeparator),
+                  counter = _a[0],
+                  counterStyle = _a[1];
+
+              if (counter && isIdentToken(counter)) {
+                var counterState = _this.counters.getCounterValue(counter.value);
+
+                var counterType = counterStyle && isIdentToken(counterStyle) ? listStyleType.parse(counterStyle.value) : LIST_STYLE_TYPE.DECIMAL;
+                anonymousReplacedElement.appendChild(document.createTextNode(createCounterText(counterState, counterType, false)));
+              }
+            } else if (token.name === 'counters') {
+              var _b = token.values.filter(nonFunctionArgSeparator),
+                  counter = _b[0],
+                  delim = _b[1],
+                  counterStyle = _b[2];
+
+              if (counter && isIdentToken(counter)) {
+                var counterStates = _this.counters.getCounterValues(counter.value);
+
+                var counterType_1 = counterStyle && isIdentToken(counterStyle) ? listStyleType.parse(counterStyle.value) : LIST_STYLE_TYPE.DECIMAL;
+                var separator = delim && delim.type === TokenType.STRING_TOKEN ? delim.value : '';
+                var text = counterStates.map(function (value) {
+                  return createCounterText(value, counterType_1, false);
+                }).join(separator);
+                anonymousReplacedElement.appendChild(document.createTextNode(text));
+              }
+            }
+          } else if (token.type === TokenType.IDENT_TOKEN) {
+            switch (token.value) {
+              case 'open-quote':
+                anonymousReplacedElement.appendChild(document.createTextNode(getQuote(declaration.quotes, _this.quoteDepth++, true)));
+                break;
+
+              case 'close-quote':
+                anonymousReplacedElement.appendChild(document.createTextNode(getQuote(declaration.quotes, --_this.quoteDepth, false)));
+                break;
+
+              default:
+                // safari doesn't parse string tokens correctly because of lack of quotes
+                anonymousReplacedElement.appendChild(document.createTextNode(token.value));
+            }
+          }
+        });
+        anonymousReplacedElement.className = PSEUDO_HIDE_ELEMENT_CLASS_BEFORE + " " + PSEUDO_HIDE_ELEMENT_CLASS_AFTER;
+        var newClassName = pseudoElt === PseudoElementType.BEFORE ? " " + PSEUDO_HIDE_ELEMENT_CLASS_BEFORE : " " + PSEUDO_HIDE_ELEMENT_CLASS_AFTER;
+
+        if (isSVGElementNode(clone)) {
+          clone.className.baseValue += newClassName;
+        } else {
+          clone.className += newClassName;
+        }
+
+        return anonymousReplacedElement;
+      };
+
+      DocumentCloner.destroy = function (container) {
+        if (container.parentNode) {
+          container.parentNode.removeChild(container);
+          return true;
+        }
+
+        return false;
+      };
+
+      return DocumentCloner;
+    }();
+
+    var PseudoElementType;
+
+    (function (PseudoElementType) {
+      PseudoElementType[PseudoElementType["BEFORE"] = 0] = "BEFORE";
+      PseudoElementType[PseudoElementType["AFTER"] = 1] = "AFTER";
+    })(PseudoElementType || (PseudoElementType = {}));
+
+    var createIFrameContainer = function createIFrameContainer(ownerDocument, bounds) {
+      var cloneIframeContainer = ownerDocument.createElement('iframe');
+      cloneIframeContainer.className = 'html2canvas-container';
+      cloneIframeContainer.style.visibility = 'hidden';
+      cloneIframeContainer.style.position = 'fixed';
+      cloneIframeContainer.style.left = '-10000px';
+      cloneIframeContainer.style.top = '0px';
+      cloneIframeContainer.style.border = '0';
+      cloneIframeContainer.width = bounds.width.toString();
+      cloneIframeContainer.height = bounds.height.toString();
+      cloneIframeContainer.scrolling = 'no'; // ios won't scroll without it
+
+      cloneIframeContainer.setAttribute(IGNORE_ATTRIBUTE, 'true');
+      ownerDocument.body.appendChild(cloneIframeContainer);
+      return cloneIframeContainer;
+    };
+
+    var iframeLoader = function iframeLoader(iframe) {
+      return new Promise(function (resolve, reject) {
+        var cloneWindow = iframe.contentWindow;
+
+        if (!cloneWindow) {
+          return reject("No window assigned for iframe");
+        }
+
+        var documentClone = cloneWindow.document;
+
+        cloneWindow.onload = iframe.onload = documentClone.onreadystatechange = function () {
+          cloneWindow.onload = iframe.onload = documentClone.onreadystatechange = null;
+          var interval = setInterval(function () {
+            if (documentClone.body.childNodes.length > 0 && documentClone.readyState === 'complete') {
+              clearInterval(interval);
+              resolve(iframe);
+            }
+          }, 50);
+        };
+      });
+    };
+
+    var copyCSSStyles = function copyCSSStyles(style, target) {
+      // Edge does not provide value for cssText
+      for (var i = style.length - 1; i >= 0; i--) {
+        var property = style.item(i); // Safari shows pseudoelements if content is set
+
+        if (property !== 'content') {
+          target.style.setProperty(property, style.getPropertyValue(property));
+        }
+      }
+
+      return target;
+    };
+
+    var serializeDoctype = function serializeDoctype(doctype) {
+      var str = '';
+
+      if (doctype) {
+        str += '<!DOCTYPE ';
+
+        if (doctype.name) {
+          str += doctype.name;
+        }
+
+        if (doctype.internalSubset) {
+          str += doctype.internalSubset;
+        }
+
+        if (doctype.publicId) {
+          str += "\"" + doctype.publicId + "\"";
+        }
+
+        if (doctype.systemId) {
+          str += "\"" + doctype.systemId + "\"";
+        }
+
+        str += '>';
+      }
+
+      return str;
+    };
+
+    var restoreOwnerScroll = function restoreOwnerScroll(ownerDocument, x, y) {
+      if (ownerDocument && ownerDocument.defaultView && (x !== ownerDocument.defaultView.pageXOffset || y !== ownerDocument.defaultView.pageYOffset)) {
+        ownerDocument.defaultView.scrollTo(x, y);
+      }
+    };
+
+    var restoreNodeScroll = function restoreNodeScroll(_a) {
+      var element = _a[0],
+          x = _a[1],
+          y = _a[2];
+      element.scrollLeft = x;
+      element.scrollTop = y;
+    };
+
+    var PSEUDO_BEFORE = ':before';
+    var PSEUDO_AFTER = ':after';
+    var PSEUDO_HIDE_ELEMENT_CLASS_BEFORE = '___html2canvas___pseudoelement_before';
+    var PSEUDO_HIDE_ELEMENT_CLASS_AFTER = '___html2canvas___pseudoelement_after';
+    var PSEUDO_HIDE_ELEMENT_STYLE = "{\n    content: \"\" !important;\n    display: none !important;\n}";
+
+    var createPseudoHideStyles = function createPseudoHideStyles(body) {
+      createStyles(body, "." + PSEUDO_HIDE_ELEMENT_CLASS_BEFORE + PSEUDO_BEFORE + PSEUDO_HIDE_ELEMENT_STYLE + "\n         ." + PSEUDO_HIDE_ELEMENT_CLASS_AFTER + PSEUDO_AFTER + PSEUDO_HIDE_ELEMENT_STYLE);
+    };
+
+    var createStyles = function createStyles(body, styles) {
+      var document = body.ownerDocument;
+
+      if (document) {
+        var style = document.createElement('style');
+        style.textContent = styles;
+        body.appendChild(style);
+      }
+    };
+
+    var PathType;
+
+    (function (PathType) {
+      PathType[PathType["VECTOR"] = 0] = "VECTOR";
+      PathType[PathType["BEZIER_CURVE"] = 1] = "BEZIER_CURVE";
+    })(PathType || (PathType = {}));
+
+    var equalPath = function equalPath(a, b) {
+      if (a.length === b.length) {
+        return a.some(function (v, i) {
+          return v === b[i];
+        });
+      }
+
+      return false;
+    };
+
+    var transformPath = function transformPath(path, deltaX, deltaY, deltaW, deltaH) {
+      return path.map(function (point, index) {
+        switch (index) {
+          case 0:
+            return point.add(deltaX, deltaY);
+
+          case 1:
+            return point.add(deltaX + deltaW, deltaY);
+
+          case 2:
+            return point.add(deltaX + deltaW, deltaY + deltaH);
+
+          case 3:
+            return point.add(deltaX, deltaY + deltaH);
+        }
+
+        return point;
+      });
+    };
+
+    var Vector =
+    /** @class */
+    function () {
+      function Vector(x, y) {
+        this.type = PathType.VECTOR;
+        this.x = x;
+        this.y = y;
+      }
+
+      Vector.prototype.add = function (deltaX, deltaY) {
+        return new Vector(this.x + deltaX, this.y + deltaY);
+      };
+
+      return Vector;
+    }();
+
+    var lerp = function lerp(a, b, t) {
+      return new Vector(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+    };
+
+    var BezierCurve =
+    /** @class */
+    function () {
+      function BezierCurve(start, startControl, endControl, end) {
+        this.type = PathType.BEZIER_CURVE;
+        this.start = start;
+        this.startControl = startControl;
+        this.endControl = endControl;
+        this.end = end;
+      }
+
+      BezierCurve.prototype.subdivide = function (t, firstHalf) {
+        var ab = lerp(this.start, this.startControl, t);
+        var bc = lerp(this.startControl, this.endControl, t);
+        var cd = lerp(this.endControl, this.end, t);
+        var abbc = lerp(ab, bc, t);
+        var bccd = lerp(bc, cd, t);
+        var dest = lerp(abbc, bccd, t);
+        return firstHalf ? new BezierCurve(this.start, ab, abbc, dest) : new BezierCurve(dest, bccd, cd, this.end);
+      };
+
+      BezierCurve.prototype.add = function (deltaX, deltaY) {
+        return new BezierCurve(this.start.add(deltaX, deltaY), this.startControl.add(deltaX, deltaY), this.endControl.add(deltaX, deltaY), this.end.add(deltaX, deltaY));
+      };
+
+      BezierCurve.prototype.reverse = function () {
+        return new BezierCurve(this.end, this.endControl, this.startControl, this.start);
+      };
+
+      return BezierCurve;
+    }();
+
+    var isBezierCurve = function isBezierCurve(path) {
+      return path.type === PathType.BEZIER_CURVE;
+    };
+
+    var BoundCurves =
+    /** @class */
+    function () {
+      function BoundCurves(element) {
+        var styles = element.styles;
+        var bounds = element.bounds;
+
+        var _a = getAbsoluteValueForTuple(styles.borderTopLeftRadius, bounds.width, bounds.height),
+            tlh = _a[0],
+            tlv = _a[1];
+
+        var _b = getAbsoluteValueForTuple(styles.borderTopRightRadius, bounds.width, bounds.height),
+            trh = _b[0],
+            trv = _b[1];
+
+        var _c = getAbsoluteValueForTuple(styles.borderBottomRightRadius, bounds.width, bounds.height),
+            brh = _c[0],
+            brv = _c[1];
+
+        var _d = getAbsoluteValueForTuple(styles.borderBottomLeftRadius, bounds.width, bounds.height),
+            blh = _d[0],
+            blv = _d[1];
+
+        var factors = [];
+        factors.push((tlh + trh) / bounds.width);
+        factors.push((blh + brh) / bounds.width);
+        factors.push((tlv + blv) / bounds.height);
+        factors.push((trv + brv) / bounds.height);
+        var maxFactor = Math.max.apply(Math, factors);
+
+        if (maxFactor > 1) {
+          tlh /= maxFactor;
+          tlv /= maxFactor;
+          trh /= maxFactor;
+          trv /= maxFactor;
+          brh /= maxFactor;
+          brv /= maxFactor;
+          blh /= maxFactor;
+          blv /= maxFactor;
+        }
+
+        var topWidth = bounds.width - trh;
+        var rightHeight = bounds.height - brv;
+        var bottomWidth = bounds.width - brh;
+        var leftHeight = bounds.height - blv;
+        var borderTopWidth = styles.borderTopWidth;
+        var borderRightWidth = styles.borderRightWidth;
+        var borderBottomWidth = styles.borderBottomWidth;
+        var borderLeftWidth = styles.borderLeftWidth;
+        var paddingTop = getAbsoluteValue(styles.paddingTop, element.bounds.width);
+        var paddingRight = getAbsoluteValue(styles.paddingRight, element.bounds.width);
+        var paddingBottom = getAbsoluteValue(styles.paddingBottom, element.bounds.width);
+        var paddingLeft = getAbsoluteValue(styles.paddingLeft, element.bounds.width);
+        this.topLeftBorderBox = tlh > 0 || tlv > 0 ? getCurvePoints(bounds.left, bounds.top, tlh, tlv, CORNER.TOP_LEFT) : new Vector(bounds.left, bounds.top);
+        this.topRightBorderBox = trh > 0 || trv > 0 ? getCurvePoints(bounds.left + topWidth, bounds.top, trh, trv, CORNER.TOP_RIGHT) : new Vector(bounds.left + bounds.width, bounds.top);
+        this.bottomRightBorderBox = brh > 0 || brv > 0 ? getCurvePoints(bounds.left + bottomWidth, bounds.top + rightHeight, brh, brv, CORNER.BOTTOM_RIGHT) : new Vector(bounds.left + bounds.width, bounds.top + bounds.height);
+        this.bottomLeftBorderBox = blh > 0 || blv > 0 ? getCurvePoints(bounds.left, bounds.top + leftHeight, blh, blv, CORNER.BOTTOM_LEFT) : new Vector(bounds.left, bounds.top + bounds.height);
+        this.topLeftPaddingBox = tlh > 0 || tlv > 0 ? getCurvePoints(bounds.left + borderLeftWidth, bounds.top + borderTopWidth, Math.max(0, tlh - borderLeftWidth), Math.max(0, tlv - borderTopWidth), CORNER.TOP_LEFT) : new Vector(bounds.left + borderLeftWidth, bounds.top + borderTopWidth);
+        this.topRightPaddingBox = trh > 0 || trv > 0 ? getCurvePoints(bounds.left + Math.min(topWidth, bounds.width + borderLeftWidth), bounds.top + borderTopWidth, topWidth > bounds.width + borderLeftWidth ? 0 : trh - borderLeftWidth, trv - borderTopWidth, CORNER.TOP_RIGHT) : new Vector(bounds.left + bounds.width - borderRightWidth, bounds.top + borderTopWidth);
+        this.bottomRightPaddingBox = brh > 0 || brv > 0 ? getCurvePoints(bounds.left + Math.min(bottomWidth, bounds.width - borderLeftWidth), bounds.top + Math.min(rightHeight, bounds.height + borderTopWidth), Math.max(0, brh - borderRightWidth), brv - borderBottomWidth, CORNER.BOTTOM_RIGHT) : new Vector(bounds.left + bounds.width - borderRightWidth, bounds.top + bounds.height - borderBottomWidth);
+        this.bottomLeftPaddingBox = blh > 0 || blv > 0 ? getCurvePoints(bounds.left + borderLeftWidth, bounds.top + leftHeight, Math.max(0, blh - borderLeftWidth), blv - borderBottomWidth, CORNER.BOTTOM_LEFT) : new Vector(bounds.left + borderLeftWidth, bounds.top + bounds.height - borderBottomWidth);
+        this.topLeftContentBox = tlh > 0 || tlv > 0 ? getCurvePoints(bounds.left + borderLeftWidth + paddingLeft, bounds.top + borderTopWidth + paddingTop, Math.max(0, tlh - (borderLeftWidth + paddingLeft)), Math.max(0, tlv - (borderTopWidth + paddingTop)), CORNER.TOP_LEFT) : new Vector(bounds.left + borderLeftWidth + paddingLeft, bounds.top + borderTopWidth + paddingTop);
+        this.topRightContentBox = trh > 0 || trv > 0 ? getCurvePoints(bounds.left + Math.min(topWidth, bounds.width + borderLeftWidth + paddingLeft), bounds.top + borderTopWidth + paddingTop, topWidth > bounds.width + borderLeftWidth + paddingLeft ? 0 : trh - borderLeftWidth + paddingLeft, trv - (borderTopWidth + paddingTop), CORNER.TOP_RIGHT) : new Vector(bounds.left + bounds.width - (borderRightWidth + paddingRight), bounds.top + borderTopWidth + paddingTop);
+        this.bottomRightContentBox = brh > 0 || brv > 0 ? getCurvePoints(bounds.left + Math.min(bottomWidth, bounds.width - (borderLeftWidth + paddingLeft)), bounds.top + Math.min(rightHeight, bounds.height + borderTopWidth + paddingTop), Math.max(0, brh - (borderRightWidth + paddingRight)), brv - (borderBottomWidth + paddingBottom), CORNER.BOTTOM_RIGHT) : new Vector(bounds.left + bounds.width - (borderRightWidth + paddingRight), bounds.top + bounds.height - (borderBottomWidth + paddingBottom));
+        this.bottomLeftContentBox = blh > 0 || blv > 0 ? getCurvePoints(bounds.left + borderLeftWidth + paddingLeft, bounds.top + leftHeight, Math.max(0, blh - (borderLeftWidth + paddingLeft)), blv - (borderBottomWidth + paddingBottom), CORNER.BOTTOM_LEFT) : new Vector(bounds.left + borderLeftWidth + paddingLeft, bounds.top + bounds.height - (borderBottomWidth + paddingBottom));
+      }
+
+      return BoundCurves;
+    }();
+
+    var CORNER;
+
+    (function (CORNER) {
+      CORNER[CORNER["TOP_LEFT"] = 0] = "TOP_LEFT";
+      CORNER[CORNER["TOP_RIGHT"] = 1] = "TOP_RIGHT";
+      CORNER[CORNER["BOTTOM_RIGHT"] = 2] = "BOTTOM_RIGHT";
+      CORNER[CORNER["BOTTOM_LEFT"] = 3] = "BOTTOM_LEFT";
+    })(CORNER || (CORNER = {}));
+
+    var getCurvePoints = function getCurvePoints(x, y, r1, r2, position) {
+      var kappa = 4 * ((Math.sqrt(2) - 1) / 3);
+      var ox = r1 * kappa; // control point offset horizontal
+
+      var oy = r2 * kappa; // control point offset vertical
+
+      var xm = x + r1; // x-middle
+
+      var ym = y + r2; // y-middle
+
+      switch (position) {
+        case CORNER.TOP_LEFT:
+          return new BezierCurve(new Vector(x, ym), new Vector(x, ym - oy), new Vector(xm - ox, y), new Vector(xm, y));
+
+        case CORNER.TOP_RIGHT:
+          return new BezierCurve(new Vector(x, y), new Vector(x + ox, y), new Vector(xm, ym - oy), new Vector(xm, ym));
+
+        case CORNER.BOTTOM_RIGHT:
+          return new BezierCurve(new Vector(xm, y), new Vector(xm, y + oy), new Vector(x + ox, ym), new Vector(x, ym));
+
+        case CORNER.BOTTOM_LEFT:
+        default:
+          return new BezierCurve(new Vector(xm, ym), new Vector(xm - ox, ym), new Vector(x, y + oy), new Vector(x, y));
+      }
+    };
+
+    var calculateBorderBoxPath = function calculateBorderBoxPath(curves) {
+      return [curves.topLeftBorderBox, curves.topRightBorderBox, curves.bottomRightBorderBox, curves.bottomLeftBorderBox];
+    };
+
+    var calculateContentBoxPath = function calculateContentBoxPath(curves) {
+      return [curves.topLeftContentBox, curves.topRightContentBox, curves.bottomRightContentBox, curves.bottomLeftContentBox];
+    };
+
+    var calculatePaddingBoxPath = function calculatePaddingBoxPath(curves) {
+      return [curves.topLeftPaddingBox, curves.topRightPaddingBox, curves.bottomRightPaddingBox, curves.bottomLeftPaddingBox];
+    };
+
+    var TransformEffect =
+    /** @class */
+    function () {
+      function TransformEffect(offsetX, offsetY, matrix) {
+        this.type = 0
+        /* TRANSFORM */
+        ;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.matrix = matrix;
+        this.target = 2
+        /* BACKGROUND_BORDERS */
+        | 4
+        /* CONTENT */
+        ;
+      }
+
+      return TransformEffect;
+    }();
+
+    var ClipEffect =
+    /** @class */
+    function () {
+      function ClipEffect(path, target) {
+        this.type = 1
+        /* CLIP */
+        ;
+        this.target = target;
+        this.path = path;
+      }
+
+      return ClipEffect;
+    }();
+
+    var isTransformEffect = function isTransformEffect(effect) {
+      return effect.type === 0
+      /* TRANSFORM */
+      ;
+    };
+
+    var isClipEffect = function isClipEffect(effect) {
+      return effect.type === 1
+      /* CLIP */
+      ;
+    };
+
+    var StackingContext =
+    /** @class */
+    function () {
+      function StackingContext(container) {
+        this.element = container;
+        this.inlineLevel = [];
+        this.nonInlineLevel = [];
+        this.negativeZIndex = [];
+        this.zeroOrAutoZIndexOrTransformedOrOpacity = [];
+        this.positiveZIndex = [];
+        this.nonPositionedFloats = [];
+        this.nonPositionedInlineLevel = [];
+      }
+
+      return StackingContext;
+    }();
+
+    var ElementPaint =
+    /** @class */
+    function () {
+      function ElementPaint(element, parentStack) {
+        this.container = element;
+        this.effects = parentStack.slice(0);
+        this.curves = new BoundCurves(element);
+
+        if (element.styles.transform !== null) {
+          var offsetX = element.bounds.left + element.styles.transformOrigin[0].number;
+          var offsetY = element.bounds.top + element.styles.transformOrigin[1].number;
+          var matrix = element.styles.transform;
+          this.effects.push(new TransformEffect(offsetX, offsetY, matrix));
+        }
+
+        if (element.styles.overflowX !== OVERFLOW.VISIBLE) {
+          var borderBox = calculateBorderBoxPath(this.curves);
+          var paddingBox = calculatePaddingBoxPath(this.curves);
+
+          if (equalPath(borderBox, paddingBox)) {
+            this.effects.push(new ClipEffect(borderBox, 2
+            /* BACKGROUND_BORDERS */
+            | 4
+            /* CONTENT */
+            ));
+          } else {
+            this.effects.push(new ClipEffect(borderBox, 2
+            /* BACKGROUND_BORDERS */
+            ));
+            this.effects.push(new ClipEffect(paddingBox, 4
+            /* CONTENT */
+            ));
+          }
+        }
+      }
+
+      ElementPaint.prototype.getParentEffects = function () {
+        var effects = this.effects.slice(0);
+
+        if (this.container.styles.overflowX !== OVERFLOW.VISIBLE) {
+          var borderBox = calculateBorderBoxPath(this.curves);
+          var paddingBox = calculatePaddingBoxPath(this.curves);
+
+          if (!equalPath(borderBox, paddingBox)) {
+            effects.push(new ClipEffect(paddingBox, 2
+            /* BACKGROUND_BORDERS */
+            | 4
+            /* CONTENT */
+            ));
+          }
+        }
+
+        return effects;
+      };
+
+      return ElementPaint;
+    }();
+
+    var parseStackTree = function parseStackTree(parent, stackingContext, realStackingContext, listItems) {
+      parent.container.elements.forEach(function (child) {
+        var treatAsRealStackingContext = contains(child.flags, 4
+        /* CREATES_REAL_STACKING_CONTEXT */
+        );
+        var createsStackingContext = contains(child.flags, 2
+        /* CREATES_STACKING_CONTEXT */
+        );
+        var paintContainer = new ElementPaint(child, parent.getParentEffects());
+
+        if (contains(child.styles.display, 2048
+        /* LIST_ITEM */
+        )) {
+          listItems.push(paintContainer);
+        }
+
+        var listOwnerItems = contains(child.flags, 8
+        /* IS_LIST_OWNER */
+        ) ? [] : listItems;
+
+        if (treatAsRealStackingContext || createsStackingContext) {
+          var parentStack = treatAsRealStackingContext || child.styles.isPositioned() ? realStackingContext : stackingContext;
+          var stack = new StackingContext(paintContainer);
+
+          if (child.styles.isPositioned() || child.styles.opacity < 1 || child.styles.isTransformed()) {
+            var order_1 = child.styles.zIndex.order;
+
+            if (order_1 < 0) {
+              var index_1 = 0;
+              parentStack.negativeZIndex.some(function (current, i) {
+                if (order_1 > current.element.container.styles.zIndex.order) {
+                  index_1 = i;
+                  return false;
+                } else if (index_1 > 0) {
+                  return true;
+                }
+
+                return false;
+              });
+              parentStack.negativeZIndex.splice(index_1, 0, stack);
+            } else if (order_1 > 0) {
+              var index_2 = 0;
+              parentStack.positiveZIndex.some(function (current, i) {
+                if (order_1 >= current.element.container.styles.zIndex.order) {
+                  index_2 = i + 1;
+                  return false;
+                } else if (index_2 > 0) {
+                  return true;
+                }
+
+                return false;
+              });
+              parentStack.positiveZIndex.splice(index_2, 0, stack);
+            } else {
+              parentStack.zeroOrAutoZIndexOrTransformedOrOpacity.push(stack);
+            }
+          } else {
+            if (child.styles.isFloating()) {
+              parentStack.nonPositionedFloats.push(stack);
+            } else {
+              parentStack.nonPositionedInlineLevel.push(stack);
+            }
+          }
+
+          parseStackTree(paintContainer, stack, treatAsRealStackingContext ? stack : realStackingContext, listOwnerItems);
+        } else {
+          if (child.styles.isInlineLevel()) {
+            stackingContext.inlineLevel.push(paintContainer);
+          } else {
+            stackingContext.nonInlineLevel.push(paintContainer);
+          }
+
+          parseStackTree(paintContainer, stackingContext, realStackingContext, listOwnerItems);
+        }
+
+        if (contains(child.flags, 8
+        /* IS_LIST_OWNER */
+        )) {
+          processListItems(child, listOwnerItems);
+        }
+      });
+    };
+
+    var processListItems = function processListItems(owner, elements) {
+      var numbering = owner instanceof OLElementContainer ? owner.start : 1;
+      var reversed = owner instanceof OLElementContainer ? owner.reversed : false;
+
+      for (var i = 0; i < elements.length; i++) {
+        var item = elements[i];
+
+        if (item.container instanceof LIElementContainer && typeof item.container.value === 'number' && item.container.value !== 0) {
+          numbering = item.container.value;
+        }
+
+        item.listValue = createCounterText(numbering, item.container.styles.listStyleType, true);
+        numbering += reversed ? -1 : 1;
+      }
+    };
+
+    var parseStackingContexts = function parseStackingContexts(container) {
+      var paintContainer = new ElementPaint(container, []);
+      var root = new StackingContext(paintContainer);
+      var listItems = [];
+      parseStackTree(paintContainer, root, root, listItems);
+      processListItems(paintContainer.container, listItems);
+      return root;
+    };
+
+    var parsePathForBorder = function parsePathForBorder(curves, borderSide) {
+      switch (borderSide) {
+        case 0:
+          return createPathFromCurves(curves.topLeftBorderBox, curves.topLeftPaddingBox, curves.topRightBorderBox, curves.topRightPaddingBox);
+
+        case 1:
+          return createPathFromCurves(curves.topRightBorderBox, curves.topRightPaddingBox, curves.bottomRightBorderBox, curves.bottomRightPaddingBox);
+
+        case 2:
+          return createPathFromCurves(curves.bottomRightBorderBox, curves.bottomRightPaddingBox, curves.bottomLeftBorderBox, curves.bottomLeftPaddingBox);
+
+        case 3:
+        default:
+          return createPathFromCurves(curves.bottomLeftBorderBox, curves.bottomLeftPaddingBox, curves.topLeftBorderBox, curves.topLeftPaddingBox);
+      }
+    };
+
+    var createPathFromCurves = function createPathFromCurves(outer1, inner1, outer2, inner2) {
+      var path = [];
+
+      if (isBezierCurve(outer1)) {
+        path.push(outer1.subdivide(0.5, false));
+      } else {
+        path.push(outer1);
+      }
+
+      if (isBezierCurve(outer2)) {
+        path.push(outer2.subdivide(0.5, true));
+      } else {
+        path.push(outer2);
+      }
+
+      if (isBezierCurve(inner2)) {
+        path.push(inner2.subdivide(0.5, true).reverse());
+      } else {
+        path.push(inner2);
+      }
+
+      if (isBezierCurve(inner1)) {
+        path.push(inner1.subdivide(0.5, false).reverse());
+      } else {
+        path.push(inner1);
+      }
+
+      return path;
+    };
+
+    var paddingBox = function paddingBox(element) {
+      var bounds = element.bounds;
+      var styles = element.styles;
+      return bounds.add(styles.borderLeftWidth, styles.borderTopWidth, -(styles.borderRightWidth + styles.borderLeftWidth), -(styles.borderTopWidth + styles.borderBottomWidth));
+    };
+
+    var contentBox = function contentBox(element) {
+      var styles = element.styles;
+      var bounds = element.bounds;
+      var paddingLeft = getAbsoluteValue(styles.paddingLeft, bounds.width);
+      var paddingRight = getAbsoluteValue(styles.paddingRight, bounds.width);
+      var paddingTop = getAbsoluteValue(styles.paddingTop, bounds.width);
+      var paddingBottom = getAbsoluteValue(styles.paddingBottom, bounds.width);
+      return bounds.add(paddingLeft + styles.borderLeftWidth, paddingTop + styles.borderTopWidth, -(styles.borderRightWidth + styles.borderLeftWidth + paddingLeft + paddingRight), -(styles.borderTopWidth + styles.borderBottomWidth + paddingTop + paddingBottom));
+    };
+
+    var calculateBackgroundPositioningArea = function calculateBackgroundPositioningArea(backgroundOrigin, element) {
+      if (backgroundOrigin === 0
+      /* BORDER_BOX */
+      ) {
+          return element.bounds;
+        }
+
+      if (backgroundOrigin === 2
+      /* CONTENT_BOX */
+      ) {
+          return contentBox(element);
+        }
+
+      return paddingBox(element);
+    };
+
+    var calculateBackgroundPaintingArea = function calculateBackgroundPaintingArea(backgroundClip, element) {
+      if (backgroundClip === BACKGROUND_CLIP.BORDER_BOX) {
+        return element.bounds;
+      }
+
+      if (backgroundClip === BACKGROUND_CLIP.CONTENT_BOX) {
+        return contentBox(element);
+      }
+
+      return paddingBox(element);
+    };
+
+    var calculateBackgroundRendering = function calculateBackgroundRendering(container, index, intrinsicSize) {
+      var backgroundPositioningArea = calculateBackgroundPositioningArea(getBackgroundValueForIndex(container.styles.backgroundOrigin, index), container);
+      var backgroundPaintingArea = calculateBackgroundPaintingArea(getBackgroundValueForIndex(container.styles.backgroundClip, index), container);
+      var backgroundImageSize = calculateBackgroundSize(getBackgroundValueForIndex(container.styles.backgroundSize, index), intrinsicSize, backgroundPositioningArea);
+      var sizeWidth = backgroundImageSize[0],
+          sizeHeight = backgroundImageSize[1];
+      var position = getAbsoluteValueForTuple(getBackgroundValueForIndex(container.styles.backgroundPosition, index), backgroundPositioningArea.width - sizeWidth, backgroundPositioningArea.height - sizeHeight);
+      var path = calculateBackgroundRepeatPath(getBackgroundValueForIndex(container.styles.backgroundRepeat, index), position, backgroundImageSize, backgroundPositioningArea, backgroundPaintingArea);
+      var offsetX = Math.round(backgroundPositioningArea.left + position[0]);
+      var offsetY = Math.round(backgroundPositioningArea.top + position[1]);
+      return [path, offsetX, offsetY, sizeWidth, sizeHeight];
+    };
+
+    var isAuto = function isAuto(token) {
+      return isIdentToken(token) && token.value === BACKGROUND_SIZE.AUTO;
+    };
+
+    var hasIntrinsicValue = function hasIntrinsicValue(value) {
+      return typeof value === 'number';
+    };
+
+    var calculateBackgroundSize = function calculateBackgroundSize(size, _a, bounds) {
+      var intrinsicWidth = _a[0],
+          intrinsicHeight = _a[1],
+          intrinsicProportion = _a[2];
+      var first = size[0],
+          second = size[1];
+
+      if (isLengthPercentage(first) && second && isLengthPercentage(second)) {
+        return [getAbsoluteValue(first, bounds.width), getAbsoluteValue(second, bounds.height)];
+      }
+
+      var hasIntrinsicProportion = hasIntrinsicValue(intrinsicProportion);
+
+      if (isIdentToken(first) && (first.value === BACKGROUND_SIZE.CONTAIN || first.value === BACKGROUND_SIZE.COVER)) {
+        if (hasIntrinsicValue(intrinsicProportion)) {
+          var targetRatio = bounds.width / bounds.height;
+          return targetRatio < intrinsicProportion !== (first.value === BACKGROUND_SIZE.COVER) ? [bounds.width, bounds.width / intrinsicProportion] : [bounds.height * intrinsicProportion, bounds.height];
+        }
+
+        return [bounds.width, bounds.height];
+      }
+
+      var hasIntrinsicWidth = hasIntrinsicValue(intrinsicWidth);
+      var hasIntrinsicHeight = hasIntrinsicValue(intrinsicHeight);
+      var hasIntrinsicDimensions = hasIntrinsicWidth || hasIntrinsicHeight; // If the background-size is auto or auto auto:
+
+      if (isAuto(first) && (!second || isAuto(second))) {
+        // If the image has both horizontal and vertical intrinsic dimensions, it's rendered at that size.
+        if (hasIntrinsicWidth && hasIntrinsicHeight) {
+          return [intrinsicWidth, intrinsicHeight];
+        } // If the image has no intrinsic dimensions and has no intrinsic proportions,
+        // it's rendered at the size of the background positioning area.
+
+
+        if (!hasIntrinsicProportion && !hasIntrinsicDimensions) {
+          return [bounds.width, bounds.height];
+        } // TODO If the image has no intrinsic dimensions but has intrinsic proportions, it's rendered as if contain had been specified instead.
+        // If the image has only one intrinsic dimension and has intrinsic proportions, it's rendered at the size corresponding to that one dimension.
+        // The other dimension is computed using the specified dimension and the intrinsic proportions.
+
+
+        if (hasIntrinsicDimensions && hasIntrinsicProportion) {
+          var width_1 = hasIntrinsicWidth ? intrinsicWidth : intrinsicHeight * intrinsicProportion;
+          var height_1 = hasIntrinsicHeight ? intrinsicHeight : intrinsicWidth / intrinsicProportion;
+          return [width_1, height_1];
+        } // If the image has only one intrinsic dimension but has no intrinsic proportions,
+        // it's rendered using the specified dimension and the other dimension of the background positioning area.
+
+
+        var width_2 = hasIntrinsicWidth ? intrinsicWidth : bounds.width;
+        var height_2 = hasIntrinsicHeight ? intrinsicHeight : bounds.height;
+        return [width_2, height_2];
+      } // If the image has intrinsic proportions, it's stretched to the specified dimension.
+      // The unspecified dimension is computed using the specified dimension and the intrinsic proportions.
+
+
+      if (hasIntrinsicProportion) {
+        var width_3 = 0;
+        var height_3 = 0;
+
+        if (isLengthPercentage(first)) {
+          width_3 = getAbsoluteValue(first, bounds.width);
+        } else if (isLengthPercentage(second)) {
+          height_3 = getAbsoluteValue(second, bounds.height);
+        }
+
+        if (isAuto(first)) {
+          width_3 = height_3 * intrinsicProportion;
+        } else if (!second || isAuto(second)) {
+          height_3 = width_3 / intrinsicProportion;
+        }
+
+        return [width_3, height_3];
+      } // If the image has no intrinsic proportions, it's stretched to the specified dimension.
+      // The unspecified dimension is computed using the image's corresponding intrinsic dimension,
+      // if there is one. If there is no such intrinsic dimension,
+      // it becomes the corresponding dimension of the background positioning area.
+
+
+      var width = null;
+      var height = null;
+
+      if (isLengthPercentage(first)) {
+        width = getAbsoluteValue(first, bounds.width);
+      } else if (second && isLengthPercentage(second)) {
+        height = getAbsoluteValue(second, bounds.height);
+      }
+
+      if (width !== null && (!second || isAuto(second))) {
+        height = hasIntrinsicWidth && hasIntrinsicHeight ? width / intrinsicWidth * intrinsicHeight : bounds.height;
+      }
+
+      if (height !== null && isAuto(first)) {
+        width = hasIntrinsicWidth && hasIntrinsicHeight ? height / intrinsicHeight * intrinsicWidth : bounds.width;
+      }
+
+      if (width !== null && height !== null) {
+        return [width, height];
+      }
+
+      throw new Error("Unable to calculate background-size for element");
+    };
+
+    var getBackgroundValueForIndex = function getBackgroundValueForIndex(values, index) {
+      var value = values[index];
+
+      if (typeof value === 'undefined') {
+        return values[0];
+      }
+
+      return value;
+    };
+
+    var calculateBackgroundRepeatPath = function calculateBackgroundRepeatPath(repeat, _a, _b, backgroundPositioningArea, backgroundPaintingArea) {
+      var x = _a[0],
+          y = _a[1];
+      var width = _b[0],
+          height = _b[1];
+
+      switch (repeat) {
+        case BACKGROUND_REPEAT.REPEAT_X:
+          return [new Vector(Math.round(backgroundPositioningArea.left), Math.round(backgroundPositioningArea.top + y)), new Vector(Math.round(backgroundPositioningArea.left + backgroundPositioningArea.width), Math.round(backgroundPositioningArea.top + y)), new Vector(Math.round(backgroundPositioningArea.left + backgroundPositioningArea.width), Math.round(height + backgroundPositioningArea.top + y)), new Vector(Math.round(backgroundPositioningArea.left), Math.round(height + backgroundPositioningArea.top + y))];
+
+        case BACKGROUND_REPEAT.REPEAT_Y:
+          return [new Vector(Math.round(backgroundPositioningArea.left + x), Math.round(backgroundPositioningArea.top)), new Vector(Math.round(backgroundPositioningArea.left + x + width), Math.round(backgroundPositioningArea.top)), new Vector(Math.round(backgroundPositioningArea.left + x + width), Math.round(backgroundPositioningArea.height + backgroundPositioningArea.top)), new Vector(Math.round(backgroundPositioningArea.left + x), Math.round(backgroundPositioningArea.height + backgroundPositioningArea.top))];
+
+        case BACKGROUND_REPEAT.NO_REPEAT:
+          return [new Vector(Math.round(backgroundPositioningArea.left + x), Math.round(backgroundPositioningArea.top + y)), new Vector(Math.round(backgroundPositioningArea.left + x + width), Math.round(backgroundPositioningArea.top + y)), new Vector(Math.round(backgroundPositioningArea.left + x + width), Math.round(backgroundPositioningArea.top + y + height)), new Vector(Math.round(backgroundPositioningArea.left + x), Math.round(backgroundPositioningArea.top + y + height))];
+
+        default:
+          return [new Vector(Math.round(backgroundPaintingArea.left), Math.round(backgroundPaintingArea.top)), new Vector(Math.round(backgroundPaintingArea.left + backgroundPaintingArea.width), Math.round(backgroundPaintingArea.top)), new Vector(Math.round(backgroundPaintingArea.left + backgroundPaintingArea.width), Math.round(backgroundPaintingArea.height + backgroundPaintingArea.top)), new Vector(Math.round(backgroundPaintingArea.left), Math.round(backgroundPaintingArea.height + backgroundPaintingArea.top))];
+      }
+    };
+
+    var SMALL_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    var SAMPLE_TEXT = 'Hidden Text';
+
+    var FontMetrics =
+    /** @class */
+    function () {
+      function FontMetrics(document) {
+        this._data = {};
+        this._document = document;
+      }
+
+      FontMetrics.prototype.parseMetrics = function (fontFamily, fontSize) {
+        var container = this._document.createElement('div');
+
+        var img = this._document.createElement('img');
+
+        var span = this._document.createElement('span');
+
+        var body = this._document.body;
+        container.style.visibility = 'hidden';
+        container.style.fontFamily = fontFamily;
+        container.style.fontSize = fontSize;
+        container.style.margin = '0';
+        container.style.padding = '0';
+        body.appendChild(container);
+        img.src = SMALL_IMAGE;
+        img.width = 1;
+        img.height = 1;
+        img.style.margin = '0';
+        img.style.padding = '0';
+        img.style.verticalAlign = 'baseline';
+        span.style.fontFamily = fontFamily;
+        span.style.fontSize = fontSize;
+        span.style.margin = '0';
+        span.style.padding = '0';
+        span.appendChild(this._document.createTextNode(SAMPLE_TEXT));
+        container.appendChild(span);
+        container.appendChild(img);
+        var baseline = img.offsetTop - span.offsetTop + 2;
+        container.removeChild(span);
+        container.appendChild(this._document.createTextNode(SAMPLE_TEXT));
+        container.style.lineHeight = 'normal';
+        img.style.verticalAlign = 'super';
+        var middle = img.offsetTop - container.offsetTop + 2;
+        body.removeChild(container);
+        return {
+          baseline: baseline,
+          middle: middle
+        };
+      };
+
+      FontMetrics.prototype.getMetrics = function (fontFamily, fontSize) {
+        var key = fontFamily + " " + fontSize;
+
+        if (typeof this._data[key] === 'undefined') {
+          this._data[key] = this.parseMetrics(fontFamily, fontSize);
+        }
+
+        return this._data[key];
+      };
+
+      return FontMetrics;
+    }();
+
+    var MASK_OFFSET = 10000;
+
+    var CanvasRenderer =
+    /** @class */
+    function () {
+      function CanvasRenderer(options) {
+        this._activeEffects = [];
+        this.canvas = options.canvas ? options.canvas : document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.options = options;
+
+        if (!options.canvas) {
+          this.canvas.width = Math.floor(options.width * options.scale);
+          this.canvas.height = Math.floor(options.height * options.scale);
+          this.canvas.style.width = options.width + "px";
+          this.canvas.style.height = options.height + "px";
+        }
+
+        this.fontMetrics = new FontMetrics(document);
+        this.ctx.scale(this.options.scale, this.options.scale);
+        this.ctx.translate(-options.x + options.scrollX, -options.y + options.scrollY);
+        this.ctx.textBaseline = 'bottom';
+        this._activeEffects = [];
+        Logger.getInstance(options.id).debug("Canvas renderer initialized (" + options.width + "x" + options.height + " at " + options.x + "," + options.y + ") with scale " + options.scale);
+      }
+
+      CanvasRenderer.prototype.applyEffects = function (effects, target) {
+        var _this = this;
+
+        while (this._activeEffects.length) {
+          this.popEffect();
+        }
+
+        effects.filter(function (effect) {
+          return contains(effect.target, target);
+        }).forEach(function (effect) {
+          return _this.applyEffect(effect);
+        });
+      };
+
+      CanvasRenderer.prototype.applyEffect = function (effect) {
+        this.ctx.save();
+
+        if (isTransformEffect(effect)) {
+          this.ctx.translate(effect.offsetX, effect.offsetY);
+          this.ctx.transform(effect.matrix[0], effect.matrix[1], effect.matrix[2], effect.matrix[3], effect.matrix[4], effect.matrix[5]);
+          this.ctx.translate(-effect.offsetX, -effect.offsetY);
+        }
+
+        if (isClipEffect(effect)) {
+          this.path(effect.path);
+          this.ctx.clip();
+        }
+
+        this._activeEffects.push(effect);
+      };
+
+      CanvasRenderer.prototype.popEffect = function () {
+        this._activeEffects.pop();
+
+        this.ctx.restore();
+      };
+
+      CanvasRenderer.prototype.renderStack = function (stack) {
+        return __awaiter(this, void 0, void 0, function () {
+          var styles;
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                styles = stack.element.container.styles;
+                if (!styles.isVisible()) return [3
+                /*break*/
+                , 2];
+                this.ctx.globalAlpha = styles.opacity;
+                return [4
+                /*yield*/
+                , this.renderStackContent(stack)];
+
+              case 1:
+                _a.sent();
+
+                _a.label = 2;
+
+              case 2:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderNode = function (paint) {
+        return __awaiter(this, void 0, void 0, function () {
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                if (!paint.container.styles.isVisible()) return [3
+                /*break*/
+                , 3];
+                return [4
+                /*yield*/
+                , this.renderNodeBackgroundAndBorders(paint)];
+
+              case 1:
+                _a.sent();
+
+                return [4
+                /*yield*/
+                , this.renderNodeContent(paint)];
+
+              case 2:
+                _a.sent();
+
+                _a.label = 3;
+
+              case 3:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderTextWithLetterSpacing = function (text, letterSpacing) {
+        var _this = this;
+
+        if (letterSpacing === 0) {
+          this.ctx.fillText(text.text, text.bounds.left, text.bounds.top + text.bounds.height);
+        } else {
+          var letters = toCodePoints(text.text).map(function (i) {
+            return fromCodePoint(i);
+          });
+          letters.reduce(function (left, letter) {
+            _this.ctx.fillText(letter, left, text.bounds.top + text.bounds.height);
+
+            return left + _this.ctx.measureText(letter).width;
+          }, text.bounds.left);
+        }
+      };
+
+      CanvasRenderer.prototype.createFontStyle = function (styles) {
+        var fontVariant = styles.fontVariant.filter(function (variant) {
+          return variant === 'normal' || variant === 'small-caps';
+        }).join('');
+        var fontFamily = styles.fontFamily.join(', ');
+        var fontSize = isDimensionToken(styles.fontSize) ? "" + styles.fontSize.number + styles.fontSize.unit : styles.fontSize.number + "px";
+        return [[styles.fontStyle, fontVariant, styles.fontWeight, fontSize, fontFamily].join(' '), fontFamily, fontSize];
+      };
+
+      CanvasRenderer.prototype.renderTextNode = function (text, styles) {
+        return __awaiter(this, void 0, void 0, function () {
+          var _a, font, fontFamily, fontSize;
+
+          var _this = this;
+
+          return __generator(this, function (_b) {
+            _a = this.createFontStyle(styles), font = _a[0], fontFamily = _a[1], fontSize = _a[2];
+            this.ctx.font = font;
+            text.textBounds.forEach(function (text) {
+              _this.ctx.fillStyle = asString(styles.color);
+
+              _this.renderTextWithLetterSpacing(text, styles.letterSpacing);
+
+              var textShadows = styles.textShadow;
+
+              if (textShadows.length && text.text.trim().length) {
+                textShadows.slice(0).reverse().forEach(function (textShadow) {
+                  _this.ctx.shadowColor = asString(textShadow.color);
+                  _this.ctx.shadowOffsetX = textShadow.offsetX.number * _this.options.scale;
+                  _this.ctx.shadowOffsetY = textShadow.offsetY.number * _this.options.scale;
+                  _this.ctx.shadowBlur = textShadow.blur.number;
+
+                  _this.ctx.fillText(text.text, text.bounds.left, text.bounds.top + text.bounds.height);
+                });
+                _this.ctx.shadowColor = '';
+                _this.ctx.shadowOffsetX = 0;
+                _this.ctx.shadowOffsetY = 0;
+                _this.ctx.shadowBlur = 0;
+              }
+
+              if (styles.textDecorationLine.length) {
+                _this.ctx.fillStyle = asString(styles.textDecorationColor || styles.color);
+                styles.textDecorationLine.forEach(function (textDecorationLine) {
+                  switch (textDecorationLine) {
+                    case 1
+                    /* UNDERLINE */
+                    :
+                      // Draws a line at the baseline of the font
+                      // TODO As some browsers display the line as more than 1px if the font-size is big,
+                      // need to take that into account both in position and size
+                      var baseline = _this.fontMetrics.getMetrics(fontFamily, fontSize).baseline;
+
+                      _this.ctx.fillRect(text.bounds.left, Math.round(text.bounds.top + baseline), text.bounds.width, 1);
+
+                      break;
+
+                    case 2
+                    /* OVERLINE */
+                    :
+                      _this.ctx.fillRect(text.bounds.left, Math.round(text.bounds.top), text.bounds.width, 1);
+
+                      break;
+
+                    case 3
+                    /* LINE_THROUGH */
+                    :
+                      // TODO try and find exact position for line-through
+                      var middle = _this.fontMetrics.getMetrics(fontFamily, fontSize).middle;
+
+                      _this.ctx.fillRect(text.bounds.left, Math.ceil(text.bounds.top + middle), text.bounds.width, 1);
+
+                      break;
+                  }
+                });
+              }
+            });
+            return [2
+            /*return*/
+            ];
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderReplacedElement = function (container, curves, image) {
+        if (image && container.intrinsicWidth > 0 && container.intrinsicHeight > 0) {
+          var box = contentBox(container);
+          var path = calculatePaddingBoxPath(curves);
+          this.path(path);
+          this.ctx.save();
+          this.ctx.clip();
+          this.ctx.drawImage(image, 0, 0, container.intrinsicWidth, container.intrinsicHeight, box.left, box.top, box.width, box.height);
+          this.ctx.restore();
+        }
+      };
+
+      CanvasRenderer.prototype.renderNodeContent = function (paint) {
+        return __awaiter(this, void 0, void 0, function () {
+          var container, curves, styles, _i, _a, child, image, e_1, image, e_2, iframeRenderer, canvas, size, bounds, x, textBounds, img, image, url, e_3, bounds;
+
+          return __generator(this, function (_b) {
+            switch (_b.label) {
+              case 0:
+                this.applyEffects(paint.effects, 4
+                /* CONTENT */
+                );
+                container = paint.container;
+                curves = paint.curves;
+                styles = container.styles;
+                _i = 0, _a = container.textNodes;
+                _b.label = 1;
+
+              case 1:
+                if (!(_i < _a.length)) return [3
+                /*break*/
+                , 4];
+                child = _a[_i];
+                return [4
+                /*yield*/
+                , this.renderTextNode(child, styles)];
+
+              case 2:
+                _b.sent();
+
+                _b.label = 3;
+
+              case 3:
+                _i++;
+                return [3
+                /*break*/
+                , 1];
+
+              case 4:
+                if (!(container instanceof ImageElementContainer)) return [3
+                /*break*/
+                , 8];
+                _b.label = 5;
+
+              case 5:
+                _b.trys.push([5, 7,, 8]);
+
+                return [4
+                /*yield*/
+                , this.options.cache.match(container.src)];
+
+              case 6:
+                image = _b.sent();
+                this.renderReplacedElement(container, curves, image);
+                return [3
+                /*break*/
+                , 8];
+
+              case 7:
+                e_1 = _b.sent();
+                Logger.getInstance(this.options.id).error("Error loading image " + container.src);
+                return [3
+                /*break*/
+                , 8];
+
+              case 8:
+                if (container instanceof CanvasElementContainer) {
+                  this.renderReplacedElement(container, curves, container.canvas);
+                }
+
+                if (!(container instanceof SVGElementContainer)) return [3
+                /*break*/
+                , 12];
+                _b.label = 9;
+
+              case 9:
+                _b.trys.push([9, 11,, 12]);
+
+                return [4
+                /*yield*/
+                , this.options.cache.match(container.svg)];
+
+              case 10:
+                image = _b.sent();
+                this.renderReplacedElement(container, curves, image);
+                return [3
+                /*break*/
+                , 12];
+
+              case 11:
+                e_2 = _b.sent();
+                Logger.getInstance(this.options.id).error("Error loading svg " + container.svg.substring(0, 255));
+                return [3
+                /*break*/
+                , 12];
+
+              case 12:
+                if (!(container instanceof IFrameElementContainer && container.tree)) return [3
+                /*break*/
+                , 14];
+                iframeRenderer = new CanvasRenderer({
+                  id: this.options.id,
+                  scale: this.options.scale,
+                  backgroundColor: container.backgroundColor,
+                  x: 0,
+                  y: 0,
+                  scrollX: 0,
+                  scrollY: 0,
+                  width: container.width,
+                  height: container.height,
+                  cache: this.options.cache,
+                  windowWidth: container.width,
+                  windowHeight: container.height
+                });
+                return [4
+                /*yield*/
+                , iframeRenderer.render(container.tree)];
+
+              case 13:
+                canvas = _b.sent();
+
+                if (container.width && container.height) {
+                  this.ctx.drawImage(canvas, 0, 0, container.width, container.height, container.bounds.left, container.bounds.top, container.bounds.width, container.bounds.height);
+                }
+
+                _b.label = 14;
+
+              case 14:
+                if (container instanceof InputElementContainer) {
+                  size = Math.min(container.bounds.width, container.bounds.height);
+
+                  if (container.type === CHECKBOX) {
+                    if (container.checked) {
+                      this.ctx.save();
+                      this.path([new Vector(container.bounds.left + size * 0.39363, container.bounds.top + size * 0.79), new Vector(container.bounds.left + size * 0.16, container.bounds.top + size * 0.5549), new Vector(container.bounds.left + size * 0.27347, container.bounds.top + size * 0.44071), new Vector(container.bounds.left + size * 0.39694, container.bounds.top + size * 0.5649), new Vector(container.bounds.left + size * 0.72983, container.bounds.top + size * 0.23), new Vector(container.bounds.left + size * 0.84, container.bounds.top + size * 0.34085), new Vector(container.bounds.left + size * 0.39363, container.bounds.top + size * 0.79)]);
+                      this.ctx.fillStyle = asString(INPUT_COLOR);
+                      this.ctx.fill();
+                      this.ctx.restore();
+                    }
+                  } else if (container.type === RADIO) {
+                    if (container.checked) {
+                      this.ctx.save();
+                      this.ctx.beginPath();
+                      this.ctx.arc(container.bounds.left + size / 2, container.bounds.top + size / 2, size / 4, 0, Math.PI * 2, true);
+                      this.ctx.fillStyle = asString(INPUT_COLOR);
+                      this.ctx.fill();
+                      this.ctx.restore();
+                    }
+                  }
+                }
+
+                if (isTextInputElement(container) && container.value.length) {
+                  this.ctx.font = this.createFontStyle(styles)[0];
+                  this.ctx.fillStyle = asString(styles.color);
+                  this.ctx.textBaseline = 'middle';
+                  this.ctx.textAlign = canvasTextAlign(container.styles.textAlign);
+                  bounds = contentBox(container);
+                  x = 0;
+
+                  switch (container.styles.textAlign) {
+                    case TEXT_ALIGN.CENTER:
+                      x += bounds.width / 2;
+                      break;
+
+                    case TEXT_ALIGN.RIGHT:
+                      x += bounds.width;
+                      break;
+                  }
+
+                  textBounds = bounds.add(x, 0, 0, -bounds.height / 2 + 1);
+                  this.ctx.save();
+                  this.path([new Vector(bounds.left, bounds.top), new Vector(bounds.left + bounds.width, bounds.top), new Vector(bounds.left + bounds.width, bounds.top + bounds.height), new Vector(bounds.left, bounds.top + bounds.height)]);
+                  this.ctx.clip();
+                  this.renderTextWithLetterSpacing(new TextBounds(container.value, textBounds), styles.letterSpacing);
+                  this.ctx.restore();
+                  this.ctx.textBaseline = 'bottom';
+                  this.ctx.textAlign = 'left';
+                }
+
+                if (!contains(container.styles.display, 2048
+                /* LIST_ITEM */
+                )) return [3
+                /*break*/
+                , 20];
+                if (!(container.styles.listStyleImage !== null)) return [3
+                /*break*/
+                , 19];
+                img = container.styles.listStyleImage;
+                if (!(img.type === CSSImageType.URL)) return [3
+                /*break*/
+                , 18];
+                image = void 0;
+                url = img.url;
+                _b.label = 15;
+
+              case 15:
+                _b.trys.push([15, 17,, 18]);
+
+                return [4
+                /*yield*/
+                , this.options.cache.match(url)];
+
+              case 16:
+                image = _b.sent();
+                this.ctx.drawImage(image, container.bounds.left - (image.width + 10), container.bounds.top);
+                return [3
+                /*break*/
+                , 18];
+
+              case 17:
+                e_3 = _b.sent();
+                Logger.getInstance(this.options.id).error("Error loading list-style-image " + url);
+                return [3
+                /*break*/
+                , 18];
+
+              case 18:
+                return [3
+                /*break*/
+                , 20];
+
+              case 19:
+                if (paint.listValue && container.styles.listStyleType !== LIST_STYLE_TYPE.NONE) {
+                  this.ctx.font = this.createFontStyle(styles)[0];
+                  this.ctx.fillStyle = asString(styles.color);
+                  this.ctx.textBaseline = 'middle';
+                  this.ctx.textAlign = 'right';
+                  bounds = new Bounds(container.bounds.left, container.bounds.top + getAbsoluteValue(container.styles.paddingTop, container.bounds.width), container.bounds.width, computeLineHeight(styles.lineHeight, styles.fontSize.number) / 2 + 1);
+                  this.renderTextWithLetterSpacing(new TextBounds(paint.listValue, bounds), styles.letterSpacing);
+                  this.ctx.textBaseline = 'bottom';
+                  this.ctx.textAlign = 'left';
+                }
+
+                _b.label = 20;
+
+              case 20:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderStackContent = function (stack) {
+        return __awaiter(this, void 0, void 0, function () {
+          var _i, _a, child, _b, _c, child, _d, _e, child, _f, _g, child, _h, _j, child, _k, _l, child, _m, _o, child;
+
+          return __generator(this, function (_p) {
+            switch (_p.label) {
+              case 0:
+                // https://www.w3.org/TR/css-position-3/#painting-order
+                // 1. the background and borders of the element forming the stacking context.
+                return [4
+                /*yield*/
+                , this.renderNodeBackgroundAndBorders(stack.element)];
+
+              case 1:
+                // https://www.w3.org/TR/css-position-3/#painting-order
+                // 1. the background and borders of the element forming the stacking context.
+                _p.sent();
+
+                _i = 0, _a = stack.negativeZIndex;
+                _p.label = 2;
+
+              case 2:
+                if (!(_i < _a.length)) return [3
+                /*break*/
+                , 5];
+                child = _a[_i];
+                return [4
+                /*yield*/
+                , this.renderStack(child)];
+
+              case 3:
+                _p.sent();
+
+                _p.label = 4;
+
+              case 4:
+                _i++;
+                return [3
+                /*break*/
+                , 2];
+
+              case 5:
+                // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
+                return [4
+                /*yield*/
+                , this.renderNodeContent(stack.element)];
+
+              case 6:
+                // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
+                _p.sent();
+
+                _b = 0, _c = stack.nonInlineLevel;
+                _p.label = 7;
+
+              case 7:
+                if (!(_b < _c.length)) return [3
+                /*break*/
+                , 10];
+                child = _c[_b];
+                return [4
+                /*yield*/
+                , this.renderNode(child)];
+
+              case 8:
+                _p.sent();
+
+                _p.label = 9;
+
+              case 9:
+                _b++;
+                return [3
+                /*break*/
+                , 7];
+
+              case 10:
+                _d = 0, _e = stack.nonPositionedFloats;
+                _p.label = 11;
+
+              case 11:
+                if (!(_d < _e.length)) return [3
+                /*break*/
+                , 14];
+                child = _e[_d];
+                return [4
+                /*yield*/
+                , this.renderStack(child)];
+
+              case 12:
+                _p.sent();
+
+                _p.label = 13;
+
+              case 13:
+                _d++;
+                return [3
+                /*break*/
+                , 11];
+
+              case 14:
+                _f = 0, _g = stack.nonPositionedInlineLevel;
+                _p.label = 15;
+
+              case 15:
+                if (!(_f < _g.length)) return [3
+                /*break*/
+                , 18];
+                child = _g[_f];
+                return [4
+                /*yield*/
+                , this.renderStack(child)];
+
+              case 16:
+                _p.sent();
+
+                _p.label = 17;
+
+              case 17:
+                _f++;
+                return [3
+                /*break*/
+                , 15];
+
+              case 18:
+                _h = 0, _j = stack.inlineLevel;
+                _p.label = 19;
+
+              case 19:
+                if (!(_h < _j.length)) return [3
+                /*break*/
+                , 22];
+                child = _j[_h];
+                return [4
+                /*yield*/
+                , this.renderNode(child)];
+
+              case 20:
+                _p.sent();
+
+                _p.label = 21;
+
+              case 21:
+                _h++;
+                return [3
+                /*break*/
+                , 19];
+
+              case 22:
+                _k = 0, _l = stack.zeroOrAutoZIndexOrTransformedOrOpacity;
+                _p.label = 23;
+
+              case 23:
+                if (!(_k < _l.length)) return [3
+                /*break*/
+                , 26];
+                child = _l[_k];
+                return [4
+                /*yield*/
+                , this.renderStack(child)];
+
+              case 24:
+                _p.sent();
+
+                _p.label = 25;
+
+              case 25:
+                _k++;
+                return [3
+                /*break*/
+                , 23];
+
+              case 26:
+                _m = 0, _o = stack.positiveZIndex;
+                _p.label = 27;
+
+              case 27:
+                if (!(_m < _o.length)) return [3
+                /*break*/
+                , 30];
+                child = _o[_m];
+                return [4
+                /*yield*/
+                , this.renderStack(child)];
+
+              case 28:
+                _p.sent();
+
+                _p.label = 29;
+
+              case 29:
+                _m++;
+                return [3
+                /*break*/
+                , 27];
+
+              case 30:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.mask = function (paths) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 0);
+        this.ctx.lineTo(this.canvas.width, 0);
+        this.ctx.lineTo(this.canvas.width, this.canvas.height);
+        this.ctx.lineTo(0, this.canvas.height);
+        this.ctx.lineTo(0, 0);
+        this.formatPath(paths.slice(0).reverse());
+        this.ctx.closePath();
+      };
+
+      CanvasRenderer.prototype.path = function (paths) {
+        this.ctx.beginPath();
+        this.formatPath(paths);
+        this.ctx.closePath();
+      };
+
+      CanvasRenderer.prototype.formatPath = function (paths) {
+        var _this = this;
+
+        paths.forEach(function (point, index) {
+          var start = isBezierCurve(point) ? point.start : point;
+
+          if (index === 0) {
+            _this.ctx.moveTo(start.x, start.y);
+          } else {
+            _this.ctx.lineTo(start.x, start.y);
+          }
+
+          if (isBezierCurve(point)) {
+            _this.ctx.bezierCurveTo(point.startControl.x, point.startControl.y, point.endControl.x, point.endControl.y, point.end.x, point.end.y);
+          }
+        });
+      };
+
+      CanvasRenderer.prototype.renderRepeat = function (path, pattern, offsetX, offsetY) {
+        this.path(path);
+        this.ctx.fillStyle = pattern;
+        this.ctx.translate(offsetX, offsetY);
+        this.ctx.fill();
+        this.ctx.translate(-offsetX, -offsetY);
+      };
+
+      CanvasRenderer.prototype.resizeImage = function (image, width, height) {
+        if (image.width === width && image.height === height) {
+          return image;
+        }
+
+        var canvas = this.canvas.ownerDocument.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, width, height);
+        return canvas;
+      };
+
+      CanvasRenderer.prototype.renderBackgroundImage = function (container) {
+        return __awaiter(this, void 0, void 0, function () {
+          var index, _loop_1, this_1, _i, _a, backgroundImage;
+
+          return __generator(this, function (_b) {
+            switch (_b.label) {
+              case 0:
+                index = container.styles.backgroundImage.length - 1;
+
+                _loop_1 = function _loop_1(backgroundImage) {
+                  var image, url, e_4, _a, path, x, y, width, height, pattern, _b, path, x, y, width, height, _c, lineLength, x0, x1, y0, y1, canvas, ctx, gradient_1, pattern, _d, path, left, top_1, width, height, position, x, y, _e, rx, ry, radialGradient_1, midX, midY, f, invF;
+
+                  return __generator(this, function (_f) {
+                    switch (_f.label) {
+                      case 0:
+                        if (!(backgroundImage.type === CSSImageType.URL)) return [3
+                        /*break*/
+                        , 5];
+                        image = void 0;
+                        url = backgroundImage.url;
+                        _f.label = 1;
+
+                      case 1:
+                        _f.trys.push([1, 3,, 4]);
+
+                        return [4
+                        /*yield*/
+                        , this_1.options.cache.match(url)];
+
+                      case 2:
+                        image = _f.sent();
+                        return [3
+                        /*break*/
+                        , 4];
+
+                      case 3:
+                        e_4 = _f.sent();
+                        Logger.getInstance(this_1.options.id).error("Error loading background-image " + url);
+                        return [3
+                        /*break*/
+                        , 4];
+
+                      case 4:
+                        if (image) {
+                          _a = calculateBackgroundRendering(container, index, [image.width, image.height, image.width / image.height]), path = _a[0], x = _a[1], y = _a[2], width = _a[3], height = _a[4];
+                          pattern = this_1.ctx.createPattern(this_1.resizeImage(image, width, height), 'repeat');
+                          this_1.renderRepeat(path, pattern, x, y);
+                        }
+
+                        return [3
+                        /*break*/
+                        , 6];
+
+                      case 5:
+                        if (isLinearGradient(backgroundImage)) {
+                          _b = calculateBackgroundRendering(container, index, [null, null, null]), path = _b[0], x = _b[1], y = _b[2], width = _b[3], height = _b[4];
+                          _c = calculateGradientDirection(backgroundImage.angle, width, height), lineLength = _c[0], x0 = _c[1], x1 = _c[2], y0 = _c[3], y1 = _c[4];
+                          canvas = document.createElement('canvas');
+                          canvas.width = width;
+                          canvas.height = height;
+                          ctx = canvas.getContext('2d');
+                          gradient_1 = ctx.createLinearGradient(x0, y0, x1, y1);
+                          processColorStops(backgroundImage.stops, lineLength).forEach(function (colorStop) {
+                            return gradient_1.addColorStop(colorStop.stop, asString(colorStop.color));
+                          });
+                          ctx.fillStyle = gradient_1;
+                          ctx.fillRect(0, 0, width, height);
+
+                          if (width > 0 && height > 0) {
+                            pattern = this_1.ctx.createPattern(canvas, 'repeat');
+                            this_1.renderRepeat(path, pattern, x, y);
+                          }
+                        } else if (isRadialGradient(backgroundImage)) {
+                          _d = calculateBackgroundRendering(container, index, [null, null, null]), path = _d[0], left = _d[1], top_1 = _d[2], width = _d[3], height = _d[4];
+                          position = backgroundImage.position.length === 0 ? [FIFTY_PERCENT] : backgroundImage.position;
+                          x = getAbsoluteValue(position[0], width);
+                          y = getAbsoluteValue(position[position.length - 1], height);
+                          _e = calculateRadius(backgroundImage, x, y, width, height), rx = _e[0], ry = _e[1];
+
+                          if (rx > 0 && rx > 0) {
+                            radialGradient_1 = this_1.ctx.createRadialGradient(left + x, top_1 + y, 0, left + x, top_1 + y, rx);
+                            processColorStops(backgroundImage.stops, rx * 2).forEach(function (colorStop) {
+                              return radialGradient_1.addColorStop(colorStop.stop, asString(colorStop.color));
+                            });
+                            this_1.path(path);
+                            this_1.ctx.fillStyle = radialGradient_1;
+
+                            if (rx !== ry) {
+                              midX = container.bounds.left + 0.5 * container.bounds.width;
+                              midY = container.bounds.top + 0.5 * container.bounds.height;
+                              f = ry / rx;
+                              invF = 1 / f;
+                              this_1.ctx.save();
+                              this_1.ctx.translate(midX, midY);
+                              this_1.ctx.transform(1, 0, 0, f, 0, 0);
+                              this_1.ctx.translate(-midX, -midY);
+                              this_1.ctx.fillRect(left, invF * (top_1 - midY) + midY, width, height * invF);
+                              this_1.ctx.restore();
+                            } else {
+                              this_1.ctx.fill();
+                            }
+                          }
+                        }
+
+                        _f.label = 6;
+
+                      case 6:
+                        index--;
+                        return [2
+                        /*return*/
+                        ];
+                    }
+                  });
+                };
+
+                this_1 = this;
+                _i = 0, _a = container.styles.backgroundImage.slice(0).reverse();
+                _b.label = 1;
+
+              case 1:
+                if (!(_i < _a.length)) return [3
+                /*break*/
+                , 4];
+                backgroundImage = _a[_i];
+                return [5
+                /*yield**/
+                , _loop_1(backgroundImage)];
+
+              case 2:
+                _b.sent();
+
+                _b.label = 3;
+
+              case 3:
+                _i++;
+                return [3
+                /*break*/
+                , 1];
+
+              case 4:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderBorder = function (color, side, curvePoints) {
+        return __awaiter(this, void 0, void 0, function () {
+          return __generator(this, function (_a) {
+            this.path(parsePathForBorder(curvePoints, side));
+            this.ctx.fillStyle = asString(color);
+            this.ctx.fill();
+            return [2
+            /*return*/
+            ];
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.renderNodeBackgroundAndBorders = function (paint) {
+        return __awaiter(this, void 0, void 0, function () {
+          var styles, hasBackground, borders, backgroundPaintingArea, side, _i, borders_1, border;
+
+          var _this = this;
+
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                this.applyEffects(paint.effects, 2
+                /* BACKGROUND_BORDERS */
+                );
+                styles = paint.container.styles;
+                hasBackground = !isTransparent(styles.backgroundColor) || styles.backgroundImage.length;
+                borders = [{
+                  style: styles.borderTopStyle,
+                  color: styles.borderTopColor
+                }, {
+                  style: styles.borderRightStyle,
+                  color: styles.borderRightColor
+                }, {
+                  style: styles.borderBottomStyle,
+                  color: styles.borderBottomColor
+                }, {
+                  style: styles.borderLeftStyle,
+                  color: styles.borderLeftColor
+                }];
+                backgroundPaintingArea = calculateBackgroundCurvedPaintingArea(getBackgroundValueForIndex(styles.backgroundClip, 0), paint.curves);
+                if (!(hasBackground || styles.boxShadow.length)) return [3
+                /*break*/
+                , 2];
+                this.ctx.save();
+                this.path(backgroundPaintingArea);
+                this.ctx.clip();
+
+                if (!isTransparent(styles.backgroundColor)) {
+                  this.ctx.fillStyle = asString(styles.backgroundColor);
+                  this.ctx.fill();
+                }
+
+                return [4
+                /*yield*/
+                , this.renderBackgroundImage(paint.container)];
+
+              case 1:
+                _a.sent();
+
+                this.ctx.restore();
+                styles.boxShadow.slice(0).reverse().forEach(function (shadow) {
+                  _this.ctx.save();
+
+                  var borderBoxArea = calculateBorderBoxPath(paint.curves);
+                  var maskOffset = shadow.inset ? 0 : MASK_OFFSET;
+                  var shadowPaintingArea = transformPath(borderBoxArea, -maskOffset + (shadow.inset ? 1 : -1) * shadow.spread.number, (shadow.inset ? 1 : -1) * shadow.spread.number, shadow.spread.number * (shadow.inset ? -2 : 2), shadow.spread.number * (shadow.inset ? -2 : 2));
+
+                  if (shadow.inset) {
+                    _this.path(borderBoxArea);
+
+                    _this.ctx.clip();
+
+                    _this.mask(shadowPaintingArea);
+                  } else {
+                    _this.mask(borderBoxArea);
+
+                    _this.ctx.clip();
+
+                    _this.path(shadowPaintingArea);
+                  }
+
+                  _this.ctx.shadowOffsetX = shadow.offsetX.number + maskOffset;
+                  _this.ctx.shadowOffsetY = shadow.offsetY.number;
+                  _this.ctx.shadowColor = asString(shadow.color);
+                  _this.ctx.shadowBlur = shadow.blur.number;
+                  _this.ctx.fillStyle = shadow.inset ? asString(shadow.color) : 'rgba(0,0,0,1)';
+
+                  _this.ctx.fill();
+
+                  _this.ctx.restore();
+                });
+                _a.label = 2;
+
+              case 2:
+                side = 0;
+                _i = 0, borders_1 = borders;
+                _a.label = 3;
+
+              case 3:
+                if (!(_i < borders_1.length)) return [3
+                /*break*/
+                , 7];
+                border = borders_1[_i];
+                if (!(border.style !== BORDER_STYLE.NONE && !isTransparent(border.color))) return [3
+                /*break*/
+                , 5];
+                return [4
+                /*yield*/
+                , this.renderBorder(border.color, side, paint.curves)];
+
+              case 4:
+                _a.sent();
+
+                _a.label = 5;
+
+              case 5:
+                side++;
+                _a.label = 6;
+
+              case 6:
+                _i++;
+                return [3
+                /*break*/
+                , 3];
+
+              case 7:
+                return [2
+                /*return*/
+                ];
+            }
+          });
+        });
+      };
+
+      CanvasRenderer.prototype.render = function (element) {
+        return __awaiter(this, void 0, void 0, function () {
+          var stack;
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                if (this.options.backgroundColor) {
+                  this.ctx.fillStyle = asString(this.options.backgroundColor);
+                  this.ctx.fillRect(this.options.x - this.options.scrollX, this.options.y - this.options.scrollY, this.options.width, this.options.height);
+                }
+
+                stack = parseStackingContexts(element);
+                return [4
+                /*yield*/
+                , this.renderStack(stack)];
+
+              case 1:
+                _a.sent();
+
+                this.applyEffects([], 2
+                /* BACKGROUND_BORDERS */
+                );
+                return [2
+                /*return*/
+                , this.canvas];
+            }
+          });
+        });
+      };
+
+      return CanvasRenderer;
+    }();
+
+    var isTextInputElement = function isTextInputElement(container) {
+      if (container instanceof TextareaElementContainer) {
+        return true;
+      } else if (container instanceof SelectElementContainer) {
+        return true;
+      } else if (container instanceof InputElementContainer && container.type !== RADIO && container.type !== CHECKBOX) {
+        return true;
+      }
+
+      return false;
+    };
+
+    var calculateBackgroundCurvedPaintingArea = function calculateBackgroundCurvedPaintingArea(clip, curves) {
+      switch (clip) {
+        case BACKGROUND_CLIP.BORDER_BOX:
+          return calculateBorderBoxPath(curves);
+
+        case BACKGROUND_CLIP.CONTENT_BOX:
+          return calculateContentBoxPath(curves);
+
+        case BACKGROUND_CLIP.PADDING_BOX:
+        default:
+          return calculatePaddingBoxPath(curves);
+      }
+    };
+
+    var canvasTextAlign = function canvasTextAlign(textAlign) {
+      switch (textAlign) {
+        case TEXT_ALIGN.CENTER:
+          return 'center';
+
+        case TEXT_ALIGN.RIGHT:
+          return 'right';
+
+        case TEXT_ALIGN.LEFT:
+        default:
+          return 'left';
+      }
+    };
+
+    var ForeignObjectRenderer =
+    /** @class */
+    function () {
+      function ForeignObjectRenderer(options) {
+        this.canvas = options.canvas ? options.canvas : document.createElement('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.options = options;
+        this.canvas.width = Math.floor(options.width * options.scale);
+        this.canvas.height = Math.floor(options.height * options.scale);
+        this.canvas.style.width = options.width + "px";
+        this.canvas.style.height = options.height + "px";
+        this.ctx.scale(this.options.scale, this.options.scale);
+        this.ctx.translate(-options.x + options.scrollX, -options.y + options.scrollY);
+        Logger.getInstance(options.id).debug("EXPERIMENTAL ForeignObject renderer initialized (" + options.width + "x" + options.height + " at " + options.x + "," + options.y + ") with scale " + options.scale);
+      }
+
+      ForeignObjectRenderer.prototype.render = function (element) {
+        return __awaiter(this, void 0, void 0, function () {
+          var svg, img;
+          return __generator(this, function (_a) {
+            switch (_a.label) {
+              case 0:
+                svg = createForeignObjectSVG(Math.max(this.options.windowWidth, this.options.width) * this.options.scale, Math.max(this.options.windowHeight, this.options.height) * this.options.scale, this.options.scrollX * this.options.scale, this.options.scrollY * this.options.scale, element);
+                return [4
+                /*yield*/
+                , loadSerializedSVG$1(svg)];
+
+              case 1:
+                img = _a.sent();
+
+                if (this.options.backgroundColor) {
+                  this.ctx.fillStyle = asString(this.options.backgroundColor);
+                  this.ctx.fillRect(0, 0, this.options.width * this.options.scale, this.options.height * this.options.scale);
+                }
+
+                this.ctx.drawImage(img, -this.options.x * this.options.scale, -this.options.y * this.options.scale);
+                return [2
+                /*return*/
+                , this.canvas];
+            }
+          });
+        });
+      };
+
+      return ForeignObjectRenderer;
+    }();
+
+    var loadSerializedSVG$1 = function loadSerializedSVG$1(svg) {
+      return new Promise(function (resolve, reject) {
+        var img = new Image();
+
+        img.onload = function () {
+          resolve(img);
+        };
+
+        img.onerror = reject;
+        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+      });
+    };
+
+    var _this = undefined;
+
+    var parseColor$1 = function parseColor$1(value) {
+      return color.parse(Parser.create(value).parseComponentValue());
+    };
+
+    var html2canvas = function html2canvas(element, options) {
+      if (options === void 0) {
+        options = {};
+      }
+
+      return renderElement(element, options);
+    };
+
+    if (typeof window !== 'undefined') {
+      CacheStorage.setContext(window);
+    }
+
+    var renderElement = function renderElement(element, opts) {
+      return __awaiter(_this, void 0, void 0, function () {
+        var ownerDocument, defaultView, instanceName, _a, width, height, left, top, defaultResourceOptions, resourceOptions, defaultOptions, options, windowBounds, documentCloner, clonedElement, container, documentBackgroundColor, bodyBackgroundColor, bgColor, defaultBackgroundColor, backgroundColor, renderOptions, canvas, renderer, root, renderer;
+
+        return __generator(this, function (_b) {
+          switch (_b.label) {
+            case 0:
+              ownerDocument = element.ownerDocument;
+
+              if (!ownerDocument) {
+                throw new Error("Element is not attached to a Document");
+              }
+
+              defaultView = ownerDocument.defaultView;
+
+              if (!defaultView) {
+                throw new Error("Document is not attached to a Window");
+              }
+
+              instanceName = (Math.round(Math.random() * 1000) + Date.now()).toString(16);
+              _a = isBodyElement(element) || isHTMLElement(element) ? parseDocumentSize(ownerDocument) : parseBounds(element), width = _a.width, height = _a.height, left = _a.left, top = _a.top;
+              defaultResourceOptions = {
+                allowTaint: false,
+                imageTimeout: 15000,
+                proxy: undefined,
+                useCORS: false
+              };
+              resourceOptions = _assign({}, defaultResourceOptions, opts);
+              defaultOptions = {
+                backgroundColor: '#ffffff',
+                cache: opts.cache ? opts.cache : CacheStorage.create(instanceName, resourceOptions),
+                logging: true,
+                removeContainer: true,
+                foreignObjectRendering: false,
+                scale: defaultView.devicePixelRatio || 1,
+                windowWidth: defaultView.innerWidth,
+                windowHeight: defaultView.innerHeight,
+                scrollX: defaultView.pageXOffset,
+                scrollY: defaultView.pageYOffset,
+                x: left,
+                y: top,
+                width: Math.ceil(width),
+                height: Math.ceil(height),
+                id: instanceName
+              };
+              options = _assign({}, defaultOptions, resourceOptions, opts);
+              windowBounds = new Bounds(options.scrollX, options.scrollY, options.windowWidth, options.windowHeight);
+              Logger.create({
+                id: instanceName,
+                enabled: options.logging
+              });
+              Logger.getInstance(instanceName).debug("Starting document clone");
+              documentCloner = new DocumentCloner(element, {
+                id: instanceName,
+                onclone: options.onclone,
+                ignoreElements: options.ignoreElements,
+                inlineImages: options.foreignObjectRendering,
+                copyStyles: options.foreignObjectRendering
+              });
+              clonedElement = documentCloner.clonedReferenceElement;
+
+              if (!clonedElement) {
+                return [2
+                /*return*/
+                , Promise.reject("Unable to find element in cloned iframe")];
+              }
+
+              return [4
+              /*yield*/
+              , documentCloner.toIFrame(ownerDocument, windowBounds)];
+
+            case 1:
+              container = _b.sent();
+              documentBackgroundColor = ownerDocument.documentElement ? parseColor$1(getComputedStyle(ownerDocument.documentElement).backgroundColor) : COLORS.TRANSPARENT;
+              bodyBackgroundColor = ownerDocument.body ? parseColor$1(getComputedStyle(ownerDocument.body).backgroundColor) : COLORS.TRANSPARENT;
+              bgColor = opts.backgroundColor;
+              defaultBackgroundColor = typeof bgColor === 'string' ? parseColor$1(bgColor) : bgColor === null ? COLORS.TRANSPARENT : 0xffffffff;
+              backgroundColor = element === ownerDocument.documentElement ? isTransparent(documentBackgroundColor) ? isTransparent(bodyBackgroundColor) ? defaultBackgroundColor : bodyBackgroundColor : documentBackgroundColor : defaultBackgroundColor;
+              renderOptions = {
+                id: instanceName,
+                cache: options.cache,
+                canvas: options.canvas,
+                backgroundColor: backgroundColor,
+                scale: options.scale,
+                x: options.x,
+                y: options.y,
+                scrollX: options.scrollX,
+                scrollY: options.scrollY,
+                width: options.width,
+                height: options.height,
+                windowWidth: options.windowWidth,
+                windowHeight: options.windowHeight
+              };
+              if (!options.foreignObjectRendering) return [3
+              /*break*/
+              , 3];
+              Logger.getInstance(instanceName).debug("Document cloned, using foreign object rendering");
+              renderer = new ForeignObjectRenderer(renderOptions);
+              return [4
+              /*yield*/
+              , renderer.render(clonedElement)];
+
+            case 2:
+              canvas = _b.sent();
+              return [3
+              /*break*/
+              , 5];
+
+            case 3:
+              Logger.getInstance(instanceName).debug("Document cloned, using computed rendering");
+              CacheStorage.attachInstance(options.cache);
+              Logger.getInstance(instanceName).debug("Starting DOM parsing");
+              root = parseTree(clonedElement);
+              CacheStorage.detachInstance();
+
+              if (backgroundColor === root.styles.backgroundColor) {
+                root.styles.backgroundColor = COLORS.TRANSPARENT;
+              }
+
+              Logger.getInstance(instanceName).debug("Starting renderer");
+              renderer = new CanvasRenderer(renderOptions);
+              return [4
+              /*yield*/
+              , renderer.render(root)];
+
+            case 4:
+              canvas = _b.sent();
+              _b.label = 5;
+
+            case 5:
+              if (options.removeContainer === true) {
+                if (!DocumentCloner.destroy(container)) {
+                  Logger.getInstance(instanceName).error("Cannot detach cloned iframe as it is not in the DOM anymore");
+                }
+              }
+
+              Logger.getInstance(instanceName).debug("Finished rendering");
+              Logger.destroy(instanceName);
+              CacheStorage.destroy(instanceName);
+              return [2
+              /*return*/
+              , canvas];
+          }
+        });
+      });
+    };
+
+    html2canvas_default = html2canvas;
+    return html2canvas;
+  });
+
+  var html2canvas_default$1 = html2canvas_default;
 
   var bitsToNum = function bitsToNum(ba) {
     return ba.reduce(function (s, n) {
@@ -16730,6 +32506,8 @@
 
   var VERSION = '0.0.1';
 
+  exports.ArrowGraphic = ArrowGraphic$1;
+  exports.ArrowPolyline = ArrowPolyline;
   exports.BillBoardGraphic = BillboardGraphic;
   exports.CVT = CVT$1;
   exports.Cartometry = Cartometry;
@@ -16739,35 +32517,65 @@
   exports.CursorTip = CursorTip;
   exports.DataLoader = DataLoader;
   exports.DraggableElement = DraggableElement;
+  exports.DynamicFadeMaterialProperty = DynamicFadeMaterialProperty;
+  exports.DynamicScanMaterialProperty = DynamicScanMaterialProperty;
+  exports.DynamicSectorFadeMaterialProperty = DynamicSectorFadeMaterialProperty;
+  exports.DynamicSpreadMaterialProperty = DynamicSpreadMaterialProperty;
+  exports.DynamicWareMaterialProperty = DynamicWareMaterialProperty;
   exports.Event = Event;
   exports.Graphic = Graphic;
+  exports.GraphicType = GraphicType$1;
   exports.GroundSkyBox = GroundSkyBox;
-  exports.LabelGraphic = LabelGraphic;
   exports.ModelAttachVector = ModelAttachVector;
   exports.ModelGraphic = ModelGraphic;
+  exports.NodeGraphic = NodeGraphic;
+  exports.PlotUtil = PlotUtil;
+  exports.Plotting = Plotting;
   exports.PointGraphic = PointGraphic;
   exports.PolygonGraphic = PolygonGraphic;
+  exports.PolylineFlowMaterialProperty = PolylineFlowMaterialProperty;
+  exports.PolylineGlowMaterialProperty = PolylineGlowMaterialProperty;
   exports.PolylineGraphic = PolylineGraphic;
+  exports.PolylineTrailLinkMaterialProperty = PolylineTrailLinkMaterialProperty;
+  exports.Properties = Properties;
   exports.URL = URL;
+  exports.UnrealBloomPass = UnrealBloomPass;
   exports.VERSION = VERSION;
+  exports.VectorTileProvider = VectorTileProvider;
   exports.ViewerParams = ViewerParams;
   exports._shaderGroundSkyBoxFS = shader;
   exports._shaderGroundSkyBoxVS = shader$1;
+  exports._shaderdynamicScanMaterial = shader$2;
+  exports._shaderdynamicSectorFadeMaterial = shader$3;
+  exports._shaderdynamicSpreadMaterial = shader$4;
+  exports._shaderdynamicWaterMaterial = shader$5;
+  exports._shaderpolylineFlowMaterial = shader$6;
+  exports._shaderpolylineGlowMaterial = shader$7;
+  exports._shaderpolylineTrackMaterial = shader$9;
+  exports._shaderpolylineTrailLinkMaterial = shader$8;
+  exports.abstract = _abstract;
   exports.ajaxCatch = errorCatch;
+  exports.arrow = ArrowGraphic;
   exports.checkViewer = checkViewer;
+  exports.clone = clone;
   exports.createViewer = createViewer;
   exports.dateFormat = dateFormat;
   exports.defaultValue = defaultValue;
   exports.defined = defined;
   exports.depthTest = depthTest;
   exports.filesaver = filesaver;
+  exports.flyChinaHome = flyChinaHome;
   exports.flyTo = flyTo;
+  exports.fxaa = fxaa;
   exports.guid = guid;
+  exports.html2canvas = html2canvas_default$1;
   exports.jquery = jQuery;
   exports.libgif = SuperGif;
   exports.logo = logo;
   exports.netcdfjs = NetCDFReaderExport$1;
   exports.pickPosition = pickPosition;
+  exports.pointVisiblity = pointVisibility;
+  exports.randomPosition = randomPosition;
   exports.shapefile = shapefile$1;
 
   Object.defineProperty(exports, '__esModule', { value: true });

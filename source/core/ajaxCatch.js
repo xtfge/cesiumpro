@@ -14,7 +14,7 @@
  *    CesiumPro.ajaxCatch(e,console.log);
  * })
  */
-const errorCatch = function(e, callback = console.error) {
+const errorCatch = function (e, callback = console.error) {
   if (e.response) {
     callback(e.status, e.response.data);
   } else if (e.request) {
@@ -24,7 +24,7 @@ const errorCatch = function(e, callback = console.error) {
   } else if (e.statusText) {
     callback(e.status, e.statusText);
   } else {
-    callback(e)
+    callback(e);
   }
 };
 
