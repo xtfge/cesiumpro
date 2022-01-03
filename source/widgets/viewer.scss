@@ -1,0 +1,6 @@
+div {
+    background-color: red;
+    &:hover{
+        background-color: gray;
+    }
+}

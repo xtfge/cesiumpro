@@ -1,0 +1,42 @@
+{
+  "name": "cesiumpro",
+  "version": "1.0.3",
+  "description": "A Cesium.js enhanced libary,including datasource, visualization, spatial analysis and satellite simulation etc.",
+  "main": "packages/CesiumPro.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build",
+    "build:doc": "gulp doc",
+    "start": "node server.js"
+  },
+  "private": false,
+  "files": [
+    "build/*"
+  ],
+  "keywords": [
+    "cesium",
+    "Cesium.js",
+    "GIS",
+    "map"
+  ],
+  "author": "Bob",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "compression": "^1.7.4",
+    "express": "^4.17.2",
+    "globby": "11.0.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-sass": "4.1.0",
+    "http-server": "^14.0.0",
+    "jsdoc": "^3.6.7",
+    "request": "^2.88.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.61.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-strip-pragma": "^1.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "stream-to-promise": "^3.0.0"
+  }
+}

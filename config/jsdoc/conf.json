@@ -1,0 +1,34 @@
+{
+    "tags": {
+        "allowUnknownTags": false
+    },
+    "source": {
+        "include": [
+            "source"
+        ],
+        "exclude": [
+            "source/thirdParty",
+            "source/workers",
+            "source/copyright.js",
+            "source/CesiumPro.js"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "./config/jsdoc/cesiumTags"
+    ],
+    "templates": {
+        "cleverLinks": true,
+        "default": {
+            "outputSourceFiles": false
+        },
+        "sourceUrl": "https://github.com/CesiumGS/cesium/blob/{version}/Source/{filename}",
+        "cesiumDoc":"../cesiumDocuments/{filename}"
+    },
+    "opts": {
+        "destination": "documents",
+        "template": "./config/jsdoc/cesium_template",
+        "recurse": true
+    }
+}
