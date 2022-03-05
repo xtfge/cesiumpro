@@ -17,4 +17,7 @@ class CesiumProError extends Error {
         this.name = 'CesiumProError';
     }
 }
+CesiumProError.throwNoInstance = function() {
+    throw new CesiumProError('它的定义了一个接口，不能被以直接调用.') 
+}
 export default CesiumProError;

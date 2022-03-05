@@ -1,9 +1,11 @@
+import defaultValue from "../core/defaultValue.js";
+
 class XYZLayer extends Cesium.UrlTemplateImageryProvider {
     /**
-     * 创建一个image图层，该图层通过使用X/Y/Z指定的URL模板请求图像。
+     * 创建一个image图层，该图层通过使用X/Y/Z指定的URL模板请求图像。你可以用它来请求TMS,WMS标准的地图服务，甚至WMTS。
      * @extends Cesium.UrlTemplateImageryProvider
-     * @property {Promise.<Object>|Object} options 具有以下属性
-     * @property {Resource|String} url  瓦片的url模板，它具有以下关键字:
+     * @param {Promise.<Object>|Object} options 具有以下属性
+     * @param {Resource|String} options.url  瓦片的url模板，它支持以下关键字:
      * <ul>
      *     <li><code>{z}</code>: 瓦片的层级，第一层为0级</li>
      *     <li><code>{x}</code>: 切片方案中X的坐标，最左边为0</li>
@@ -23,8 +25,8 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
      *     <li><code>{width}</code>: 瓦片宽度，单位像素</li>
      *     <li><code>{height}</code>: 瓦片高度，单位像素</li>
      * </ul>
-     * @property {Resource|String} [pickFeaturesUrl] 用于选择功能的 URL 模板，如果未定义
-     *                 {@link XYZLayer#pickFeatures} 将返回undefined，表示未选中任何内容，该模板除了支持url的所有关键字外，还具有以下关键字:
+     * @param {Resource|String} [options.pickFeaturesUrl] 用于选择功能的 URL 模板，如果未定义
+     *                 {@link XYZLayer#pickFeatures} 将返回undefined，表示未选中任何内容，该模板除了支持url的所有关键字外，还支持以下关键字:
      * <ul>
      *     <li><code>{i}</code>: 选择位置的列，单位像素，最左边为0。</li>
      *     <li><code>{j}</code>: 拾取位置的行，单位像素，最上边为0。</li>
@@ -36,9 +38,8 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
      *     <li><code>{latitudeProjected}</code>: 拾取位置的纬度，单位米</li>
      *     <li><code>{format}</code>: 一个函数，用于定义信息的返回形式, 如{@link Cesium.GetFeatureInfoFormat}.</li>
      * </ul>
-     * @property {Object} [urlSchemeZeroPadding] 设置坐标的位数，不足的以0填充，对于urlSchemeZeroPadding : { '{x}' : '0000'}
-     * 如果x为12，将被填充为0012。
-     * It the passed object has the following keywords:
+     * @param {Object} [options.urlSchemeZeroPadding] 设置坐标的位数，不足的以0填充，对于urlSchemeZeroPadding : { '{x}' : '0000'}
+     * 如果x为12，将被填充为0012。它具有以下关键字：
      * <ul>
      *  <li> <code>{z}</code>: z关键字的填充方案</li>
      *  <li> <code>{x}</code>: x关键字的填充方案</li>
@@ -47,18 +48,18 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
      *  <li> <code>{reverseY}</code>: reverseY关键字的填充方案</li>
      *  <li> <code>{reverseZ}</code>: reverseZ关键字的填充方案</li>
      * </ul>
-     * @property {String|String[]} [subdomains='abc'] s占位符可用的子域名，如果该值为字符串，由字符串中的每个字符都是一个子域名。
-     * @property {Credit|String} [credit=''] 数据源的版权信息.
-     * @property {Number} [minimumLevel=0] 图层支持的最低细节级别。在指定最小级别的瓦片数量很少时要小心，较大的数字可能会导致渲染问题。
-     * @property {Number} [maximumLevel] 图层支持的最大细节级别，如果未定义，则无限制。
-     * @property {Rectangle} [rectangle=Cesium.Rectangle.MAX_VALUE] 瓦片覆盖范围，单位弧度。
-     * @property {TilingScheme} [tilingScheme=Cesium.WebMercatorTilingScheme] 图层的坐标系，默认为墨卡托投影。
-     * @property {Number} [tileWidth=256] 瓦片宽度。
-     * @property {Number} [tileHeight=256] 瓦片高度。
-     * @property {Boolean} [hasAlphaChannel=true] 瓦片图像是否拥有alpha通道，如果为false，内存使用量和加载时间将减少，但是会失去alpha通道的数据。
-     * @property {GetFeatureInfoFormat[]} [getFeatureInfoFormats]  {@link XYZLayer#pickFeatures} 调用时在指定位置获取特征信息的格式。如果未指定此参数，则禁用特征拾取。
-     * @property {Boolean} [enablePickFeatures=true] 是否支持要素不支持，如果为true,XYZLayer#pickFeatures将请求pickFeaturesUrl并解析其内容，否则将返回undefined。
-     * @property {Object} [customTags] 为URL模板自定义关键字。该对象的键必须为字符串，值为函数。
+     * @param {String|String[]} [options.subdomains='abc'] {s}占位符可用的子域名，如果该值为字符串，由字符串中的每个字符都是一个子域名。
+     * @param {Credit|String} [options.credit=''] 数据源的版权信息.
+     * @param {Number} [options.minimumLevel=0] 图层支持的最低细节级别。在指定最小级别的瓦片数量很少时要小心，较大的数字可能会导致渲染问题。
+     * @param {Number} [options.maximumLevel] 图层支持的最大细节级别，如果未定义，则无限制。
+     * @param {Rectangle} [options.rectangle=Cesium.Rectangle.MAX_VALUE] 瓦片覆盖范围，单位弧度。
+     * @param {TilingScheme} [options.tilingScheme=Cesium.WebMercatorTilingScheme] 图层的坐标系，默认为墨卡托投影。
+     * @param {Number} [options.tileWidth=256] 瓦片宽度。
+     * @param {Number} [options.tileHeight=256] 瓦片高度。
+     * @param {Boolean} [options.hasAlphaChannel=true] 瓦片图像是否拥有alpha通道，如果为false，内存使用量和加载时间将减少，但是会失去alpha通道的数据。
+     * @param {GetFeatureInfoFormat[]} [options.getFeatureInfoFormats=XYZLayer.defaultFeatureInfoFormats]  {@link XYZLayer#pickFeatures} 调用时在指定位置获取特征信息的格式。如果未指定此参数，则禁用特征拾取。
+     * @param {Boolean} [options.enablePickFeatures=true] 是否支持要素不支持，如果为true,XYZLayer#pickFeatures将请求pickFeaturesUrl并解析其内容，否则将返回undefined。
+     * @param {Object} [options.customTags] 为URL模板自定义关键字。该对象的键必须为字符串，值为函数。
      * 
      * @example
      * // Access Natural Earth II imagery, which uses a TMS tiling scheme and Geographic (EPSG:4326) project
@@ -92,8 +93,44 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
      *        }
      *    }
      * });
+     * // geoserver tms服务
+     * const  geoserverTMS = new XYZLayer({
+     *      url: 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/topp%3Astates@EPSG%3A4326@png/{z}/{x}/{reverseY}.png',
+     *      tilingScheme: proj.get('EPSG:4326')
+     *  })
+     * // geoserver wms服务，并支持pick
+     * const geoserverTMS = new XYZLayer({
+     *      pickFeaturesUrl:'http://localhost:8080/geoserver/wms?service=WMS&version=1.1.1&request=GetFeatureInfo&layers=topp%3Astates&bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&width={width}&height={height}&srs=EPSG%3A4326&query_layers=topp%3Astates&info_format={format}&x={i}&y={j}',
+     *      url: 'http://localhost:8080/geoserver/topp/wms?service=WMS&version=1.1.1&request=GetMap&layers' +
+     *          '=topp%3Astates&bbox={westDegrees}%2C{southDegrees}%2C{eastDegrees}%2C{northDegrees}&transparent=true&' +
+     *           'width=768&height=330&srs=EPSG%3A4326&format=image/png',
+     *      tilingScheme: proj.get('EPSG:4326'),
+     *      getFeatureInfoFormats: [new Cesium.GetFeatureInfoFormat("xml", "text/xml")]
+     * })
+     * // geoserver WMTS服务
+     * const layer = new XYZLayer({
+     *     url: 'http://localhost:8080/geoserver/gwc/service/wmts?layer=topp%3Astates&style=&til' +
+     *         'ematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={TileMatrix}' +
+     *         '&TileCol={tileCol}&TileRow={tileRow}',
+     *     tilingScheme: proj.get('EPSG:4326'),
+     *     customTags: {
+     *         TileMatrix: function (imageryProvider, x, y, level) {
+     *             return 'EPSG:4326:' + level
+     *         },
+     *         tileCol: function (imageryProvider, x, y, level) {
+     *             return y
+     *         },
+     *         tileRow: function (imageryProvider, x, y, level) {
+     *             return x
+     *         }
+     *     }
+     * })
      */
     constructor(options) {
+        if (typeof options === 'string') {
+            options = {url: options}
+        }
+        options.getFeatureInfoFormats = defaultValue(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
         super(options);
     }
     /**
@@ -124,9 +161,41 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
         return super.url;
     }
     /**
+     * 可以请求的最小瓦片级别
+     * @readonly
+     * @type {Number}
+     */
+     get minimumLevel() {
+        return super.minimumLevel;
+    }
+    /**
+     * 可以请求的最大详细级别
+     * @type {Number}
+     * @readonly
+     */
+    get maximumLevel() {
+        return super.maximumLevel;
+    }
+    /**
+     * 图层的范围
+     * @type {Cesium.Rectangle}
+     * @readonly
+     */
+     get rectangle() {
+        return super.rectangle;
+    }
+    /**
+     * 获取影像错误时触发的事件
+     * @type {Event}
+     * @readonly
+     */
+    get errorEvent() {
+        return super.errorEvent;
+    }
+    /**
      * 获取一个值，该值指示图层是否已准备好使用。
      * @readonly
-     * @returns {Boolean} 图层是否已经准备好使用。
+     * @type {Boolean}
      */
     get ready() {
         return super.ready;
@@ -134,18 +203,28 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
     /**
      * 获取一个Promise，该图层准备好时将resolve
      * @readonly
-     * @returns {Promise<Boolean>}
+     * @type {Promise<Boolean>}
      */
     get readyPromise() {
         return super.readyPromise;
     }
     /**
      * 图层的坐标系
-     * @returns {TilingScheme} 坐标系
+     * @type {Cesium.TilingScheme}
      * @readonly
      */
     get tilingScheme() {
         return super.tilingScheme;
+    }
+    /**
+     * 图层是否允许被pick
+     * @default true
+     */
+    get enablePickFeatures() {
+        return super.enablePickFeatures;
+    }
+    set enablePickFeatures(val) {
+        super.enablePickFeatures = val;
     }
 
     /**
@@ -157,7 +236,7 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
      * @param {Number} level 瓦片的层级。
      * @param {Number} longitude 选择要素的经度。
      * @param {Number} latitude  选择要素的纬度
-     * @return {Promise.<ImageryLayerFeatureInfo[]>|undefined} 
+     * @return {Promise.<Cesium.ImageryLayerFeatureInfo[]>|undefined} 
      */
     pickFeatures(x, y, level, longitude, latitude) {
         return super.pickFeatures(x, y, level, longitude, latitude);
@@ -174,4 +253,14 @@ class XYZLayer extends Cesium.UrlTemplateImageryProvider {
         return super.requestImage(x, y, level, request)
     }
 }
+ /**
+ * 默认数据解析格式
+ * @constant
+ * @type {Object}
+ */
+XYZLayer.defaultFeatureInfoFormats = Object.freeze([
+    Object.freeze(new Cesium.GetFeatureInfoFormat("json", "application/json")),
+    Object.freeze(new Cesium.GetFeatureInfoFormat("xml", "text/xml")),
+    Object.freeze(new Cesium.GetFeatureInfoFormat("text", "text/html")),
+])
 export default XYZLayer;

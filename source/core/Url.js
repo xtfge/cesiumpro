@@ -140,7 +140,9 @@ Url.join = function (...args) {
 /**
  * 获取CesiumPro静态资源的完整路径
  * @param {String} path 指定文件
- * @returns {String}
+ * @returns {String} 完整的Url地址
+ * @example 
+ * Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png')
  */
 Url.buildModuleUrl = function (path) {
   return buildModuleUrl(path);

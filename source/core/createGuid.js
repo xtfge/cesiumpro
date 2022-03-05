@@ -3,7 +3,7 @@
  *
  * @exports createGuid
  *
- * @returns {String}
+ * @returns {String} guid
  *
  *
  * @example
