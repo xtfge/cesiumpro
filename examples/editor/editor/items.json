@@ -1,0 +1,319 @@
+[
+  {
+    "label": "数据加载",
+    "value": "layer",
+    "icon": "glyphicon glyphicon-search",
+    "status": true,
+    "children": [
+      {
+        "label": "在线地图",
+        "value": "image",
+        "icon": "",
+        "children": [
+          {
+            "label": "天地图",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          },
+          {
+            "label": "高德地图",
+            "value": "1.1.2gaode",
+            "thumb": "./images/gaode.gif"
+          },
+          {
+            "label": "百度地图",
+            "value": "1.1.3baidu",
+            "thumb": "./images/baidu.gif"
+          },
+          {
+            "label": "腾讯地图",
+            "value": "1.1.4tecent",
+            "thumb": "./images/tecent.gif"
+          },
+          {
+            "label": "ArcGIS Online",
+            "value": "1.1.5arcgis",
+            "thumb": "./images/arcgis.gif"
+          },
+          {
+            "label": "mapBox地图",
+            "value": "1.1.6mapbox",
+            "thumb": "./images/mapbox.gif"
+          },
+          {
+            "label": "OpenStreetMap(OSM)",
+            "value": "1.1.7osm",
+            "thumb": "./images/osm.gif"
+          },
+          {
+            "label": "本地图片",
+            "value": "1.1.8offline",
+            "thumb": "./images/offline.gif"
+          },
+          {
+            "label": "Bing Maps",
+            "value": "1.1.9bing",
+            "thumb": "./images/bing.gif"
+          }
+        ]
+      },
+      {
+        "label": "OGC服务图层",
+        "value": "ogc",
+        "icon": "",
+        "children": [
+          {
+            "label": "WMS",
+            "value": "1.2.1wms",
+            "thumb": "./images/wms.gif"
+          },
+          {
+            "label": "WMTS",
+            "value": "1.2.2wmts",
+            "thumb": "./images/wmts.gif"
+          },
+          {
+            "label": "TMS",
+            "value": "1.2.3tms",
+            "thumb": "./images/tms.gif"
+          }
+        ]
+      },
+      {
+        "label": "瓦片及图层参数控制",
+        "value": "debug",
+        "icon": "",
+        "children": [
+          {
+            "label": "TMS标准瓦片",
+            "value": "1.3.1tms-tile",
+            "thumb": "./images/tms-tile.gif"
+          },
+          {
+            "label": "Google标准瓦片",
+            "value": "1.3.2google-tile",
+            "thumb": "./images/google-tile.gif"
+          },
+          {
+            "label": "ArcGIS标准瓦片",
+            "value": "1.3.3arcgis-tile",
+            "thumb": "./images/arcgis-tile.gif"
+          },
+          {
+            "label": "瓦片调试",
+            "value": "1.3.4tile-debug",
+            "thumb": "./images/tile-debug.gif"
+          },
+          {
+            "label": "经纬网",
+            "value": "1.3.5lonlat",
+            "thumb": "./images/lonlat.gif"
+          },
+          {
+            "label": "图层调整",
+            "value": "1.3.6layerparameter",
+            "thumb": "./images/layerparameter.gif"
+          },
+          {
+            "label": "限制地球范围",
+            "value": "1.3.7globe-extent",
+            "thumb": "./images/globe-extent.gif"
+          }
+        ]
+      },
+      {
+        "label": "矢量加载",
+        "value": "vector",
+        "children": [
+          {
+            "label": "GeoJson",
+            "value": "1.4.1geojson",
+            "thumb": "./images/geojson.gif"
+          },
+          {
+            "label": "KML/KMZ",
+            "value": "1.4.2kml",
+            "thumb": "./images/kml.gif"
+          },
+          {
+            "label": "Shapefile",
+            "value": "1.4.3shp",
+            "thumb": "./images/shp.gif"
+          },
+          {
+            "label": "PBF",
+            "value": "1.4.4pbf",
+            "thumb": "./images/pbf.gif"
+          },
+          {
+            "label": "WFS服务",
+            "value": "1.4.5wfs",
+            "thumb": "./images/wfs.gif"
+          },
+          {
+            "label": "多边形拉伸(建筑矢量拉伸)",
+            "value": "1.4.6polygonExa",
+            "thumb": "./images/polygonExa.gif"
+          }
+        ]
+      },
+      {
+        "label": "地形",
+        "value": "terrain",
+        "icon": "",
+        "children": [
+          {
+            "label": "地形",
+            "value": "1.5.1terrain",
+            "thumb": "./images/terrain.gif"
+          },
+          {
+            "label": "自定义高度图",
+            "value": "1.5.4customterrain",
+            "thumb": "./images/customterrain.gif"
+          },
+          {
+            "label": "多地形",
+            "value": "1.5.2mutilterrain",
+            "thumb": "./images/mutipleterrain.gif"
+          },
+          {
+            "label": "地形夸张",
+            "value": "1.5.3terrainExa",
+            "thumb": "./images/terrainExa.gif"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "视图控件",
+    "value": "view",
+    "icon": "glyphicon glyphicon-search",
+    "status": false,
+    "children": [
+      {
+        "label": "视图",
+        "value": "view",
+        "icon": "",
+        "children": [
+          {
+            "label": "自转模拟",
+            "value": "2.1.1rotation",
+            "thumb": "./images/selfrotation.gif"
+          },
+          {
+            "label": "双球同步",
+            "value": "2.1.2viewlink",
+            "thumb": "./images/viewlink.gif"
+          },
+          {
+            "label": "绕点观察",
+            "value": "2.1.3rotatebypoint",
+            "thumb": "./images/rotatebypoint.gif"
+          },
+          {
+            "label": "开场动画",
+            "value": "2.1.4stepfly",
+            "thumb": "./images/stepfly.gif"
+          },
+          {
+            "label": "kml漫游",
+            "value": "2.1.10kmltour",
+            "thumb": "./images/kmltour.gif"
+          }
+        ]
+      },
+      {
+        "label": "小部件",
+        "value": "widgets",
+        "icon": "",
+        "children": [
+          {
+            "label": "阴影",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          },
+          {
+            "label": "漫游",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          },
+          {
+            "label": "kml漫游",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "三维模型",
+    "value": "model",
+    "icon": "glyphicon glyphicon-search",
+    "status": false,
+    "children": [
+      {
+        "label": "小模型",
+        "value": "model",
+        "children": [
+          {
+            "label": "gltf/glb模型加载",
+            "value": "3.1.1gltf",
+            "thumb": "./images/gltf.gif"
+          }
+        ]
+      },
+      {
+        "label": "Tileset",
+        "value": "tileset"
+      }
+    ]
+  },
+  {
+    "label": "可视化",
+    "value": "visual",
+    "icon": "glyphicon glyphicon-asterisk",
+    "children": [
+      {
+        "label": "大数据可视化",
+        "value": "mag",
+        "children": [
+          {
+            "label": "大量点加载",
+            "value": "mag-point",
+            "thumb": "./images/mag-point.gif"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "label": "分析",
+    "value": "analysis",
+    "icon": "glyphicon glyphicon-asterisk",
+    "children": [
+      {
+        "label": "空间分析",
+        "value": "spatial",
+        "children": [
+          {
+            "label": "缓冲区分析",
+            "value": "buffer",
+            "thumb": "./assets/images/selector.png"
+          },
+          {
+            "label": "淹没分析",
+            "value": "hiy",
+            "thumb": "./assets/images/gif.gif"
+          }
+        ]
+      },
+      {
+        "label": "卫星过境分析",
+        "value": "satelliate"
+      }
+    ]
+  }
+]

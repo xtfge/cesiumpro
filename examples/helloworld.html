@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../thirdParty/cesium/CesiumUnminified/Cesium.js"></script>
+    <link href="../thirdParty/cesium/Cesium/Widgets/widgets.css" rel="stylesheet" />
+    <title>Cesium Pro</title>
+</head>
+
+<body>
+    <div id="contanier"></div>
+    <script type="module">
+        window.CESIUMPRO_BASE_URL = '../source/'
+        import Viewer from '../source/core/Viewer.js';
+        import XYZLayer from '../source/layer/XYZLayer.js';
+        import proj from '../source/core/proj.js'
+        import WMSLayer from '../source/layer/WMSLayer.js'
+        import WMTSLayer from '../source/layer/WMTSLayer.js'
+        import TDTLayer from '../source/layer/TDTLayer.js'
+        import GaoDeLayer from '../source/layer/GaoDeLayer.js'
+        import GeoPoint from '../source/core/GeoPoint.js'
+        window.viewer = new Viewer('contanier', {
+            infoBox: true,
+            selectionIndicator: false,
+            navigationHelpButton:true,
+            navigationInstructionsInitiallyVisible:false,
+            // sceneMode: Cesium.SceneMode.SCENE2D
+        });
+        const layer = new GaoDeLayer({
+            key: "ac7f26daf5b1a54c746e93a414dd9c6a",
+        });
+        window.p = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(110, 30),
+            point: {
+                pixelSize: 10
+            },
+            description: '666',
+            name: '999',
+            desc: 'name'
+        })
+        layer.errorEvent.addEventListener((e) => {
+            console.log(e, '--')
+        })
+        // viewer.addLayer(layer);
+        const wms = new WMSLayer({
+            url: 'http://localhost:8080/geoserver/wms',
+            layers: 'topp:states',
+        })
+        window.layer = layer;
+        window.wms = wms;
+        window.wmts = new WMTSLayer({
+            url: 'http://localhost:8080/geoserver/gwc/service/wmts',
+            layer: 'topp:states',
+            format: 'image/png',
+            tileMatrixSetID: 'EPSG:4326',
+            tileMatrixLabels: ['EPSG:4326:0', 'EPSG:4326:1', 'EPSG:4326:2', 'EPSG:4326:3', 'EPSG:4326:4'],
+            style: '',
+            tileWidth: 700,
+            tileHeight: 300,
+            tilingScheme: proj.get('EPSG:4326')
+        })
+        viewer.addLayer(layer);
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+        handler.setInputAction(e => {
+            console.log(e.position)
+            const position = e.position;
+            console.log(e.position, GeoPoint.fromPixel(position, viewer).toCartographic())
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+    </script>
+
+</body>
+
+</html>

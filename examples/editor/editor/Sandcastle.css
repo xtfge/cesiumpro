@@ -1,0 +1,39 @@
+#toolbar {
+  margin: 10px;
+  padding: 10px  20px;
+  position: absolute;
+  right: 10px;
+  top: 2px;
+  background: #303333;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+span{
+  display: flex;
+  align-items: center;
+}
+.ele-cls{
+  display: inline-block;;
+  background: #303333;
+  border: 1px solid #666;
+  color:#eee;
+  border-radius: 4px;
+  padding:5px 12px;
+  margin:0 5px;
+}
+.ele-cls:hover{
+  color:#fff;
+  background-color: #48b;
+  border-color: #aaf;
+  box-shadow: 0 0 8px #fff;
+}
+.button-cls{
+  cursor: pointer;
+}
+.label-cls{
+  padding:2px 5px;
+  /* border: 1px solid #666; */
+  color:#eee;
+  border-radius: 4px;
+}

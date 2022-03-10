@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+   <script src='./editor/Sandcastle.js'></script>
+   <link href='./editor/Sandcastle.css' rel='stylesheet'/>
+    <script src='/thirdParty/cesium/Cesium/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+        body,html {
+            margin: 0;
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+   <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const geojson = CesiumPro.GeoJsonDataSource.load('../data/geojson/building.geojson', {
+            extrudedHeight: '${Floor} * 10',
+            fill: Cesium.Color.WHITE.withAlpha(0.6),
+            outlineColor: Cesium.Color.WHITE
+        })
+        parent.viewer = viewer;
+        viewer.addLayer(geojson);
+        viewer.flyTo(geojson)
+    </script>
+</body>
+</html>

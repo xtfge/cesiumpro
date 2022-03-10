@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+   <script src='./editor/Sandcastle.js'></script>
+   <link href='./editor/Sandcastle.css' rel='stylesheet'/>
+    <script src='/thirdParty/cesium/Cesium/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+        body,html {
+            margin: 0;
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+   <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map', {
+            imageryProvider: new CesiumPro.GaoDeLayer()
+        });
+        const terrain = new Cesium.CesiumTerrainProvider({
+            url: '../data/terrain/terrain1'
+        })
+        viewer.terrain = terrain;
+        viewer.flyTo(new CesiumPro.GeoPoint(108.5, 33.3, 10000))
+        parent.viewer = viewer;
+    </script>
+</body>
+</html>
