@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      ShapefileDataSource - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        ShapefileDataSource
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="ShapefileDataSource">
+    <a href="#ShapefileDataSource" class="doc-link"></a>
+    new CesiumPro.ShapefileDataSource<span class="signature">(<span class="optional">name</span>)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L522">layer/ShapefileDataSource.js 522</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  创建一个ESRI Shapefile数据源
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                数据源名称</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp') const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp') viewer.addLayer(province) viewer.addLayer(city)</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+    <h3 class="subsection-title">Extends</h3>
+
+    
+
+
+    <ul>
+        <li><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".clampToGround">
+    <a href="#.clampToGround" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.clampToGround<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L595">layer/ShapefileDataSource.js 595</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否贴地
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".fill">
+    <a href="#.fill" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.fill<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L567">layer/ShapefileDataSource.js 567</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  多边形要素的填充色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Color.fromBytes(255, 255, 0, 100)</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".lineColor">
+    <a href="#.lineColor" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.lineColor<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L560">layer/ShapefileDataSource.js 560</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  线要素的颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Color.YELLOW</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".lineWidth">
+    <a href="#.lineWidth" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.lineWidth<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L588">layer/ShapefileDataSource.js 588</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  线要素的宽度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">2</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".outline">
+    <a href="#.outline" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.outline<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L574">layer/ShapefileDataSource.js 574</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  多边形要素是否显边框
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".outlineColor">
+    <a href="#.outlineColor" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.outlineColor<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L581">layer/ShapefileDataSource.js 581</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  多边形要素边框的颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Color.YELLOW</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".outlineWidth">
+    <a href="#.outlineWidth" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.outlineWidth<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L602">layer/ShapefileDataSource.js 602</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  多边形要素的边框宽度，该属性在windows环境下可能不生效
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">1</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".pointColor">
+    <a href="#.pointColor" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.pointColor<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L553">layer/ShapefileDataSource.js 553</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  点要素的默认颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Color.ROYALBLUE</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".pointSize">
+    <a href="#.pointSize" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.pointSize<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L546">layer/ShapefileDataSource.js 546</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  点要素的默认大小
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">5</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="changedEvent">
+    <a href="#changedEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> changedEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L668">layer/GeoJsonDataSource.js 668</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  数据发生变化时触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#changedEvent">GeoJsonDataSource#changedEvent</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clustering">
+    <a href="#clustering" class="doc-link"></a>
+    clustering<span class="type-signature"> : <a href="../cesiumDocumentation/EntityCluster.html" target = '_blank'>Cesium.EntityCluster</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L702">layer/GeoJsonDataSource.js 702</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  数据源的聚合参数
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#clustering">GeoJsonDataSource#clustering</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="credit">
+    <a href="#credit" class="doc-link"></a>
+    credit<span class="type-signature"> : <a href="../cesiumDocumentation/Credit.html" target = '_blank'>Cesium.Credit</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L717">layer/GeoJsonDataSource.js 717</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  版权信息
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#credit">GeoJsonDataSource#credit</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="entities">
+    <a href="#entities" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> entities<span class="type-signature"> : <a href="../cesiumDocumentation/EntityCollection.html" target = '_blank'>Cesium.EntityCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L636">layer/GeoJsonDataSource.js 636</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  该数据源中的entity
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#entities">GeoJsonDataSource#entities</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="errorEvent">
+    <a href="#errorEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> errorEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L676">layer/GeoJsonDataSource.js 676</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  数据加载出错时触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#errorEvent">GeoJsonDataSource#errorEvent</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="isLoading">
+    <a href="#isLoading" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> isLoading<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L660">layer/GeoJsonDataSource.js 660</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  指示该数据源是否正在加载数据
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#isLoading">GeoJsonDataSource#isLoading</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="loadingEvent">
+    <a href="#loadingEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> loadingEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L684">layer/GeoJsonDataSource.js 684</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  数据源开始或结束加载时触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#loadingEvent">GeoJsonDataSource#loadingEvent</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="name">
+    <a href="#name" class="doc-link"></a>
+    name<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L643">layer/GeoJsonDataSource.js 643</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  数据源名称
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#name">GeoJsonDataSource#name</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/GeoJsonDataSource.js#L692">layer/GeoJsonDataSource.js 692</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否显示数据源
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="GeoJsonDataSource.html#show">GeoJsonDataSource#show</a>
+    </li></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".load">
+    <a href="#.load" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.ShapefileDataSource.load<span class="signature">(data, options)</span> &rarr; <span class="type-signature returnType">Promise.&lt;<a href="ShapefileDataSource.html">ShapefileDataSource</a>></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L701">layer/ShapefileDataSource.js 701</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  加载Shapefile数据
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                shapefile文件路径</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="GeoJsonDataSource.html#.LoadOptions">GeoJsonDataSource.LoadOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                样式配置参数</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="load">
+    <a href="#load" class="doc-link"></a>
+    load<span class="signature">(data, options)</span> &rarr; <span class="type-signature returnType">Promise.&lt;<a href="ShapefileDataSource.html">ShapefileDataSource</a>></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L618">layer/ShapefileDataSource.js 618</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  加载Shapefile数据
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                shapefile文件路径</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="GeoJsonDataSource.html#.LoadOptions">GeoJsonDataSource.LoadOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                样式配置参数</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Type Definitions</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".LoadOptions">
+    <a href="#.LoadOptions" class="doc-link"></a>
+    CesiumPro.ShapefileDataSource.LoadOptions
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ShapefileDataSource.js#L704">layer/ShapefileDataSource.js 704</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  加载GeoJson数据源时的配置项
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pointColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">点的颜色，如果没有设置将使用ShapefileDataSource.pointColor</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pointSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">点的大小，如果没有设置将使用ShapefileDataSource.pointSize</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>outlineColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">多边形边框颜色，如果没有设置将使用ShapefileDataSource.outlineColor</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>outlineWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">多边形边框宽度，如果没有设置将使用ShapefileDataSource.outlineWidth</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>outline</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">是否显示多边形边框，如果没有设置将使用ShapefileDataSource.outline</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fill</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">多边形填充颜色，如果没有设置将使用ShapefileDataSource.fill</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">线要素的颜色，如果没有设置将使用ShapefileDataSource.lineColor</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lineWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">线要素的宽度，如果没有设置将使用ShapefileDataSource.lineWidth</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clampToGround</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">是否贴地，如果未定义则使用ShapefileDataSource.clampToGround</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>extrudedHeight</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">拉伸高度，仅对多边形要素有效</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>credit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Credit.html" target = '_blank'>Cesium.Credit</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">信用信息</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="GeoPoint"><a href="GeoPoint.html">GeoPoint</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

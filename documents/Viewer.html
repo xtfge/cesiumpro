@@ -1,0 +1,5250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Viewer - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        Viewer
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="Viewer">
+    <a href="#Viewer" class="doc-link"></a>
+    new CesiumPro.Viewer<span class="signature">(container, options)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L338">core/Viewer.js 338</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  创建一个地球, 该Viewer是对Cesium.Viewer的继承。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>container</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  Element</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                创建地球的容器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性：
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>animation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果设置为true, 则不会创建动画小部件。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>baseLayerPicker</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建底图选择器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fullscreenButton</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建全屏按钮。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vrButton</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建VR小部件.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geocoder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+|
+
+
+<span class="param-type">
+  Array.&lt;GeocoderService></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建位置搜索小部件。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>homeButton</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建复位按钮</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>infoBox</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建属性信息显示框,当selectedEntity被定义时，将显示它的属性信息。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sceneModePicker</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建场景模式切换器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>selectionIndicator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建创建指示器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timeline</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建时间轴，一般和animation配合使用。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>navigationHelpButton</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建帮助工具。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>navigationInstructionsInitiallyVisible</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                帮助工具是否默认展示,只有当navigationHelpButton为true时生效。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scene3DOnly</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否仅以3D模式渲染每个几何要素，如果为true,可以节省GPU内存。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shouldAnimate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果设为true, 时钟将默认前进。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imageryProvider</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/ImageryProvider.html" target = '_blank'>Cesium.ImageryProvider</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">createDefaultLayer()</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                默认底图。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>terrainProvider</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/TerrainProvider.html" target = '_blank'>Cesium.TerrainProvider</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Cesium.EllipsoidTerrainProvider()</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                默认地形。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skyBox</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/SkyBox.html" target = '_blank'>Cesium.SkyBox</a></span>
+|
+
+
+<span class="param-type">
+  false</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                天空盒。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skyAtmosphere</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/SkyAtmosphere.html" target = '_blank'>Cesium.SkyAtmosphere</a></span>
+|
+
+
+<span class="param-type">
+  false</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                大气层。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fullscreenElement</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Element</span>
+|
+
+
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">document.body</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                全屏显示的容器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>useDefaultRenderLoop</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果设为false, 你必须手动调用<code>resize></code>, <code>render</code>函数。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>targetFrameRate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                使用默认循环时的目标帧率。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>showRenderLoopErrors</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                发生渲染错误时，是否显示错误信息。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>useBrowserRecommendedResolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否使用浏览器推荐的分辨率，如果为真<code>window.devicePixelRatio</code>将不生效。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>automaticallyTrackDataSourceClocks</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                不是自动跟踪新添加的数据源的时钟设置，并在数据源的时钟发生变化时进行更新。如果要独立配置时钟，请将其设置为 false。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>contextOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                WebGL配置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sceneMode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/SceneMode.html" target = '_blank'>Cesium.SceneMode</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.SceneMode.SCENE3D</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                场景模式，默认3D。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mapProjection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/MapProjection.html" target = '_blank'>Cesium.MapProjection</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Cesium.GeographicProjection()</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                在 2D 和 Columbus View 模式中使用的地图投影。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>globe</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Globe.html" target = '_blank'>Cesium.Globe</a></span>
+|
+
+
+<span class="param-type">
+  false</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Cesium.Globe(mapProjection.ellipsoid)</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果为false，地球将不会被创建。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dataSources</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/DataSourceCollection.html" target = '_blank'>Cesium.DataSourceCollection</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Cesium.DataSourceCollection()</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                矢量数据集。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadows</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否显示阴影。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>terrainShadows</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/ShadowMode.html" target = '_blank'>Cesium.ShadowMode</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.ShadowMode.RECEIVE_ONLY</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                确定地形是否投射或接收来自光源的阴影。.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mapMode2D</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/MapMode2D.html" target = '_blank'>Cesium.MapMode2D</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.MapMode2D.INFINITE_SCROLL</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                确定 2D 地图是否可旋转或可在水平方向无限滚动。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>projectionPicker</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否显示投影选择器。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>requestRenderMode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果设为true，则仅在场景中的内容变化时才会渲染帧，可以提高性能，节省电源但是有些情况下可能需要您手动调用<a href="../cesiumDocumentation/Scene.html#requestRender" target = '_blank'><code>Cesium.Scene#requestRender</code></a>, 详情请参考<a href="https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/">Improving Performance with Explicit Rendering</a>.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumRenderTimeChange</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">0.0</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                如果requestRenderMode为 true，则此值定义在请求渲染之前允许的模拟时间的最大更改。即模拟时间超maximumRenderTimeChange，将自动调用<a href="../cesiumDocumentation/Scene.html#requestRender" target = '_blank'><code>Cesium.Scene#requestRender</code></a></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+    <h3 class="subsection-title">Extends</h3>
+
+    
+
+
+    <ul>
+        <li><a href="../cesiumDocumentation/Viewer.html" target = '_blank'>Cesium.Viewer</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="autoRotation">
+    <a href="#autoRotation" class="doc-link"></a>
+    autoRotation<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L421">core/Viewer.js 421</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得或设置是否允许地球自转
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="center">
+    <a href="#center" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> center<span class="type-signature"> : <a href="GeoPoint.html">GeoPoint</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L457">core/Viewer.js 457</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  返回场景的中心点坐标, 如果中心没有内容，则返回undefined
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="container">
+    <a href="#container" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> container<span class="type-signature"> : Element</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L465">core/Viewer.js 465</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  创建地球的容器
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dataSources">
+    <a href="#dataSources" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> dataSources<span class="type-signature"> : <a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L481">core/Viewer.js 481</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得地球上所有矢量图层（geojson,CZML, Kml等）
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="depthTest">
+    <a href="#depthTest" class="doc-link"></a>
+    depthTest<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L600">core/Viewer.js 600</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  打开或关闭基于地形的深度测试，同<code>viewer.scene.globe.depthTestAgainstTerrain</code>
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="distancePerPixel">
+    <a href="#distancePerPixel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> distancePerPixel<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L442">core/Viewer.js 442</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  单位像素的长度所代表的真实距离，它的倒数就是地图学中的比例尺, 单位 km
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="ellipsoid">
+    <a href="#ellipsoid" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> ellipsoid<span class="type-signature"> : <a href="../cesiumDocumentation/Ellipsoid.html" target = '_blank'>Cesium.Ellipsoid</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L497">core/Viewer.js 497</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  椭球体
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="enableLighting">
+    <a href="#enableLighting" class="doc-link"></a>
+    enableLighting<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L406">core/Viewer.js 406</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否启用太阳光照射，如果启用，将对地球对昼夜区域区分显示。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="entities">
+    <a href="#entities" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> entities<span class="type-signature"> : <a href="../cesiumDocumentation/EntityCollection.html" target = '_blank'>Cesium.EntityCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L391">core/Viewer.js 391</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取未绑定到特定数据源的实体集合。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="extent">
+    <a href="#extent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> extent<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L449">core/Viewer.js 449</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  返回场景的边界范围
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="fps">
+    <a href="#fps" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> fps<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L561">core/Viewer.js 561</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  瞬时帧率
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="fxaa">
+    <a href="#fxaa" class="doc-link"></a>
+    fxaa<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L431">core/Viewer.js 431</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  打开或关闭快速抗锯齿功能
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="globe">
+    <a href="#globe" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> globe<span class="type-signature"> : <a href="../cesiumDocumentation/Globe.html" target = '_blank'>Cesium.Globe</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L489">core/Viewer.js 489</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  地球对象
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="heading">
+    <a href="#heading" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> heading<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L577">core/Viewer.js 577</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得相机的偏航角，单位：度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="layers">
+    <a href="#layers" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> layers<span class="type-signature"> : <a href="../cesiumDocumentation/ImageryLayerCollection.html" target = '_blank'>Cesium.ImageryLayerCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L473">core/Viewer.js 473</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得地球上的所有影像图层(ImageryLayer), 同Cesium中的imageryLayers。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="massiveGraphicLayers">
+    <a href="#massiveGraphicLayers" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> massiveGraphicLayers<span class="type-signature"> : <a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L383">core/Viewer.js 383</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  大数据图层集合
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="ms">
+    <a href="#ms" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> ms<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L569">core/Viewer.js 569</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  瞬时延迟
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pitch">
+    <a href="#pitch" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> pitch<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L585">core/Viewer.js 585</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得相机的仰俯角，单位：度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="primitives">
+    <a href="#primitives" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> primitives<span class="type-signature"> : <a href="../cesiumDocumentation/PrimitiveCollection.html" target = '_blank'>Cesium.PrimitiveCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L399">core/Viewer.js 399</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得场景中primitive的集合。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="roll">
+    <a href="#roll" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> roll<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L593">core/Viewer.js 593</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得相机的翻滚角，单位：度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="showFps">
+    <a href="#showFps" class="doc-link"></a>
+    showFps<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L550">core/Viewer.js 550</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取或设置帧率/延迟小部件的显隐状态
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrain">
+    <a href="#terrain" class="doc-link"></a>
+    terrain<span class="type-signature"> : <a href="../cesiumDocumentation/TerrainProvider.html" target = '_blank'>Cesium.TerrainProvider</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L507">core/Viewer.js 507</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得或设置地形
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainChanged">
+    <a href="#terrainChanged" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> terrainChanged<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L524">core/Viewer.js 524</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  地形发生变化时触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainExaggeration">
+    <a href="#terrainExaggeration" class="doc-link"></a>
+    terrainExaggeration<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L532">core/Viewer.js 532</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  地球夸张比例，小于1的值表示地表缩小，大于1的值表示地形放大
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">1.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addLayer">
+    <a href="#addLayer" class="doc-link"></a>
+    addLayer<span class="signature">(layerProvider)</span> &rarr; <span class="type-signature returnType"><a href="../cesiumDocumentation/ImageryLayer.html" target = '_blank'>Cesium.ImageryLayer</a>|<a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a>|Promise.&lt;<a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a>&gt;</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L777">core/Viewer.js 777</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  添加一个图层,对影像图层(ImageryProvider)和矢量图层(DataSource)都有效
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layerProvider</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/ImageryProvider.html" target = '_blank'>Cesium.ImageryProvider</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a></span>
+|
+
+
+<span class="param-type">
+  Promise.&lt;<a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a>&gt;</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    新添加的图层
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">// 1. 使用viewer.addLayer添加影像图层viewer.addLayer(new CesiumPro.GaoDeLayer())// 2. 使用viewer.layers.add添加影像图层viewer.layers.addImageryProvider(new CesiumPro.GaoDeLayer())// 1和2的效果是相同的// 3. 使用viewer.addLayer添加矢量图层viewer.addLayer(Cesium.KmlDataSource.load('sample.kml'))// 4.使用viewer.dataSources.add添加矢量图层viewer.dataSources.add(Cesium.KmlDataSource.load('sample.kml'))// 3和4的效果是相同的</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addModel">
+    <a href="#addModel" class="doc-link"></a>
+    addModel<span class="signature">(model)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L610">core/Viewer.js 610</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将一个模型添加到场景中
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="Model.html">Model</a></span>
+|
+
+
+<span class="param-type">
+  Tileset</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L869">core/Viewer.js 869</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  销毁场景
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="flyTo">
+    <a href="#flyTo" class="doc-link"></a>
+    flyTo<span class="signature">(target, options)</span> &rarr; <span class="type-signature returnType">Promise.&lt;Boolean></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L696">core/Viewer.js 696</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将相机移动到提供的Cartesian, entity, primitive, 或dataSource,如果数据源仍在加载过程中，或者可视化仍在加载，此方法将在数据准备就绪后执行。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>target</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="GeoPoint.html">GeoPoint</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian.html" target = '_blank'>Cesium.Cartesian</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Primitive.html" target = '_blank'>Cesium.Primitive</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Entity.html" target = '_blank'>Cesium.Entity</a></span>
+|
+
+
+<span class="param-type">
+  Array.&lt;<a href="../cesiumDocumentation/Entity.html" target = '_blank'>Cesium.Entity</a>&gt;</span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/EntityCollection.html" target = '_blank'>Cesium.EntityCollection</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/ImageryLayer.html" target = '_blank'>Cesium.ImageryLayer</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cesium3DTileset.html" target = '_blank'>Cesium.Cesium3DTileset</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/TimeDynamicPointCloud.html" target = '_blank'>Cesium.TimeDynamicPointCloud</a></span>
+|
+
+
+<span class="param-type">
+  Promise.&lt;(Cesium.Entity|Array.&lt;Cesium.Entity>|Cesium.EntityCollection|Cesium.DataSource|Cesium.ImageryLayer|Cesium.Cesium3DTileset|Cesium.TimeDynamicPointCloud)></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                需要定位的Cartesian, Entity, Primitive, ImageryLayer, Datasource等</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">3000</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                相机飞行持续时间，单位毫秒</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumHeight</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                相机飞行最大高度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/HeadingPitchRange.html" target = '_blank'>Cesium.HeadingPitchRange</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                在以目标为中心的earth-north-up局部坐标系中，与目标的偏移量</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="forceResize">
+    <a href="#forceResize" class="doc-link"></a>
+    forceResize<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L863">core/Viewer.js 863</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  强制调整小部件大小
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="isDestroyed">
+    <a href="#isDestroyed" class="doc-link"></a>
+    isDestroyed<span class="signature">()</span> &rarr; <span class="type-signature returnType">Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L876">core/Viewer.js 876</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  判断场景是否被销毁
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    是否被销毁
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="linkView">
+    <a href="#linkView" class="doc-link"></a>
+    linkView<span class="signature">(viewer)</span> &rarr; <span class="type-signature returnType">function</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L680">core/Viewer.js 680</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将两个球的视图同步，同步后任何一个球的相机位置发生变化后，另一个球也随之变化。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="Viewer.html">Viewer</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                viewer对象</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    用于取消视图同步的函数
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const viewer = new CesiumPro.Viewer('map');const viewer1 = new CesiumPro.Viewer('map1);const cancelLink = viewer.linkView(viewer1);// 取消同步cancelLink();</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pickLayer">
+    <a href="#pickLayer" class="doc-link"></a>
+    pickLayer<span class="signature">(windowPosition)</span> &rarr; <span class="type-signature returnType">Array.&lt;<a href="../cesiumDocumentation/ImageryLayerFeatureInfo.html" target = '_blank'>Cesium.ImageryLayerFeatureInfo</a>&gt;</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L826">core/Viewer.js 826</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  拾取指定位置的图层信息，该方法会调用图层的pickFeatures方法
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>windowPosition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Carteisn2.html" target = '_blank'>Cesium.Carteisn2</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                屏幕位置</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    属性信息
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);handler.setInputAction(e => {   const layer = viewer.pickLayer(e.position)   layer.then(res=>{        console.log(res)   }), Cesium.ScreenSpaceEventType.LEFT_CLICK)}</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="removeLayer">
+    <a href="#removeLayer" class="doc-link"></a>
+    removeLayer<span class="signature">(layer)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L799">core/Viewer.js 799</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  删除图层
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/ImageryLayer.html" target = '_blank'>Cesium.ImageryLayer</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a></span>
+|
+
+
+<span class="param-type">
+  Promise.&lt;<a href="../cesiumDocumentation/DataSource.html" target = '_blank'>Cesium.DataSource</a>&gt;</span>
+|
+
+
+<span class="param-type">
+  Promise.&lt;<a href="../cesiumDocumentation/ImageryLayer.html" target = '_blank'>Cesium.ImageryLayer</a>&gt;</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                被删除的图层</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const provider = new BingLayer();const layer = viewer.addLayer(provider);viewer.removeLayer(layer);</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="render">
+    <a href="#render" class="doc-link"></a>
+    render<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L835">core/Viewer.js 835</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  该函数会自动被调用，除非<code>useDefaultRenderLoop</code> 设为false;
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="resize">
+    <a href="#resize" class="doc-link"></a>
+    resize<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L857">core/Viewer.js 857</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  调整小部件的大小，以适应container，该函数会自动被调用，除非<code>useDefaultRenderLoop</code> 设为false;
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="rotateAroundPoint">
+    <a href="#rotateAroundPoint" class="doc-link"></a>
+    rotateAroundPoint<span class="signature">(point, options)</span> &rarr; <span class="type-signature returnType">function</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L728">core/Viewer.js 728</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  使场景绕指定点旋转。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>point</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartographic.html" target = '_blank'>Cesium.Cartographic</a></span>
+|
+
+
+<span class="param-type">
+  <a href="GeoPoint.html">GeoPoint</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                相机旋转的中心点</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/HeadingPitchRange.html" target = '_blank'>Cesium.HeadingPitchRange</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                相机的角度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>multiplier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">1</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                旋转倍速，大小1的值使旋转速度变快，小于1的值使旋转速度变慢，小于0的值将使地球反方向旋转。</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    用于取消旋转的函数
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const p = new CesiumPro.GeoPoint(110,30)let cancel = viewer.rotateAroundPoint(p);</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="setView">
+    <a href="#setView" class="doc-link"></a>
+    setView<span class="signature">(target)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L623">core/Viewer.js 623</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  设置地球场景的视图位置。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>target</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="GeoPoint.html">GeoPoint</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartographic.html" target = '_blank'>Cesium.Cartographic</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                默认位置</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">viewer.setView(new CesiumPro.GeoPoint(110, 30, 10000))viewer.setView(Cesium.Cartesian3.fromDegrees(110, 30, 10000))</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="stepFlyTo">
+    <a href="#stepFlyTo" class="doc-link"></a>
+    stepFlyTo<span class="signature">(<span class="optional">options</span>)</span> &rarr; <span class="type-signature returnType">Promise</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Viewer.js#L651">core/Viewer.js 651</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  此方法将定位分成3个步骤：step 1:调整位置,step 2:调整高度,step 3:调整角度，一般用于小场景初始化时。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">{}</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                具有以下参数
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>destination</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                目标位置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>orientation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                相机姿态</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>step1Duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">3.0</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                调整高度的持续时间</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>step1Duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">3.0</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                调整位置的持续时间</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>step1Duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">3.0</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                调整姿态的持续时间</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="GeoPoint"><a href="GeoPoint.html">GeoPoint</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

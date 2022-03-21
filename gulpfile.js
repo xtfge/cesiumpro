@@ -27,10 +27,12 @@ const config = {
     combineOutpath: '__combineOutpath',
     doc: 'documents',
     publicPath: './',
+    worker: 'workers',
     sourceFiles: [
         'source/**/*.js',
         '!source/CesiumPro.js',
-        '!source/copyright.js'
+        '!source/copyright.js',
+        '!source/workers/*'
     ],
     outputName: 'CesiumPro'
 }
@@ -59,7 +61,7 @@ function createCesiumProJs() {
     }
     fs.writeFileSync(path.join(config.src, `${config.outputName}.js`), contents)
 }
-function buildModule(debug = true) {
+function buildCesiumPro(debug = true) {
     const plugins = [];
     let libaryName = `${config.outputName}.js`
     if (!debug) {
@@ -84,9 +86,29 @@ function buildModule(debug = true) {
     })
 
 }
+function buildModule(inputFile, libaryName, outputFile, debug) {
+    const plugins = [];
+    if (!debug) {
+        plugins.push(rollupPluginStripPragma({
+            pragmas: ['debug']
+        }))
+        plugins.push(rollupPluginTerser.terser());
+    }
+    return rollup.rollup({
+        input: inputFile,
+        plugins,
+        onwarn: rollupWarning,
+    }).then(bundle => {
+        bundle.write({
+            format: 'umd',
+            name: libaryName,
+            file: outputFile
+        })
+    })
+}
 function combineJS() {
-    buildModule(); // CesiumPro.js
-    buildModule(false); // CesiumPro.min.js
+    buildCesiumPro(); // CesiumPro.js
+    buildCesiumPro(false); // CesiumPro.min.js
 }
 function buildCSS() {
 
@@ -117,6 +139,24 @@ function buildDocument() {
     })
 
 }
+function createWorkers() {
+    const outPath = path.join(config.dist, 'workers');
+    if (fs.existsSync(outPath)) {
+        rimraf.sync(outPath);
+    }
+
+    const workers = globby.sync([`${config.src}/${config.worker}/**`]);
+    for (let file of workers) {
+        const libaryName = path.basename(file)
+        buildModule(
+            file,
+            libaryName.replace('.js', ''),
+            path.join(config.publicPath, config.dist, config.worker, libaryName),
+            true
+        )
+    }
+    return Promise.resolve('success.')
+}
 function buildCSS() {
     return gulp.src(`${config.src}/**/*.scss`)
         .pipe(sass())
@@ -129,7 +169,9 @@ function build() {
     combineJS()
     buildCSS()
     copyAssets();
+    createWorkers()
     return Promise.resolve('build success.')
 }
 exports.build = build;
 exports.doc = buildDocument;
+exports.worker = createWorkers

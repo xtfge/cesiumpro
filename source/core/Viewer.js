@@ -8,7 +8,7 @@ import GeoPoint from "./GeoPoint.js";
 import computeSceneCenterPoint from "./computeSceneCenterPoint.js";
 import GeoJsonDataSource from "../layer/GeoJsonDataSource.js";
 import ShapefileDataSource from "../layer/ShapefileDataSource.js";
-import InfoBox from '../widgets/InfoBox'
+import InfoBox from '../widgets/InfoBox.js'
 import CesiumProError from "./CesiumProError.js";
 import Model from "../scene/Model.js";
 import Scene from '../scene/Scene.js'
@@ -367,20 +367,22 @@ class Viewer extends Cesium.Viewer {
         this.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
         if (this.scene.globe) {
             const quadtreeProvider = new QuadTreeProvider({
-                terrainProvider: this.terrainProvider
+                terrainProvider: this.terrainProvider,
+                scene: this.scene
             })
             const quadtree = new Cesium.QuadtreePrimitive({
                 tileProvider: quadtreeProvider
             })
             this.scene._LodGraphic = quadtree;
         }
+        this.scene.dataSources = this.dataSources;
     }
     /**
      * 大数据图层集合
      * @readonly
-     * @type {LodGraphicLayerCollection}
+     * @type {MassiveGraphicLayerCollection}
      */
-    get lodGraphicLayers() {
+    get massiveGraphicLayers() {
         return this.scene._LodGraphic.tileProvider._layers;
     }
     /**

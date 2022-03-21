@@ -37,15 +37,16 @@
         });
         viewer.showFps = true;
         function addPoint(obj) {
-            const entity = createPoint(obj)
+            const entity = createPoint(obj)            
             return viewer.entities.add(entity)
         }
         function createPoint(obj) {
             return new Cesium.Entity({
                 position: obj.position,
+                id: obj.id,
                 point: {
-                    pixelSize: obj.pixelSize,
-                    color: obj.color
+                    pixelSize: 5,
+                    color: Cesium.Color.fromRandom({alpha:1})
                 }
             })
         }
@@ -62,23 +63,41 @@
             }
         })
         const positions = tools.randomPoint(100, 30, 102, 32, 10000);
-        const objects = positions.map(_ => {
+        const gap = 0.0001
+        const positions1 = Cesium.Cartesian3.fromDegreesArray([
+            100,30,
+            100+gap,30+gap,
+            100+gap,30,
+            100,30+gap,
+            100-gap,30,
+            100-gap,30-gap,
+            100,30-gap
+        ])
+        let i=0
+        const objects = [...positions, ...positions1].map(_ => {
+            i++
             return {
+                id: Cesium.createGuid(),
                 position:_,
-                color: Cesium.Color.fromRandom({alpha:1}),
+                // color: Cesium.Color.fromRandom({alpha:1}),
                 pixelSize: 5
             }
         })
-        viewer.flyTo(new CesiumPro.GeoPoint(101,31,10000))
+        viewer.flyTo(new CesiumPro.GeoPoint(100,30,10000))
 
-        const pointlayer = new CesiumPro.LodGraphicLayer({
-            createGeometryFunction: addPoint,
-            removeGeometryFunction: removePoint,
-            addGeometryFunction: addPoint,
-            objects: objects
+        const pointlayer = new CesiumPro.MassivePointLayer({
+            objects: objects,
+            color: Cesium.Color.GOLD,
+            pixelSize: 5,
+            maxClusterLevel: 10
         })
         parent.viewer = viewer;
-        viewer.lodGraphicLayers.add(pointlayer)
+        viewer.massiveGraphicLayers.add(pointlayer)
+
+        parent.CesiumPro = CesiumPro;
+        for(let point of objects) {
+            // addPoint(point)
+        }
         
     </script>
 </body>

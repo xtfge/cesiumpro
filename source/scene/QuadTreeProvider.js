@@ -1,5 +1,7 @@
 import defined from '../core/defined.js';
-import LodGraphicLayerCollection from './LodGraphicLayerCollection.js';
+import MassiveGraphicLayerCollection from './MassiveGraphicLayerCollection.js';
+import createGuid from '../core/createGuid.js';
+import GeoPoint from "../core/GeoPoint.js";
 const {
     GeographicTilingScheme,
     GlobeSurfaceTileProvider,
@@ -12,7 +14,9 @@ const {
     Rectangle,
     QuadtreeTileLoadState,
     Visibility,
-    AssociativeArray
+    AssociativeArray,
+    Cartesian3,
+    Cartographic
 } = Cesium;
 
 function requestGeometry(tile, framestate, terrainProvider) {
@@ -102,7 +106,7 @@ function transform(surfaceTile, frameState, terrainProvider, x, y, level) {
         }
     );
 }
-function processTerrainStateMachine(tile, framestate, terrainProvider, layers, quadtree) {
+function processStateMachine(tile, framestate, terrainProvider, layers, quadtree) {
     const surfaceTile = tile.data
     if (surfaceTile.terrainState === TerrainState.UNLOADED) {
         requestGeometry(tile, framestate, terrainProvider);
@@ -119,20 +123,39 @@ function processTerrainStateMachine(tile, framestate, terrainProvider, layers, q
     }
     if (surfaceTile.terrainState === TerrainState.TRANSFORMED) {
         tile.renderable = true;
-        processLayer(layers.values, quadtree);
     }
 }
-function processLayer(layers, quadtree) {
-    const tiles = quadtree._tilesToRender;// [...quadtree._tileLoadQueueHigh, ...quadtree._tileLoadQueueMedium];
-    for(let layer of layers) {
-        layer.initialize(tiles)
-        for(let tile of tiles) {
-            const hasRender = layer.tileWasRendered(tile);
-            // 已经渲染的就不要再渲染了。
-            (!hasRender) && layer.createGeometry(tile.x, tile.y ,tile.level, tile)
+function getObjectByTile(objects, tile) {
+    const tileObject = []
+    for (let object of objects) {
+        if (!defined(object)) {
+            continue;
         }
-        layer.clearExpireGeometry();
+        if (!defined(object.id)) {
+            object.id = createGuid();
+        }
+        if (!(defined(object) && defined(object.position))) {
+            continue;
+        }
+        if (object.position instanceof Cartesian3) {
+            object.cartesian = object.position;
+        } else if (object.position instanceof Cartographic) {
+            object.cartesian = Cartographic.toCartesian(object.position);
+            object.catographic = object.position;
+        } else if (object.position instanceof GeoPoint) {
+            object.cartesian = object.position.toCartesian();
+            object.cartographic = object.position.toCartoGraphic()
+        } else {
+            object.cartesian = object.position;
+        }
+        if (!object.cartographic) {
+            object.cartographic = Cartographic.fromCartesian(object.cartesian);
+        }
+        if (Rectangle.contains(tile.rectangle, object.cartographic)) {
+            tileObject.push(object);
+        }
     }
+    return tileObject;
 }
 class QuadTile {
     constructor() {
@@ -141,12 +164,15 @@ class QuadTile {
         this.mesh = undefined;
         this.terrainData = undefined;
         this.objects = undefined;
+        this._geometryOfTile = new AssociativeArray();
+        this._objectsOfTile = new AssociativeArray();
+        this._needRenderObjects = new AssociativeArray();
 
     }
     static processStateMachine(tile, frameState, terrainProvider, layers, quadtree) {
         QuadTile.initialize(tile, terrainProvider);
         if (tile.state === QuadtreeTileLoadState.LOADING) {
-            processTerrainStateMachine(
+            processStateMachine(
                 tile,
                 frameState,
                 terrainProvider,
@@ -166,20 +192,60 @@ class QuadTile {
         }
     }
 }
+function createGeometry(provider, layer, tile, framestate, objects) {
+    let list = tile.data._geometryOfTile.get(layer.id);
+    let hasRenderCached = provider._hasRenderCached.get(layer.id);
+    if (!hasRenderCached) {
+        hasRenderCached = {};
+        provider._hasRenderCached.set(layer.id, hasRenderCached);
+    }
+    if (!list) {
+        list = [];
+    }
+    for (let object of objects) {
+        if (hasRenderCached[object.id]) {
+            return;
+        }
+        const geometry = layer.createGeometry(tile, framestate, object);
+        hasRenderCached[object.id] = true;
+        list.push({ id: object.id, geometry });
+    }
+    tile.data._geometryOfTile.set(layer.id, list);
+}
+function removeGeometry(provider, layer, tile, framestate, geometryList) {
+    const hasRenderCached = provider._hasRenderCached.get(layer.id);
+    for (let geometryObject of geometryList) {
+        const { id, geometry } = geometryObject;
+        layer.removeGeometry(framestate, geometry);
+        delete hasRenderCached[id]
+    }
+    tile.data._geometryOfTile.remove(layer.id);
+
+}
 class QuadTreeProvider {
     constructor(options = {}) {
         // super(options)
         this._ready = true;
+        this._scene = options.scene;
         this._tilingSceheme = new GeographicTilingScheme();
         this._readyPromise = when.defer();
         this._readyPromise.resolve(true);
         this._errorEvent = new Event();
         this._terrainProvider = options.terrainProvider;
         this._show = true;
-        this._createGeometry = options.createGeometry;
         this.cartographicLimitRectangle = Rectangle.clone(Rectangle.MAX_VALUE);
         this.tree = undefined;
-        this._layers = new LodGraphicLayerCollection();
+        this._layers = new MassiveGraphicLayerCollection();
+        this._lastTilesToRender = [];
+        this._hasRenderCached = new AssociativeArray();
+        this._tilesCahced = []
+        this._removeEventListener = this._scene.camera.changed.addEventListener(() => {
+            const layers = this._layers.values;
+            for (let layer of layers) {
+                const needClear = layer.updateCluster(this._scene.camera.positionCartographic.height);
+                needClear && (this.clearTile(layer.id), layer.removeAll());
+            }
+        })
     }
     get terrainProvider() {
         return this._terrainProvider;
@@ -208,22 +274,80 @@ class QuadTreeProvider {
         }
     }
     /**
-     *QuadtreePrimitive. beginFrame中调用该方法
+     *QuadtreePrimitive.beginFrame中调用该方法
      * @param {Cesium.FrameState} framestate 
      */
     initialize(framestate) {
+        for (let layer of this._layers.values) {
+            layer.initialize(framestate, this._scene);
+        }
     }
     /**
-     * QuadtreePrimitive.render中会调用该方法
+     * QuadtreePrimitive.render中会调用该方法，此时还不知道本此渲染需要用到哪些瓦片。
      * @param {Cesium.FrameState}} framestate 
      */
     beginUpdate(framestate) {
+        const layers = this._layers.values;
+        for (let layer of layers) {
+            layer.beginUpdate()
+        }
+        this._frameNumber++;
     }
     /**
-     * QuadtreePrimitive.render中会调用该方法,该方法调用前需要渲染的瓦片已准备好。
+     * QuadtreePrimitive.render中会调用该方法，在beginUpdate之后
+     * @param {*} tile 
+     * @param {*} framestate 
+     */
+    showTileThisFrame(tile, framestate) {
+        const surfaceData = tile.data;
+        if (!defined(surfaceData)) {
+            return;
+        }
+        if (!this._tilesCahced.includes(tile)) {
+            this._tilesCahced.push(tile)
+        }
+        const layers = this._layers.values;
+        for (let layer of layers) {
+            if (!(defined(layer.objects) && Array.isArray(layer.objects))) {
+                continue;
+            }
+            const id = layer.id;
+            const geometryOfTile = surfaceData._geometryOfTile.get(id);
+            if (geometryOfTile && !layer._needReclass) {
+                return;
+            }
+            let tileObjects = surfaceData._objectsOfTile.get(id);
+            if (!defined(tileObjects) || layer._needReclass) {
+                tileObjects = getObjectByTile(layer.objects, tile);
+                surfaceData._objectsOfTile.set(id, tileObjects);
+            }
+            createGeometry(this, layer, tile, framestate, tileObjects);
+        }
+    }
+    /**
+     * QuadtreePrimitive.render中会调用该方法, 在showTileThisFrame之后。
      */
     endUpdate(framestate) {
-
+        const quadtree = this._quadtree;
+        if (!quadtree) {
+            return;
+        }
+        const lastTilesToRender = this._lastTilesToRender;
+        const tilesToRender = quadtree._tilesToRender;
+        const layers = this._layers.values;
+        for (let tile of lastTilesToRender) {
+            if (tilesToRender.includes(tile)) {
+                continue;
+            }
+            for (let layer of layers) {
+                const geometryList = tile.data._geometryOfTile.get(layer.id) || [];
+                removeGeometry(this, layer, tile, framestate, geometryList)
+            }
+        }
+        for (let layer of layers) {
+            layer.endUpdate();
+        }
+        this._lastTilesToRender = [...tilesToRender];
     }
     /**
      * 加载瓦片数据，QuadtreePrimitive的endFrame中会调用该函数。
@@ -238,14 +362,13 @@ class QuadTreeProvider {
             terrainOnly = tile.data.boundingVolumeSourceTile !== tile
         }
         QuadTile.processStateMachine(tile, framestate, this.terrainProvider, this._layers, this.quadtree)
-        let surfaceTile = tile.data;
+        const surfaceTile = tile.data;
         if (terrainOnly && terrainStateBefore !== tile.data.terrainState) {
             if (
                 this.computeTileVisibility(tile, framestate, this.quadtree.occluders) !==
                 Visibility.NONE &&
                 surfaceTile.boundingVolumeSourceTile === tile
             ) {
-                terrainOnly = false;
                 QuadTile.processStateMachine(tile, framestate, this.terrainProvider, this._layers, this.quadtree);
             }
         }
@@ -268,12 +391,23 @@ class QuadTreeProvider {
         }
         return GlobeSurfaceTileProvider.prototype.computeDistanceToTile.call(this, tile, framestate)
     }
-    showTileThisFrame(){}
+    clearTile(id) {
+        const tiles = this._tilesCahced;
+        for (let tile of tiles) {
+            tile.data._geometryOfTile.remove(id);
+            tile.data._objectsOfTile.remove(id);
+        }
+        this._hasRenderCached.remove(id)
+    }
     isDestroyed() {
         return false;
     }
     destroy() {
-        this._tileProvider && this._tileProvider.destroy();
+        this._removeEventListener();
+        const layers = this._layers.values;
+        for (let layer of layers) {
+            layer.destroy();
+        }
     }
     computeTileLoadPriority(tile, frameState) {
         return GlobeSurfaceTileProvider.prototype.computeTileLoadPriority(tile, frameState)

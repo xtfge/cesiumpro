@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      WMTSLayer - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        WMTSLayer
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="WMTSLayer">
+    <a href="#WMTSLayer" class="doc-link"></a>
+    new CesiumPro.WMTSLayer<span class="signature">(options)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L102">layer/WMTSLayer.js 102</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  创建一个从WMTS服务请求数据的图层。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Resource</span>
+|
+
+
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                WMTS服务GetTile需要的URL或着tile-URL模板. 如果是tile-URL模板m该URL应该包含以下关键字：<ul> <li><code>{style}</code>: 样式</li> <li><code>{TileMatrixSet}</code>: tile数据集</li> <li><code>{TileMatrix}</code>:代表瓦片的级别</li> <li><code>{TileRow}</code>: 瓦片行号</li> <li><code>{TileCol}</code>: 瓦片列号</li> <li><code>{s}</code>: 子域名</li></ul></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>format</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">'image/jpeg'</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                瓦片格式(MIME type)。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                服务所提供的图层名.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>style</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                样式名.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileMatrixSetID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                用于 WMTS 请求的 TileMatrixSet 的标识符。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileMatrixLabels</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Array</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                TileMatrix 中用于 WMTS 请求的标识符列表。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clock</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Clock</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                在确定时间维度的值时使用的 Clock 实例。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>times</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  TimeIntervalCollection</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                TimeIntervalCollection 其data属性是一个包含时间动态维度及其值的对象。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dimensions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                包含静态尺寸及其值的对象。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">256</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                瓦片宽度。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileHeight</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">256</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                瓦片高度。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tilingScheme</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  TilingScheme</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                坐标系</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rectangle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Rectangle</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Rectangle.MAX_VALUE</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                该地图的覆盖范围。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>minimumLevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">0</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                最小级别。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumLevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                最大级别。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>credit</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Credit</span>
+|
+
+
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                版权信息</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>subdomains</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">'abc'</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                {s}中可用的子域名。Provides tiled imagery served by <a href="http://www.opengeospatial.org/standards/wmts">WMTS 1.0.0</a> compliant servers.This provider supports HTTP KVP-encoded and RESTful GetTile requests, but does not yet support the SOAP encoding.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples:</h5>
+        
+    <pre><code class="language-javascript">// Example 1. USGS shaded relief tiles (KVP)var shadedRelief1 = new CesiumPro.WMTSLayer({    url : 'http://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS',    layer : 'USGSShadedReliefOnly',    style : 'default',    format : 'image/jpeg',    tileMatrixSetID : 'default028mm',    // tileMatrixLabels : ['default028mm:0', 'default028mm:1', 'default028mm:2' ...],    maximumLevel: 19,    credit : new Cesium.Credit('U. S. Geological Survey')});viewer.imageryLayers.addImageryProvider(shadedRelief1);</code></pre>
+
+    <pre><code class="language-javascript">// Example 2. USGS shaded relief tiles (RESTful)var shadedRelief2 = new CesiumPro.WMTSLayer({    url : 'http://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/WMTS/tile/1.0.0/USGSShadedReliefOnly/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg',    layer : 'USGSShadedReliefOnly',    style : 'default',    format : 'image/jpeg',    tileMatrixSetID : 'default028mm',    maximumLevel: 19,    credit : new Cesium.Credit('U. S. Geological Survey')});viewer.addLayer(shadedRelief2);</code></pre>
+
+    <pre><code class="language-javascript">// Example 3. NASA time dynamic weather data (RESTful)var times = Cesium.TimeIntervalCollection.fromIso8601({    iso8601: '2015-07-30/2017-06-16/P1D',    dataCallback: function dataCallback(interval, index) {        return {            Time: Cesium.JulianDate.toIso8601(interval.start)        };    }});var weather = new CesiumPro.WMTSLayer({    url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/AMSR2_Snow_Water_Equivalent/default/{Time}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png',    layer : 'AMSR2_Snow_Water_Equivalent',    style : 'default',    tileMatrixSetID : '2km',    maximumLevel : 5,    format : 'image/png',    clock: clock,    times: times,    credit : new Cesium.Credit('NASA Global Imagery Browse Services for EOSDIS')});viewer.addLayer(weather);const geoserverWMTS = new WMTSLayer({      url: 'http://localhost:8080/geoserver/gwc/service/wmts',      layer: 'topp:states',      format: 'image/png',      tileMatrixSetID: 'EPSG:4326',      tileMatrixLabels: ['EPSG:4326:0','EPSG:4326:1','EPSG:4326:2', 'EPSG:4326:3', 'EPSG:4326:4'],      style: '',      tileWidth:700,      tileHeight:300,      tilingScheme:proj.get('EPSG:4326')})viewer.addLayer(geoserverWMTS)</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+    <h3 class="subsection-title">Extends</h3>
+
+    
+
+
+    <ul>
+        <li><a href="../cesiumDocumentation/WebMapTileServiceImageryProvider.html" target = '_blank'>Cesium.WebMapTileServiceImageryProvider</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dimensions">
+    <a href="#dimensions" class="doc-link"></a>
+    dimensions<span class="type-signature"> : Object</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L109">layer/WMTSLayer.js 109</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取或设置一个包含静态维度及其值的对象。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="enablePickFeatures">
+    <a href="#enablePickFeatures" class="doc-link"></a>
+    enablePickFeatures<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L176">layer/WMTSLayer.js 176</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图层是否允许被pick
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="errorEvent">
+    <a href="#errorEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> errorEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L136">layer/WMTSLayer.js 136</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取影像错误时触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="maximumLevel">
+    <a href="#maximumLevel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> maximumLevel<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L128">layer/WMTSLayer.js 128</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  可以请求的最大详细级别
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="minimumLevel">
+    <a href="#minimumLevel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> minimumLevel<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L120">layer/WMTSLayer.js 120</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  可以请求的最小瓦片级别
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="ready">
+    <a href="#ready" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> ready<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L144">layer/WMTSLayer.js 144</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取一个值，该值指示图层是否已准备好使用。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="readyPromise">
+    <a href="#readyPromise" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> readyPromise<span class="type-signature"> : Promise.&lt;Boolean></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L152">layer/WMTSLayer.js 152</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取一个Promise，该图层准备好时将resolve
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="rectangle">
+    <a href="#rectangle" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> rectangle<span class="type-signature"> : <a href="../cesiumDocumentation/Rectangle.html" target = '_blank'>Cesium.Rectangle</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L168">layer/WMTSLayer.js 168</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图层的范围
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tilingScheme">
+    <a href="#tilingScheme" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tilingScheme<span class="type-signature"> : <a href="../cesiumDocumentation/TilingScheme.html" target = '_blank'>Cesium.TilingScheme</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L160">layer/WMTSLayer.js 160</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图层的坐标系
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pickFeatures">
+    <a href="#pickFeatures" class="doc-link"></a>
+    pickFeatures<span class="signature">(x, y, level, longitude, latitude)</span> &rarr; <span class="type-signature returnType">Promise.&lt;Array.&lt;<a href="../cesiumDocumentation/ImageryLayerFeatureInfo.html" target = '_blank'>Cesium.ImageryLayerFeatureInfo</a>&gt;&gt;|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L193">layer/WMTSLayer.js 193</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  确定哪些要素（如果有）位于图块内的给定经度和纬度。在<a href="../cesiumDocumentation/ImageryProvider.html#ready" target = '_blank'><code>Cesium.ImageryProvider#ready</code></a>返回 true之前不应调用此函数。在数据图层ready之前，该函数不能被调用
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                瓦片的x坐标。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                瓦片的y坐标。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                瓦片的层级。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>longitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                选择要素的经度。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>latitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                选择要素的纬度</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="requestImage">
+    <a href="#requestImage" class="doc-link"></a>
+    requestImage<span class="signature">(x, y, level, <span class="optional">request</span>)</span> &rarr; <span class="type-signature returnType">Promise.&lt;(HTMLImageElement|HTMLCanvasElement)>|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/WMTSLayer.js#L204">layer/WMTSLayer.js 204</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  请求指定瓦片
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                瓦片x坐标</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                瓦片y坐标</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                瓦片级别</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Request.html" target = '_blank'>Cesium.Request</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    如果瓦片解析成功，返回一个异步Promise，解析的图像可以是 Image 或 Canvas DOM 对象，否则返回undefined
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="GeoPoint"><a href="GeoPoint.html">GeoPoint</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

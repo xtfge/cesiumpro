@@ -147,4 +147,6 @@ Url.join = function (...args) {
 Url.buildModuleUrl = function (path) {
   return buildModuleUrl(path);
 };
+Url.getCesiumProBaseUrl = getCesiumProBaseUrl;
+export {buildModuleUrl, getCesiumProBaseUrl}
 export default Url;

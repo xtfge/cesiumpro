@@ -21,11 +21,11 @@ class GeoPoint {
     }
     /**
      * 转为屏幕坐标
-     * @param {Cesium.Viewer} viewer 
+     * @param {Cesium.Scene} scene 
      * @returns {Cesium.Cartesian2} 屏幕坐标
      */
-    toPixel(viewer) {
-        return GeoPoint.toPixel(this, viewer);
+    toPixel(scene) {
+        return GeoPoint.toPixel(this, scene);
     }
     /**
      * 转为笛卡尔坐标
@@ -95,7 +95,7 @@ class GeoPoint {
             if (!visibility) {
                 return false;
             }
-            const windowPosition = GeoPoint.toPixel(point, viewer);
+            const windowPosition = GeoPoint.toPixel(point, viewer.scene);
             if (!defined(windowPosition)) {
                 return false;
             }
@@ -117,25 +117,25 @@ class GeoPoint {
     }
     /**
      * 转屏幕坐标
-     * @param {GeoPoint} point 
-     * @param {Cesium.Viewer} viewer 
+     * @param {GeoPoint|Cesium.Cartesian3|Cesium.Cartographic} point 
+     * @param {Cesium.Scene} scene 
      * @returns 对应的屏幕坐标
      */
-    static toPixel(point, viewer) {
+    static toPixel(point, scene) {
         //>>includeStart('debug', pragmas.debug);
-        if (viewer instanceof Cesium.Viewer === false) {
-            throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
+        if (!defined(scene)) {
+            throw new CesiumProError('scene未定义。')
         }
         if (!defined(point)) {
             throw new CesiumProError('point is not defined.')
         }
         //>>includeEnd('debug', pragmas.debug);
-        const cartesian = GeoPoint.toCartesian(point);
-        if(!defined(cartesian)) {
+        const cartesian = GeoPoint.toCartesian(point)
+        if (!defined(cartesian)) {
             return undefined;
         }
         return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
-            viewer.scene,
+            scene,
             cartesian,
         );
     }
@@ -154,16 +154,33 @@ class GeoPoint {
     }
     /**
      * 转笛卡尔坐标
-     * @param {GeoPoint} point 
+     * @param {GeoPoint|Cesium.Cartesian3|Cesium.Cartographic} point 
+     * @param {Viewer} viewer viewer对象
      * @returns 用笛卡尔坐标表示的点
      */
-    static toCartesian(point) {
+    static toCartesian(point, viewer) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(point)) {
             throw new CesiumProError('point is not defined.')
         }
         //>>includeEnd('debug', pragmas.debug);
-        return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
+        if (point instanceof Cesium.Cartesian3) {
+            return point;
+        }
+        if (point instanceof Cesium.Cartographic) {
+            return Cesium.Cartographic.toCartesian(point)
+        }
+        if (point instanceof GeoPoint) {
+            return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
+        }
+        if (point instanceof Cesium.Cartesian2) {
+            if(!viewer) {
+                return;
+            }
+            const ray = viewer.scene.camera.getPickRay(pixel);
+            return viewer.scene.globe.pick(ray, viewer.scene);
+        }
+
     }
     /**
      * 从一个笛卡尔坐标创建点
@@ -177,7 +194,7 @@ class GeoPoint {
         }
         //>>includeEnd('debug', pragmas.debug);
         const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-        if(!defined(cartographic)) {
+        if (!defined(cartographic)) {
             return undefined;
         }
         return GeoPoint.fromCartographic(cartographic)
@@ -206,7 +223,7 @@ class GeoPoint {
      * @returns {GeoPoint} GeoPoint点
      */
     static fromPixel(pixel, viewer) {
-        if(!viewer.scene.globe) {
+        if (!viewer.scene.globe) {
             return undefined;
         }
         //>>includeStart('debug', pragmas.debug);
@@ -240,15 +257,15 @@ class GeoPoint {
      * @returns 如果在中国范围内，返回true
      */
     static inChina(...args) {
-        if(args.length === 1) {
+        if (args.length === 1) {
             const p = args[0]
-            if(args[0] instanceof GeoPoint) {
+            if (args[0] instanceof GeoPoint) {
                 return GeoPoint.inChina(p.lon, p.lat)
             }
         } else {
             const lon = +args[0];
             const lat = +args[1];
-            return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat <53.55
+            return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat < 53.55
         }
     }
     /**
