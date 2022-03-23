@@ -16,7 +16,8 @@ const {
     Visibility,
     AssociativeArray,
     Cartesian3,
-    Cartographic
+    Cartographic,
+    getTimestamp
 } = Cesium;
 
 function requestGeometry(tile, framestate, terrainProvider) {
@@ -207,6 +208,9 @@ function createGeometry(provider, layer, tile, framestate, objects) {
             return;
         }
         const geometry = layer.createGeometry(tile, framestate, object);
+        if (!geometry) {
+            continue;
+        }
         hasRenderCached[object.id] = true;
         list.push({ id: object.id, geometry });
     }
@@ -239,13 +243,15 @@ class QuadTreeProvider {
         this._lastTilesToRender = [];
         this._hasRenderCached = new AssociativeArray();
         this._tilesCahced = []
-        this._removeEventListener = this._scene.camera.changed.addEventListener(() => {
-            const layers = this._layers.values;
-            for (let layer of layers) {
-                const needClear = layer.updateCluster(this._scene.camera.positionCartographic.height);
-                needClear && (this.clearTile(layer.id), layer.removeAll());
-            }
-        })
+        // this._removeEventListener = this._scene.camera.changed.addEventListener(() => {
+        //     const layers = this._layers.values;
+        //     for (let layer of layers) {
+        //         const cluster = layer.updateCluster(this._scene.camera.positionCartographic.height);
+        //         cluster.then(needClear => {
+        //             needClear && (this.clearTile(layer.id), layer.removeAll());
+        //         })                
+        //     }
+        // })
     }
     get terrainProvider() {
         return this._terrainProvider;
@@ -289,7 +295,7 @@ class QuadTreeProvider {
     beginUpdate(framestate) {
         const layers = this._layers.values;
         for (let layer of layers) {
-            layer.beginUpdate()
+            layer.beginUpdate(framestate)
         }
         this._frameNumber++;
     }
@@ -307,10 +313,15 @@ class QuadTreeProvider {
             this._tilesCahced.push(tile)
         }
         const layers = this._layers.values;
+        const time = getTimestamp();
+        const loadQueueTimeSlice = 5.0;
         for (let layer of layers) {
             if (!(defined(layer.objects) && Array.isArray(layer.objects))) {
                 continue;
             }
+            // if(getTimestamp() < time + loadQueueTimeSlice) {
+            //     break;
+            // }
             const id = layer.id;
             const geometryOfTile = surfaceData._geometryOfTile.get(id);
             if (geometryOfTile && !layer._needReclass) {
@@ -345,7 +356,13 @@ class QuadTreeProvider {
             }
         }
         for (let layer of layers) {
-            layer.endUpdate();
+            const needClear = layer.endUpdate(framestate);
+            if(needClear) {
+                tilesToRender.forEach(tile => {
+                    const geoList = tile.data._geometryOfTile.get(layer.id) || [];
+                    removeGeometry(this, layer, tile, framestate, geoList)
+                })
+            }
         }
         this._lastTilesToRender = [...tilesToRender];
     }

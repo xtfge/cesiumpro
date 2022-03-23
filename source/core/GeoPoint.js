@@ -243,13 +243,23 @@ class GeoPoint {
     }
     /**
      * 从经纬度创建点
-     * @param {Number} lon 经度
-     * @param {Number} lat 纬度
-     * @param {Number} height 海拔
+     * @param {Number} lon 经度(度)
+     * @param {Number} lat 纬度(度)
+     * @param {Number} height 海拔(米)
      * @returns {GeoPoint}
      */
     static fromDegrees(lon, lat, height) {
         return new GeoPoint(lon, lat, height);
+    }
+    /**
+     * 从经纬度创建点
+     * @param {Number} lon 经度(弧度)
+     * @param {Number} lat 纬度(弧度)
+     * @param {Number} height 海拔(米)
+     * @returns {GeoPoint}
+     */
+     static fromRadians(lon, lat, height) {
+        return new GeoPoint(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
     }
     /**
      * 判断一个点或经纬度是否在中国范围内（粗略）

@@ -218,6 +218,11 @@
             "thumb": "./images/stepfly.gif"
           },
           {
+            "label": "近地天空盒",
+            "value": "2.1.5groundskybox",
+            "thumb": "./images/groundskybox.gif"
+          },
+          {
             "label": "kml漫游",
             "value": "2.1.10kmltour",
             "thumb": "./images/kmltour.gif"
@@ -262,12 +267,34 @@
             "label": "gltf/glb模型加载",
             "value": "3.1.1gltf",
             "thumb": "./images/gltf.gif"
+          },
+          {
+            "label": "模型批量加载(50万模型)",
+            "value": "3.1.2massiveModel",
+            "thumb": "./images/massivemodel.gif"
+          },
+          {
+            "label": "模型（矩阵）变换",
+            "value": "3.1.3modelMatrix",
+            "thumb": "./images/modelMatrix.gif"
           }
         ]
       },
       {
         "label": "Tileset",
-        "value": "tileset"
+        "value": "tileset",
+        "children": [
+          {
+            "label": "gltf/glb模型加载",
+            "value": "3.1.1gltf",
+            "thumb": "./images/gltf.gif"
+          },
+          {
+            "label": "无球模式",
+            "value": "3.2.2noglobe",
+            "thumb": "./images/noglobe.gif"
+          }
+        ]
       }
     ]
   },
@@ -281,8 +308,8 @@
         "value": "mag",
         "children": [
           {
-            "label": "大量点加载",
-            "value": "mag-point",
+            "label": "大量点加载(100万点数据)",
+            "value": "4.1.1mag-point",
             "thumb": "./images/mag-point.gif"
           }
         ]

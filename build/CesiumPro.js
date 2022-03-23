@@ -29,8 +29,13 @@
             this.name = 'CesiumProError';
         }
     }
-    CesiumProError.throwNoInstance = function() {
-        throw new CesiumProError('它的定义了一个接口，不能被以直接调用.') 
+    CesiumProError.throwInstantiationError = function () {
+        throw new DeveloperError(
+            "This function defines an interface and should not be called directly."
+        );
+    };
+    CesiumProError.throwNoInstance = function () {
+        throw new CesiumProError('它的定义了一个接口，不能被以直接调用.')
     };
 
     /* eslint-disable prefer-rest-params */
@@ -38,7 +43,7 @@
     function compareNumber(a, b) {
       return b - a;
     }
-    class Event$4 {
+    class Event$6 {
       /**
        * 事件管理器
        * @example
@@ -180,15 +185,15 @@
 
     const {
         RequestState: RequestState$1,
-        when: when$5,
+        when: when$6,
         AttributeCompression,
         BoundingSphere: BoundingSphere$2,
-        Cartesian3: Cartesian3$7,
+        Cartesian3: Cartesian3$8,
         Credit: Credit$1,
-        defaultValue: defaultValue$4,
-        defined: defined$5,
+        defaultValue: defaultValue$5,
+        defined: defined$6,
         DeveloperError: DeveloperError$1,
-        GeographicTilingScheme: GeographicTilingScheme$2,
+        GeographicTilingScheme: GeographicTilingScheme$3,
         WebMercatorTilingScheme,
         getJsonFromTypedArray,
         HeightmapTerrainData,
@@ -248,7 +253,7 @@
      */
     function CesiumProTerrainProvider(options) {
         //>>includeStart('debug', pragmas.debug)
-        if (!defined$5(options) || !defined$5(options.url)) {
+        if (!defined$6(options) || !defined$6(options.url)) {
             throw new DeveloperError$1("options.url is required.");
         }
         //>>includeEnd('debug');
@@ -265,7 +270,7 @@
          * @default false
          * @private
          */
-        this._requestVertexNormals = defaultValue$4(
+        this._requestVertexNormals = defaultValue$5(
             options.requestVertexNormals,
             false
         );
@@ -276,7 +281,7 @@
          * @default false
          * @private
          */
-        this._requestWaterMask = defaultValue$4(options.requestWaterMask, false);
+        this._requestWaterMask = defaultValue$5(options.requestWaterMask, false);
 
         /**
          * Boolean flag that indicates if the client should request tile metadata from the server.
@@ -284,9 +289,9 @@
          * @default true
          * @private
          */
-        this._requestMetadata = defaultValue$4(options.requestMetadata, true);
+        this._requestMetadata = defaultValue$5(options.requestMetadata, true);
 
-        this._errorEvent = new Event$4();
+        this._errorEvent = new Event$6();
 
         var credit = options.credit;
         if (typeof credit === "string") {
@@ -296,7 +301,7 @@
 
         this._availability = undefined;
 
-        var deferred = when$5.defer();
+        var deferred = when$6.defer();
         this._ready = false;
         this._readyPromise = deferred;
         this._tileCredits = undefined;
@@ -310,7 +315,7 @@
         var attribution = "";
         var overallAvailability = [];
         var overallMaxZoom = 0;
-        when$5(options.url)
+        when$6(options.url)
             .then(function (url) {
                 var resource = Resource$4.createIfNeeded(url);
                 resource.appendForwardSlash();
@@ -368,7 +373,7 @@
             var isHeightmap = false;
             if (data.format === "heightmap-1.0") {
                 isHeightmap = true;
-                if (!defined$5(that._heightmapStructure)) {
+                if (!defined$6(that._heightmapStructure)) {
                     that._heightmapStructure = {
                         heightScale: 1.0 / 5.0,
                         heightOffset: -1000.0,
@@ -405,7 +410,7 @@
             // Keeps track of which of the availablity containing tiles have been loaded
 
             if (!data.projection || data.projection === "EPSG:4326") {
-                that._tilingScheme = new GeographicTilingScheme$2({
+                that._tilingScheme = new GeographicTilingScheme$3({
                     numberOfLevelZeroTilesX: 2,
                     numberOfLevelZeroTilesY: 1,
                     ellipsoid: that._ellipsoid,
@@ -463,25 +468,25 @@
             // by setting the _littleEndianExtensionSize to false. Always prefer 'octvertexnormals'
             // over 'vertexnormals' if both extensions are supported by the server.
             if (
-                defined$5(data.extensions) &&
+                defined$6(data.extensions) &&
                 data.extensions.indexOf("octvertexnormals") !== -1
             ) {
                 hasVertexNormals = true;
             } else if (
-                defined$5(data.extensions) &&
+                defined$6(data.extensions) &&
                 data.extensions.indexOf("vertexnormals") !== -1
             ) {
                 hasVertexNormals = true;
                 littleEndianExtensionSize = false;
             }
             if (
-                defined$5(data.extensions) &&
+                defined$6(data.extensions) &&
                 data.extensions.indexOf("watermask") !== -1
             ) {
                 hasWaterMask = true;
             }
             if (
-                defined$5(data.extensions) &&
+                defined$6(data.extensions) &&
                 data.extensions.indexOf("metadata") !== -1
             ) {
                 hasMetadata = true;
@@ -490,7 +495,7 @@
             var availabilityLevels = data.metadataAvailability;
             var availableTiles = data.available;
             var availability;
-            if (defined$5(availableTiles) && !defined$5(availabilityLevels)) {
+            if (defined$6(availableTiles) && !defined$6(availabilityLevels)) {
                 availability = new TileAvailability(
                     that._tilingScheme,
                     availableTiles.length
@@ -498,7 +503,7 @@
                 for (var level = 0; level < availableTiles.length; ++level) {
                     var rangesAtLevel = availableTiles[level];
                     var yTiles = that._tilingScheme.getNumberOfYTilesAtLevel(level);
-                    if (!defined$5(overallAvailability[level])) {
+                    if (!defined$6(overallAvailability[level])) {
                         overallAvailability[level] = [];
                     }
 
@@ -525,7 +530,7 @@
                         );
                     }
                 }
-            } else if (defined$5(availabilityLevels)) {
+            } else if (defined$6(availabilityLevels)) {
                 availabilityTilesLoaded = new TileAvailability(
                     that._tilingScheme,
                     maxZoom
@@ -538,7 +543,7 @@
             that._hasWaterMask = that._hasWaterMask || hasWaterMask;
             that._hasVertexNormals = that._hasVertexNormals || hasVertexNormals;
             that._hasMetadata = that._hasMetadata || hasMetadata;
-            if (defined$5(data.attribution)) {
+            if (defined$6(data.attribution)) {
                 if (attribution.length > 0) {
                     attribution += " ";
                 }
@@ -562,12 +567,12 @@
             );
 
             var parentUrl = data.parentUrl;
-            if (defined$5(parentUrl)) {
-                if (!defined$5(availability)) {
+            if (defined$6(parentUrl)) {
+                if (!defined$6(availability)) {
                     console.log(
                         "A layer.json can't have a parentUrl if it does't have an available array."
                     );
-                    return when$5.resolve();
+                    return when$6.resolve();
                 }
                 lastResource = lastResource.getDerivedResource({
                     url: parentUrl,
@@ -577,10 +582,10 @@
                     url: "layer.json",
                 });
                 var parentMetadata = layerJsonResource.fetchJson();
-                return when$5(parentMetadata, parseMetadataSuccess, parseMetadataFailure);
+                return when$6(parentMetadata, parseMetadataSuccess, parseMetadataFailure);
             }
 
-            return when$5.resolve();
+            return when$6.resolve();
         }
 
         function parseMetadataFailure(data) {
@@ -600,7 +605,7 @@
 
         function metadataSuccess(data) {
             parseMetadataSuccess(data).then(function () {
-                if (defined$5(metadataError)) {
+                if (defined$6(metadataError)) {
                     return;
                 }
 
@@ -628,7 +633,7 @@
                 if (attribution.length > 0) {
                     var layerJsonCredit = new Credit$1(attribution);
 
-                    if (defined$5(that._tileCredits)) {
+                    if (defined$6(that._tileCredits)) {
                         that._tileCredits.push(layerJsonCredit);
                     } else {
                         that._tileCredits = [layerJsonCredit];
@@ -642,7 +647,7 @@
 
         function metadataFailure(data) {
             // If the metadata is not found, assume this is a pre-metadata heightmap tileset.
-            if (defined$5(data) && data.statusCode === 404) {
+            if (defined$6(data) && data.statusCode === 404) {
                 metadataSuccess({
                     tilejson: "2.1.0",
                     format: "heightmap-1.0",
@@ -656,7 +661,7 @@
         }
 
         function requestLayerJson() {
-            when$5(layerJsonResource.fetchJson())
+            when$6(layerJsonResource.fetchJson())
                 .then(metadataSuccess)
                 .otherwise(metadataFailure);
         }
@@ -698,7 +703,7 @@
     };
 
     function getRequestHeader(extensionsList) {
-        if (!defined$5(extensionsList) || extensionsList.length === 0) {
+        if (!defined$6(extensionsList) || extensionsList.length === 0) {
             return {
                 Accept:
                     "application/vnd.quantized-mesh,application/octet-stream;q=0.9,*/*;q=0.01",
@@ -750,7 +755,7 @@
         var triangleLength = bytesPerIndex * triangleElements;
 
         var view = new DataView(buffer);
-        var center = new Cartesian3$7(
+        var center = new Cartesian3$8(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -763,7 +768,7 @@
         pos += Float32Array.BYTES_PER_ELEMENT;
 
         var boundingSphere = new BoundingSphere$2(
-            new Cartesian3$7(
+            new Cartesian3$8(
                 view.getFloat64(pos, true),
                 view.getFloat64(pos + 8, true),
                 view.getFloat64(pos + 16, true)
@@ -772,7 +777,7 @@
         );
         pos += boundingSphereLength;
 
-        var horizonOcclusionPoint = new Cartesian3$7(
+        var horizonOcclusionPoint = new Cartesian3$8(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -898,7 +903,7 @@
                         stringLength
                     );
                     var availableTiles = metadata.available;
-                    if (defined$5(availableTiles)) {
+                    if (defined$6(availableTiles)) {
                         for (var offset = 0; offset < availableTiles.length; ++offset) {
                             var availableLevel = level + offset + 1;
                             var rangesAtLevel = availableTiles[offset];
@@ -1018,7 +1023,7 @@
             for (var i = 0; i < layerCount; ++i) {
                 var layer = layers[i];
                 if (
-                    !defined$5(layer.availability) ||
+                    !defined$6(layer.availability) ||
                     layer.availability.isTileAvailable(level, x, y)
                 ) {
                     layerToUse = layer;
@@ -1030,8 +1035,8 @@
     };
 
     function requestTileGeometry(provider, x, y, level, layerToUse, request) {
-        if (!defined$5(layerToUse)) {
-            return when$5.reject(new RuntimeError("Terrain tile doesn't exist"));
+        if (!defined$6(layerToUse)) {
+            return when$6.reject(new RuntimeError("Terrain tile doesn't exist"));
         }
 
         var urlTemplates = layerToUse.tileUrlTemplates;
@@ -1069,8 +1074,8 @@
 
         var resource = layerToUse.resource;
         if (
-            defined$5(resource._ionEndpoint) &&
-            !defined$5(resource._ionEndpoint.externalType)
+            defined$6(resource._ionEndpoint) &&
+            !defined$6(resource._ionEndpoint.externalType)
         ) {
             // ion uses query paremeters to request extensions
             if (extensionList.length !== 0) {
@@ -1102,12 +1107,12 @@
         }
         var promise = source.fetchArrayBuffer();
 
-        if (!defined$5(promise)) {
+        if (!defined$6(promise)) {
             return undefined;
         }
 
         return promise.then(function (buffer) {
-            if (defined$5(provider._heightmapStructure)) {
+            if (defined$6(provider._heightmapStructure)) {
                 return createHeightmapTerrainData(provider, buffer);
             }
             return createQuantizedMeshTerrainData(
@@ -1361,7 +1366,7 @@
      * @returns {Boolean|undefined} Undefined if not supported or availability is unknown, otherwise true or false.
      */
     CesiumProTerrainProvider.prototype.getTileDataAvailable = function (x, y, level) {
-        if (!defined$5(this._availability)) {
+        if (!defined$6(this._availability)) {
             return undefined;
         }
         if (level > this._availability._maximumLevel) {
@@ -1404,7 +1409,7 @@
         level
     ) {
         if (
-            !defined$5(this._availability) ||
+            !defined$6(this._availability) ||
             level > this._availability._maximumLevel ||
             this._availability.isTileAvailable(level, x, y) ||
             !this._hasMetadata
@@ -1417,7 +1422,7 @@
         var count = layers.length;
         for (var i = 0; i < count; ++i) {
             var layerResult = checkLayer(this, x, y, level, layers[i], i === 0);
-            if (defined$5(layerResult.promise)) {
+            if (defined$6(layerResult.promise)) {
                 return layerResult.promise;
             }
         }
@@ -1445,7 +1450,7 @@
     }
 
     function checkLayer(provider, x, y, level, layer, topLayer) {
-        if (!defined$5(layer.availabilityLevels)) {
+        if (!defined$6(layer.availabilityLevels)) {
             // It's definitely not in this layer
             return {
                 result: false,
@@ -1460,7 +1465,7 @@
         var availability = layer.availability;
 
         var tile = getAvailabilityTile(layer, x, y, level);
-        while (defined$5(tile)) {
+        while (defined$6(tile)) {
             if (
                 availability.isTileAvailable(tile.level, tile.x, tile.y) &&
                 !availabilityTilesLoaded.isTileAvailable(tile.level, tile.x, tile.y)
@@ -1469,7 +1474,7 @@
                 if (!topLayer) {
                     cacheKey = tile.level + "-" + tile.x + "-" + tile.y;
                     requestPromise = layer.availabilityPromiseCache[cacheKey];
-                    if (!defined$5(requestPromise)) {
+                    if (!defined$6(requestPromise)) {
                         // For cutout terrain, if this isn't the top layer the availability tiles
                         //  may never get loaded, so request it here.
                         var request = new Request$1({
@@ -1485,7 +1490,7 @@
                             layer,
                             request
                         );
-                        if (defined$5(requestPromise)) {
+                        if (defined$6(requestPromise)) {
                             layer.availabilityPromiseCache[cacheKey] = requestPromise;
                             requestPromise.then(deleteFromCache);
                         }
@@ -1523,7 +1528,7 @@
      * @example
      * param = CesiumPro.defaultValue(param, 'default');
      */
-    function defaultValue$3(a, b) {
+    function defaultValue$4(a, b) {
         if (a !== undefined && a !== null) {
             return a;
         }
@@ -1536,7 +1541,7 @@
      * @exports defined
      * @returns {Boolean} value是否被定义
      */
-     function defined$4(value) {
+     function defined$5(value) {
         return value !== undefined && value !== null;
       }
 
@@ -1550,7 +1555,7 @@
         return url;
       }
 
-      if (!defined$4(a)) {
+      if (!defined$5(a)) {
         a = document.createElement('a');
       }
       a.href = url;
@@ -1581,7 +1586,7 @@
     }
 
     function getCesiumProBaseUrl() {
-      if (defined$4(baseResource)) {
+      if (defined$5(baseResource)) {
         return baseResource;
       }
 
@@ -1590,7 +1595,7 @@
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$4(window.define.amd)
+        && defined$5(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -1601,13 +1606,13 @@
         baseUrlString = getBaseUrlFromCesiumScript();
       }
       // >>includeStart('debug');
-      if (!defined$4(baseUrlString)) {
+      if (!defined$5(baseUrlString)) {
         throw new CesiumProError(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$4(baseUrlString)) {
+      if(!defined$5(baseUrlString)) {
           baseUrlString = '';
       }
       baseResource = new Cesium.Resource({
@@ -1626,11 +1631,11 @@
     }
 
     function buildModuleUrl$1(relativeUrl) {
-      if (!defined$4(implementation)) {
+      if (!defined$5(implementation)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$4(window.define.amd)
+          && defined$5(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
           implementation = buildModuleUrlFromRequireToUrl;
@@ -1723,14 +1728,14 @@
     }
     let bootstrapperUrlResult;
     function getBootstrapperUrl() {
-        if (!defined$4(bootstrapperUrlResult)) {
+        if (!defined$5(bootstrapperUrlResult)) {
             bootstrapperUrlResult = getWorkerUrl("Workers/cesiumWorkerBootstrapper.js");
         }
         return bootstrapperUrlResult;
     }
     function createWorker(processor) {
         const worker = new Worker(getBootstrapperUrl());
-        worker.postMessage = defaultValue$3(
+        worker.postMessage = defaultValue$4(
             worker.webkitPostMessage,
             worker.postMessage
         );
@@ -1776,11 +1781,11 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$6,
-        Cartographic: Cartographic$2,
+        Cartesian3: Cartesian3$7,
+        Cartographic: Cartographic$3,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$1,
-        SceneMode: SceneMode$1,
+        SceneMode: SceneMode$2,
         EllipsoidalOccluder,
     } = Cesium;
     function computedScreenPosition(objects, scene) {
@@ -1790,7 +1795,7 @@
             if (!object.position) {
                 continue;
             }
-            if (scene.mode === SceneMode$1.SCENE3D && !occluder.isPointVisible(object.position)) {
+            if (scene.mode === SceneMode$2.SCENE3D && !occluder.isPointVisible(object.position)) {
                 continue;
             }
             object.__pixel = Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -1822,8 +1827,8 @@
     }
     class Cluster {
         constructor(scene, options = {}) {
-            this._objects = defaultValue$3(options.objects, []);
-            this._getScreenBoundingBox = defaultValue$3(options.getScreenBoundingBox, getScreenBoundingBox);
+            this._objects = defaultValue$4(options.objects, []);
+            this._getScreenBoundingBox = defaultValue$4(options.getScreenBoundingBox, getScreenBoundingBox);
             this._scene = scene;
             this.clusterSize = 3;
             this.pixelRange = 50;
@@ -1855,7 +1860,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$6.clone(object.position);
+                const clusterPosition = Cartesian3$7.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -1867,16 +1872,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$6.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$7.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$1.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$6.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$7.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$6(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$7(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -1902,7 +1907,7 @@
         }
         const now = Cesium.getTimestamp();
         const scene = viewer.scene;
-        if (defined$4(lastUpdateTime) && now - lastUpdateTime < 250) {
+        if (defined$5(lastUpdateTime) && now - lastUpdateTime < 250) {
             return;
         }
         lastUpdateTime = now;
@@ -1913,7 +1918,7 @@
         const endRay = scene.camera.getPickRay(new Cesium.Cartesian2(width / 2 + 1, height / 2));
         const startPosition = scene.globe.pick(startRay, scene);
         const endPosition = scene.globe.pick(endRay, scene);
-        if (!(defined$4(startPosition) && defined$4(endPosition))) {
+        if (!(defined$5(startPosition) && defined$5(endPosition))) {
             return;
         }
         const geodesic = new Cesium.EllipsoidGeodesic(
@@ -1924,7 +1929,7 @@
         return distance;
     }
 
-    class GeoPoint$1 {
+    class GeoPoint {
         /**
          * 用经纬度（度）和海拔（米）描述一个点。
          * @param {Number} lon 经度，单位：度
@@ -1932,15 +1937,15 @@
          * @param {Number} alt 海拔，单位：米
          */
         constructor(lon, lat, alt) {
-            if (!defined$4(lon)) {
+            if (!defined$5(lon)) {
                 throw new CesiumProError('longitude is required.')
             }
-            if (!defined$4(lat)) {
+            if (!defined$5(lat)) {
                 throw new CesiumProError('latitude is required.')
             }
             this.lon = lon;
             this.lat = lat;
-            this.alt = defaultValue$3(alt, 0);
+            this.alt = defaultValue$4(alt, 0);
         }
         /**
          * 转为屏幕坐标
@@ -1948,21 +1953,21 @@
          * @returns {Cesium.Cartesian2} 屏幕坐标
          */
         toPixel(scene) {
-            return GeoPoint$1.toPixel(this, scene);
+            return GeoPoint.toPixel(this, scene);
         }
         /**
          * 转为笛卡尔坐标
          * @returns {Cesium.Cartesian3} 笛卡尔坐标
          */
         toCartesian() {
-            return GeoPoint$1.toCartesian(this);
+            return GeoPoint.toCartesian(this);
         }
         /**
          * 转为地理坐标
          * @returns {Cesium.Cartographic} 地理坐标
          */
         toCartographic() {
-            return GeoPoint$1.toCartographic(this)
+            return GeoPoint.toCartographic(this)
         }
         /**
          * 获得该点的弧度形式
@@ -1980,7 +1985,7 @@
          * @returns {Boolean} 可见性
          */
         isVisible(viewer) {
-            return GeoPoint$1.isVisible(this, viewer)
+            return GeoPoint.isVisible(this, viewer)
         }
         /**
          * 转为字符串
@@ -2008,18 +2013,18 @@
             if (viewer instanceof Cesium.Viewer) {
                 throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
             }
-            if (!defined$4(point)) {
+            if (!defined$5(point)) {
                 throw new CesiumProError('point is not defined.')
             }
-            const position = GeoPoint$1.toCartesian(point);
+            const position = GeoPoint.toCartesian(point);
             if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
                 const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
                     .isPointVisible(position);
                 if (!visibility) {
                     return false;
                 }
-                const windowPosition = GeoPoint$1.toPixel(point, viewer.scene);
-                if (!defined$4(windowPosition)) {
+                const windowPosition = GeoPoint.toPixel(point, viewer.scene);
+                if (!defined$5(windowPosition)) {
                     return false;
                 }
                 const width = viewer.canvas.width || viewer.canvas.clientWidth;
@@ -2046,15 +2051,15 @@
          */
         static toPixel(point, scene) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(scene)) {
+            if (!defined$5(scene)) {
                 throw new CesiumProError('scene未定义。')
             }
-            if (!defined$4(point)) {
+            if (!defined$5(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
-            const cartesian = GeoPoint$1.toCartesian(point);
-            if (!defined$4(cartesian)) {
+            const cartesian = GeoPoint.toCartesian(point);
+            if (!defined$5(cartesian)) {
                 return undefined;
             }
             return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -2069,7 +2074,7 @@
          */
         static toCartographic(point) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(point)) {
+            if (!defined$5(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -2083,7 +2088,7 @@
          */
         static toCartesian(point, viewer) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(point)) {
+            if (!defined$5(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -2093,7 +2098,7 @@
             if (point instanceof Cesium.Cartographic) {
                 return Cesium.Cartographic.toCartesian(point)
             }
-            if (point instanceof GeoPoint$1) {
+            if (point instanceof GeoPoint) {
                 return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
             }
             if (point instanceof Cesium.Cartesian2) {
@@ -2112,15 +2117,15 @@
          */
         static fromCartesian(cartesian) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(cartesian)) {
+            if (!defined$5(cartesian)) {
                 throw new CesiumProError('cartesian is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-            if (!defined$4(cartographic)) {
+            if (!defined$5(cartographic)) {
                 return undefined;
             }
-            return GeoPoint$1.fromCartographic(cartographic)
+            return GeoPoint.fromCartographic(cartographic)
         }
         /**
          * 从一个地理坐标点创建点
@@ -2129,11 +2134,11 @@
          */
         static fromCartographic(cartographic) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(cartographic)) {
+            if (!defined$5(cartographic)) {
                 throw new CesiumProError('cartographic is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
-            return new GeoPoint$1(
+            return new GeoPoint(
                 Cesium.Math.toDegrees(cartographic.longitude),
                 Cesium.Math.toDegrees(cartographic.latitude),
                 cartographic.height
@@ -2150,7 +2155,7 @@
                 return undefined;
             }
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(pixel)) {
+            if (!defined$5(pixel)) {
                 throw new CesiumProError('pixel is not defined.')
             }
             if (viewer instanceof Cesium.Viewer === false) {
@@ -2159,20 +2164,30 @@
             //>>includeEnd('debug', pragmas.debug);
             const ray = viewer.scene.camera.getPickRay(pixel);
             const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-            if (!defined$4(cartesian)) {
+            if (!defined$5(cartesian)) {
                 return undefined;
             }
-            return GeoPoint$1.fromCartesian(cartesian);
+            return GeoPoint.fromCartesian(cartesian);
         }
         /**
          * 从经纬度创建点
-         * @param {Number} lon 经度
-         * @param {Number} lat 纬度
-         * @param {Number} height 海拔
+         * @param {Number} lon 经度(度)
+         * @param {Number} lat 纬度(度)
+         * @param {Number} height 海拔(米)
          * @returns {GeoPoint}
          */
         static fromDegrees(lon, lat, height) {
-            return new GeoPoint$1(lon, lat, height);
+            return new GeoPoint(lon, lat, height);
+        }
+        /**
+         * 从经纬度创建点
+         * @param {Number} lon 经度(弧度)
+         * @param {Number} lat 纬度(弧度)
+         * @param {Number} height 海拔(米)
+         * @returns {GeoPoint}
+         */
+         static fromRadians(lon, lat, height) {
+            return new GeoPoint(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
         }
         /**
          * 判断一个点或经纬度是否在中国范围内（粗略）
@@ -2182,8 +2197,8 @@
         static inChina(...args) {
             if (args.length === 1) {
                 const p = args[0];
-                if (args[0] instanceof GeoPoint$1) {
-                    return GeoPoint$1.inChina(p.lon, p.lat)
+                if (args[0] instanceof GeoPoint) {
+                    return GeoPoint.inChina(p.lon, p.lat)
                 }
             } else {
                 const lon = +args[0];
@@ -2197,7 +2212,7 @@
          * @returns {GeoPoint}
          */
         static fromLonlat(lonlat) {
-            return new GeoPoint$1(...lonlat)
+            return new GeoPoint(...lonlat)
         }
     }
 
@@ -2212,7 +2227,7 @@
 
         // center pixel
         const pixel = new Cesium.Cartesian2(bounding.width / 2, bounding.height / 2);
-        return GeoPoint$1.fromPixel(pixel, viewer);
+        return GeoPoint.fromPixel(pixel, viewer);
     }
 
     function computeSceneExtent(viewer) {
@@ -2223,7 +2238,7 @@
         }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const rect = viewer.camera.computeViewRectangle();
-            if(!defined$4(rect)) {
+            if(!defined$5(rect)) {
                 return undefined;
             }
             return {
@@ -2235,10 +2250,10 @@
         }
         const canvas = viewer.canvas;
         const bounding = canvas.getBoundingClientRect();
-        const left = GeoPoint$1.fromPixel(new Cesium.Cartesian2(0, bounding.height / 2), viewer)|| {lon: -180};
-        const right = GeoPoint$1.fromPixel(new Cesium.Cartesian2(bounding.width, bounding.height / 2), viewer) || {lon: 180};
-        const top = GeoPoint$1.fromPixel(new Cesium.Cartesian2(bounding.width / 2, 0), viewer) || {lat: 90};
-        const bottom = GeoPoint$1.fromPixel(new Cesium.Cartesian2(bounding.width / 2, bounding.height), viewer) || {lat: -90};
+        const left = GeoPoint.fromPixel(new Cesium.Cartesian2(0, bounding.height / 2), viewer)|| {lon: -180};
+        const right = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width, bounding.height / 2), viewer) || {lon: 180};
+        const top = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width / 2, 0), viewer) || {lat: 90};
+        const bottom = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width / 2, bounding.height), viewer) || {lat: -90};
 
         return {
             west: left.lon,
@@ -2310,6 +2325,247 @@
         dateFormat(format, this);
       };
 
+    const shader$1 = 'uniform samplerCube u_cubeMap;\n\
+  varying vec3 v_texCoord;\n\
+  void main()\n\
+  {\n\
+  vec4 color = textureCube(u_cubeMap, normalize(v_texCoord));\n\
+  gl_FragColor = vec4(czm_gammaCorrect(color).rgb, czm_morphTime);\n\
+  }\n\
+  ';
+
+    const shader = 'attribute vec3 position;\n\
+  varying vec3 v_texCoord;\n\
+  uniform mat3 u_rotateMatrix;\n\
+  void main()\n\
+  {\n\
+  vec3 p = czm_viewRotation * u_rotateMatrix * (czm_temeToPseudoFixed * (czm_entireFrustum.y * position));\n\
+  gl_Position = czm_projection * vec4(p, 1.0);\n\
+  v_texCoord = position.xyz;\n\
+  }\n\
+  ';
+
+    const {
+        defaultValue: defaultValue$3,
+        destroyObject: destroyObject$3,
+        Matrix4: Matrix4$1,
+        DrawCommand,
+        BoxGeometry,
+        Cartesian3: Cartesian3$6,
+        defined: defined$4,
+        GeometryPipeline,
+        Transforms: Transforms$2,
+        VertexFormat,
+        BufferUsage,
+        CubeMap,
+        loadCubeMap,
+        RenderState,
+        VertexArray,
+        BlendingState,
+        SceneMode: SceneMode$1,
+        ShaderProgram,
+        ShaderSource,
+        Matrix3,
+    } = Cesium;
+    const SkyBoxFS = shader$1;
+    const SkyBoxVS = shader;
+    class GroundSkyBox {
+        /**
+         * A sky box around the scene to draw stars.  The sky box is defined using the True Equator Mean Equinox (TEME) axes.
+         * <p>
+         * This is only supported in 3D.  The sky box is faded out when morphing to 2D or Columbus view.  The size of
+         * the sky box must not exceed {@link Scene#maximumCubeMapSize}.
+         * </p>
+         *
+         * @param {Object} options Object with the following properties:
+         * @param {Object} [options.sources] The source URL or <code>Image</code> object for each of the six cube map faces.  See the example below.
+         * @param {Boolean} [options.show=true] Determines if this primitive will be shown.
+         *
+         *
+         * @example
+         * scene.skyBox = new CesiumPro.GroundSkyBox({
+         *   sources : {
+         *     positiveX : 'skybox_px.png',
+         *     negativeX : 'skybox_nx.png',
+         *     positiveY : 'skybox_py.png',
+         *     negativeY : 'skybox_ny.png',
+         *     positiveZ : 'skybox_pz.png',
+         *     negativeZ : 'skybox_nz.png'
+         *   }
+         * });
+         *
+         * @see Cesium.SkyBox
+         */
+        constructor(options = {}) {
+            this.sources = defaultValue$3(options.sources, {
+                positiveX: Url.buildModuleUrl('./assets/skybox/px.png'),
+                negativeX: Url.buildModuleUrl('./assets/skybox/nx.png'),
+                positiveY: Url.buildModuleUrl('./assets/skybox/py.png'),
+                negativeY: Url.buildModuleUrl('./assets/skybox/ny.png'),
+                positiveZ: Url.buildModuleUrl('./assets/skybox/pz.png'),
+                negativeZ: Url.buildModuleUrl('./assets/skybox/nz.png')
+            });
+            this._sources = undefined;
+            /**
+             * 决定天空盒是否被显示.
+             *
+             * @type {Boolean}
+             * @default true
+             */
+            this.show = defaultValue$3(options.show, true);
+
+            this._command = new DrawCommand({
+                modelMatrix: Matrix4$1.clone(Matrix4$1.IDENTITY),
+                owner: this,
+            });
+            this._cubeMap = undefined;
+
+            this._attributeLocations = undefined;
+            this._useHdr = undefined;
+            this._isDestroyed = false;
+        }
+
+        /**
+         *
+         * 当场景渲染的时候会自动调用该函数更新天空盒。
+         * <p>切勿主动调用该函数。</p>
+         */
+        update(frameState, useHdr) {
+            const skyboxMatrix3 = new Matrix3();
+            const that = this;
+
+            if (!this.show) {
+                return undefined;
+            }
+
+            if ((frameState.mode !== SceneMode$1.SCENE3D)
+                && (frameState.mode !== SceneMode$1.MORPHING)) {
+                return undefined;
+            }
+
+            // The sky box is only rendered during the render pass; it is not pickable,
+            // it doesn't cast shadows, etc.
+            if (!frameState.passes.render) {
+                return undefined;
+            }
+
+            const {
+                context,
+            } = frameState;
+
+            if (this._sources !== this.sources) {
+                this._sources = this.sources;
+                const {
+                    sources,
+                } = this;
+
+                if ((!defined$4(sources.positiveX))
+                    || (!defined$4(sources.negativeX))
+                    || (!defined$4(sources.positiveY))
+                    || (!defined$4(sources.negativeY))
+                    || (!defined$4(sources.positiveZ))
+                    || (!defined$4(sources.negativeZ))) {
+                    throw new CesiumProError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
+                }
+
+                if ((typeof sources.positiveX !== typeof sources.negativeX)
+                    || (typeof sources.positiveX !== typeof sources.positiveY)
+                    || (typeof sources.positiveX !== typeof sources.negativeY)
+                    || (typeof sources.positiveX !== typeof sources.positiveZ)
+                    || (typeof sources.positiveX !== typeof sources.negativeZ)) {
+                    throw new CesiumProError('this.sources properties must all be the same type.');
+                }
+
+                if (typeof sources.positiveX === 'string') {
+                    // Given urls for cube-map images.  Load them.
+                    loadCubeMap(context, this._sources).then((cubeMap) => {
+                        that._cubeMap = that._cubeMap && that._cubeMap.destroy();
+                        that._cubeMap = cubeMap;
+                    });
+                } else {
+                    this._cubeMap = this._cubeMap && this._cubeMap.destroy();
+                    this._cubeMap = new CubeMap({
+                        context,
+                        source: sources,
+                    });
+                }
+            }
+
+            const command = this._command;
+
+            command.modelMatrix = Transforms$2.eastNorthUpToFixedFrame(frameState.camera._positionWC);
+            if (!defined$4(command.vertexArray)) {
+                command.uniformMap = {
+                    u_cubeMap() {
+                        return that._cubeMap;
+                    },
+                    u_rotateMatrix() {
+                        if (typeof Matrix4$1.getRotation === 'function') {
+                            return Matrix4$1.getRotation(command.modelMatrix, skyboxMatrix3);
+                        }
+                        return Matrix4$1.getMatrix3(command.modelMatrix, skyboxMatrix3);
+                    },
+                };
+
+                const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
+                    dimensions: new Cartesian3$6(2.0, 2.0, 2.0),
+                    vertexFormat: VertexFormat.POSITION_ONLY,
+                }));
+                const attributeLocations = this._attributeLocations = GeometryPipeline
+                    .createAttributeLocations(geometry);
+
+                command.vertexArray = VertexArray.fromGeometry({
+                    context,
+                    geometry,
+                    attributeLocations,
+                    bufferUsage: BufferUsage._DRAW,
+                });
+
+                command.renderState = RenderState.fromCache({
+                    blending: BlendingState.ALPHA_BLEND,
+                });
+            }
+
+            if (!defined$4(command.shaderProgram) || this._useHdr !== useHdr) {
+                const fs = new ShaderSource({
+                    defines: [useHdr ? 'HDR' : ''],
+                    sources: [SkyBoxFS],
+                });
+                command.shaderProgram = ShaderProgram.fromCache({
+                    context,
+                    vertexShaderSource: SkyBoxVS,
+                    fragmentShaderSource: fs,
+                    attributeLocations: this._attributeLocations,
+                });
+                this._useHdr = useHdr;
+            }
+
+            if (!defined$4(this._cubeMap)) {
+                return undefined;
+            }
+
+            return command;
+        }
+
+        /**
+         * 对象是否被销毁
+         */
+        isDestroyed() {
+            return this._isDestroyed;
+        }
+
+        /**
+         * 销毁对象
+         */
+        destroy() {
+            const command = this._command;
+            command.vertexArray = command.vertexArray && command.vertexArray.destroy();
+            command.shaderProgram = command.shaderProgram && command.shaderProgram.destroy();
+            this._cubeMap = this._cubeMap && this._cubeMap.destroy();
+            return destroyObject$3(this);
+        }
+    }
+
     const {Cartesian2, Rectangle: Rectangle$3, GeographicProjection, Ellipsoid} = Cesium;
     const CesiumMath = Cesium.Math;
 
@@ -2331,14 +2587,14 @@
      * the tile tree.
      */
     function LonlatTilingScheme(options) {
-      options = defaultValue$3(options, defaultValue$3.EMPTY_OBJECT);
+      options = defaultValue$4(options, defaultValue$4.EMPTY_OBJECT);
 
-      this._ellipsoid = defaultValue$3(options.ellipsoid, Ellipsoid.WGS84);
-      this._rectangle = defaultValue$3(options.rectangle, Rectangle$3.MAX_VALUE);
+      this._ellipsoid = defaultValue$4(options.ellipsoid, Ellipsoid.WGS84);
+      this._rectangle = defaultValue$4(options.rectangle, Rectangle$3.MAX_VALUE);
       this._projection = new GeographicProjection(this._ellipsoid);
       this._numberOfLevelZeroTilesX = 36;
       this._numberOfLevelZeroTilesY = 18;
-      this._intervalOfZeorLevel = defaultValue$3(options.intervalOfZeorLevel, 16);
+      this._intervalOfZeorLevel = defaultValue$4(options.intervalOfZeorLevel, 16);
     }
 
     Object.defineProperties(LonlatTilingScheme.prototype, {
@@ -2434,7 +2690,7 @@
       const east = CesiumMath.toDegrees(rectangle.east);
       const north = CesiumMath.toDegrees(rectangle.north);
 
-      if (!defined$4(result)) {
+      if (!defined$5(result)) {
         return new Rectangle$3(west, south, east, north);
       }
 
@@ -2501,7 +2757,7 @@
       var north = rectangle.north - y * yTileHeight;
       var south = rectangle.north - (y + 1) * yTileHeight;
 
-      if (!defined$4(result)) {
+      if (!defined$5(result)) {
         result = new Rectangle$3(west, south, east, north);
       }
 
@@ -2556,7 +2812,7 @@
         yTileCoordinate = yTiles - 1;
       }
 
-      if (!defined$4(result)) {
+      if (!defined$5(result)) {
         return new Cartesian2(xTileCoordinate, yTileCoordinate);
       }
 
@@ -2567,13 +2823,13 @@
 
     const {
         CesiumTerrainProvider,
-        when: when$4,
+        when: when$5,
         TerrainProvider,
         Resource: Resource$3,
         CustomDataSource: CustomDataSource$1,
         Cartesian3: Cartesian3$5,
-        Entity: Entity$1,
-        Color: Color$6,
+        Entity: Entity$2,
+        Color: Color$7,
         Rectangle: Rectangle$2
     } = Cesium;
     function createBoundingRect(provider) {
@@ -2588,10 +2844,10 @@
                 bounding[0], bounding[1]
             ];
         }
-        return new Entity$1({
+        return new Entity$2({
             polyline: {
                 positions: Cartesian3$5.fromRadiansArray(positions),
-                material: Color$6.fromRandom({ alpha: 1 }),
+                material: Color$7.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
@@ -2604,7 +2860,7 @@
             url: "layer.json",
         });
         return new Promise((resolve, reject) => {
-            when$4(layerJsonResource.fetchJson())
+            when$5(layerJsonResource.fetchJson())
             .then((data) => {
                 provider.projection = data.projection;
                 provider.bounds = Rectangle$2.fromDegrees(...data.valid_bounds);
@@ -2645,10 +2901,10 @@
             this._hasWaterMask = false;
             this._hasVertexNormals = false;
             this._ellipsoid = options.ellipsoid;
-            this._requestVertexNormals = defaultValue$3(options.requestVertexNormals, false);
-            this._requestWaterMask = defaultValue$3(options.requestWaterMask, false);
-            this._requestMetadata = defaultValue$3(options.requestMetadata, true);
-            this._errorEvent = new Event$4();
+            this._requestVertexNormals = defaultValue$4(options.requestVertexNormals, false);
+            this._requestWaterMask = defaultValue$4(options.requestWaterMask, false);
+            this._requestMetadata = defaultValue$4(options.requestMetadata, true);
+            this._errorEvent = new Event$6();
 
             this._terrainProviders = [];
             const boundPromise = [];
@@ -2662,7 +2918,7 @@
                 boundPromise.push(bindBounding(provider, terrain.url));
             }
             this._ready = false;
-            this._readyPromise = when$4.defer();
+            this._readyPromise = when$5.defer();
             this._terrainList = terrainList;
 
             // 所有地形准备完成就准备完成
@@ -2846,7 +3102,7 @@
     proj.WGS84ToGCJ02 = function (lon, lat) {
         lat = +lat;
         lon = +lon;
-        if (GeoPoint$1.inChina(lon, lat)) {
+        if (GeoPoint.inChina(lon, lat)) {
             const d = delta(lon, lat);
             return [lon + d[0], lat + d[1]];        
         } else {
@@ -2864,7 +3120,7 @@
     proj.GCJ02ToWGS84 = function (lon, lat) {
         lat = +lat;
         lon = +lon;
-        if(GeoPoint$1.inChina(lon, lat)) {
+        if(GeoPoint.inChina(lon, lat)) {
             const d = delta(lon, lat);
             const mgLng = lon + d[0];
             const mgLat = lat + d[1];
@@ -2875,7 +3131,7 @@
     };
 
     const {
-        Color: Color$5
+        Color: Color$6
     } = Cesium;
     class Selection{
         /**
@@ -2890,19 +3146,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$5.AQUA;
+        static pointColor = Color$6.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$5.AQUA;
+        static fillColor = Color$6.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$5.AQUA;
+        static strokeColor = Color$6.AQUA;
     }
 
     class XYZLayer extends Cesium.UrlTemplateImageryProvider {
@@ -3035,7 +3291,7 @@
             if (typeof options === 'string') {
                 options = {url: options};
             }
-            options.getFeatureInfoFormats = defaultValue$3(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
+            options.getFeatureInfoFormats = defaultValue$4(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
             super(options);
         }
         /**
@@ -3209,13 +3465,13 @@
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$4,
+        Color: Color$5,
         EntityCollection,
         HeightReference: HeightReference$1,
-        when: when$3,
+        when: when$4,
         Resource: Resource$2,
         describe,
-        Event: Event$3
+        Event: Event$5
     } = Cesium;
     const sizes$1 = {
         small: 24,
@@ -3393,7 +3649,7 @@
         if (defined$3(properties)) {
             const cssColor = properties['point-color'];
             if (defined$3(cssColor)) {
-                color = Color$4.fromCssColorString(cssColor);
+                color = Color$5.fromCssColorString(cssColor);
             }
 
             size = defaultValue$2(sizes$1[properties['point-size']], size);
@@ -3437,7 +3693,7 @@
             let color;
             let stroke = properties.stroke;
             if (defined$3(stroke)) {
-                color = Color$4.fromCssColorString(stroke);
+                color = Color$5.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$3(opacity) && opacity !== 1.0) {
@@ -3522,7 +3778,7 @@
             let color;
             const stroke = properties.stroke;
             if (defined$3(stroke)) {
-                color = Color$4.fromCssColorString(stroke);
+                color = Color$5.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$3(opacity) && opacity !== 1.0) {
@@ -3539,7 +3795,7 @@
             let fillColor;
             const fill = properties.fill;
             if (defined$3(fill)) {
-                fillColor = Color$4.fromCssColorString(fill);
+                fillColor = Color$5.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -3731,10 +3987,10 @@
          */
         constructor(name) {
             this._name = name;
-            this._changed = new Event$3();
-            this._error = new Event$3();
+            this._changed = new Event$5();
+            this._error = new Event$5();
             this._isLoading = false;
-            this._loading = new Event$3();
+            this._loading = new Event$5();
             this._entityCollection = new EntityCollection(this);
             this._promises = [];
             this._pinBuilder = new PinBuilder();
@@ -3755,21 +4011,21 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$4.ROYALBLUE;
+        static pointColor = Color$5.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$4.YELLOW;
+        static lineColor = Color$5.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$4.fromBytes(255, 255, 0, 100);
+        static fill = Color$5.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof GeoJsonDataSource
@@ -3783,7 +4039,7 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$4.YELLOW;
+        static outlineColor = Color$5.YELLOW;
         /**
          * 线要素的宽度
          * @memberof GeoJsonDataSource
@@ -3965,13 +4221,13 @@
             };
 
             const that = this;
-            return when$3(promise, function (geoJson) {
+            return when$4(promise, function (geoJson) {
                 return load$1(that, geoJson, options, sourceUri);
             }).otherwise(function (error) {
                 DataSource$1.setLoading(that, false);
                 that._error.raiseEvent(that, error);
                 console.log(error);
-                return when$3.reject(error);
+                return when$4.reject(error);
             });
         };
         update() {
@@ -4505,7 +4761,7 @@
         PointGraphics,
         ArcType,
         PolygonHierarchy,
-        Color: Color$3,
+        Color: Color$4,
         HeightReference,
         Resource: Resource$1,
     } = Cesium;
@@ -4672,7 +4928,7 @@
         if (defined$2(properties)) {
             const cssColor = properties['point-color'];
             if (defined$2(cssColor)) {
-                color = Color$3.fromCssColorString(cssColor);
+                color = Color$4.fromCssColorString(cssColor);
             }
 
             size = defaultValue$1(sizes[properties['point-size']], size);
@@ -4716,7 +4972,7 @@
             let color;
             let stroke = properties.stroke;
             if (defined$2(stroke)) {
-                color = Color$3.fromCssColorString(stroke);
+                color = Color$4.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$2(opacity) && opacity !== 1.0) {
@@ -4770,7 +5026,7 @@
             let color;
             const stroke = properties.stroke;
             if (defined$2(stroke)) {
-                color = Color$3.fromCssColorString(stroke);
+                color = Color$4.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$2(opacity) && opacity !== 1.0) {
@@ -4787,7 +5043,7 @@
             let fillColor;
             const fill = properties.fill;
             if (defined$2(fill)) {
-                fillColor = Color$3.fromCssColorString(fill);
+                fillColor = Color$4.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -5032,21 +5288,21 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$3.ROYALBLUE;
+        static pointColor = Color$4.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$3.YELLOW;
+        static lineColor = Color$4.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$3.fromBytes(255, 255, 0, 100);
+        static fill = Color$4.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof ShapefileDataSource
@@ -5060,7 +5316,7 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$3.YELLOW;
+        static outlineColor = Color$4.YELLOW;
         /**
          * 线要素的宽度
          * @memberof ShapefileDataSource
@@ -5185,9 +5441,9 @@
 
     const {
         buildModuleUrl,
-        Color: Color$2,
+        Color: Color$3,
         defined: defined$1,
-        destroyObject: destroyObject$1,
+        destroyObject: destroyObject$2,
         knockout,
         getElement,
         subscribeAndEvaluate,
@@ -5288,7 +5544,7 @@
                             var style = window.getComputedStyle(firstElementChild);
                             if (style !== null) {
                                 var backgroundColor = style["background-color"];
-                                var color = Color$2.fromCssColorString(backgroundColor);
+                                var color = Color$3.fromCssColorString(backgroundColor);
                                 if (defined$1(color) && color.alpha !== 0) {
                                     background = style["background-color"];
                                 }
@@ -5327,12 +5583,12 @@
                 this._descriptionSubscription.dispose();
             }
         
-            return destroyObject$1(this);
+            return destroyObject$2(this);
         };
     }
 
     const {
-        Transforms,
+        Transforms: Transforms$1,
         Cartesian3: Cartesian3$2
     } = Cesium;
     class Model{
@@ -5340,6 +5596,7 @@
          * 创建一个gltf/glb模型
          * @param {Model.ModelOptions} optinos 模型参数
          * @example
+         *  // 1. 通过position设置模型位置
          *  const p = new CesiumPro.GeoPoint(110, 30, 10).toCartesian();
          *  const model = new CesiumPro.Model({
          *      url: '../data/models/Cesium_Air.glb',
@@ -5347,6 +5604,7 @@
          *      position: p
          *  })
          * viewer.addModel(model);
+         * // 2. 通过modelMatrix设置模型位置和姿态
          * const translation = Cesium.Transforms.eastNorthUpToFixedFrame(p);
          * const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2);
          * const modelMatrix = new Cesium.Matrix4();
@@ -5364,7 +5622,7 @@
          * viewer.addModel(model)
          */
         constructor(options = {}) {
-            if(!defined$4(options.modelMatrix)&&defined$4(options.position)) {
+            if(!defined$5(options.modelMatrix)&&defined$5(options.position)) {
                 let cartesian;
                 if(options.position instanceof Cartesian3$2) {
                     cartesian = options.position;
@@ -5372,12 +5630,12 @@
                     cartesian = options.position.toCartesian();
                 }
                 if(cartesian) {
-                    options.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
+                    options.modelMatrix = Transforms$1.eastNorthUpToFixedFrame(cartesian);
                 }
             }
-            if(defined$4(options.gltf)) {
+            if(defined$5(options.gltf)) {
                 this.delegate = new Cesium.Model(options);
-            } else if(defined$4(options.url)) {
+            } else if(defined$5(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
                 throw new CesiumProError('one of parameters url or gltf must be provided.')
@@ -5694,9 +5952,11 @@
         Cesium3DTilePassState,
         Cesium3DTilePass,
         defaultValue,
-        Color: Color$1,
+        Color: Color$2,
         BoundingRectangle,
-        Pass
+        Pass,
+        SunLight,
+        Cartesian3: Cartesian3$1
     } = Cesium;
     const preloadTilesetPassState = new Cesium3DTilePassState({
         pass: Cesium3DTilePass.PRELOAD,
@@ -5832,9 +6092,9 @@
         frameState.passes.postProcess = scene.postProcessStages.hasSelected;
         frameState.tilesetPassState = renderTilesetPassState;
 
-        var backgroundColor = defaultValue(scene.backgroundColor, Color$1.BLACK);
+        var backgroundColor = defaultValue(scene.backgroundColor, Color$2.BLACK);
         if (scene._hdr) {
-            backgroundColor = Color$1.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor = Color$2.clone(backgroundColor, scratchBackgroundColor);
             backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
             backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
             backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
@@ -5849,9 +6109,9 @@
         if (defined(shadowMap) && shadowMap.enabled) {
             if (!defined(scene.light) || scene.light instanceof SunLight) {
                 // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+                Cartesian3$1.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
             } else {
-                Cartesian3.clone(scene.light.direction, scene._shadowMapCamera.direction);
+                Cartesian3$1.clone(scene.light.direction, scene._shadowMapCamera.direction);
             }
             frameState.shadowMaps.push(shadowMap);
         }
@@ -5997,61 +6257,30 @@
 
     }
 
-    const {
-        AssociativeArray: AssociativeArray$2,
-        destroyObject,
-        CustomDataSource,
-        Event: Event$2
-    } = Cesium;
-    const defaultCreateGeometryFunction = function () { };
-    const ZEROLEVELHEIGHT = 31638318;
-    const cameraHeightForLevel = [ZEROLEVELHEIGHT];
-    for (let i = 1; i < 20; i++) {
-        cameraHeightForLevel.push(cameraHeightForLevel[i - 1] / 2);
-    }
-    function getLevelByHeight(height) {
-        let level = 0;
-        for (let levelHeight of cameraHeightForLevel) {
-            if (height > levelHeight) {
-                break;
-            }
-            level++;
-        }
-        return level;
-    }
     class MassiveGraphicLayer {
         /**
          * 一个以LOD方式加载大量点（model, billboard, point, label）数据的基础类。
          * 该图层的点数据会类似瓦片数据的方式加载，即只加载当前窗口范围内的数据，在按
          * 瓦片分割数据前还会对数据做聚类处理，以解决低层级时加载大量数据的低性能问题。
          * @private
-         * @param {Object} options 具有以下属性
-         * @param {Object} options.objects 定义点对象的属性
-         * @param {Function} [options.createGeometryFunction] 创建点要素的函数
-         * @param {Number} [options.maxClusterLevel = 16] 最大聚类层级， 层级大于maxClusterLevel时将不做聚类。
+         * @see MassivePointLayer
+         * @see MassiveBillboardLayer
+         * @see MassiveModelLayer
+         * @see MassiveEntityLayer
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$4(options.objects)) {
+            if (!defined$5(options.objects)) {
                 throw new CesiumProError('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
                 throw new CesiumProError('objects property must be an array')
             }
             //>>includeEnd('debug')
-            // if(!options.scene) {
-            //     throw new CesiumProError('property scene must be defined.')
-            // }
-            this._scene = options._scene;
-            this._id = defaultValue$3(options.id, createGuid$2());
-            this._removedValue = new AssociativeArray$2();
-            this._createGeometryFunction = options.createGeometryFunction;
-            this._data = options.objects;
-            this._needReclass = true;
-            this._changeEvent = new Event$2();
-            this._maxClusterLevel = defaultValue$3(options.maxClusterLevel, 12);
-            this._geometryCached = {};
-            this._objectsCached = {};
+            this._id = defaultValue$4(options.id, createGuid$2());
+            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._objects = undefined;
         }
         /**
          * 图层的唯一标识
@@ -6062,114 +6291,80 @@
             return this._id;
         }
         /**
+         * 最小加载层级，瓦片层级小于该值时将不加载任何数据
+         */
+        get minLoadLevel() {
+            return this._minLoadLevel;
+        }
+        set minLoadLevel(val) {
+            this._minLoadLevel = val;
+        }
+        /**
          * 创建点要素属性对象
          */
         get objects() {
             return this._objects;
         }
+        set objects(val) {
+            this._objects = val;
+        }
         /**
-         * 更新聚合状态，由于计算屏幕坐标代价较大，这里对每一层级的屏幕坐标只计算一次
+         * 更新聚合状态，由于计算屏幕坐标代价较大，这里对每一层级的屏幕坐标只计算一次，
          * 这可能会造成一些误差。
+         * @private
          * @param {Number} height 当前相机高度
-         * @returns 
+         * @returns {Boolean} 更新前后数据是否发生变化。
          */
         updateCluster(height) {
-            const level = getLevelByHeight(height);
-            const oldObjects = this._objects;
-            this._objects = this._data;
-            if (level > this._maxClusterLevel) {
-                this._objects = this._data;
-                this._needReclass = oldObjects !== this._objects;
-                return this._needReclass
-            }
-            if(this._objectsCached[level]) {
-                this._objects = this._objectsCached[level];
-                this._needReclass = oldObjects !== this._objects;
-                return this._needReclass;
-            }
-            if (this._cluster) {
-                this._cluster.update();
-                this._objects = this._cluster._clusterObjects;
-                this._objectsCached[level] = JSON.parse(JSON.stringify(this._objects));
-                this._needReclass = true;
-                return true;
-            }
+            CesiumProError.throwInstantiationError();
         }
         /**
-         * 在render前调用
+         * 所有要素创建前调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
          */
-        beginUpdate() {
+        beginUpdate(framestate) {
+            CesiumProError.throwInstantiationError();
         }
         /**
-         * render后调用
+         * 所有要素创建完成后调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
          */
-        endUpdate() {
-            this._needReclass = false;
+        endUpdate(framestate) {
+            CesiumProError.throwInstantiationError();
         }
         /**
          * 初始化图层
+         * @private
          * @param {Cesium.FrameState} framestate 
          * @param {Cesium.Scene} scene 
          */
         initialize(framestate, scene) {
-            if (!this._cluster) {
-                this._cluster = new Cluster(scene, {
-                    objects: [...this._data]
-                });
-                this.updateCluster();
-            }
-            if (!this._dataSource) {
-                this._scene = scene;
-                this._dataSource = new CustomDataSource('massive-layer' + createGuid$2());
-                this._scene.dataSources.add(this._dataSource);
-            }
+            CesiumProError.throwInstantiationError();
         }
         /**
-         * 创建当前瓦片范围内的点要素
-         * @param {Cesium.QuadtreeTile} tile 瓦片
-         * @param {*} framestate 
-         * @param {Object} object 描述点要素的属性
-         * @returns 
+         * 根据object创建点要素，一般不需要主动调用。
+         * @param {Cesium.QuadtreeTile} tile 该要素所在的瓦片
+         * @param {*} framestate framestate
+         * @param {Object} object 描述点要素的属性信息
+         * @returns {Object} 被创建的对象
          */
         createGeometry(tile, framestate, object) {
-            const createGeometry = defaultValue$3(this._createGeometryFunction, defaultCreateGeometryFunction);
-            const geometry = createGeometry(object);
-            const keys = Object.keys(object);
-            for (let key of keys) {
-                if (key === 'position' 
-                || key === 'id' 
-                || key === "cartesian" 
-                || key === "cartographic"
-                || key === "__pixel") {
-                    continue;
-                }
-                geometry[key] = object[key];
-
-            }
-            this.add(geometry);
-            return geometry;
+            CesiumProError.throwInstantiationError();
         }
         /**
-         * 删除点要素
+         * 删除点要素，一般不需要主动调用。
          * @param {Cesium.FrameState} framestate 
          * @param {Entity} object 要删除的点要素
-         * @returns 
+         * @returns {Boolean} 是否删除成功
          */
         removeGeometry(framestate, object) {
-            if (!object) {
-                return;
-            }
-            const removed = this._dataSource.entities.remove(object);
-            destroyObject(object);
-            return removed;
+            
         }
-        add(entity) {
-            if (this._dataSource && entity) {
-                this._dataSource.entities.add(entity);
-            }
-        }
+        /**
+         * 移除所有要素
+         */
         removeAll() {
-            this._dataSource.entities.removeAll();
+            CesiumProError.throwInstantiationError();
         }
         /**
          * 判断图层是否被销毁
@@ -6177,28 +6372,20 @@
         isDestroyed() {
             return false;
         }
-        /**
-         * 销毁图层
-         * @example
-         * if(!layer.isDestroyed()) {
-         *   layer.destroy()
-         * }
-         */
         destroy() {
-            this._dataSource.removeAll();
-            destroyObject(this);
+            CesiumProError.throwInstantiationError();
         }
     }
 
     const {
-        AssociativeArray: AssociativeArray$1 
+        AssociativeArray: AssociativeArray$2 
     } = Cesium;
     class MassiveGraphicLayerCollection{
         /**
-         * 管理Lod图层的集合。
+         * 基于四叉树和聚合的LOD图层的集合。
          */
         constructor() {
-            this._layers = new AssociativeArray$1();
+            this._layers = new AssociativeArray$2();
         }
         get layer() {
             return this._layers;
@@ -6246,8 +6433,11 @@
          */
         remove(layer) {
             if(layer instanceof MassiveGraphicLayer) {
+                layer.destroy();
                 return this._layers.remove(layer.id)
             } else if(typeof layer === 'string') {
+                const layerObject = this._layers.get(layer);
+                layerObject && layerObject.destroy();
                 return this._layers.remove(layer)
             }
             return false;
@@ -6261,10 +6451,10 @@
     }
 
     const {
-        GeographicTilingScheme: GeographicTilingScheme$1,
+        GeographicTilingScheme: GeographicTilingScheme$2,
         GlobeSurfaceTileProvider,
-        when: when$2,
-        Event: Event$1,
+        when: when$3,
+        Event: Event$4,
         GlobeSurfaceTile,
         TerrainState,
         RequestType,
@@ -6272,9 +6462,10 @@
         Rectangle: Rectangle$1,
         QuadtreeTileLoadState,
         Visibility,
-        AssociativeArray,
-        Cartesian3: Cartesian3$1,
-        Cartographic: Cartographic$1
+        AssociativeArray: AssociativeArray$1,
+        Cartesian3,
+        Cartographic: Cartographic$2,
+        getTimestamp
     } = Cesium;
 
     function requestGeometry(tile, framestate, terrainProvider) {
@@ -6310,9 +6501,9 @@
                 tile.level,
                 request
             );
-            if (defined$4(requestPromise)) {
+            if (defined$5(requestPromise)) {
                 surfaceTile.terrainState = TerrainState.RECEIVING;
-                when$2(requestPromise, success, failure);
+                when$3(requestPromise, success, failure);
             } else {
                 // Deferred - try again later.
                 surfaceTile.terrainState = TerrainState.UNLOADED;
@@ -6346,14 +6537,14 @@
         const terrainData = surfaceTile.terrainData;
         const meshPromise = terrainData.createMesh(createMeshOptions);
 
-        if (!defined$4(meshPromise)) {
+        if (!defined$5(meshPromise)) {
             // Postponed.
             return;
         }
 
         surfaceTile.terrainState = TerrainState.TRANSFORMING;
 
-        when$2(
+        when$3(
             meshPromise,
             function (mesh) {
                 surfaceTile.mesh = mesh;
@@ -6386,28 +6577,28 @@
     function getObjectByTile(objects, tile) {
         const tileObject = [];
         for (let object of objects) {
-            if (!defined$4(object)) {
+            if (!defined$5(object)) {
                 continue;
             }
-            if (!defined$4(object.id)) {
+            if (!defined$5(object.id)) {
                 object.id = createGuid$2();
             }
-            if (!(defined$4(object) && defined$4(object.position))) {
+            if (!(defined$5(object) && defined$5(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3$1) {
+            if (object.position instanceof Cartesian3) {
                 object.cartesian = object.position;
-            } else if (object.position instanceof Cartographic$1) {
-                object.cartesian = Cartographic$1.toCartesian(object.position);
+            } else if (object.position instanceof Cartographic$2) {
+                object.cartesian = Cartographic$2.toCartesian(object.position);
                 object.catographic = object.position;
-            } else if (object.position instanceof GeoPoint$1) {
+            } else if (object.position instanceof GeoPoint) {
                 object.cartesian = object.position.toCartesian();
                 object.cartographic = object.position.toCartoGraphic();
             } else {
                 object.cartesian = object.position;
             }
             if (!object.cartographic) {
-                object.cartographic = Cartographic$1.fromCartesian(object.cartesian);
+                object.cartographic = Cartographic$2.fromCartesian(object.cartesian);
             }
             if (Rectangle$1.contains(tile.rectangle, object.cartographic)) {
                 tileObject.push(object);
@@ -6422,9 +6613,9 @@
             this.mesh = undefined;
             this.terrainData = undefined;
             this.objects = undefined;
-            this._geometryOfTile = new AssociativeArray();
-            this._objectsOfTile = new AssociativeArray();
-            this._needRenderObjects = new AssociativeArray();
+            this._geometryOfTile = new AssociativeArray$1();
+            this._objectsOfTile = new AssociativeArray$1();
+            this._needRenderObjects = new AssociativeArray$1();
 
         }
         static processStateMachine(tile, frameState, terrainProvider, layers, quadtree) {
@@ -6438,7 +6629,7 @@
         }
         static initialize(tile, terrainProvider) {
             let surfaceTile = tile.data;
-            if (!defined$4(surfaceTile)) {
+            if (!defined$5(surfaceTile)) {
                 surfaceTile = tile.data = new QuadTile();
             }
 
@@ -6462,6 +6653,9 @@
                 return;
             }
             const geometry = layer.createGeometry(tile, framestate, object);
+            if (!geometry) {
+                continue;
+            }
             hasRenderCached[object.id] = true;
             list.push({ id: object.id, geometry });
         }
@@ -6482,25 +6676,27 @@
             // super(options)
             this._ready = true;
             this._scene = options.scene;
-            this._tilingSceheme = new GeographicTilingScheme$1();
-            this._readyPromise = when$2.defer();
+            this._tilingSceheme = new GeographicTilingScheme$2();
+            this._readyPromise = when$3.defer();
             this._readyPromise.resolve(true);
-            this._errorEvent = new Event$1();
+            this._errorEvent = new Event$4();
             this._terrainProvider = options.terrainProvider;
             this._show = true;
             this.cartographicLimitRectangle = Rectangle$1.clone(Rectangle$1.MAX_VALUE);
             this.tree = undefined;
             this._layers = new MassiveGraphicLayerCollection();
             this._lastTilesToRender = [];
-            this._hasRenderCached = new AssociativeArray();
+            this._hasRenderCached = new AssociativeArray$1();
             this._tilesCahced = [];
-            this._removeEventListener = this._scene.camera.changed.addEventListener(() => {
-                const layers = this._layers.values;
-                for (let layer of layers) {
-                    const needClear = layer.updateCluster(this._scene.camera.positionCartographic.height);
-                    needClear && (this.clearTile(layer.id), layer.removeAll());
-                }
-            });
+            // this._removeEventListener = this._scene.camera.changed.addEventListener(() => {
+            //     const layers = this._layers.values;
+            //     for (let layer of layers) {
+            //         const cluster = layer.updateCluster(this._scene.camera.positionCartographic.height);
+            //         cluster.then(needClear => {
+            //             needClear && (this.clearTile(layer.id), layer.removeAll());
+            //         })                
+            //     }
+            // })
         }
         get terrainProvider() {
             return this._terrainProvider;
@@ -6524,7 +6720,7 @@
             return this._quadtree;
         }
         set quadtree(val) {
-            if (defined$4(val)) {
+            if (defined$5(val)) {
                 this._quadtree = val;
             }
         }
@@ -6544,7 +6740,7 @@
         beginUpdate(framestate) {
             const layers = this._layers.values;
             for (let layer of layers) {
-                layer.beginUpdate();
+                layer.beginUpdate(framestate);
             }
             this._frameNumber++;
         }
@@ -6555,24 +6751,28 @@
          */
         showTileThisFrame(tile, framestate) {
             const surfaceData = tile.data;
-            if (!defined$4(surfaceData)) {
+            if (!defined$5(surfaceData)) {
                 return;
             }
             if (!this._tilesCahced.includes(tile)) {
                 this._tilesCahced.push(tile);
             }
             const layers = this._layers.values;
+            getTimestamp();
             for (let layer of layers) {
-                if (!(defined$4(layer.objects) && Array.isArray(layer.objects))) {
+                if (!(defined$5(layer.objects) && Array.isArray(layer.objects))) {
                     continue;
                 }
+                // if(getTimestamp() < time + loadQueueTimeSlice) {
+                //     break;
+                // }
                 const id = layer.id;
                 const geometryOfTile = surfaceData._geometryOfTile.get(id);
                 if (geometryOfTile && !layer._needReclass) {
                     return;
                 }
                 let tileObjects = surfaceData._objectsOfTile.get(id);
-                if (!defined$4(tileObjects) || layer._needReclass) {
+                if (!defined$5(tileObjects) || layer._needReclass) {
                     tileObjects = getObjectByTile(layer.objects, tile);
                     surfaceData._objectsOfTile.set(id, tileObjects);
                 }
@@ -6600,7 +6800,13 @@
                 }
             }
             for (let layer of layers) {
-                layer.endUpdate();
+                const needClear = layer.endUpdate(framestate);
+                if(needClear) {
+                    tilesToRender.forEach(tile => {
+                        const geoList = tile.data._geometryOfTile.get(layer.id) || [];
+                        removeGeometry(this, layer, tile, framestate, geoList);
+                    });
+                }
             }
             this._lastTilesToRender = [...tilesToRender];
         }
@@ -6635,7 +6841,7 @@
             return GlobeSurfaceTileProvider.prototype.canRefine.call(this, tile);
         }
         computeTileVisibility(tile, frameState, occluders) {
-            if (!defined$4(tile.data)) {
+            if (!defined$5(tile.data)) {
                 tile.data = new QuadTile();
             }
             return GlobeSurfaceTileProvider.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
@@ -6694,6 +6900,7 @@
         viewer.camera.flyToBoundingSphere(target, {
             duration: options.duration,
             maximumHeight: options.maximumHeight,
+            endTransform: options.endTransform,
             complete: function () {
                 viewer._zoomPromise.resolve(true);
             },
@@ -6738,10 +6945,10 @@
     let fpsCount = 0, msCount = 0;
     let fps = 'N/A', ms = 'N/A';
     function updateFps() {
-        if (!defined$4(lastFpsTime)) {
+        if (!defined$5(lastFpsTime)) {
             lastFpsTime = Cesium.getTimestamp();
         }
-        if (!defined$4(lastMsTime)) {
+        if (!defined$5(lastMsTime)) {
             lastMsTime = Cesium.getTimestamp();
         }
         fpsCount++;
@@ -6779,7 +6986,7 @@
         const icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(
             viewer.clock.currentTime
         );
-        if (defined$4(icrfToFixed)) {
+        if (defined$5(icrfToFixed)) {
             const camera = viewer.camera;
             const offset = Cesium.Cartesian3.clone(camera.position);
             const transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
@@ -6815,9 +7022,9 @@
         const {
             camera
         } = viewer;
-        const step1 = defaultValue$3(options.step1Duration, 3);
-        const step2 = defaultValue$3(options.step2Duration, 3);
-        const step3 = defaultValue$3(options.step3Duration, 3);
+        const step1 = defaultValue$4(options.step1Duration, 3);
+        const step2 = defaultValue$4(options.step2Duration, 3);
+        const step3 = defaultValue$4(options.step3Duration, 3);
 
         const cartographic = options.destination;
         // 第一步改变位置
@@ -7053,7 +7260,7 @@
         /**
          * 大数据图层集合
          * @readonly
-         * @type {MassiveGraphicLayerCollection}
+         * @type {MassiveEntityLayerCollection}
          */
         get massiveGraphicLayers() {
             return this.scene._LodGraphic.tileProvider._layers;
@@ -7079,13 +7286,13 @@
          * @type {Boolean}
          */
         get enableLighting() {
-            if (!defined$4(this.globe)) {
+            if (!defined$5(this.globe)) {
                 return;
             }
             return this.scene.globe.enableLighting
         }
         set enableLighting(val) {
-            if (!defined$4(this.globe)) {
+            if (!defined$5(this.globe)) {
                 return;
             }
             this.scene.globe.enableLighting = val;
@@ -7183,7 +7390,7 @@
             return this.terrainProvider;
         }
         set terrain(value) {
-            if (!defined$4(value) || value === false) {
+            if (!defined$5(value) || value === false) {
                 this.terrainProvider = new Cesium.EllipsoidTerrainProvider();
             }
             if (value !== this.terrainProvider) {
@@ -7284,7 +7491,12 @@
          */
         addModel(model) {
             this.primitives.add(model.delegate);
-        }
+        }    
+        /**
+         * 删除模型
+         * @param {Model} model 需要被删除的模型
+         * @returns {Boolean} 是否删除成功
+         */
         removeModel(model) {
             this.primitives.remove(model.delegate);
         }
@@ -7298,10 +7510,10 @@
         setView(target) {
             let geopoint;
             if (target instanceof Cesium.Cartographic) {
-                geopoint = GeoPoint$1.fromCartographic(target);
+                geopoint = GeoPoint.fromCartographic(target);
             } else if (target instanceof Cesium.Cartesian3) {
-                geopoint = GeoPoint$1.fromCartesian(target);
-            } else if (target instanceof GeoPoint$1) {
+                geopoint = GeoPoint.fromCartesian(target);
+            } else if (target instanceof GeoPoint) {
                 geopoint = target;
             } else {
                 //>>includeStart('debug', pragmas.debug);
@@ -7326,10 +7538,10 @@
         stepFlyTo(options = {}) {
             let destination;
             if (options.destination instanceof Cesium.Cartesian3) {
-                destination = GeoPoint$1.fromCartesian(options.destination);
+                destination = GeoPoint.fromCartesian(options.destination);
             } else if (options.destination instanceof Cesium.Cartographic) {
-                destination = GeoPoint$1.fromCartographic(options.destination);
-            } else if (options.destination instanceof GeoPoint$1) {
+                destination = GeoPoint.fromCartographic(options.destination);
+            } else if (options.destination instanceof GeoPoint) {
                 destination = options.destination;
             } else {
                 //>>includeStart('debug', pragmas.debug);
@@ -7353,7 +7565,7 @@
          * cancelLink();
          */
         linkView(viewer) {
-            if (!defined$4(viewer)) {
+            if (!defined$5(viewer)) {
                 throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
@@ -7369,13 +7581,13 @@
          * @returns {Promise<Boolean>}
          */
         flyTo(target, options = {}) {
-            if (target instanceof GeoPoint$1) {
+            if (target instanceof GeoPoint) {
                 const catresian = target.toCartesian();
                 return this.flyTo(catresian, options)
             }
             if (target instanceof Cesium.Cartesian3) {
                 const zoomPromise = viewer._zoomPromise = Cesium.when.defer();
-                const radius = defaultValue$3(options.radius, 1000);
+                const radius = defaultValue$4(options.radius, 1000);
                 delete options.radius;
                 const boundingSphere = new Cesium.BoundingSphere(target, radius);
                 flyTo(this, boundingSphere, options);
@@ -7407,18 +7619,18 @@
                 target = point;
             } else if (point instanceof Cesium.Cartographic) {
                 target = Cesium.Cartographic.toCartesian(point);
-            } else if (point instanceof GeoPoint$1) {
+            } else if (point instanceof GeoPoint) {
                 target = point.toCartesian();
             } else {
                 //>>includeStart('debug', pragmas.debug);
                 throw new CesiumProError('point不是一个有效值。')
             }
-            const multiplier = defaultValue$3(options.multiplier, 1);
-            const offset = defaultValue$3(options.offset, {});
+            const multiplier = defaultValue$4(options.multiplier, 1);
+            const offset = defaultValue$4(options.offset, {});
             function rotate() {
-                const heading = Cesium.Math.toRadians(defaultValue$3(offset.heading, viewer.heading) + 1 * multiplier);
-                const pitch = Cesium.Math.toRadians(defaultValue$3(offset.pitch, -20));
-                const range = defaultValue$3(offset.range, 10000);
+                const heading = Cesium.Math.toRadians(defaultValue$4(offset.heading, viewer.heading) + 1 * multiplier);
+                const pitch = Cesium.Math.toRadians(defaultValue$4(offset.pitch, -20));
+                const range = defaultValue$4(offset.range, 10000);
                 viewer.flyTo(target, {
                     duration: 0,
                     offset: new Cesium.HeadingPitchRange(heading, pitch, range)
@@ -7575,8 +7787,8 @@
          * @see {@link http://lbsyun.baidu.com/custom/list.htm|百度个性化地图列表}
          */
         constructor(options) {
-            options = defaultValue$3(options, {});
-            options.url = defaultValue$3(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
+            options = defaultValue$4(options, {});
+            options.url = defaultValue$4(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
             if (options.customid) {
                 options.url = `https://api.map.baidu.com/customimage/tile?customid=${options.customid}`;
             }
@@ -7618,8 +7830,8 @@
          */
         constructor(options = {}) {
             options.url = 'https://dev.virtualearth.net';
-            options.mapStyle = defaultValue$3(options.mapStyle, BingLayer.mapStyle.AERIAL);
-            options.key = defaultValue$3(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
+            options.mapStyle = defaultValue$4(options.mapStyle, BingLayer.mapStyle.AERIAL);
+            options.key = defaultValue$4(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
             super(options);
         }
         /**
@@ -7794,14 +8006,14 @@
          *
          */
         constructor(options) {
-            options = defaultValue$3(options, {});
+            options = defaultValue$4(options, {});
 
-            const layer = defaultValue$3(options.layer, 'img');
+            const layer = defaultValue$4(options.layer, 'img');
             const {
                 scl,
                 style
             } = GaoDeLayer.getParametersByLayer(layer);
-            const lang = defaultValue$3(options.lang, 'zh_cn');
+            const lang = defaultValue$4(options.lang, 'zh_cn');
             options.url = `https://webst0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=${lang}&size=1&scl=${scl}&style=${style}`;
             options.subdomains = '1234';
             super(options);
@@ -7876,21 +8088,21 @@
                 rectangle: Cesium.Rectangle.MAX_VALUE,
                 intervalOfZeorLevel: options.intervalOfZeorLevel
             });
-            this._hasAlphaChannel = defaultValue$3(options.hasAlphaChannel, true);
+            this._hasAlphaChannel = defaultValue$4(options.hasAlphaChannel, true);
             this._tilingScheme = tilingScheme;
             this._image = undefined;
             this._texture = undefined;
 
-            this._errorEvent = new Event$4();
+            this._errorEvent = new Event$6();
 
             this._ready = true;
             this._readyPromise = Cesium.when.defer();
             this._readyPromise.resolve(true);
 
-            this._font = defaultValue$3(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$3(options.color, 'white');
-            this._borderColor = defaultValue$3(options.borderColor, 'gold');
-            this._borderWidth = defaultValue$3(options.borderWidth, 2);
+            this._font = defaultValue$4(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$4(options.color, 'white');
+            this._borderColor = defaultValue$4(options.borderColor, 'gold');
+            this._borderWidth = defaultValue$4(options.borderWidth, 2);
             this.canvas = document.createElement('canvas');
             this.ctx = this.canvas.getContext('2d');
             this.canvas.width = 256;
@@ -8270,24 +8482,24 @@
        *
        */
       constructor(options) {
-        options = defaultValue$3(options, {});
+        options = defaultValue$4(options, {});
         const key = options.key;
         if (!key) {
           console.warn('未定义key，地图服务将不可用');
           console.warn('请前往http://lbs.tianditu.gov.cn/server/MapService.html获取地图key');
         }
-        const tilingScheme = defaultValue$3(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
+        const tilingScheme = defaultValue$4(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
         let crs = 'w',
           tileMatrixSet = 'w',
           tileMatrixLabels = options.tileMatrixLabels;
         if (tilingScheme instanceof Cesium.GeographicTilingScheme) {
           crs = 'c';
           tileMatrixSet = 'c';
-          if (!defined$4(tileMatrixLabels)) {
+          if (!defined$5(tileMatrixLabels)) {
             tileMatrixLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
           }
         }
-        const layer = defaultValue$3(options.layer, 'img');
+        const layer = defaultValue$4(options.layer, 'img');
         const url = `http://t{s}.tianditu.com/${layer}_${crs}/wmts?service=wmts&tileMatrixSet=${tileMatrixSet}&request=GetTile&version=1.0.0&LAYER=${layer}&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${key}`;
         return new Cesium.WebMapTileServiceImageryProvider({
           url,
@@ -8367,7 +8579,7 @@
          * @extends XYZLayer
          */
         constructor(options = {}) {
-            options.layer = defaultValue$3(options.layer, 'img');
+            options.layer = defaultValue$4(options.layer, 'img');
             options.subdomains = '123';
             options.url = layerMap[options.layer];
             options.customTags = {
@@ -8404,20 +8616,20 @@
          * @param {Cesium.TilingScheme} [options.tilingScheme = proj.get('EPSG:4326')] 瓦片分割坐标系
          */
         constructor(options = {}) {
-            options.tileWidth = defaultValue$3(options.tileWidth, 256);
-            options.tileHeight = defaultValue$3(options.tileHeight, 256);
-            this._tilingScheme = defined$4(options.tilingScheme)
+            options.tileWidth = defaultValue$4(options.tileWidth, 256);
+            options.tileHeight = defaultValue$4(options.tileHeight, 256);
+            this._tilingScheme = defined$5(options.tilingScheme)
                 ? options.tilingScheme
                 : proj.get('EPSG:4326', { ellipsoid: options.ellipsoid });
-            this._errorEvent = new Event$4();
-            this._tileWidth = defaultValue$3(options.tileWidth, 256);
-            this._tileHeight = defaultValue$3(options.tileHeight, 256);
+            this._errorEvent = new Event$6();
+            this._tileWidth = defaultValue$4(options.tileWidth, 256);
+            this._tileHeight = defaultValue$4(options.tileHeight, 256);
             this._readyPromise = Cesium.when.resolve(true);
 
-            this._font = defaultValue$3(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$3(options.color, new Cesium.Color(1,1,1,1));
-            this._borderColor = defaultValue$3(options.borderColor, Cesium.Color.GOLD);
-            this._borderWidth = defaultValue$3(options.borderWidth, 2);    
+            this._font = defaultValue$4(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$4(options.color, new Cesium.Color(1,1,1,1));
+            this._borderColor = defaultValue$4(options.borderColor, Cesium.Color.GOLD);
+            this._borderWidth = defaultValue$4(options.borderWidth, 2);    
         }
         /**
          * 表示图层是否已准备完成。
@@ -8557,7 +8769,7 @@
     }
 
     const {
-        when: when$1,
+        when: when$2,
         Rectangle
     } = Cesium;
     class TileLayer {
@@ -8581,16 +8793,16 @@
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            this._errorEvent = new Event$4();
+            this._errorEvent = new Event$6();
             this._tilingScheme = proj.get('EPSG:4326');
-            this._readyPromise = when$1.defer();
+            this._readyPromise = when$2.defer();
             this._ready = false;
             this._ready = true;
-            this._minimumLevel = defaultValue$3(options.minimumLevel, 0);
+            this._minimumLevel = defaultValue$4(options.minimumLevel, 0);
             this._maximumLevel = options.maximumLevel;
-            this._tileWidth = defaultValue$3(options.tileWidth, 256);
-            this._tileHeight = defaultValue$3(options.tileHeight, 256);
-            this._rectangle = defaultValue$3(options.rectangle, Rectangle.MAX_VALUE);
+            this._tileWidth = defaultValue$4(options.tileWidth, 256);
+            this._tileHeight = defaultValue$4(options.tileHeight, 256);
+            this._rectangle = defaultValue$4(options.rectangle, Rectangle.MAX_VALUE);
             this._readyPromise.resolve(true);
             this._errorEvent.addEventListener((x, y, z) => {
                 // 主要是为了不让TileProviderError.handleError打印错误
@@ -8889,10 +9101,10 @@
             this._url = options.url;
             this._typeName = options.typeName;
             this._style = options.style;
-            if (!defined$4(this._url)) {
+            if (!defined$5(this._url)) {
                 throw new CesiumProError('parameter url must be provided.')
             }
-            if (!defined$4(this._typeName)) {
+            if (!defined$5(this._typeName)) {
                 throw new CesiumProError('parameter typeName must be provided.')
             }
             const resource = new Resource({
@@ -8962,10 +9174,10 @@
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            if (!defined$4(options.parameters)) {
+            if (!defined$5(options.parameters)) {
                 options.parameters = WMSLayer.DefaultParameters;
             }
-            if (!defined$4(options.GetFeatureInfoDefaultParameters)) ;
+            if (!defined$5(options.GetFeatureInfoDefaultParameters)) ;
             super(options);
         }
         /**
@@ -9093,6 +9305,607 @@
     WMSLayer.GetFeatureInfoDefaultParameters = Cesium.WebMapServiceImageryProvider.GetFeatureInfoDefaultParameters;
 
     const {
+        AssociativeArray,
+        destroyObject: destroyObject$1,
+        CustomDataSource,
+        Event: Event$3
+    } = Cesium;
+    const defaultCreateGeometryFunction$1 = function () { };
+    const ZEROLEVELHEIGHT$1 = 31638318;
+    const cameraHeightForLevel$1 = [ZEROLEVELHEIGHT$1];
+    for (let i = 1; i < 20; i++) {
+        cameraHeightForLevel$1.push(cameraHeightForLevel$1[i - 1] / 2);
+    }
+    function getLevelByHeight$1(height) {
+        let level = 0;
+        for (let levelHeight of cameraHeightForLevel$1) {
+            if (height > levelHeight) {
+                break;
+            }
+            level++;
+        }
+        return level;
+    }
+    class MassiveEntityLayer extends MassiveGraphicLayer{
+        /**
+         * 一个以LOD方式加载大量点（model, billboard, point, label）数据的基础类。
+         * 该图层的点数据会类似瓦片数据的方式加载，即只加载当前窗口范围内的数据，在按
+         * 瓦片分割数据前还会对数据做聚类处理，以解决低层级时加载大量数据的低性能问题。
+         * <p>
+         * 但是，不得不说这是一个半成品，我的本意是想写一个加载大量点（point, level, billboard, model)
+         * 数据的图层，该图层基于四叉树进行分层分片，按需创建点要素，但仅仅这样，图层在各个层级的细节
+         * 相同，当相机非常高时，瓦片的范围特别大，每个瓦片内包含大量的点数据，这会造成严重的性能问题，
+         * 因此我想通过聚合来解决这个问题，但是发现Cesium的聚类算法性能非常差，最终不得不放弃了这一
+         * 优化思路，但是，如果你有需要，仍然可以使用聚合来解决低层级时的性能问题。
+         * </p>
+         * @param {Object} options 具有以下属性
+         * @param {Object} options.objects 定义点对象的属性
+         * @param {Function} [options.createGeometryFunction] 创建点要素的函数
+         * @param {Number} [options.minLoadLevel = 12] 最小加载层级， 瓦片层级小于minLoadLevel将不加载任何数据
+         * 
+         * @see MassivePointLayer
+         * @see MassiveBillboardLayer
+         * @see MassiveModelLayer
+         */
+        constructor(options = {}) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$5(options.objects)) {
+                throw new CesiumProError('objects property must be provided.')
+            }
+            if (!Array.isArray(options.objects)) {
+                throw new CesiumProError('objects property must be an array')
+            }
+            //>>includeEnd('debug')
+            // if(!options.scene) {
+            //     throw new CesiumProError('property scene must be defined.')
+            // }
+            super(options);
+            this._id = defaultValue$4(options.id, createGuid$2());
+            this._createGeometryFunction = options.createGeometryFunction;
+            this._data = options.objects;
+            this._needReclass = true;
+            this._changeEvent = new Event$3();
+            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._geometryCached = {};
+            this._objectsCached = {};
+        }
+        /**
+         * 图层的唯一标识
+         * @type {String}
+         * @readonly
+         */
+        get id() {
+            return this._id;
+        }
+        /**
+         * 包含所有点要素的数据源
+         * @type {Cesium.CustomDataSource}
+         * @readonly
+         */
+        get dataSource() {
+            return this._dataSource;
+        }
+        /**
+         * 最小加载层级，瓦片层级小于该值时将不加载任何数据
+         */
+        get minLoadLevel() {
+            return this._minLoadLevel;
+        }
+        set minLoadLevel(val) {
+            this._minLoadLevel = val;
+        }
+        /**
+         * 创建点要素属性对象
+         */
+        get objects() {
+            return this._objects || this._data;
+        }
+        set objects(val) {
+            this._objects = val;
+        }
+        /**
+         * 更新聚合状态，由于计算屏幕坐标代价较大，这里对每一层级的屏幕坐标只计算一次，
+         * 这可能会造成一些误差。
+         * @private
+         * @param {Number} height 当前相机高度
+         * @returns {Boolean} 更新前后数据是否发生变化。
+         */
+        updateCluster(height) {
+            const level = getLevelByHeight$1(height);
+            const oldObjects = this._objects;
+            if (level > this._maxClusterLevel) {
+                this._objects = this._data;
+                this._needReclass = oldObjects !== this._objects;
+                return Promise.resolve(this._needReclass)
+            }
+            if (this._objectsCached[level]) {
+                this._objects = this._objectsCached[level];
+                this._needReclass = oldObjects !== this._objects;
+                return Promise.resolve(this._needReclass)
+            }
+            if (this._cluster) {
+                return new Promise((resolve, reject) => {
+                    this._cluster.update();
+                    this._objects = this._cluster._clusterObjects;
+                    this._objectsCached[level] = JSON.parse(JSON.stringify(this._objects));
+                    this._needReclass = true;
+                    resolve(true);
+                });
+            }
+        }
+        /**
+         * 所有要素创建前调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
+         */
+        beginUpdate(framestate) {
+            const height = framestate.camera.positionCartographic.height;
+            const level = getLevelByHeight$1(height);
+            if(level < this._minLoadLevel) {
+                this._objects = [];
+            } else {
+                this._objects = this._data;
+            }
+        }
+        /**
+         * 所有要素创建完成后调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
+         */
+        endUpdate(framestate) {
+            const height = framestate.camera.positionCartographic.height;
+            const level = getLevelByHeight$1(height);
+            this._needReclass = false;
+            return level < this._minLoadLevel;
+        }
+        /**
+         * 初始化图层
+         * @private
+         * @param {Cesium.FrameState} framestate 
+         * @param {Cesium.Scene} scene 
+         */
+        initialize(framestate, scene) {
+            // if (!this._cluster) {
+            //     this._cluster = new Cluster(scene, {
+            //         objects: [...this._data]
+            //     })
+            //     this.updateCluster()
+            // }
+            if (!this._dataSource) {
+                this._scene = scene;
+                this._dataSource = new CustomDataSource('massive-layer' + createGuid$2());
+                this._scene.dataSources.add(this._dataSource);
+
+                // 太耗费性能
+                // ds.then((dataSource) => {
+                //     var pixelRange = 150;
+                //     var minimumClusterSize = 3;
+                //     var enabled = true;
+
+                //     dataSource.clustering.enabled = enabled;
+                //     dataSource.clustering.pixelRange = pixelRange;
+                //     dataSource.clustering.minimumClusterSize = minimumClusterSize;
+
+                //     var removeListener;
+
+                //     var pinBuilder = new Cesium.PinBuilder();
+                //     var pin50 = pinBuilder
+                //         .fromText("50+", Cesium.Color.RED, 48)
+                //         .toDataURL();
+                //     var pin40 = pinBuilder
+                //         .fromText("40+", Cesium.Color.ORANGE, 48)
+                //         .toDataURL();
+                //     var pin30 = pinBuilder
+                //         .fromText("30+", Cesium.Color.YELLOW, 48)
+                //         .toDataURL();
+                //     var pin20 = pinBuilder
+                //         .fromText("20+", Cesium.Color.GREEN, 48)
+                //         .toDataURL();
+                //     var pin10 = pinBuilder
+                //         .fromText("10+", Cesium.Color.BLUE, 48)
+                //         .toDataURL();
+
+                //     var singleDigitPins = new Array(8);
+                //     for (var i = 0; i < singleDigitPins.length; ++i) {
+                //         singleDigitPins[i] = pinBuilder
+                //             .fromText("" + (i + 2), Cesium.Color.VIOLET, 48)
+                //             .toDataURL();
+                //     }
+
+                //     function customStyle() {
+                //         if (Cesium.defined(removeListener)) {
+                //             removeListener();
+                //             removeListener = undefined;
+                //         } else {
+                //             removeListener = dataSource.clustering.clusterEvent.addEventListener(
+                //                 function (clusteredEntities, cluster) {
+                //                     cluster.label.show = false;
+                //                     cluster.billboard.show = true;
+                //                     cluster.billboard.id = cluster.label.id;
+                //                     cluster.billboard.verticalOrigin =
+                //                         Cesium.VerticalOrigin.BOTTOM;
+
+                //                     if (clusteredEntities.length >= 50) {
+                //                         cluster.billboard.image = pin50;
+                //                     } else if (clusteredEntities.length >= 40) {
+                //                         cluster.billboard.image = pin40;
+                //                     } else if (clusteredEntities.length >= 30) {
+                //                         cluster.billboard.image = pin30;
+                //                     } else if (clusteredEntities.length >= 20) {
+                //                         cluster.billboard.image = pin20;
+                //                     } else if (clusteredEntities.length >= 10) {
+                //                         cluster.billboard.image = pin10;
+                //                     } else {
+                //                         cluster.billboard.image =
+                //                             singleDigitPins[clusteredEntities.length - 2];
+                //                     }
+                //                 }
+                //             );
+                //         }
+
+                //         // force a re-cluster with the new styling
+                //         var pixelRange = dataSource.clustering.pixelRange;
+                //         dataSource.clustering.pixelRange = 0;
+                //         dataSource.clustering.pixelRange = pixelRange;
+                //     }
+                //     customStyle()
+                // })
+            }
+        }
+        /**
+         * 根据object创建点要素，一般不需要主动调用。
+         * @param {Cesium.QuadtreeTile} tile 该要素所在的瓦片
+         * @param {*} framestate framestate
+         * @param {Object} object 描述点要素的属性信息
+         * @returns {Object} 被创建的对象
+         */
+        createGeometry(tile, framestate, object) {
+            if(tile.level < this._minLoadLevel) {
+                return;
+            }
+            const createGeometry = defaultValue$4(this._createGeometryFunction, defaultCreateGeometryFunction$1);
+            const geometry = createGeometry(object);
+            const keys = Object.keys(object);
+            for (let key of keys) {
+                if (key === 'position'
+                    || key === 'id'
+                    || key === "cartesian"
+                    || key === "cartographic"
+                    || key === "label"
+                    || key === 'billboard'
+                    || key === "__pixel") {
+                    continue;
+                }
+                geometry[key] = object[key];
+
+            }
+            this.add(geometry);
+            return geometry;
+        }
+        /**
+         * 删除点要素，一般不需要主动调用。
+         * @param {Cesium.FrameState} framestate 
+         * @param {Entity} object 要删除的点要素
+         * @returns {Boolean} 是否删除成功
+         */
+        removeGeometry(framestate, object) {
+            if (!object) {
+                return;
+            }
+            const removed = this._dataSource.entities.remove(object);
+            destroyObject$1(object);
+            return removed;
+        }
+        add(entity) {
+            if (this._dataSource && entity) {
+                this._dataSource.entities.add(entity);
+            }
+        }
+        /**
+         * 移除所有要素
+         */
+        removeAll() {
+            this._dataSource.entities.removeAll();
+        }
+        /**
+         * 判断图层是否被销毁
+         */
+        isDestroyed() {
+            return false;
+        }
+        /**
+         * 销毁图层
+         * @example
+         * if(!layer.isDestroyed()) {
+         *   layer.destroy()
+         * }
+         */
+        destroy() {
+            this._dataSource.removeAll();
+            destroyObject$1(this);
+        }
+    }
+
+    const {
+        QuadtreeTileProvider: QuadtreeTileProvider$1,
+        GeographicTilingScheme: GeographicTilingScheme$1,
+        when: when$1,
+        Event: Event$2,
+        Cartographic: Cartographic$1,
+        Color: Color$1,
+        Entity: Entity$1
+    } = Cesium;
+    function defaultCreateFn$1(options) {
+        return function (object) {
+            const entityOptions = {
+                id: object.id,
+                position: object.position,
+                point: {
+                    pixelSize: defaultValue$4(object.pixelSize, options.pixelSize),
+                    color: defaultValue$4(object.color, options.color)
+                }
+            };
+            if (object.label) {
+                entityOptions.label = {
+                    text: object.label
+                };
+            }
+            return new Entity$1(entityOptions)
+        }
+
+    }
+    class MassiveBillboardLayer extends MassiveEntityLayer {
+        /**
+         
+         * @extends MassiveEntityLayer
+         * @param {MassiveBillboardLayer.Options} options 选项
+         */
+        constructor(options = {}) {
+            options.objects = defaultValue$4(options.objects, []);
+            options.pixelSize = defaultValue$4(options.pixelSize, 5);
+            options.color = defaultValue$4(options.color, Color$1.fromRandom);
+            options.createGeometryFunction = defaultValue$4(options.createGeometryFunction, defaultCreateFn$1(options));
+            super(options);
+        }
+    }
+
+    const {
+        destroyObject,
+        Event: Event$1,
+        Transforms
+    } = Cesium;
+    const defaultCreateGeometryFunction = function (object, options) {
+        const modelOption = {};
+        if(object.modelMatrix) {
+            modelOption.modelMatrix = object.modelMatrix;
+        } else if(object.position) {
+            let cartesian = object.position;
+            if(object.position instanceof GeoPoint) {
+                cartesian = object.position.toCartesian();
+            }
+            if(!cartesian) {
+                return;
+            }
+            modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
+            object.modelMatrix = modelOption.modelMatrix;
+        }
+        modelOption.minimumPixelSize = defaultValue$4(object.minimumPixelSize, options.minimumPixelSize);
+        modelOption.maximumScale = defaultValue$4(object.maximumScale, options.maximumScale);
+        modelOption.scale  = defaultValue$4(object.scale, options.scale);
+        modelOption.allowPicking = defaultValue$4(object.allowPicking, options.allowPicking);
+        modelOption.shadows = defaultValue$4(object.shadows, options.shadows);
+        modelOption.id = object._id;
+        modelOption.url = defaultValue$4(object.url, options.url);
+        return Cesium.Model.fromGltf(modelOption)
+    };
+    const ZEROLEVELHEIGHT = 31638318;
+    const cameraHeightForLevel = [ZEROLEVELHEIGHT];
+    for (let i = 1; i < 20; i++) {
+        cameraHeightForLevel.push(cameraHeightForLevel[i - 1] / 2);
+    }
+    function getLevelByHeight(height) {
+        let level = 0;
+        for (let levelHeight of cameraHeightForLevel) {
+            if (height > levelHeight) {
+                break;
+            }
+            level++;
+        }
+        return level;
+    }
+    class MassiveModelLayer extends MassiveGraphicLayer{
+        /**
+         * 海量模型(gltf/glb）加载。该图层会基于四叉树对数据进行分块，搂需加载，以优化性能。
+         * @param {Object} options 具有以下属性
+         * @param {Object} options.objects 定义点对象的属性
+         * @param {Function} [options.createGeometryFunction] 创建点要素的函数
+         * @param {Number} [options.minLoadLevel = 12] 最小加载层级， 瓦片层级小于minLoadLevel将不加载任何数据
+         * 
+         * @see MassivePointLayer
+         * @see MassiveBillboardLayer
+         */
+        constructor(options = {}) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$5(options.objects)) {
+                throw new CesiumProError('objects property must be provided.')
+            }
+            if (!Array.isArray(options.objects)) {
+                throw new CesiumProError('objects property must be an array')
+            }
+            //>>includeEnd('debug')
+            // if(!options.scene) {
+            //     throw new CesiumProError('property scene must be defined.')
+            // }
+            // 作为要素的唯一标识必须是字符串, Model的id是对象
+            options.objects.forEach(_ => {
+                _._id = _.id;
+                delete _.id;
+            });
+            super(options);
+            this._id = defaultValue$4(options.id, createGuid$2());
+            this._createGeometryFunction = options.createGeometryFunction;
+            this._data = options.objects;
+            this._needReclass = true;
+            this._changeEvent = new Event$1();
+            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._geometryCached = {};
+            this._objectsCached = {};
+            this._options = options;
+        }
+        /**
+         * 图层的唯一标识
+         * @type {String}
+         * @readonly
+         */
+        get id() {
+            return this._id;
+        }
+        /**
+         * 最小加载层级，瓦片层级小于该值时将不加载任何数据
+         */
+        get minLoadLevel() {
+            return this._minLoadLevel;
+        }
+        set minLoadLevel(val) {
+            this._minLoadLevel = val;
+        }
+        /**
+         * 创建点要素属性对象
+         */
+        get objects() {
+            return this._objects || this._data;
+        }
+        set objects(val) {
+            this._objects = val;
+        }
+        /**
+         * 更新聚合状态，由于计算屏幕坐标代价较大，这里对每一层级的屏幕坐标只计算一次，
+         * 这可能会造成一些误差。
+         * @private
+         * @param {Number} height 当前相机高度
+         * @returns {Boolean} 更新前后数据是否发生变化。
+         */
+        updateCluster(height) {
+            const level = getLevelByHeight(height);
+            const oldObjects = this._objects;
+            if (level > this._maxClusterLevel) {
+                this._objects = this._data;
+                this._needReclass = oldObjects !== this._objects;
+                return Promise.resolve(this._needReclass)
+            }
+            if (this._objectsCached[level]) {
+                this._objects = this._objectsCached[level];
+                this._needReclass = oldObjects !== this._objects;
+                return Promise.resolve(this._needReclass)
+            }
+            if (this._cluster) {
+                return new Promise((resolve, reject) => {
+                    this._cluster.update();
+                    this._objects = this._cluster._clusterObjects;
+                    this._objectsCached[level] = JSON.parse(JSON.stringify(this._objects));
+                    this._needReclass = true;
+                    resolve(true);
+                });
+            }
+        }
+        /**
+         * 所有要素创建前调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
+         */
+        beginUpdate(framestate) {
+            const height = framestate.camera.positionCartographic.height;
+            const level = getLevelByHeight(height);
+            if(level < this._minLoadLevel) {
+                this._objects = [];
+            } else {
+                this._objects = this._data;
+            }
+        }
+        /**
+         * 所有要素创建完成后调用，一般不需要主动调用，每帧会自动调用一次
+         * @param {Cesium.FrameState} framestate framestate
+         */
+        endUpdate(framestate) {
+            const height = framestate.camera.positionCartographic.height;
+            const level = getLevelByHeight(height);
+            this._needReclass = false;
+            return level < this._minLoadLevel;
+        }
+        /**
+         * 初始化图层
+         * @private
+         * @param {Cesium.FrameState} framestate 
+         * @param {Cesium.Scene} scene 
+         */
+        initialize(framestate, scene) {
+            if (!this._collection) {
+                this._scene = scene;
+                const collection = new Cesium.PrimitiveCollection();
+                scene.primitives.add(collection);
+                this._collection = collection;
+            }
+        }
+        /**
+         * 根据object创建点要素，一般不需要主动调用。
+         * @param {Cesium.QuadtreeTile} tile 该要素所在的瓦片
+         * @param {*} framestate framestate
+         * @param {Object} object 描述点要素的属性信息
+         * @returns {Object} 被创建的对象
+         */
+        createGeometry(tile, framestate, object) {
+            if(tile.level < this._minLoadLevel) {
+                return;
+            }
+            const createGeometry = defaultValue$4(this._createGeometryFunction, defaultCreateGeometryFunction);
+            const geometry = createGeometry(object, this._options);
+            this.add(geometry);
+            return geometry;
+        }
+        /**
+         * 删除点要素，一般不需要主动调用。
+         * @param {Cesium.FrameState} framestate 
+         * @param {Entity} object 要删除的点要素
+         * @returns {Boolean} 是否删除成功
+         */
+        removeGeometry(framestate, object) {
+            if (!object) {
+                return;
+            }
+            const removed = this._collection.remove(object);
+            // destroyObject(object);
+            return removed;
+        }
+        add(primitive) {
+            if (this._collection && primitive) {
+                this._collection.add(primitive);
+            }
+        }
+        /**
+         * 移除所有要素
+         */
+        removeAll() {
+            this._collection.removeAll();
+        }
+        /**
+         * 判断图层是否被销毁
+         */
+        isDestroyed() {
+            return false;
+        }
+        /**
+         * 销毁图层
+         * @example
+         * if(!layer.isDestroyed()) {
+         *   layer.destroy()
+         * }
+         */
+        destroy() {
+            this._collection.removeAll();
+            destroyObject(this);
+        }
+    }
+
+    const {
         QuadtreeTileProvider,
         GeographicTilingScheme,
         when,
@@ -9101,27 +9914,36 @@
         Color,
         Entity
     } = Cesium;
+    function defaultCreateFn(options) {
+        return function (object) {
+            const entityOptions = {
+                id: object.id,
+                position: object.position,
+                point: {
+                    pixelSize: defaultValue$4(object.pixelSize, options.pixelSize),
+                    color: defaultValue$4(object.color, options.color)
+                }
+            };
+            if (object.label) {
+                entityOptions.label = {
+                    text: object.label
+                };
+            }
+            return new Entity(entityOptions)
+        }
 
-    class MassivePointLayer extends MassiveGraphicLayer {
+    }
+    class MassivePointLayer extends MassiveEntityLayer {
         /**
-         * 
-         * @extends MassiveGraphicLayer
-         * @param {*} options 
+         * 创建大量点要素（Entity)
+         * @extends MassiveEntityLayer
+         * @param {MassivePointLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$3(options.objects, []);
-            options.pixelSize = defaultValue$3(options.pixelSize, 5);
-            options.color = defaultValue$3(options.color, Color.fromRandom);
-            options.createGeometryFunction = function (object) {
-                return new Entity({
-                    id: object.id,
-                    position: object.position,
-                    point: {
-                        pixelSize: defaultValue$3(object.pixelSize, options.pixelSize),
-                        color: defaultValue$3(object.color, options.color)
-                    }
-                })
-            };
+            options.objects = defaultValue$4(options.objects, []);
+            options.pixelSize = defaultValue$4(options.pixelSize, 5);
+            options.color = defaultValue$4(options.color, Color.fromRandom);
+            options.createGeometryFunction = defaultValue$4(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
     }
@@ -9135,15 +9957,19 @@
     exports.CesiumProError = CesiumProError;
     exports.CesiumProTerrainProvider = CesiumProTerrainProvider;
     exports.Cluster = Cluster;
-    exports.Event = Event$4;
+    exports.Event = Event$6;
     exports.GaoDeLayer = GaoDeLayer;
     exports.GeoJsonDataSource = GeoJsonDataSource;
-    exports.GeoPoint = GeoPoint$1;
+    exports.GeoPoint = GeoPoint;
+    exports.GroundSkyBox = GroundSkyBox;
     exports.InfoBox = InfoBox;
     exports.LonLatNetLayer = LonLatNetLayer;
     exports.LonlatTilingScheme = LonlatTilingScheme;
+    exports.MassiveBillboardLayer = MassiveBillboardLayer;
+    exports.MassiveEntityLayer = MassiveEntityLayer;
     exports.MassiveGraphicLayer = MassiveGraphicLayer;
     exports.MassiveGraphicLayerCollection = MassiveGraphicLayerCollection;
+    exports.MassiveModelLayer = MassiveModelLayer;
     exports.MassivePointLayer = MassivePointLayer;
     exports.Model = Model;
     exports.MultipleTerrainProvider = MultipleTerrainProvider;
@@ -9165,6 +9991,8 @@
     exports.WMSLayer = WMSLayer;
     exports.WMTSLayer = WMTSLayer;
     exports.XYZLayer = XYZLayer;
+    exports._shaderGroundSkyBoxFS = shader$1;
+    exports._shaderGroundSkyBoxVS = shader;
     exports._shaderLine = line;
     exports.computeDistancePerPixel = computeDistancePerPixel;
     exports.computeSceneCenterPoint = computeSceneCenterPoint;
@@ -9172,8 +10000,8 @@
     exports.createDefaultLayer = createDefaultLayer;
     exports.createGuid = createGuid$2;
     exports.dateFormat = dateFormat;
-    exports.defaultValue = defaultValue$3;
-    exports.defined = defined$4;
+    exports.defaultValue = defaultValue$4;
+    exports.defined = defined$5;
     exports.proj = proj;
 
     Object.defineProperty(exports, '__esModule', { value: true });

@@ -9,7 +9,9 @@ const {
     defaultValue,
     Color,
     BoundingRectangle,
-    Pass
+    Pass,
+    SunLight,
+    Cartesian3
 } = Cesium;
 const preloadTilesetPassState = new Cesium3DTilePassState({
     pass: Cesium3DTilePass.PRELOAD,

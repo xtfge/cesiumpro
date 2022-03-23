@@ -1,5 +1,6 @@
 import CesiumProError from "../core/CesiumProError.js";
 import defined from "../core/defined.js";
+import GeoPoint from "../core/GeoPoint.js";
 const {
     Transforms,
     Cartesian3
@@ -9,6 +10,7 @@ class Model{
      * 创建一个gltf/glb模型
      * @param {Model.ModelOptions} optinos 模型参数
      * @example
+     *  // 1. 通过position设置模型位置
      *  const p = new CesiumPro.GeoPoint(110, 30, 10).toCartesian();
      *  const model = new CesiumPro.Model({
      *      url: '../data/models/Cesium_Air.glb',
@@ -16,6 +18,7 @@ class Model{
      *      position: p
      *  })
      * viewer.addModel(model);
+     * // 2. 通过modelMatrix设置模型位置和姿态
      * const translation = Cesium.Transforms.eastNorthUpToFixedFrame(p);
      * const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2);
      * const modelMatrix = new Cesium.Matrix4();

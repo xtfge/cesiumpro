@@ -17,7 +17,12 @@ class CesiumProError extends Error {
         this.name = 'CesiumProError';
     }
 }
-CesiumProError.throwNoInstance = function() {
-    throw new CesiumProError('它的定义了一个接口，不能被以直接调用.') 
+CesiumProError.throwInstantiationError = function () {
+    throw new DeveloperError(
+        "This function defines an interface and should not be called directly."
+    );
+};
+CesiumProError.throwNoInstance = function () {
+    throw new CesiumProError('它的定义了一个接口，不能被以直接调用.')
 }
 export default CesiumProError;

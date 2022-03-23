@@ -50,7 +50,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L35">scene/Model.js 35</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L37">scene/Model.js 37</a>
 </div>
 
 
@@ -157,7 +157,7 @@
     
         <h5>Example:</h5>
         
-    <pre><code class="language-javascript">const p = new CesiumPro.GeoPoint(110, 30, 10).toCartesian(); const model = new CesiumPro.Model({     url: '../data/models/Cesium_Air.glb',     minimumPixelSize: 16,     position: p })viewer.addModel(model);const translation = Cesium.Transforms.eastNorthUpToFixedFrame(p);const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2);const modelMatrix = new Cesium.Matrix4();Cesium.Matrix4.multiply(translation, rotation, modelMatrix);const model = new CesiumPro.Model({  url: '../data/models/Cesium_Air.glb',  modelMatrix:modelMatrix})model.readyPromise.then(() => {  model.activeAnimations.addAll({    multiplier: 1.5,    loop: Cesium.ModelAnimationLoop.REPEAT,  });})viewer.addModel(model)</code></pre>
+    <pre><code class="language-javascript">// 1. 通过position设置模型位置 const p = new CesiumPro.GeoPoint(110, 30, 10).toCartesian(); const model = new CesiumPro.Model({     url: '../data/models/Cesium_Air.glb',     minimumPixelSize: 16,     position: p })viewer.addModel(model);// 2. 通过modelMatrix设置模型位置和姿态const translation = Cesium.Transforms.eastNorthUpToFixedFrame(p);const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2);const modelMatrix = new Cesium.Matrix4();Cesium.Matrix4.multiply(translation, rotation, modelMatrix);const model = new CesiumPro.Model({  url: '../data/models/Cesium_Air.glb',  modelMatrix:modelMatrix})model.readyPromise.then(() => {  model.activeAnimations.addAll({    multiplier: 1.5,    loop: Cesium.ModelAnimationLoop.REPEAT,  });})viewer.addModel(model)</code></pre>
 
     
 
@@ -197,7 +197,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L77">scene/Model.js 77</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L79">scene/Model.js 79</a>
 </div>
 
 
@@ -256,7 +256,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L88">scene/Model.js 88</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L90">scene/Model.js 90</a>
 </div>
 
 
@@ -315,7 +315,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L96">scene/Model.js 96</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L98">scene/Model.js 98</a>
 </div>
 
 
@@ -374,7 +374,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L103">scene/Model.js 103</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L105">scene/Model.js 105</a>
 </div>
 
 
@@ -433,7 +433,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L109">scene/Model.js 109</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L111">scene/Model.js 111</a>
 </div>
 
 
@@ -492,7 +492,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L117">scene/Model.js 117</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L119">scene/Model.js 119</a>
 </div>
 
 
@@ -551,7 +551,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L124">scene/Model.js 124</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L126">scene/Model.js 126</a>
 </div>
 
 
@@ -610,7 +610,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L134">scene/Model.js 134</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L136">scene/Model.js 136</a>
 </div>
 
 
@@ -669,7 +669,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L153">scene/Model.js 153</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L155">scene/Model.js 155</a>
 </div>
 
 
@@ -728,7 +728,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L144">scene/Model.js 144</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L146">scene/Model.js 146</a>
 </div>
 
 
@@ -787,7 +787,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L163">scene/Model.js 163</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L165">scene/Model.js 165</a>
 </div>
 
 
@@ -846,7 +846,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L173">scene/Model.js 173</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L175">scene/Model.js 175</a>
 </div>
 
 
@@ -905,7 +905,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L183">scene/Model.js 183</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L185">scene/Model.js 185</a>
 </div>
 
 
@@ -964,7 +964,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L193">scene/Model.js 193</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L195">scene/Model.js 195</a>
 </div>
 
 
@@ -1023,7 +1023,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L204">scene/Model.js 204</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L206">scene/Model.js 206</a>
 </div>
 
 
@@ -1082,7 +1082,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L211">scene/Model.js 211</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L213">scene/Model.js 213</a>
 </div>
 
 
@@ -1141,7 +1141,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L221">scene/Model.js 221</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L223">scene/Model.js 223</a>
 </div>
 
 
@@ -1200,7 +1200,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L231">scene/Model.js 231</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L233">scene/Model.js 233</a>
 </div>
 
 
@@ -1259,7 +1259,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L241">scene/Model.js 241</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L243">scene/Model.js 243</a>
 </div>
 
 
@@ -1318,7 +1318,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L62">scene/Model.js 62</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L64">scene/Model.js 64</a>
 </div>
 
 
@@ -1377,7 +1377,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L70">scene/Model.js 70</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L72">scene/Model.js 72</a>
 </div>
 
 
@@ -1436,7 +1436,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L251">scene/Model.js 251</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L253">scene/Model.js 253</a>
 </div>
 
 
@@ -1495,7 +1495,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L261">scene/Model.js 261</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L263">scene/Model.js 263</a>
 </div>
 
 
@@ -1554,7 +1554,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L271">scene/Model.js 271</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L273">scene/Model.js 273</a>
 </div>
 
 
@@ -1613,7 +1613,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L291">scene/Model.js 291</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L293">scene/Model.js 293</a>
 </div>
 
 
@@ -1675,7 +1675,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L301">scene/Model.js 301</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L303">scene/Model.js 303</a>
 </div>
 
 
@@ -1740,7 +1740,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L312">scene/Model.js 312</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L314">scene/Model.js 314</a>
 </div>
 
 
@@ -1875,7 +1875,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L322">scene/Model.js 322</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L324">scene/Model.js 324</a>
 </div>
 
 
@@ -1960,7 +1960,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L336">scene/Model.js 336</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L338">scene/Model.js 338</a>
 </div>
 
 
@@ -2091,7 +2091,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L344">scene/Model.js 344</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L346">scene/Model.js 346</a>
 </div>
 
 
@@ -2222,7 +2222,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L352">scene/Model.js 352</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L354">scene/Model.js 354</a>
 </div>
 
 
@@ -2353,7 +2353,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L328">scene/Model.js 328</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L330">scene/Model.js 330</a>
 </div>
 
 
@@ -2439,7 +2439,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L356">scene/Model.js 356</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L358">scene/Model.js 358</a>
 </div>
 
 
@@ -3577,7 +3577,7 @@
     <div class="nav">
       <div class="menu">
         <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
-        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="GeoPoint"><a href="GeoPoint.html">GeoPoint</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="GeoPoint"><a href="GeoPoint.html">GeoPoint</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveEntityLayerCollection"><a href="MassiveEntityLayerCollection.html">MassiveEntityLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
       </div>
     </div>
 

@@ -4,7 +4,7 @@ const {
 } = Cesium;
 class MassiveGraphicLayerCollection{
     /**
-     * 管理Lod图层的集合。
+     * 基于四叉树和聚合的LOD图层的集合。
      */
     constructor() {
         this._layers = new AssociativeArray();
@@ -55,8 +55,11 @@ class MassiveGraphicLayerCollection{
      */
     remove(layer) {
         if(layer instanceof MassiveGraphicLayer) {
+            layer.destroy();
             return this._layers.remove(layer.id)
         } else if(typeof layer === 'string') {
+            const layerObject = this._layers.get(layer);
+            layerObject && layerObject.destroy();
             return this._layers.remove(layer)
         }
         return false;

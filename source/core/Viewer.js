@@ -21,6 +21,7 @@ function flyTo(viewer, target, options) {
     viewer.camera.flyToBoundingSphere(target, {
         duration: options.duration,
         maximumHeight: options.maximumHeight,
+        endTransform: options.endTransform,
         complete: function () {
             viewer._zoomPromise.resolve(true);
         },
@@ -380,7 +381,7 @@ class Viewer extends Cesium.Viewer {
     /**
      * 大数据图层集合
      * @readonly
-     * @type {MassiveGraphicLayerCollection}
+     * @type {MassiveEntityLayerCollection}
      */
     get massiveGraphicLayers() {
         return this.scene._LodGraphic.tileProvider._layers;
@@ -611,7 +612,12 @@ class Viewer extends Cesium.Viewer {
      */
     addModel(model) {
         this.primitives.add(model.delegate);
-    }
+    }    
+    /**
+     * 删除模型
+     * @param {Model} model 需要被删除的模型
+     * @returns {Boolean} 是否删除成功
+     */
     removeModel(model) {
         this.primitives.remove(model.delegate);
     }
