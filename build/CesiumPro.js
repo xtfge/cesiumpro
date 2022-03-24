@@ -5941,6 +5941,38 @@
         getNode(name) {
             return this.delegate.getNode(name);
         }
+        /**
+         * 模型根节点
+         * @readonly
+         * @type {Array}
+         */
+        get rootNodes() {
+            return this.delegate._runtime.rootNodes;
+        }
+        /**
+         * 模型的所有节点
+         * @readonly
+         * @type {Array}
+         */
+        get nodes() {
+            return this.delegate._runtime.nodesByName;
+        }
+        /**
+         * 模型的所有材质
+         * @readonly
+         * @type {Array}
+         */
+        get materials() {
+            return this.delegate._runtime.materialsByName;
+        }
+        /**
+         * 模型的所有网格
+         * @readonly
+         * @type {Array}
+         */
+        get meshs() {
+            return this.delegate._runtime.meshesByName;
+        }
     }
 
     const CesiumScene = Cesium.Scene;
@@ -6901,6 +6933,7 @@
             duration: options.duration,
             maximumHeight: options.maximumHeight,
             endTransform: options.endTransform,
+            offset: options.offset,
             complete: function () {
                 viewer._zoomPromise.resolve(true);
             },
@@ -7577,8 +7610,17 @@
          * @param {Object} options 具有以下属性
          * @param {Number} [options.duration = 3000] 相机飞行持续时间，单位毫秒
          * @param {Number} [options.maximumHeight] 相机飞行最大高度
-         * @param {Cesium.HeadingPitchRange} [options.offset] 在以目标为中心的earth-north-up局部坐标系中，与目标的偏移量
+         * @param {Cesium.HeadingPitchRange} [options.offset] 相机角度，可以包含heading、pitch、roll
          * @returns {Promise<Boolean>}
+         * @example
+         * viewer.flyTo({
+         *     destination : Cesium.Cartesian3.fromDegrees(-122.19, 46.25, 5000.0),
+         *     orientation : {
+         *         heading : Cesium.Math.toRadians(175.0),
+         *         pitch : Cesium.Math.toRadians(-35.0),
+         *         roll : 0.0
+         *     }
+         * });
          */
         flyTo(target, options = {}) {
             if (target instanceof GeoPoint) {

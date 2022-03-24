@@ -355,6 +355,38 @@ class Model{
     getNode(name) {
         return this.delegate.getNode(name);
     }
+    /**
+     * 模型根节点
+     * @readonly
+     * @type {Array}
+     */
+    get rootNodes() {
+        return this.delegate._runtime.rootNodes;
+    }
+    /**
+     * 模型的所有节点
+     * @readonly
+     * @type {Array}
+     */
+    get nodes() {
+        return this.delegate._runtime.nodesByName;
+    }
+    /**
+     * 模型的所有材质
+     * @readonly
+     * @type {Array}
+     */
+    get materials() {
+        return this.delegate._runtime.materialsByName;
+    }
+    /**
+     * 模型的所有网格
+     * @readonly
+     * @type {Array}
+     */
+    get meshs() {
+        return this.delegate._runtime.meshesByName;
+    }
 }
 /**
  * 模型加载选项

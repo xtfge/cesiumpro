@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-      Url - CesiumPro Documentation
+      GroundSkyBox - CesiumPro Documentation
     </title>
 
     <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
 
       <h1 class="page-title">
         <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
-        Url
+        GroundSkyBox
         <div class="titleCenterer"></div>
       </h1>
 
@@ -43,20 +43,194 @@
 
       
       
+<div class="nameContainer">
+  <h4 class="name" id="GroundSkyBox">
+    <a href="#GroundSkyBox" class="doc-link"></a>
+    new CesiumPro.GroundSkyBox<span class="signature">(options)</span>
+    
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Url.js#L106">core/Url.js 106</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/GroundSkyBox.js#L56">core/GroundSkyBox.js 56</a>
+</div>
+
+
+  </h4>
+
 </div>
 
 
 
-      
-      <div class="description">
-        URL相关工具
-      </div>
-      
 
-      
+<div class="description">
+  A sky box around the scene to draw stars.  The sky box is defined using the True Equator Mean Equinox (TEME) axes.<p>This is only supported in 3D.  The sky box is faded out when morphing to 2D or Columbus view.  The size ofthe sky box must not exceed <code>Scene#maximumCubeMapSize</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                Object with the following properties:
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sources</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                The source URL or <code>Image</code> object for each of the six cube map faces.  See the example below.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>show</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Determines if this primitive will be shown.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <dl class="details">
 
 
@@ -77,6 +251,9 @@
     
 
     
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">scene.skyBox = new CesiumPro.GroundSkyBox({  sources : {    positiveX : 'skybox_px.png',    negativeX : 'skybox_nx.png',    positiveY : 'skybox_py.png',    negativeY : 'skybox_ny.png',    positiveZ : 'skybox_pz.png',    negativeZ : 'skybox_nz.png'  }});</code></pre>
 
     
 
@@ -84,6 +261,13 @@
 
     
 
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="../cesiumDocumentation/SkyBox.html" target = '_blank'>Cesium.SkyBox</a></li>
+    </ul>
     
 
     
@@ -103,6 +287,72 @@
     
 
     
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/GroundSkyBox.js#L72">core/GroundSkyBox.js 72</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  决定天空盒是否被显示.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
 
     
     <h3 class="subsection-title">Methods</h3>
@@ -110,13 +360,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id=".buildModuleUrl">
-    <a href="#.buildModuleUrl" class="doc-link"></a>
-    <span class="type-signature attribute-static">static</span> CesiumPro.Url.buildModuleUrl<span class="signature">(path)</span> &rarr; <span class="type-signature returnType">String</span>
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Url.js#L147">core/Url.js 147</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/GroundSkyBox.js#L217">core/GroundSkyBox.js 217</a>
 </div>
 
 
@@ -128,7 +378,7 @@
 
 
 <div class="description">
-  获取CesiumPro静态资源的完整路径
+  销毁对象
 </div>
 
 
@@ -143,66 +393,11 @@
 
 
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>path</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  String</span>
-
-
-            
-            </td>
-
-            
-
-            <td class="description last">
-            
-                指定文件</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
 
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-
-<div class="param-desc">
-    完整的Url地址
-</div>
 
 
 
@@ -228,11 +423,6 @@
     
 
     
-
-    
-        <h5>Example:</h5>
-        
-    <pre><code class="language-javascript">Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png')</code></pre>
 
     
 
@@ -250,13 +440,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id=".join">
-    <a href="#.join" class="doc-link"></a>
-    <span class="type-signature attribute-static">static</span> CesiumPro.Url.join<span class="signature">(args)</span> &rarr; <span class="type-signature returnType">String</span>
+  <h4 class="name" id="isDestroyed">
+    <a href="#isDestroyed" class="doc-link"></a>
+    isDestroyed<span class="signature">()</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Url.js#L122">core/Url.js 122</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/GroundSkyBox.js#L210">core/GroundSkyBox.js 210</a>
 </div>
 
 
@@ -268,7 +458,7 @@
 
 
 <div class="description">
-  从多个字符串拼接url,以/为分割符
+  对象是否被销毁
 </div>
 
 
@@ -283,73 +473,11 @@
 
 
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>args</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  String</span>
-
-
-            
-            </td>
-
-            
-
-            <td class="description last">
-            
-                
-                
-
-                
-                        <span class="repeatable">repeatable</span>
-                
-            
-                </td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
 
 
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-
-<div class="param-desc">
-    url
-</div>
 
 
 
@@ -377,9 +505,84 @@
     
 
     
-        <h5>Example:</h5>
-        
-    <pre><code class="language-javascript">URL.join("www.baidu.com/",'/tieba/','cesium')//www.baidu.com/tieba/cesium</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="update">
+    <a href="#update" class="doc-link"></a>
+    update<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/GroundSkyBox.js#L90">core/GroundSkyBox.js 90</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  当场景渲染的时候会自动调用该函数更新天空盒。<p>切勿主动调用该函数。</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 
