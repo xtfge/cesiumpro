@@ -67,6 +67,25 @@ tools.addBr = function (parentId = "toolbar") {
   const ele = document.createElement('br');
   document.getElementById(parentId).appendChild(ele);
 }
+tools.addRadio = function (text, selected, name, callback, parentId = "toolbar") {
+  const labelContainer = document.createElement('div');
+  for (let t of text) {
+    const label = tools.addLabel(t, labelContainer)
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = name
+    radio.className = "ele-cls";
+    radio.value = t;
+    if(t === selected) {
+      radio.checked = true;
+    }
+    label.appendChild(radio)
+    labelContainer.appendChild(label);
+    radio.onchange = callback
+  }
+
+  document.getElementById(parentId).appendChild(labelContainer);
+}
 tools.randomPoint = function (minx = -180, miny = -90, maxx = 180, maxy = 90, count = 100) {
 
   const pts = [];

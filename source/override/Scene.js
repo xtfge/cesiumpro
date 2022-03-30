@@ -311,4 +311,7 @@ class Scene {
     }
 
 }
-export default Scene;
+function override() {    
+    Scene.overrideRenderFunction();
+}
+export default override;

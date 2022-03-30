@@ -43,7 +43,7 @@
     function compareNumber(a, b) {
       return b - a;
     }
-    class Event$6 {
+    class Event$7 {
       /**
        * 事件管理器
        * @example
@@ -185,14 +185,14 @@
 
     const {
         RequestState: RequestState$1,
-        when: when$6,
+        when: when$7,
         AttributeCompression,
-        BoundingSphere: BoundingSphere$2,
-        Cartesian3: Cartesian3$8,
+        BoundingSphere: BoundingSphere$3,
+        Cartesian3: Cartesian3$9,
         Credit: Credit$1,
-        defaultValue: defaultValue$5,
-        defined: defined$6,
-        DeveloperError: DeveloperError$1,
+        defaultValue: defaultValue$6,
+        defined: defined$8,
+        DeveloperError: DeveloperError$2,
         GeographicTilingScheme: GeographicTilingScheme$3,
         WebMercatorTilingScheme,
         getJsonFromTypedArray,
@@ -202,8 +202,8 @@
         QuantizedMeshTerrainData,
         Request: Request$1,
         RequestType: RequestType$1,
-        Resource: Resource$4,
-        RuntimeError,
+        Resource: Resource$5,
+        RuntimeError: RuntimeError$1,
         TerrainProvider: TerrainProvider$1,
         TileAvailability,
         TileProviderError
@@ -253,8 +253,8 @@
      */
     function CesiumProTerrainProvider(options) {
         //>>includeStart('debug', pragmas.debug)
-        if (!defined$6(options) || !defined$6(options.url)) {
-            throw new DeveloperError$1("options.url is required.");
+        if (!defined$8(options) || !defined$8(options.url)) {
+            throw new DeveloperError$2("options.url is required.");
         }
         //>>includeEnd('debug');
 
@@ -270,7 +270,7 @@
          * @default false
          * @private
          */
-        this._requestVertexNormals = defaultValue$5(
+        this._requestVertexNormals = defaultValue$6(
             options.requestVertexNormals,
             false
         );
@@ -281,7 +281,7 @@
          * @default false
          * @private
          */
-        this._requestWaterMask = defaultValue$5(options.requestWaterMask, false);
+        this._requestWaterMask = defaultValue$6(options.requestWaterMask, false);
 
         /**
          * Boolean flag that indicates if the client should request tile metadata from the server.
@@ -289,9 +289,9 @@
          * @default true
          * @private
          */
-        this._requestMetadata = defaultValue$5(options.requestMetadata, true);
+        this._requestMetadata = defaultValue$6(options.requestMetadata, true);
 
-        this._errorEvent = new Event$6();
+        this._errorEvent = new Event$7();
 
         var credit = options.credit;
         if (typeof credit === "string") {
@@ -301,7 +301,7 @@
 
         this._availability = undefined;
 
-        var deferred = when$6.defer();
+        var deferred = when$7.defer();
         this._ready = false;
         this._readyPromise = deferred;
         this._tileCredits = undefined;
@@ -315,9 +315,9 @@
         var attribution = "";
         var overallAvailability = [];
         var overallMaxZoom = 0;
-        when$6(options.url)
+        when$7(options.url)
             .then(function (url) {
-                var resource = Resource$4.createIfNeeded(url);
+                var resource = Resource$5.createIfNeeded(url);
                 resource.appendForwardSlash();
                 lastResource = resource;
                 layerJsonResource = lastResource.getDerivedResource({
@@ -373,7 +373,7 @@
             var isHeightmap = false;
             if (data.format === "heightmap-1.0") {
                 isHeightmap = true;
-                if (!defined$6(that._heightmapStructure)) {
+                if (!defined$8(that._heightmapStructure)) {
                     that._heightmapStructure = {
                         heightScale: 1.0 / 5.0,
                         heightOffset: -1000.0,
@@ -468,25 +468,25 @@
             // by setting the _littleEndianExtensionSize to false. Always prefer 'octvertexnormals'
             // over 'vertexnormals' if both extensions are supported by the server.
             if (
-                defined$6(data.extensions) &&
+                defined$8(data.extensions) &&
                 data.extensions.indexOf("octvertexnormals") !== -1
             ) {
                 hasVertexNormals = true;
             } else if (
-                defined$6(data.extensions) &&
+                defined$8(data.extensions) &&
                 data.extensions.indexOf("vertexnormals") !== -1
             ) {
                 hasVertexNormals = true;
                 littleEndianExtensionSize = false;
             }
             if (
-                defined$6(data.extensions) &&
+                defined$8(data.extensions) &&
                 data.extensions.indexOf("watermask") !== -1
             ) {
                 hasWaterMask = true;
             }
             if (
-                defined$6(data.extensions) &&
+                defined$8(data.extensions) &&
                 data.extensions.indexOf("metadata") !== -1
             ) {
                 hasMetadata = true;
@@ -495,7 +495,7 @@
             var availabilityLevels = data.metadataAvailability;
             var availableTiles = data.available;
             var availability;
-            if (defined$6(availableTiles) && !defined$6(availabilityLevels)) {
+            if (defined$8(availableTiles) && !defined$8(availabilityLevels)) {
                 availability = new TileAvailability(
                     that._tilingScheme,
                     availableTiles.length
@@ -503,7 +503,7 @@
                 for (var level = 0; level < availableTiles.length; ++level) {
                     var rangesAtLevel = availableTiles[level];
                     var yTiles = that._tilingScheme.getNumberOfYTilesAtLevel(level);
-                    if (!defined$6(overallAvailability[level])) {
+                    if (!defined$8(overallAvailability[level])) {
                         overallAvailability[level] = [];
                     }
 
@@ -530,7 +530,7 @@
                         );
                     }
                 }
-            } else if (defined$6(availabilityLevels)) {
+            } else if (defined$8(availabilityLevels)) {
                 availabilityTilesLoaded = new TileAvailability(
                     that._tilingScheme,
                     maxZoom
@@ -543,7 +543,7 @@
             that._hasWaterMask = that._hasWaterMask || hasWaterMask;
             that._hasVertexNormals = that._hasVertexNormals || hasVertexNormals;
             that._hasMetadata = that._hasMetadata || hasMetadata;
-            if (defined$6(data.attribution)) {
+            if (defined$8(data.attribution)) {
                 if (attribution.length > 0) {
                     attribution += " ";
                 }
@@ -567,12 +567,12 @@
             );
 
             var parentUrl = data.parentUrl;
-            if (defined$6(parentUrl)) {
-                if (!defined$6(availability)) {
+            if (defined$8(parentUrl)) {
+                if (!defined$8(availability)) {
                     console.log(
                         "A layer.json can't have a parentUrl if it does't have an available array."
                     );
-                    return when$6.resolve();
+                    return when$7.resolve();
                 }
                 lastResource = lastResource.getDerivedResource({
                     url: parentUrl,
@@ -582,10 +582,10 @@
                     url: "layer.json",
                 });
                 var parentMetadata = layerJsonResource.fetchJson();
-                return when$6(parentMetadata, parseMetadataSuccess, parseMetadataFailure);
+                return when$7(parentMetadata, parseMetadataSuccess, parseMetadataFailure);
             }
 
-            return when$6.resolve();
+            return when$7.resolve();
         }
 
         function parseMetadataFailure(data) {
@@ -605,7 +605,7 @@
 
         function metadataSuccess(data) {
             parseMetadataSuccess(data).then(function () {
-                if (defined$6(metadataError)) {
+                if (defined$8(metadataError)) {
                     return;
                 }
 
@@ -633,7 +633,7 @@
                 if (attribution.length > 0) {
                     var layerJsonCredit = new Credit$1(attribution);
 
-                    if (defined$6(that._tileCredits)) {
+                    if (defined$8(that._tileCredits)) {
                         that._tileCredits.push(layerJsonCredit);
                     } else {
                         that._tileCredits = [layerJsonCredit];
@@ -647,7 +647,7 @@
 
         function metadataFailure(data) {
             // If the metadata is not found, assume this is a pre-metadata heightmap tileset.
-            if (defined$6(data) && data.statusCode === 404) {
+            if (defined$8(data) && data.statusCode === 404) {
                 metadataSuccess({
                     tilejson: "2.1.0",
                     format: "heightmap-1.0",
@@ -661,7 +661,7 @@
         }
 
         function requestLayerJson() {
-            when$6(layerJsonResource.fetchJson())
+            when$7(layerJsonResource.fetchJson())
                 .then(metadataSuccess)
                 .otherwise(metadataFailure);
         }
@@ -703,7 +703,7 @@
     };
 
     function getRequestHeader(extensionsList) {
-        if (!defined$6(extensionsList) || extensionsList.length === 0) {
+        if (!defined$8(extensionsList) || extensionsList.length === 0) {
             return {
                 Accept:
                     "application/vnd.quantized-mesh,application/octet-stream;q=0.9,*/*;q=0.01",
@@ -755,7 +755,7 @@
         var triangleLength = bytesPerIndex * triangleElements;
 
         var view = new DataView(buffer);
-        var center = new Cartesian3$8(
+        var center = new Cartesian3$9(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -767,8 +767,8 @@
         var maximumHeight = view.getFloat32(pos, true);
         pos += Float32Array.BYTES_PER_ELEMENT;
 
-        var boundingSphere = new BoundingSphere$2(
-            new Cartesian3$8(
+        var boundingSphere = new BoundingSphere$3(
+            new Cartesian3$9(
                 view.getFloat64(pos, true),
                 view.getFloat64(pos + 8, true),
                 view.getFloat64(pos + 16, true)
@@ -777,7 +777,7 @@
         );
         pos += boundingSphereLength;
 
-        var horizonOcclusionPoint = new Cartesian3$8(
+        var horizonOcclusionPoint = new Cartesian3$9(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -903,7 +903,7 @@
                         stringLength
                     );
                     var availableTiles = metadata.available;
-                    if (defined$6(availableTiles)) {
+                    if (defined$8(availableTiles)) {
                         for (var offset = 0; offset < availableTiles.length; ++offset) {
                             var availableLevel = level + offset + 1;
                             var rangesAtLevel = availableTiles[offset];
@@ -1006,7 +1006,7 @@
     ) {
         //>>includeStart('debug', pragmas.debug)
         if (!this._ready) {
-            throw new DeveloperError$1(
+            throw new DeveloperError$2(
                 "requestTileGeometry must not be called before the terrain provider is ready."
             );
         }
@@ -1023,7 +1023,7 @@
             for (var i = 0; i < layerCount; ++i) {
                 var layer = layers[i];
                 if (
-                    !defined$6(layer.availability) ||
+                    !defined$8(layer.availability) ||
                     layer.availability.isTileAvailable(level, x, y)
                 ) {
                     layerToUse = layer;
@@ -1035,8 +1035,8 @@
     };
 
     function requestTileGeometry(provider, x, y, level, layerToUse, request) {
-        if (!defined$6(layerToUse)) {
-            return when$6.reject(new RuntimeError("Terrain tile doesn't exist"));
+        if (!defined$8(layerToUse)) {
+            return when$7.reject(new RuntimeError$1("Terrain tile doesn't exist"));
         }
 
         var urlTemplates = layerToUse.tileUrlTemplates;
@@ -1074,8 +1074,8 @@
 
         var resource = layerToUse.resource;
         if (
-            defined$6(resource._ionEndpoint) &&
-            !defined$6(resource._ionEndpoint.externalType)
+            defined$8(resource._ionEndpoint) &&
+            !defined$8(resource._ionEndpoint.externalType)
         ) {
             // ion uses query paremeters to request extensions
             if (extensionList.length !== 0) {
@@ -1107,12 +1107,12 @@
         }
         var promise = source.fetchArrayBuffer();
 
-        if (!defined$6(promise)) {
+        if (!defined$8(promise)) {
             return undefined;
         }
 
         return promise.then(function (buffer) {
-            if (defined$6(provider._heightmapStructure)) {
+            if (defined$8(provider._heightmapStructure)) {
                 return createHeightmapTerrainData(provider, buffer);
             }
             return createQuantizedMeshTerrainData(
@@ -1152,7 +1152,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "credit must not be called before the terrain provider is ready."
                     );
                 }
@@ -1173,7 +1173,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "tilingScheme must not be called before the terrain provider is ready."
                     );
                 }
@@ -1221,7 +1221,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "hasWaterMask must not be called before the terrain provider is ready."
                     );
                 }
@@ -1243,7 +1243,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "hasVertexNormals must not be called before the terrain provider is ready."
                     );
                 }
@@ -1266,7 +1266,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "hasMetadata must not be called before the terrain provider is ready."
                     );
                 }
@@ -1335,7 +1335,7 @@
             get: function () {
                 //>>includeStart('debug', pragmas.debug)
                 if (!this._ready) {
-                    throw new DeveloperError$1(
+                    throw new DeveloperError$2(
                         "availability must not be called before the terrain provider is ready."
                     );
                 }
@@ -1366,7 +1366,7 @@
      * @returns {Boolean|undefined} Undefined if not supported or availability is unknown, otherwise true or false.
      */
     CesiumProTerrainProvider.prototype.getTileDataAvailable = function (x, y, level) {
-        if (!defined$6(this._availability)) {
+        if (!defined$8(this._availability)) {
             return undefined;
         }
         if (level > this._availability._maximumLevel) {
@@ -1409,7 +1409,7 @@
         level
     ) {
         if (
-            !defined$6(this._availability) ||
+            !defined$8(this._availability) ||
             level > this._availability._maximumLevel ||
             this._availability.isTileAvailable(level, x, y) ||
             !this._hasMetadata
@@ -1422,7 +1422,7 @@
         var count = layers.length;
         for (var i = 0; i < count; ++i) {
             var layerResult = checkLayer(this, x, y, level, layers[i], i === 0);
-            if (defined$6(layerResult.promise)) {
+            if (defined$8(layerResult.promise)) {
                 return layerResult.promise;
             }
         }
@@ -1450,7 +1450,7 @@
     }
 
     function checkLayer(provider, x, y, level, layer, topLayer) {
-        if (!defined$6(layer.availabilityLevels)) {
+        if (!defined$8(layer.availabilityLevels)) {
             // It's definitely not in this layer
             return {
                 result: false,
@@ -1465,7 +1465,7 @@
         var availability = layer.availability;
 
         var tile = getAvailabilityTile(layer, x, y, level);
-        while (defined$6(tile)) {
+        while (defined$8(tile)) {
             if (
                 availability.isTileAvailable(tile.level, tile.x, tile.y) &&
                 !availabilityTilesLoaded.isTileAvailable(tile.level, tile.x, tile.y)
@@ -1474,7 +1474,7 @@
                 if (!topLayer) {
                     cacheKey = tile.level + "-" + tile.x + "-" + tile.y;
                     requestPromise = layer.availabilityPromiseCache[cacheKey];
-                    if (!defined$6(requestPromise)) {
+                    if (!defined$8(requestPromise)) {
                         // For cutout terrain, if this isn't the top layer the availability tiles
                         //  may never get loaded, so request it here.
                         var request = new Request$1({
@@ -1490,7 +1490,7 @@
                             layer,
                             request
                         );
-                        if (defined$6(requestPromise)) {
+                        if (defined$8(requestPromise)) {
                             layer.availabilityPromiseCache[cacheKey] = requestPromise;
                             requestPromise.then(deleteFromCache);
                         }
@@ -1528,7 +1528,7 @@
      * @example
      * param = CesiumPro.defaultValue(param, 'default');
      */
-    function defaultValue$4(a, b) {
+    function defaultValue$5(a, b) {
         if (a !== undefined && a !== null) {
             return a;
         }
@@ -1541,7 +1541,7 @@
      * @exports defined
      * @returns {Boolean} value是否被定义
      */
-     function defined$5(value) {
+     function defined$7(value) {
         return value !== undefined && value !== null;
       }
 
@@ -1555,7 +1555,7 @@
         return url;
       }
 
-      if (!defined$5(a)) {
+      if (!defined$7(a)) {
         a = document.createElement('a');
       }
       a.href = url;
@@ -1586,7 +1586,7 @@
     }
 
     function getCesiumProBaseUrl() {
-      if (defined$5(baseResource)) {
+      if (defined$7(baseResource)) {
         return baseResource;
       }
 
@@ -1595,7 +1595,7 @@
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$5(window.define.amd)
+        && defined$7(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -1606,13 +1606,13 @@
         baseUrlString = getBaseUrlFromCesiumScript();
       }
       // >>includeStart('debug');
-      if (!defined$5(baseUrlString)) {
+      if (!defined$7(baseUrlString)) {
         throw new CesiumProError(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$5(baseUrlString)) {
+      if(!defined$7(baseUrlString)) {
           baseUrlString = '';
       }
       baseResource = new Cesium.Resource({
@@ -1630,12 +1630,12 @@
       return resource.url;
     }
 
-    function buildModuleUrl$1(relativeUrl) {
-      if (!defined$5(implementation)) {
+    function buildModuleUrl$2(relativeUrl) {
+      if (!defined$7(implementation)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$5(window.define.amd)
+          && defined$7(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
           implementation = buildModuleUrlFromRequireToUrl;
@@ -1689,7 +1689,7 @@
      * Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png')
      */
     Url.buildModuleUrl = function (path) {
-      return buildModuleUrl$1(path);
+      return buildModuleUrl$2(path);
     };
     Url.getCesiumProBaseUrl = getCesiumProBaseUrl;
 
@@ -1728,14 +1728,14 @@
     }
     let bootstrapperUrlResult;
     function getBootstrapperUrl() {
-        if (!defined$5(bootstrapperUrlResult)) {
+        if (!defined$7(bootstrapperUrlResult)) {
             bootstrapperUrlResult = getWorkerUrl("Workers/cesiumWorkerBootstrapper.js");
         }
         return bootstrapperUrlResult;
     }
     function createWorker(processor) {
         const worker = new Worker(getBootstrapperUrl());
-        worker.postMessage = defaultValue$4(
+        worker.postMessage = defaultValue$5(
             worker.webkitPostMessage,
             worker.postMessage
         );
@@ -1743,7 +1743,7 @@
         const bootstrapMessage = {
             loaderConfig: {
                 paths: {
-                    Workers: buildModuleUrl$1("workers"),
+                    Workers: buildModuleUrl$2("workers"),
                 },
                 baseUrl: getCesiumProBaseUrl().url,
             },
@@ -1781,11 +1781,11 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$7,
-        Cartographic: Cartographic$3,
+        Cartesian3: Cartesian3$8,
+        Cartographic: Cartographic$4,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$1,
-        SceneMode: SceneMode$2,
+        SceneMode: SceneMode$3,
         EllipsoidalOccluder,
     } = Cesium;
     function computedScreenPosition(objects, scene) {
@@ -1795,7 +1795,7 @@
             if (!object.position) {
                 continue;
             }
-            if (scene.mode === SceneMode$2.SCENE3D && !occluder.isPointVisible(object.position)) {
+            if (scene.mode === SceneMode$3.SCENE3D && !occluder.isPointVisible(object.position)) {
                 continue;
             }
             object.__pixel = Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -1827,8 +1827,8 @@
     }
     class Cluster {
         constructor(scene, options = {}) {
-            this._objects = defaultValue$4(options.objects, []);
-            this._getScreenBoundingBox = defaultValue$4(options.getScreenBoundingBox, getScreenBoundingBox);
+            this._objects = defaultValue$5(options.objects, []);
+            this._getScreenBoundingBox = defaultValue$5(options.getScreenBoundingBox, getScreenBoundingBox);
             this._scene = scene;
             this.clusterSize = 3;
             this.pixelRange = 50;
@@ -1860,7 +1860,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$7.clone(object.position);
+                const clusterPosition = Cartesian3$8.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -1872,16 +1872,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$7.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$8.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$1.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$7.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$8.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$7(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$8(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -1907,7 +1907,7 @@
         }
         const now = Cesium.getTimestamp();
         const scene = viewer.scene;
-        if (defined$5(lastUpdateTime) && now - lastUpdateTime < 250) {
+        if (defined$7(lastUpdateTime) && now - lastUpdateTime < 250) {
             return;
         }
         lastUpdateTime = now;
@@ -1918,7 +1918,7 @@
         const endRay = scene.camera.getPickRay(new Cesium.Cartesian2(width / 2 + 1, height / 2));
         const startPosition = scene.globe.pick(startRay, scene);
         const endPosition = scene.globe.pick(endRay, scene);
-        if (!(defined$5(startPosition) && defined$5(endPosition))) {
+        if (!(defined$7(startPosition) && defined$7(endPosition))) {
             return;
         }
         const geodesic = new Cesium.EllipsoidGeodesic(
@@ -1937,15 +1937,15 @@
          * @param {Number} alt 海拔，单位：米
          */
         constructor(lon, lat, alt) {
-            if (!defined$5(lon)) {
+            if (!defined$7(lon)) {
                 throw new CesiumProError('longitude is required.')
             }
-            if (!defined$5(lat)) {
+            if (!defined$7(lat)) {
                 throw new CesiumProError('latitude is required.')
             }
             this.lon = lon;
             this.lat = lat;
-            this.alt = defaultValue$4(alt, 0);
+            this.alt = defaultValue$5(alt, 0);
         }
         /**
          * 转为屏幕坐标
@@ -2013,7 +2013,7 @@
             if (viewer instanceof Cesium.Viewer) {
                 throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
             }
-            if (!defined$5(point)) {
+            if (!defined$7(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             const position = GeoPoint.toCartesian(point);
@@ -2024,7 +2024,7 @@
                     return false;
                 }
                 const windowPosition = GeoPoint.toPixel(point, viewer.scene);
-                if (!defined$5(windowPosition)) {
+                if (!defined$7(windowPosition)) {
                     return false;
                 }
                 const width = viewer.canvas.width || viewer.canvas.clientWidth;
@@ -2051,15 +2051,15 @@
          */
         static toPixel(point, scene) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(scene)) {
+            if (!defined$7(scene)) {
                 throw new CesiumProError('scene未定义。')
             }
-            if (!defined$5(point)) {
+            if (!defined$7(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartesian = GeoPoint.toCartesian(point);
-            if (!defined$5(cartesian)) {
+            if (!defined$7(cartesian)) {
                 return undefined;
             }
             return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -2074,7 +2074,7 @@
          */
         static toCartographic(point) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(point)) {
+            if (!defined$7(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -2088,7 +2088,7 @@
          */
         static toCartesian(point, viewer) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(point)) {
+            if (!defined$7(point)) {
                 throw new CesiumProError('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -2117,12 +2117,12 @@
          */
         static fromCartesian(cartesian) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(cartesian)) {
+            if (!defined$7(cartesian)) {
                 throw new CesiumProError('cartesian is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-            if (!defined$5(cartographic)) {
+            if (!defined$7(cartographic)) {
                 return undefined;
             }
             return GeoPoint.fromCartographic(cartographic)
@@ -2134,7 +2134,7 @@
          */
         static fromCartographic(cartographic) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(cartographic)) {
+            if (!defined$7(cartographic)) {
                 throw new CesiumProError('cartographic is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -2155,7 +2155,7 @@
                 return undefined;
             }
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(pixel)) {
+            if (!defined$7(pixel)) {
                 throw new CesiumProError('pixel is not defined.')
             }
             if (viewer instanceof Cesium.Viewer === false) {
@@ -2164,7 +2164,7 @@
             //>>includeEnd('debug', pragmas.debug);
             const ray = viewer.scene.camera.getPickRay(pixel);
             const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-            if (!defined$5(cartesian)) {
+            if (!defined$7(cartesian)) {
                 return undefined;
             }
             return GeoPoint.fromCartesian(cartesian);
@@ -2238,7 +2238,7 @@
         }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const rect = viewer.camera.computeViewRectangle();
-            if(!defined$5(rect)) {
+            if(!defined$7(rect)) {
                 return undefined;
             }
             return {
@@ -2346,13 +2346,13 @@
   ';
 
     const {
-        defaultValue: defaultValue$3,
-        destroyObject: destroyObject$3,
+        defaultValue: defaultValue$4,
+        destroyObject: destroyObject$4,
         Matrix4: Matrix4$1,
         DrawCommand,
         BoxGeometry,
-        Cartesian3: Cartesian3$6,
-        defined: defined$4,
+        Cartesian3: Cartesian3$7,
+        defined: defined$6,
         GeometryPipeline,
         Transforms: Transforms$2,
         VertexFormat,
@@ -2362,9 +2362,9 @@
         RenderState,
         VertexArray,
         BlendingState,
-        SceneMode: SceneMode$1,
-        ShaderProgram,
-        ShaderSource,
+        SceneMode: SceneMode$2,
+        ShaderProgram: ShaderProgram$1,
+        ShaderSource: ShaderSource$2,
         Matrix3,
     } = Cesium;
     const SkyBoxFS = shader$1;
@@ -2397,7 +2397,7 @@
          * @see Cesium.SkyBox
          */
         constructor(options = {}) {
-            this.sources = defaultValue$3(options.sources, {
+            this.sources = defaultValue$4(options.sources, {
                 positiveX: Url.buildModuleUrl('./assets/skybox/px.png'),
                 negativeX: Url.buildModuleUrl('./assets/skybox/nx.png'),
                 positiveY: Url.buildModuleUrl('./assets/skybox/py.png'),
@@ -2412,7 +2412,7 @@
              * @type {Boolean}
              * @default true
              */
-            this.show = defaultValue$3(options.show, true);
+            this.show = defaultValue$4(options.show, true);
 
             this._command = new DrawCommand({
                 modelMatrix: Matrix4$1.clone(Matrix4$1.IDENTITY),
@@ -2438,8 +2438,8 @@
                 return undefined;
             }
 
-            if ((frameState.mode !== SceneMode$1.SCENE3D)
-                && (frameState.mode !== SceneMode$1.MORPHING)) {
+            if ((frameState.mode !== SceneMode$2.SCENE3D)
+                && (frameState.mode !== SceneMode$2.MORPHING)) {
                 return undefined;
             }
 
@@ -2459,12 +2459,12 @@
                     sources,
                 } = this;
 
-                if ((!defined$4(sources.positiveX))
-                    || (!defined$4(sources.negativeX))
-                    || (!defined$4(sources.positiveY))
-                    || (!defined$4(sources.negativeY))
-                    || (!defined$4(sources.positiveZ))
-                    || (!defined$4(sources.negativeZ))) {
+                if ((!defined$6(sources.positiveX))
+                    || (!defined$6(sources.negativeX))
+                    || (!defined$6(sources.positiveY))
+                    || (!defined$6(sources.negativeY))
+                    || (!defined$6(sources.positiveZ))
+                    || (!defined$6(sources.negativeZ))) {
                     throw new CesiumProError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
                 }
 
@@ -2494,7 +2494,7 @@
             const command = this._command;
 
             command.modelMatrix = Transforms$2.eastNorthUpToFixedFrame(frameState.camera._positionWC);
-            if (!defined$4(command.vertexArray)) {
+            if (!defined$6(command.vertexArray)) {
                 command.uniformMap = {
                     u_cubeMap() {
                         return that._cubeMap;
@@ -2508,7 +2508,7 @@
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$6(2.0, 2.0, 2.0),
+                    dimensions: new Cartesian3$7(2.0, 2.0, 2.0),
                     vertexFormat: VertexFormat.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
@@ -2526,12 +2526,12 @@
                 });
             }
 
-            if (!defined$4(command.shaderProgram) || this._useHdr !== useHdr) {
-                const fs = new ShaderSource({
+            if (!defined$6(command.shaderProgram) || this._useHdr !== useHdr) {
+                const fs = new ShaderSource$2({
                     defines: [useHdr ? 'HDR' : ''],
                     sources: [SkyBoxFS],
                 });
-                command.shaderProgram = ShaderProgram.fromCache({
+                command.shaderProgram = ShaderProgram$1.fromCache({
                     context,
                     vertexShaderSource: SkyBoxVS,
                     fragmentShaderSource: fs,
@@ -2540,7 +2540,7 @@
                 this._useHdr = useHdr;
             }
 
-            if (!defined$4(this._cubeMap)) {
+            if (!defined$6(this._cubeMap)) {
                 return undefined;
             }
 
@@ -2562,11 +2562,48 @@
             command.vertexArray = command.vertexArray && command.vertexArray.destroy();
             command.shaderProgram = command.shaderProgram && command.shaderProgram.destroy();
             this._cubeMap = this._cubeMap && this._cubeMap.destroy();
-            return destroyObject$3(this);
+            return destroyObject$4(this);
         }
     }
 
-    const {Cartesian2, Rectangle: Rectangle$3, GeographicProjection, Ellipsoid} = Cesium;
+    /**
+     * 影像分割显示类型
+     * @enum {Number}
+     */
+    const ImagerySplitDirection = Object.freeze({
+        /**
+         * 影像显示在屏幕左侧
+         * @type {Number}
+         * @constant
+         */
+        LEFT:-1,
+        /**
+         * 影像显示在屏幕右侧
+         * @type {Number}
+         * @constant
+         */
+        RIGHT:1,
+        /**
+         * 一直显示该影像
+         * @type {Number}
+         * @constant
+         */
+        NONE:0,
+        /**
+         * 影像显示在屏幕上方
+         * @type {Number}
+         * @constant
+         */
+        TOP:-10,
+        /**
+         * 影像显示在屏幕下方
+         * @type {Number}
+         * @constant
+         */
+        BOTTOM:10
+    });
+
+    const {Cartesian2, Rectangle: Rectangle$4, GeographicProjection, Ellipsoid: Ellipsoid$1} = Cesium;
     const CesiumMath = Cesium.Math;
 
     /**
@@ -2587,14 +2624,14 @@
      * the tile tree.
      */
     function LonlatTilingScheme(options) {
-      options = defaultValue$4(options, defaultValue$4.EMPTY_OBJECT);
+      options = defaultValue$5(options, defaultValue$5.EMPTY_OBJECT);
 
-      this._ellipsoid = defaultValue$4(options.ellipsoid, Ellipsoid.WGS84);
-      this._rectangle = defaultValue$4(options.rectangle, Rectangle$3.MAX_VALUE);
+      this._ellipsoid = defaultValue$5(options.ellipsoid, Ellipsoid$1.WGS84);
+      this._rectangle = defaultValue$5(options.rectangle, Rectangle$4.MAX_VALUE);
       this._projection = new GeographicProjection(this._ellipsoid);
       this._numberOfLevelZeroTilesX = 36;
       this._numberOfLevelZeroTilesY = 18;
-      this._intervalOfZeorLevel = defaultValue$4(options.intervalOfZeorLevel, 16);
+      this._intervalOfZeorLevel = defaultValue$5(options.intervalOfZeorLevel, 16);
     }
 
     Object.defineProperties(LonlatTilingScheme.prototype, {
@@ -2690,8 +2727,8 @@
       const east = CesiumMath.toDegrees(rectangle.east);
       const north = CesiumMath.toDegrees(rectangle.north);
 
-      if (!defined$5(result)) {
-        return new Rectangle$3(west, south, east, north);
+      if (!defined$7(result)) {
+        return new Rectangle$4(west, south, east, north);
       }
 
       result.west = west;
@@ -2757,8 +2794,8 @@
       var north = rectangle.north - y * yTileHeight;
       var south = rectangle.north - (y + 1) * yTileHeight;
 
-      if (!defined$5(result)) {
-        result = new Rectangle$3(west, south, east, north);
+      if (!defined$7(result)) {
+        result = new Rectangle$4(west, south, east, north);
       }
 
       result.west = west;
@@ -2785,7 +2822,7 @@
       result
     ) {
       var rectangle = this._rectangle;
-      if (!Rectangle$3.contains(rectangle, position)) {
+      if (!Rectangle$4.contains(rectangle, position)) {
         // outside the bounds of the tiling scheme
         return undefined;
       }
@@ -2812,7 +2849,7 @@
         yTileCoordinate = yTiles - 1;
       }
 
-      if (!defined$5(result)) {
+      if (!defined$7(result)) {
         return new Cartesian2(xTileCoordinate, yTileCoordinate);
       }
 
@@ -2823,14 +2860,14 @@
 
     const {
         CesiumTerrainProvider,
-        when: when$5,
+        when: when$6,
         TerrainProvider,
-        Resource: Resource$3,
+        Resource: Resource$4,
         CustomDataSource: CustomDataSource$1,
-        Cartesian3: Cartesian3$5,
+        Cartesian3: Cartesian3$6,
         Entity: Entity$2,
-        Color: Color$7,
-        Rectangle: Rectangle$2
+        Color: Color$8,
+        Rectangle: Rectangle$3
     } = Cesium;
     function createBoundingRect(provider) {
         let positions = [];
@@ -2846,24 +2883,24 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$5.fromRadiansArray(positions),
-                material: Color$7.fromRandom({ alpha: 1 }),
+                positions: Cartesian3$6.fromRadiansArray(positions),
+                material: Color$8.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
         })
     }
     function bindBounding(provider, url) {
-        const resource = Resource$3.createIfNeeded(url);
+        const resource = Resource$4.createIfNeeded(url);
         resource.appendForwardSlash();
         const layerJsonResource = resource.getDerivedResource({
             url: "layer.json",
         });
         return new Promise((resolve, reject) => {
-            when$5(layerJsonResource.fetchJson())
+            when$6(layerJsonResource.fetchJson())
             .then((data) => {
                 provider.projection = data.projection;
-                provider.bounds = Rectangle$2.fromDegrees(...data.valid_bounds);
+                provider.bounds = Rectangle$3.fromDegrees(...data.valid_bounds);
                 resolve(true);
             });
         })
@@ -2901,10 +2938,10 @@
             this._hasWaterMask = false;
             this._hasVertexNormals = false;
             this._ellipsoid = options.ellipsoid;
-            this._requestVertexNormals = defaultValue$4(options.requestVertexNormals, false);
-            this._requestWaterMask = defaultValue$4(options.requestWaterMask, false);
-            this._requestMetadata = defaultValue$4(options.requestMetadata, true);
-            this._errorEvent = new Event$6();
+            this._requestVertexNormals = defaultValue$5(options.requestVertexNormals, false);
+            this._requestWaterMask = defaultValue$5(options.requestWaterMask, false);
+            this._requestMetadata = defaultValue$5(options.requestMetadata, true);
+            this._errorEvent = new Event$7();
 
             this._terrainProviders = [];
             const boundPromise = [];
@@ -2918,7 +2955,7 @@
                 boundPromise.push(bindBounding(provider, terrain.url));
             }
             this._ready = false;
-            this._readyPromise = when$5.defer();
+            this._readyPromise = when$6.defer();
             this._terrainList = terrainList;
 
             // 所有地形准备完成就准备完成
@@ -3131,7 +3168,7 @@
     };
 
     const {
-        Color: Color$6
+        Color: Color$7
     } = Cesium;
     class Selection{
         /**
@@ -3146,19 +3183,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$6.AQUA;
+        static pointColor = Color$7.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$6.AQUA;
+        static fillColor = Color$7.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$6.AQUA;
+        static strokeColor = Color$7.AQUA;
     }
 
     class XYZLayer extends Cesium.UrlTemplateImageryProvider {
@@ -3291,7 +3328,7 @@
             if (typeof options === 'string') {
                 options = {url: options};
             }
-            options.getFeatureInfoFormats = defaultValue$4(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
+            options.getFeatureInfoFormats = defaultValue$5(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
             super(options);
         }
         /**
@@ -3450,8 +3487,8 @@
      * @Desc: 
      */
     const {
-        defined: defined$3,
-        defaultValue: defaultValue$2,
+        defined: defined$5,
+        defaultValue: defaultValue$3,
         ColorMaterialProperty: ColorMaterialProperty$1,
         ConstantPositionProperty: ConstantPositionProperty$1,
         ConstantProperty: ConstantProperty$1,
@@ -3461,17 +3498,17 @@
         EntityCluster,
         PinBuilder,
         createGuid: createGuid$1,
-        Cartesian3: Cartesian3$4,
+        Cartesian3: Cartesian3$5,
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$5,
+        Color: Color$6,
         EntityCollection,
         HeightReference: HeightReference$1,
-        when: when$4,
-        Resource: Resource$2,
+        when: when$5,
+        Resource: Resource$3,
         describe,
-        Event: Event$5
+        Event: Event$6
     } = Cesium;
     const sizes$1 = {
         small: 24,
@@ -3530,7 +3567,7 @@
     function createDescriptionCallback$1(describe, properties, nameProperty) {
         var description;
         return function (time, result) {
-            if (!defined$3(description)) {
+            if (!defined$5(description)) {
                 description = describe(properties, nameProperty);
             }
             return description;
@@ -3539,12 +3576,12 @@
     // GeoJSON processing functions
     function createObject$1(geoJson, entityCollection, describe) {
         var id = geoJson.id;
-        if (!defined$3(id) || geoJson.type !== 'Feature') {
+        if (!defined$5(id) || geoJson.type !== 'Feature') {
             id = createGuid$1();
         } else {
             var i = 2;
             var finalId = id;
-            while (defined$3(entityCollection.getById(finalId))) {
+            while (defined$5(entityCollection.getById(finalId))) {
                 finalId = id + '_' + i;
                 i++;
             }
@@ -3553,14 +3590,14 @@
 
         var entity = entityCollection.getOrCreateEntity(id);
         var properties = geoJson.properties;
-        if (defined$3(properties)) {
+        if (defined$5(properties)) {
             entity.properties = properties;
 
             var nameProperty;
 
             //Check for the simplestyle specified name first.
             var name = properties.title;
-            if (defined$3(name)) {
+            if (defined$5(name)) {
                 entity.name = name;
                 nameProperty = 'title';
             } else {
@@ -3591,14 +3628,14 @@
                         }
                     }
                 }
-                if (defined$3(nameProperty)) {
+                if (defined$5(nameProperty)) {
                     entity.name = properties[nameProperty];
                 }
             }
 
             var description = properties.description;
             if (description !== null) {
-                entity.description = !defined$3(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
+                entity.description = !defined$5(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
             }
         }
         return entity;
@@ -3610,13 +3647,13 @@
             return;
         }
 
-        if (!defined$3(feature.geometry)) {
+        if (!defined$5(feature.geometry)) {
             throw new CesiumProError('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes$1[geometryType];
-        if (!defined$3(geometryHandler)) {
+        if (!defined$5(geometryHandler)) {
             throw new CesiumProError('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
@@ -3635,7 +3672,7 @@
             var geometry = geometries[i];
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes$1[geometryType];
-            if (!defined$3(geometryHandler)) {
+            if (!defined$5(geometryHandler)) {
                 throw new CesiumProError('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
@@ -3646,13 +3683,13 @@
         let size = options.pointSize;
         let color = options.pointColor;
         const properties = geoJson.properties;
-        if (defined$3(properties)) {
+        if (defined$5(properties)) {
             const cssColor = properties['point-color'];
-            if (defined$3(cssColor)) {
-                color = Color$5.fromCssColorString(cssColor);
+            if (defined$5(cssColor)) {
+                color = Color$6.fromCssColorString(cssColor);
             }
 
-            size = defaultValue$2(sizes$1[properties['point-size']], size);
+            size = defaultValue$3(sizes$1[properties['point-size']], size);
         }
         const point = new PointGraphics$1();
 
@@ -3684,25 +3721,25 @@
         const widthProperty = options.lineWidth;
 
         const properties = geoJson.properties;
-        if (defined$3(properties)) {
+        if (defined$5(properties)) {
             const width = properties['stroke-width'];
-            if (defined$3(width)) {
+            if (defined$5(width)) {
                 widthProperty = new ConstantProperty$1(width);
             }
 
             let color;
             let stroke = properties.stroke;
-            if (defined$3(stroke)) {
-                color = Color$5.fromCssColorString(stroke);
+            if (defined$5(stroke)) {
+                color = Color$6.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$3(opacity) && opacity !== 1.0) {
-                if (!defined$3(color)) {
+            if (defined$5(opacity) && opacity !== 1.0) {
+                if (!defined$5(color)) {
                     color = material.color.clone();
                 }
                 color.alpha = opacity;
             }
-            if (defined$3(color)) {
+            if (defined$5(color)) {
                 material = new ColorMaterialProperty$1(color);
             }
         }
@@ -3725,7 +3762,7 @@
                     continue;
                 }
                 var value = properties[key];
-                if (defined$3(value)) {
+                if (defined$5(value)) {
                     if (typeof value === "object") {
                         html +=
                             "<tr><th>" +
@@ -3770,42 +3807,42 @@
         let outlineWidth = options.outlineWidth;
 
         const properties = geoJson.properties;
-        if (defined$3(properties)) {
+        if (defined$5(properties)) {
             const width = properties['stroke-width'];
-            if (defined$3(width)) {
+            if (defined$5(width)) {
                 outlineWidth = new ConstantProperty$1(width);
             }
             let color;
             const stroke = properties.stroke;
-            if (defined$3(stroke)) {
-                color = Color$5.fromCssColorString(stroke);
+            if (defined$5(stroke)) {
+                color = Color$6.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$3(opacity) && opacity !== 1.0) {
-                if (!defined$3(color)) {
+            if (defined$5(opacity) && opacity !== 1.0) {
+                if (!defined$5(color)) {
                     color = options.outlineColor.color.clone();
                 }
                 color.alpha = opacity;
             }
 
-            if (defined$3(color)) {
+            if (defined$5(color)) {
                 outlineColor = new ConstantProperty$1(color);
             }
 
             let fillColor;
             const fill = properties.fill;
-            if (defined$3(fill)) {
-                fillColor = Color$5.fromCssColorString(fill);
+            if (defined$5(fill)) {
+                fillColor = Color$6.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
-            if (defined$3(opacity) && opacity !== material.color.alpha) {
-                if (!defined$3(fillColor)) {
+            if (defined$5(opacity) && opacity !== material.color.alpha) {
+                if (!defined$5(fillColor)) {
                     fillColor = material.color.clone();
                 }
                 fillColor.alpha = opacity;
             }
-            if (defined$3(fillColor)) {
+            if (defined$5(fillColor)) {
                 material = new ColorMaterialProperty$1(fillColor);
             }
         }
@@ -3827,7 +3864,7 @@
                     let extrudeValue = extrudedHeight;
                     for(let con of conditions) {
                         const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if(!(defined$3(value) && defined$3(value[1]))) {
+                        if(!(defined$5(value) && defined$5(value[1]))) {
                             continue;
                         }
                         extrudeValue = extrudeValue.replace(con, properties[value[1]]);
@@ -3885,21 +3922,21 @@
         return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
     }
     function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$4.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$5.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load$1(that, geoJson, options, sourceUri) {
         let name;
-        if (defined$3(sourceUri)) {
+        if (defined$5(sourceUri)) {
             name = Cesium.getFilenameFromUri(sourceUri);
         }
 
-        if (defined$3(name) && that._name !== name) {
+        if (defined$5(name) && that._name !== name) {
             that._name = name;
             that._changed.raiseEvent(that);
         }
 
         const typeHandler = geoJsonObjectTypes$1[geoJson.type];
-        if (!defined$3(typeHandler)) {
+        if (!defined$5(typeHandler)) {
             throw new CesiumProError('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
@@ -3907,31 +3944,31 @@
         const crs = geoJson.crs;
         let crsFunction = crs !== null ? defaultCrsFunction$1 : null;
 
-        if (defined$3(crs)) {
-            if (!defined$3(crs.properties)) {
+        if (defined$5(crs)) {
+            if (!defined$5(crs.properties)) {
                 throw new CesiumProError('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames$1[properties.name];
-                if (!defined$3(crsFunction)) {
+                if (!defined$5(crsFunction)) {
                     throw new CesiumProError('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs$1[properties.href];
-                if (!defined$3(handler)) {
+                if (!defined$5(handler)) {
                     handler = crsLinkTypes$1[properties.type];
                 }
 
-                if (!defined$3(handler)) {
+                if (!defined$5(handler)) {
                     throw new CesiumProError('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames$1['EPSG:' + properties.code];
-                if (!defined$3(crsFunction)) {
+                if (!defined$5(crsFunction)) {
                     throw new CesiumProError('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
@@ -3987,10 +4024,10 @@
          */
         constructor(name) {
             this._name = name;
-            this._changed = new Event$5();
-            this._error = new Event$5();
+            this._changed = new Event$6();
+            this._error = new Event$6();
             this._isLoading = false;
-            this._loading = new Event$5();
+            this._loading = new Event$6();
             this._entityCollection = new EntityCollection(this);
             this._promises = [];
             this._pinBuilder = new PinBuilder();
@@ -4011,21 +4048,21 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$5.ROYALBLUE;
+        static pointColor = Color$6.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$5.YELLOW;
+        static lineColor = Color$6.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$5.fromBytes(255, 255, 0, 100);
+        static fill = Color$6.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof GeoJsonDataSource
@@ -4039,7 +4076,7 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$5.YELLOW;
+        static outlineColor = Color$6.YELLOW;
         /**
          * 线要素的宽度
          * @memberof GeoJsonDataSource
@@ -4146,7 +4183,7 @@
         }
         set clustering(value) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$3(value)) {
+            if (!defined$5(value)) {
                 throw new DeveloperError("value must be defined.");
             }
             //>>includeEnd('debug');
@@ -4167,13 +4204,13 @@
          */
         load(data, options) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$3(data)) {
+            if (!defined$5(data)) {
                 throw new CesiumProError("data is required.");
             }
             //>>includeEnd('debug');
 
             DataSource$1.setLoading(this, true);
-            options = defaultValue$2(options, {});
+            options = defaultValue$3(options, {});
 
             // User specified credit
             let credit = options.credit;
@@ -4184,15 +4221,15 @@
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === "string" || data instanceof Resource$2) {
-                data = Resource$2.createIfNeeded(data);
+            if (typeof data === "string" || data instanceof Resource$3) {
+                data = Resource$3.createIfNeeded(data);
                 promise = data.fetchJson();
-                sourceUri = defaultValue$2(sourceUri, data.getUrlComponent());
+                sourceUri = defaultValue$3(sourceUri, data.getUrlComponent());
 
                 // Add resource credits to our list of credits to display
                 const resourceCredits = this._resourceCredits;
                 const credits = data.credits;
-                if (defined$3(credits)) {
+                if (defined$5(credits)) {
                     const length = credits.length;
                     for (const i = 0; i < length; i++) {
                         resourceCredits.push(credits[i]);
@@ -4201,33 +4238,33 @@
             }
 
             options = {
-                describe: defaultValue$2(options.describe, defaultDescribeProperty$1),
-                pointSize: defaultValue$2(options.pointSize, GeoJsonDataSource.pointSize),
-                pointColor: defaultValue$2(options.pointColor, GeoJsonDataSource.pointColor),
+                describe: defaultValue$3(options.describe, defaultDescribeProperty$1),
+                pointSize: defaultValue$3(options.pointSize, GeoJsonDataSource.pointSize),
+                pointColor: defaultValue$3(options.pointColor, GeoJsonDataSource.pointColor),
                 lineWidth: new ConstantProperty$1(
-                    defaultValue$2(options.lineWidth, GeoJsonDataSource.lineWidth)
+                    defaultValue$3(options.lineWidth, GeoJsonDataSource.lineWidth)
                 ),
                 outlineColor: new ColorMaterialProperty$1(
-                    defaultValue$2(options.outlineColor, GeoJsonDataSource.outlineColor)
+                    defaultValue$3(options.outlineColor, GeoJsonDataSource.outlineColor)
                 ),
-                lineColor: new ColorMaterialProperty$1(defaultValue$2(options.lineColor, GeoJsonDataSource.lineColor)),
-                outlineWidth: defaultValue$2(options.outlineWidth, GeoJsonDataSource.outlineWidth),
+                lineColor: new ColorMaterialProperty$1(defaultValue$3(options.lineColor, GeoJsonDataSource.lineColor)),
+                outlineWidth: defaultValue$3(options.outlineWidth, GeoJsonDataSource.outlineWidth),
                 fill: new ColorMaterialProperty$1(
-                    defaultValue$2(options.fill, GeoJsonDataSource.fill)
+                    defaultValue$3(options.fill, GeoJsonDataSource.fill)
                 ),
-                outline: defaultValue$2(options.outline, GeoJsonDataSource.outline),
-                clampToGround: defaultValue$2(options.clampToGround, GeoJsonDataSource.clampToGround),
+                outline: defaultValue$3(options.outline, GeoJsonDataSource.outline),
+                clampToGround: defaultValue$3(options.clampToGround, GeoJsonDataSource.clampToGround),
                 extrudedHeight: options.extrudedHeight
             };
 
             const that = this;
-            return when$4(promise, function (geoJson) {
+            return when$5(promise, function (geoJson) {
                 return load$1(that, geoJson, options, sourceUri);
             }).otherwise(function (error) {
                 DataSource$1.setLoading(that, false);
                 that._error.raiseEvent(that, error);
                 console.log(error);
-                return when$4.reject(error);
+                return when$5.reject(error);
             });
         };
         update() {
@@ -4748,8 +4785,8 @@
      * @Desc: 
      */
     const {
-        defined: defined$2,
-        defaultValue: defaultValue$1,
+        defined: defined$4,
+        defaultValue: defaultValue$2,
         ColorMaterialProperty,
         ConstantPositionProperty,
         ConstantProperty,
@@ -4757,13 +4794,13 @@
         PolygonGraphics,
         PolylineGraphics,
         createGuid,
-        Cartesian3: Cartesian3$3,
+        Cartesian3: Cartesian3$4,
         PointGraphics,
         ArcType,
         PolygonHierarchy,
-        Color: Color$4,
+        Color: Color$5,
         HeightReference,
-        Resource: Resource$1,
+        Resource: Resource$2,
     } = Cesium;
     const sizes = {
         small: 24,
@@ -4809,7 +4846,7 @@
     function createDescriptionCallback(describe, properties, nameProperty) {
         var description;
         return function (time, result) {
-            if (!defined$2(description)) {
+            if (!defined$4(description)) {
                 description = describe(properties, nameProperty);
             }
             return description;
@@ -4818,12 +4855,12 @@
     // GeoJSON processing functions
     function createObject(geoJson, entityCollection, describe) {
         var id = geoJson.id;
-        if (!defined$2(id) || geoJson.type !== 'Feature') {
+        if (!defined$4(id) || geoJson.type !== 'Feature') {
             id = createGuid();
         } else {
             var i = 2;
             var finalId = id;
-            while (defined$2(entityCollection.getById(finalId))) {
+            while (defined$4(entityCollection.getById(finalId))) {
                 finalId = id + '_' + i;
                 i++;
             }
@@ -4832,14 +4869,14 @@
 
         var entity = entityCollection.getOrCreateEntity(id);
         var properties = geoJson.properties;
-        if (defined$2(properties)) {
+        if (defined$4(properties)) {
             entity.properties = properties;
 
             var nameProperty;
 
             //Check for the simplestyle specified name first.
             var name = properties.title;
-            if (defined$2(name)) {
+            if (defined$4(name)) {
                 entity.name = name;
                 nameProperty = 'title';
             } else {
@@ -4870,14 +4907,14 @@
                         }
                     }
                 }
-                if (defined$2(nameProperty)) {
+                if (defined$4(nameProperty)) {
                     entity.name = properties[nameProperty];
                 }
             }
 
             var description = properties.description;
             if (description !== null) {
-                entity.description = !defined$2(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
+                entity.description = !defined$4(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
             }
         }
         return entity;
@@ -4889,13 +4926,13 @@
             return;
         }
 
-        if (!defined$2(feature.geometry)) {
+        if (!defined$4(feature.geometry)) {
             throw new CesiumProError('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes[geometryType];
-        if (!defined$2(geometryHandler)) {
+        if (!defined$4(geometryHandler)) {
             throw new CesiumProError('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
@@ -4914,7 +4951,7 @@
             var geometry = geometries[i];
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes[geometryType];
-            if (!defined$2(geometryHandler)) {
+            if (!defined$4(geometryHandler)) {
                 throw new CesiumProError('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
@@ -4925,13 +4962,13 @@
         let size = options.pointSize;
         let color = options.pointColor;
         const properties = geoJson.properties;
-        if (defined$2(properties)) {
+        if (defined$4(properties)) {
             const cssColor = properties['point-color'];
-            if (defined$2(cssColor)) {
-                color = Color$4.fromCssColorString(cssColor);
+            if (defined$4(cssColor)) {
+                color = Color$5.fromCssColorString(cssColor);
             }
 
-            size = defaultValue$1(sizes[properties['point-size']], size);
+            size = defaultValue$2(sizes[properties['point-size']], size);
         }
         const point = new PointGraphics();
 
@@ -4963,25 +5000,25 @@
         const widthProperty = options.lineWidth;
 
         const properties = geoJson.properties;
-        if (defined$2(properties)) {
+        if (defined$4(properties)) {
             const width = properties['stroke-width'];
-            if (defined$2(width)) {
+            if (defined$4(width)) {
                 widthProperty = new ConstantProperty(width);
             }
 
             let color;
             let stroke = properties.stroke;
-            if (defined$2(stroke)) {
-                color = Color$4.fromCssColorString(stroke);
+            if (defined$4(stroke)) {
+                color = Color$5.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$2(opacity) && opacity !== 1.0) {
-                if (!defined$2(color)) {
+            if (defined$4(opacity) && opacity !== 1.0) {
+                if (!defined$4(color)) {
                     color = material.color.clone();
                 }
                 color.alpha = opacity;
             }
-            if (defined$2(color)) {
+            if (defined$4(color)) {
                 material = new ColorMaterialProperty(color);
             }
         }
@@ -5018,42 +5055,42 @@
         let outlineWidth = options.outlineWidth;
 
         const properties = geoJson.properties;
-        if (defined$2(properties)) {
+        if (defined$4(properties)) {
             const width = properties['stroke-width'];
-            if (defined$2(width)) {
+            if (defined$4(width)) {
                 outlineWidth = new ConstantProperty(width);
             }
             let color;
             const stroke = properties.stroke;
-            if (defined$2(stroke)) {
-                color = Color$4.fromCssColorString(stroke);
+            if (defined$4(stroke)) {
+                color = Color$5.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$2(opacity) && opacity !== 1.0) {
-                if (!defined$2(color)) {
+            if (defined$4(opacity) && opacity !== 1.0) {
+                if (!defined$4(color)) {
                     color = options.outlineColor.color.clone();
                 }
                 color.alpha = opacity;
             }
 
-            if (defined$2(color)) {
+            if (defined$4(color)) {
                 outlineColor = new ConstantProperty(color);
             }
 
             let fillColor;
             const fill = properties.fill;
-            if (defined$2(fill)) {
-                fillColor = Color$4.fromCssColorString(fill);
+            if (defined$4(fill)) {
+                fillColor = Color$5.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
-            if (defined$2(opacity) && opacity !== material.color.alpha) {
-                if (!defined$2(fillColor)) {
+            if (defined$4(opacity) && opacity !== material.color.alpha) {
+                if (!defined$4(fillColor)) {
                     fillColor = material.color.clone();
                 }
                 fillColor.alpha = opacity;
             }
-            if (defined$2(fillColor)) {
+            if (defined$4(fillColor)) {
                 material = new ColorMaterialProperty(fillColor);
             }
         }
@@ -5074,7 +5111,7 @@
                     let extrudeValue = extrudedHeight;
                     for(let con of conditions) {
                         const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if(!(defined$2(value) && defined$2(value[1]))) {
+                        if(!(defined$4(value) && defined$4(value[1]))) {
                             continue;
                         }
                         extrudeValue = extrudeValue.replace(con, properties[value[1]]);
@@ -5136,7 +5173,7 @@
                     continue;
                 }
                 var value = properties[key];
-                if (defined$2(value)) {
+                if (defined$4(value)) {
                     if (typeof value === "object") {
                         html +=
                             "<tr><th>" +
@@ -5176,21 +5213,21 @@
         return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
     }
     function defaultCrsFunction(coordinates) {
-        return Cartesian3$3.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$4.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load(that, geoJson, options, sourceUri) {
         let name;
-        if (defined$2(sourceUri)) {
+        if (defined$4(sourceUri)) {
             name = Cesium.getFilenameFromUri(sourceUri);
         }
 
-        if (defined$2(name) && that._name !== name) {
+        if (defined$4(name) && that._name !== name) {
             that._name = name;
             that._changed.raiseEvent(that);
         }
 
         const typeHandler = geoJsonObjectTypes[geoJson.type];
-        if (!defined$2(typeHandler)) {
+        if (!defined$4(typeHandler)) {
             throw new CesiumProError('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
@@ -5198,31 +5235,31 @@
         const crs = geoJson.crs;
         let crsFunction = crs !== null ? defaultCrsFunction : null;
 
-        if (defined$2(crs)) {
-            if (!defined$2(crs.properties)) {
+        if (defined$4(crs)) {
+            if (!defined$4(crs.properties)) {
                 throw new CesiumProError('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames[properties.name];
-                if (!defined$2(crsFunction)) {
+                if (!defined$4(crsFunction)) {
                     throw new CesiumProError('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs[properties.href];
-                if (!defined$2(handler)) {
+                if (!defined$4(handler)) {
                     handler = crsLinkTypes[properties.type];
                 }
 
-                if (!defined$2(handler)) {
+                if (!defined$4(handler)) {
                     throw new CesiumProError('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames['EPSG:' + properties.code];
-                if (!defined$2(crsFunction)) {
+                if (!defined$4(crsFunction)) {
                     throw new CesiumProError('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
@@ -5288,21 +5325,21 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$4.ROYALBLUE;
+        static pointColor = Color$5.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$4.YELLOW;
+        static lineColor = Color$5.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$4.fromBytes(255, 255, 0, 100);
+        static fill = Color$5.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof ShapefileDataSource
@@ -5316,7 +5353,7 @@
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$4.YELLOW;
+        static outlineColor = Color$5.YELLOW;
         /**
          * 线要素的宽度
          * @memberof ShapefileDataSource
@@ -5354,7 +5391,7 @@
           * @returns {Promise<ShapefileDataSource>}
          */
         load(data, options = { encoding: 'utf-8' }) {
-            if (!defined$2(data)) {
+            if (!defined$4(data)) {
                 throw new CesiumProError('data is required.');
             }
 
@@ -5369,7 +5406,7 @@
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === 'string' || (data instanceof Resource$1)) {
+            if (typeof data === 'string' || (data instanceof Resource$2)) {
                 promise = new Promise((resolve, reject) => {
                     exports$1.open(data, undefined, { encoding: options.encoding })
                         .then(source =>
@@ -5383,12 +5420,12 @@
                         )
                         .catch(error => reject(error.stack));
                 });
-                sourceUri = defaultValue$1(sourceUri, '');
+                sourceUri = defaultValue$2(sourceUri, '');
 
                 // Add resource credits to our list of credits to display
                 var resourceCredits = this._resourceCredits;
                 var credits = data.credits;
-                if (defined$2(credits)) {
+                if (defined$4(credits)) {
                     var length = credits.length;
                     for (var i = 0; i < length; i++) {
                         resourceCredits.push(credits[i]);
@@ -5397,22 +5434,22 @@
             }
 
             options = {
-                describe: defaultValue$1(options.describe, defaultDescribeProperty),
-                pointSize: defaultValue$1(options.pointSize, ShapefileDataSource.pointSize),
-                pointColor: defaultValue$1(options.pointColor, ShapefileDataSource.pointColor),
+                describe: defaultValue$2(options.describe, defaultDescribeProperty),
+                pointSize: defaultValue$2(options.pointSize, ShapefileDataSource.pointSize),
+                pointColor: defaultValue$2(options.pointColor, ShapefileDataSource.pointColor),
                 lineWidth: new ConstantProperty(
-                    defaultValue$1(options.lineWidth, ShapefileDataSource.lineWidth)
+                    defaultValue$2(options.lineWidth, ShapefileDataSource.lineWidth)
                 ),
                 outlineColor: new ColorMaterialProperty(
-                    defaultValue$1(options.outlineColor, ShapefileDataSource.outlineColor)
+                    defaultValue$2(options.outlineColor, ShapefileDataSource.outlineColor)
                 ),
-                lineColor: new ColorMaterialProperty(defaultValue$1(options.lineColor, ShapefileDataSource.lineColor)),
-                outlineWidth: defaultValue$1(options.outlineWidth, ShapefileDataSource.outlineWidth),
+                lineColor: new ColorMaterialProperty(defaultValue$2(options.lineColor, ShapefileDataSource.lineColor)),
+                outlineWidth: defaultValue$2(options.outlineWidth, ShapefileDataSource.outlineWidth),
                 fill: new ColorMaterialProperty(
-                    defaultValue$1(options.fill, ShapefileDataSource.fill)
+                    defaultValue$2(options.fill, ShapefileDataSource.fill)
                 ),
-                outline: defaultValue$1(options.outline, ShapefileDataSource.outline),
-                clampToGround: defaultValue$1(options.clampToGround, ShapefileDataSource.clampToGround),
+                outline: defaultValue$2(options.outline, ShapefileDataSource.outline),
+                clampToGround: defaultValue$2(options.clampToGround, ShapefileDataSource.clampToGround),
                 extrudedHeight: options.extrudedHeight
             };
 
@@ -5440,10 +5477,10 @@
     };
 
     const {
-        buildModuleUrl,
-        Color: Color$3,
-        defined: defined$1,
-        destroyObject: destroyObject$2,
+        buildModuleUrl: buildModuleUrl$1,
+        Color: Color$4,
+        defined: defined$3,
+        destroyObject: destroyObject$3,
         knockout,
         getElement,
         subscribeAndEvaluate,
@@ -5509,7 +5546,7 @@
                 //We inject default css into the content iframe,
                 //end users can remove it or add their own via the exposed frame property.
                 var cssLink = frameDocument.createElement("link");
-                cssLink.href = buildModuleUrl("Widgets/InfoBox/InfoBoxDescription.css");
+                cssLink.href = buildModuleUrl$1("Widgets/InfoBox/InfoBoxDescription.css");
                 cssLink.rel = "stylesheet";
                 cssLink.type = "text/css";
 
@@ -5544,8 +5581,8 @@
                             var style = window.getComputedStyle(firstElementChild);
                             if (style !== null) {
                                 var backgroundColor = style["background-color"];
-                                var color = Color$3.fromCssColorString(backgroundColor);
-                                if (defined$1(color) && color.alpha !== 0) {
+                                var color = Color$4.fromCssColorString(backgroundColor);
+                                if (defined$3(color) && color.alpha !== 0) {
                                     background = style["background-color"];
                                 }
                             }
@@ -5579,17 +5616,17 @@
             knockout.cleanNode(this._element);
             container.removeChild(this._element);
         
-            if (defined$1(this._descriptionSubscription)) {
+            if (defined$3(this._descriptionSubscription)) {
                 this._descriptionSubscription.dispose();
             }
         
-            return destroyObject$2(this);
+            return destroyObject$3(this);
         };
     }
 
     const {
         Transforms: Transforms$1,
-        Cartesian3: Cartesian3$2
+        Cartesian3: Cartesian3$3
     } = Cesium;
     class Model{
         /**
@@ -5622,9 +5659,9 @@
          * viewer.addModel(model)
          */
         constructor(options = {}) {
-            if(!defined$5(options.modelMatrix)&&defined$5(options.position)) {
+            if(!defined$7(options.modelMatrix)&&defined$7(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$2) {
+                if(options.position instanceof Cartesian3$3) {
                     cartesian = options.position;
                 } else if(options.position instanceof GeoPoint) {
                     cartesian = options.position.toCartesian();
@@ -5633,9 +5670,9 @@
                     options.modelMatrix = Transforms$1.eastNorthUpToFixedFrame(cartesian);
                 }
             }
-            if(defined$5(options.gltf)) {
+            if(defined$7(options.gltf)) {
                 this.delegate = new Cesium.Model(options);
-            } else if(defined$5(options.url)) {
+            } else if(defined$7(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
                 throw new CesiumProError('one of parameters url or gltf must be provided.')
@@ -5975,320 +6012,6 @@
         }
     }
 
-    const CesiumScene = Cesium.Scene;
-    const {
-        JulianDate,
-        defined,
-        RequestScheduler,
-        PerformanceDisplay,
-        Cesium3DTilePassState,
-        Cesium3DTilePass,
-        defaultValue,
-        Color: Color$2,
-        BoundingRectangle,
-        Pass,
-        SunLight,
-        Cartesian3: Cartesian3$1
-    } = Cesium;
-    const preloadTilesetPassState = new Cesium3DTilePassState({
-        pass: Cesium3DTilePass.PRELOAD,
-    });
-
-    const preloadFlightTilesetPassState = new Cesium3DTilePassState({
-        pass: Cesium3DTilePass.PRELOAD_FLIGHT,
-    });
-
-    const requestRenderModeDeferCheckPassState = new Cesium3DTilePassState({
-        pass: Cesium3DTilePass.REQUEST_RENDER_MODE_DEFER_CHECK,
-    });
-
-    function updateFrameNumber(scene, frameNumber, time) {
-        var frameState = scene._frameState;
-        frameState.frameNumber = frameNumber;
-        frameState.time = JulianDate.clone(time, frameState.time);
-    }
-    function tryAndCatchError(scene, functionToExecute) {
-        try {
-            functionToExecute(scene);
-        } catch (error) {
-            scene._renderError.raiseEvent(scene, error);
-
-            if (scene.rethrowRenderErrors) {
-                throw error;
-            }
-        }
-    }
-    function updateDebugShowFramesPerSecond(scene, renderedThisFrame) {
-        if (scene.debugShowFramesPerSecond) {
-            if (!defined(scene._performanceDisplay)) {
-                var performanceContainer = document.createElement("div");
-                performanceContainer.className =
-                    "cesium-performanceDisplay-defaultContainer";
-                var container = scene._canvas.parentNode;
-                container.appendChild(performanceContainer);
-                var performanceDisplay = new PerformanceDisplay({
-                    container: performanceContainer,
-                });
-                scene._performanceDisplay = performanceDisplay;
-                scene._performanceContainer = performanceContainer;
-            }
-
-            scene._performanceDisplay.throttled = scene.requestRenderMode;
-            scene._performanceDisplay.update(renderedThisFrame);
-        } else if (defined(scene._performanceDisplay)) {
-            scene._performanceDisplay =
-                scene._performanceDisplay && scene._performanceDisplay.destroy();
-            scene._performanceContainer.parentNode.removeChild(
-                scene._performanceContainer
-            );
-        }
-    }
-    function callAfterRenderFunctions(scene) {
-        // Functions are queued up during primitive update and executed here in case
-        // the function modifies scene state that should remain constant over the frame.
-        var functions = scene._frameState.afterRender;
-        for (var i = 0, length = functions.length; i < length; ++i) {
-            functions[i]();
-            scene.requestRender();
-        }
-
-        functions.length = 0;
-    }
-    function prePassesUpdate(scene) {
-        scene._jobScheduler.resetBudgets();
-
-        var frameState = scene._frameState;
-        var primitives = scene.primitives;
-        primitives.prePassesUpdate(frameState);
-
-        if (defined(scene.globe)) {
-            scene.globe.update(frameState);
-        }
-
-        scene._picking.update();
-        frameState.creditDisplay.update();
-    }
-    function updateMostDetailedRayPicks(scene) {
-        return scene._picking.updateMostDetailedRayPicks(scene);
-    }
-    function updatePreloadPass(scene) {
-        var frameState = scene._frameState;
-        preloadTilesetPassState.camera = frameState.camera;
-        preloadTilesetPassState.cullingVolume = frameState.cullingVolume;
-
-        var primitives = scene.primitives;
-        primitives.updateForPass(frameState, preloadTilesetPassState);
-    }
-    function updatePreloadFlightPass(scene) {
-        var frameState = scene._frameState;
-        var camera = frameState.camera;
-        if (!camera.canPreloadFlight()) {
-            return;
-        }
-
-        preloadFlightTilesetPassState.camera = scene.preloadFlightCamera;
-        preloadFlightTilesetPassState.cullingVolume =
-            scene.preloadFlightCullingVolume;
-
-        var primitives = scene.primitives;
-        primitives.updateForPass(frameState, preloadFlightTilesetPassState);
-    }
-    const renderTilesetPassState = new Cesium3DTilePassState({
-        pass: Cesium3DTilePass.RENDER,
-    });
-    function updateRequestRenderModeDeferCheckPass(scene) {
-        // Check if any ignored requests are ready to go (to wake rendering up again)
-        scene.primitives.updateForPass(
-            scene._frameState,
-            requestRenderModeDeferCheckPassState
-        );
-    }
-    function postPassesUpdate(scene) {
-        var frameState = scene._frameState;
-        var primitives = scene.primitives;
-        primitives.postPassesUpdate(frameState);
-
-        RequestScheduler.update();
-    }
-    function render(scene) {
-        var frameState = scene._frameState;
-
-        var context = scene.context;
-        var us = context.uniformState;
-
-        var view = scene._defaultView;
-        scene._view = view;
-
-        scene.updateFrameState();
-        frameState.passes.render = true;
-        frameState.passes.postProcess = scene.postProcessStages.hasSelected;
-        frameState.tilesetPassState = renderTilesetPassState;
-
-        var backgroundColor = defaultValue(scene.backgroundColor, Color$2.BLACK);
-        if (scene._hdr) {
-            backgroundColor = Color$2.clone(backgroundColor, scratchBackgroundColor);
-            backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
-            backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
-            backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
-        }
-        frameState.backgroundColor = backgroundColor;
-
-        scene.fog.update(frameState);
-
-        us.update(frameState);
-
-        var shadowMap = scene.shadowMap;
-        if (defined(shadowMap) && shadowMap.enabled) {
-            if (!defined(scene.light) || scene.light instanceof SunLight) {
-                // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3$1.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
-            } else {
-                Cartesian3$1.clone(scene.light.direction, scene._shadowMapCamera.direction);
-            }
-            frameState.shadowMaps.push(shadowMap);
-        }
-
-        scene._computeCommandList.length = 0;
-        scene._overlayCommandList.length = 0;
-
-        var viewport = view.viewport;
-        viewport.x = 0;
-        viewport.y = 0;
-        viewport.width = context.drawingBufferWidth;
-        viewport.height = context.drawingBufferHeight;
-
-        var passState = view.passState;
-        passState.framebuffer = undefined;
-        passState.blendingEnabled = undefined;
-        passState.scissorTest = undefined;
-        passState.viewport = BoundingRectangle.clone(viewport, passState.viewport);
-
-        if (defined(scene.globe)) {
-            scene.globe.beginFrame(frameState);
-            scene._LodGraphic.beginFrame(frameState);
-        }
-        scene.updateEnvironment();
-        scene.updateAndExecuteCommands(passState, backgroundColor);
-        scene.globe && scene._LodGraphic.render(frameState);
-        scene.resolveFramebuffers(passState);
-
-        passState.framebuffer = undefined;
-        executeOverlayCommands(scene, passState);
-
-        if (defined(scene.globe)) {
-            scene.globe.endFrame(frameState);
-            scene._LodGraphic.endFrame(frameState);
-
-            if (!scene.globe.tilesLoaded) {
-                scene._renderRequested = true;
-            }
-        }
-        context.endFrame();
-    }
-    function executeOverlayCommands(scene, passState) {
-        var us = scene.context.uniformState;
-        us.updatePass(Pass.OVERLAY);
-
-        var context = scene.context;
-        var commandList = scene._overlayCommandList;
-        var length = commandList.length;
-        for (var i = 0; i < length; ++i) {
-            commandList[i].execute(context, passState);
-        }
-    }
-    function sceneRender(time) {
-        this._preUpdate.raiseEvent(this, time);
-
-        var frameState = this._frameState;
-        frameState.newFrame = false;
-
-        if (!defined(time)) {
-            time = JulianDate.now();
-        }
-
-        // Determine if shouldRender
-        var cameraChanged = this._view.checkForCameraUpdates(this);
-        var shouldRender =
-            !this.requestRenderMode ||
-            this._renderRequested ||
-            cameraChanged ||
-            this._logDepthBufferDirty ||
-            this._hdrDirty ||
-            this.mode === SceneMode.MORPHING;
-        if (
-            !shouldRender &&
-            defined(this.maximumRenderTimeChange) &&
-            defined(this._lastRenderTime)
-        ) {
-            var difference = Math.abs(
-                JulianDate.secondsDifference(this._lastRenderTime, time)
-            );
-            shouldRender = shouldRender || difference > this.maximumRenderTimeChange;
-        }
-
-        if (shouldRender) {
-            this._lastRenderTime = JulianDate.clone(time, this._lastRenderTime);
-            this._renderRequested = false;
-            this._logDepthBufferDirty = false;
-            this._hdrDirty = false;
-
-            var frameNumber = Cesium.Math.incrementWrap(
-                frameState.frameNumber,
-                15000000.0,
-                1.0
-            );
-            updateFrameNumber(this, frameNumber, time);
-            frameState.newFrame = true;
-        }
-
-        tryAndCatchError(this, prePassesUpdate);
-
-        /**
-         *
-         * Passes update. Add any passes here
-         *
-         */
-        if (this.primitives.show) {
-            tryAndCatchError(this, updateMostDetailedRayPicks);
-            tryAndCatchError(this, updatePreloadPass);
-            tryAndCatchError(this, updatePreloadFlightPass);
-            if (!shouldRender) {
-                tryAndCatchError(this, updateRequestRenderModeDeferCheckPass);
-            }
-        }
-
-        this._postUpdate.raiseEvent(this, time);
-
-        if (shouldRender) {
-            this._preRender.raiseEvent(this, time);
-            frameState.creditDisplay.beginFrame();
-            tryAndCatchError(this, render);
-        }
-
-        /**
-         *
-         * Post passes update. Execute any pass invariant code that should run after the passes here.
-         *
-         */
-        updateDebugShowFramesPerSecond(this, shouldRender);
-        tryAndCatchError(this, postPassesUpdate);
-
-        // Often used to trigger events (so don't want in trycatch) that the user might be subscribed to. Things like the tile load events, ready promises, etc.
-        // We don't want those events to resolve during the render loop because the events might add new primitives
-        callAfterRenderFunctions(this);
-
-        if (shouldRender) {
-            this._postRender.raiseEvent(this, time);
-            frameState.creditDisplay.endFrame();
-        }
-    }
-    class Scene {
-        static overrideRenderFunction() {
-            CesiumScene.prototype.render = sceneRender;
-        }
-
-    }
-
     class MassiveGraphicLayer {
         /**
          * 一个以LOD方式加载大量点（model, billboard, point, label）数据的基础类。
@@ -6302,16 +6025,16 @@
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(options.objects)) {
+            if (!defined$7(options.objects)) {
                 throw new CesiumProError('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
                 throw new CesiumProError('objects property must be an array')
             }
             //>>includeEnd('debug')
-            this._id = defaultValue$4(options.id, createGuid$2());
-            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._id = defaultValue$5(options.id, createGuid$2());
+            this._maxClusterLevel = defaultValue$5(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$5(options.minLoadLevel, 12);
             this._objects = undefined;
         }
         /**
@@ -6484,19 +6207,19 @@
 
     const {
         GeographicTilingScheme: GeographicTilingScheme$2,
-        GlobeSurfaceTileProvider,
-        when: when$3,
-        Event: Event$4,
+        GlobeSurfaceTileProvider: GlobeSurfaceTileProvider$1,
+        when: when$4,
+        Event: Event$5,
         GlobeSurfaceTile,
         TerrainState,
         RequestType,
         Request,
-        Rectangle: Rectangle$1,
+        Rectangle: Rectangle$2,
         QuadtreeTileLoadState,
         Visibility,
         AssociativeArray: AssociativeArray$1,
-        Cartesian3,
-        Cartographic: Cartographic$2,
+        Cartesian3: Cartesian3$2,
+        Cartographic: Cartographic$3,
         getTimestamp
     } = Cesium;
 
@@ -6533,9 +6256,9 @@
                 tile.level,
                 request
             );
-            if (defined$5(requestPromise)) {
+            if (defined$7(requestPromise)) {
                 surfaceTile.terrainState = TerrainState.RECEIVING;
-                when$3(requestPromise, success, failure);
+                when$4(requestPromise, success, failure);
             } else {
                 // Deferred - try again later.
                 surfaceTile.terrainState = TerrainState.UNLOADED;
@@ -6569,14 +6292,14 @@
         const terrainData = surfaceTile.terrainData;
         const meshPromise = terrainData.createMesh(createMeshOptions);
 
-        if (!defined$5(meshPromise)) {
+        if (!defined$7(meshPromise)) {
             // Postponed.
             return;
         }
 
         surfaceTile.terrainState = TerrainState.TRANSFORMING;
 
-        when$3(
+        when$4(
             meshPromise,
             function (mesh) {
                 surfaceTile.mesh = mesh;
@@ -6609,19 +6332,19 @@
     function getObjectByTile(objects, tile) {
         const tileObject = [];
         for (let object of objects) {
-            if (!defined$5(object)) {
+            if (!defined$7(object)) {
                 continue;
             }
-            if (!defined$5(object.id)) {
+            if (!defined$7(object.id)) {
                 object.id = createGuid$2();
             }
-            if (!(defined$5(object) && defined$5(object.position))) {
+            if (!(defined$7(object) && defined$7(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3) {
+            if (object.position instanceof Cartesian3$2) {
                 object.cartesian = object.position;
-            } else if (object.position instanceof Cartographic$2) {
-                object.cartesian = Cartographic$2.toCartesian(object.position);
+            } else if (object.position instanceof Cartographic$3) {
+                object.cartesian = Cartographic$3.toCartesian(object.position);
                 object.catographic = object.position;
             } else if (object.position instanceof GeoPoint) {
                 object.cartesian = object.position.toCartesian();
@@ -6630,9 +6353,9 @@
                 object.cartesian = object.position;
             }
             if (!object.cartographic) {
-                object.cartographic = Cartographic$2.fromCartesian(object.cartesian);
+                object.cartographic = Cartographic$3.fromCartesian(object.cartesian);
             }
-            if (Rectangle$1.contains(tile.rectangle, object.cartographic)) {
+            if (Rectangle$2.contains(tile.rectangle, object.cartographic)) {
                 tileObject.push(object);
             }
         }
@@ -6661,7 +6384,7 @@
         }
         static initialize(tile, terrainProvider) {
             let surfaceTile = tile.data;
-            if (!defined$5(surfaceTile)) {
+            if (!defined$7(surfaceTile)) {
                 surfaceTile = tile.data = new QuadTile();
             }
 
@@ -6709,12 +6432,12 @@
             this._ready = true;
             this._scene = options.scene;
             this._tilingSceheme = new GeographicTilingScheme$2();
-            this._readyPromise = when$3.defer();
+            this._readyPromise = when$4.defer();
             this._readyPromise.resolve(true);
-            this._errorEvent = new Event$4();
+            this._errorEvent = new Event$5();
             this._terrainProvider = options.terrainProvider;
             this._show = true;
-            this.cartographicLimitRectangle = Rectangle$1.clone(Rectangle$1.MAX_VALUE);
+            this.cartographicLimitRectangle = Rectangle$2.clone(Rectangle$2.MAX_VALUE);
             this.tree = undefined;
             this._layers = new MassiveGraphicLayerCollection();
             this._lastTilesToRender = [];
@@ -6752,7 +6475,7 @@
             return this._quadtree;
         }
         set quadtree(val) {
-            if (defined$5(val)) {
+            if (defined$7(val)) {
                 this._quadtree = val;
             }
         }
@@ -6783,7 +6506,7 @@
          */
         showTileThisFrame(tile, framestate) {
             const surfaceData = tile.data;
-            if (!defined$5(surfaceData)) {
+            if (!defined$7(surfaceData)) {
                 return;
             }
             if (!this._tilesCahced.includes(tile)) {
@@ -6792,7 +6515,7 @@
             const layers = this._layers.values;
             getTimestamp();
             for (let layer of layers) {
-                if (!(defined$5(layer.objects) && Array.isArray(layer.objects))) {
+                if (!(defined$7(layer.objects) && Array.isArray(layer.objects))) {
                     continue;
                 }
                 // if(getTimestamp() < time + loadQueueTimeSlice) {
@@ -6804,7 +6527,7 @@
                     return;
                 }
                 let tileObjects = surfaceData._objectsOfTile.get(id);
-                if (!defined$5(tileObjects) || layer._needReclass) {
+                if (!defined$7(tileObjects) || layer._needReclass) {
                     tileObjects = getObjectByTile(layer.objects, tile);
                     surfaceData._objectsOfTile.set(id, tileObjects);
                 }
@@ -6870,19 +6593,19 @@
             return this._terrainProvider.getLevelMaximumGeometricError(level);
         }
         canRefine(tile) {
-            return GlobeSurfaceTileProvider.prototype.canRefine.call(this, tile);
+            return GlobeSurfaceTileProvider$1.prototype.canRefine.call(this, tile);
         }
         computeTileVisibility(tile, frameState, occluders) {
-            if (!defined$5(tile.data)) {
+            if (!defined$7(tile.data)) {
                 tile.data = new QuadTile();
             }
-            return GlobeSurfaceTileProvider.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
+            return GlobeSurfaceTileProvider$1.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
         }
         computeDistanceToTile(tile, framestate) {
             if (!tile.data) {
                 tile.data = new QuadTile();
             }
-            return GlobeSurfaceTileProvider.prototype.computeDistanceToTile.call(this, tile, framestate)
+            return GlobeSurfaceTileProvider$1.prototype.computeDistanceToTile.call(this, tile, framestate)
         }
         clearTile(id) {
             const tiles = this._tilesCahced;
@@ -6903,7 +6626,7 @@
             }
         }
         computeTileLoadPriority(tile, frameState) {
-            return GlobeSurfaceTileProvider.prototype.computeTileLoadPriority(tile, frameState)
+            return GlobeSurfaceTileProvider$1.prototype.computeTileLoadPriority(tile, frameState)
         }
         _onLayerAdded(layer, index) {
 
@@ -6922,6 +6645,2461 @@
                 this._onLayerRemoved(layer, index);
             }
         }
+    }
+
+    //This file is automatically rebuilt by the Cesium build process.
+    var GlobeFS = "uniform vec4 u_initialColor;\n\
+\n\
+#if TEXTURE_UNITS > 0\n\
+uniform sampler2D u_dayTextures[TEXTURE_UNITS];\n\
+uniform vec4 u_dayTextureTranslationAndScale[TEXTURE_UNITS];\n\
+uniform bool u_dayTextureUseWebMercatorT[TEXTURE_UNITS];\n\
+\n\
+#ifdef APPLY_ALPHA\n\
+uniform float u_dayTextureAlpha[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_DAY_NIGHT_ALPHA\n\
+uniform float u_dayTextureNightAlpha[TEXTURE_UNITS];\n\
+uniform float u_dayTextureDayAlpha[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_SPLIT\n\
+uniform float czm_p_imagerySplitPosition;\n\
+uniform float czm_p_drawingBufferHeight;\n\
+uniform float czm_p_drawingBufferWidth;\n\
+uniform float u_dayTextureSplit[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_BRIGHTNESS\n\
+uniform float u_dayTextureBrightness[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_CONTRAST\n\
+uniform float u_dayTextureContrast[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_HUE\n\
+uniform float u_dayTextureHue[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_SATURATION\n\
+uniform float u_dayTextureSaturation[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_GAMMA\n\
+uniform float u_dayTextureOneOverGamma[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_IMAGERY_CUTOUT\n\
+uniform vec4 u_dayTextureCutoutRectangles[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef APPLY_COLOR_TO_ALPHA\n\
+uniform vec4 u_colorsToAlpha[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+uniform vec4 u_dayTextureTexCoordsRectangle[TEXTURE_UNITS];\n\
+#endif\n\
+\n\
+#ifdef SHOW_REFLECTIVE_OCEAN\n\
+uniform sampler2D u_waterMask;\n\
+uniform vec4 u_waterMaskTranslationAndScale;\n\
+uniform float u_zoomedOutOceanSpecularIntensity;\n\
+#endif\n\
+\n\
+#ifdef SHOW_OCEAN_WAVES\n\
+uniform sampler2D u_oceanNormalMap;\n\
+#endif\n\
+\n\
+#if defined(ENABLE_DAYNIGHT_SHADING) || defined(GROUND_ATMOSPHERE)\n\
+uniform vec2 u_lightingFadeDistance;\n\
+#endif\n\
+\n\
+#ifdef TILE_LIMIT_RECTANGLE\n\
+uniform vec4 u_cartographicLimitRectangle;\n\
+#endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+uniform vec2 u_nightFadeDistance;\n\
+#endif\n\
+\n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+uniform highp sampler2D u_clippingPlanes;\n\
+uniform mat4 u_clippingPlanesMatrix;\n\
+uniform vec4 u_clippingPlanesEdgeStyle;\n\
+#endif\n\
+\n\
+#if defined(FOG) && defined(DYNAMIC_ATMOSPHERE_LIGHTING) && (defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING))\n\
+uniform float u_minimumBrightness;\n\
+#endif\n\
+\n\
+#ifdef COLOR_CORRECT\n\
+uniform vec3 u_hsbShift; // Hue, saturation, brightness\n\
+#endif\n\
+\n\
+#ifdef HIGHLIGHT_FILL_TILE\n\
+uniform vec4 u_fillHighlightColor;\n\
+#endif\n\
+\n\
+#ifdef TRANSLUCENT\n\
+uniform vec4 u_frontFaceAlphaByDistance;\n\
+uniform vec4 u_backFaceAlphaByDistance;\n\
+uniform vec4 u_translucencyRectangle;\n\
+#endif\n\
+\n\
+#ifdef UNDERGROUND_COLOR\n\
+uniform vec4 u_undergroundColor;\n\
+uniform vec4 u_undergroundColorAlphaByDistance;\n\
+#endif\n\
+\n\
+varying vec3 v_positionMC;\n\
+varying vec3 v_positionEC;\n\
+varying vec3 v_textureCoordinates;\n\
+varying vec3 v_normalMC;\n\
+varying vec3 v_normalEC;\n\
+\n\
+#ifdef APPLY_MATERIAL\n\
+varying float v_height;\n\
+varying float v_slope;\n\
+varying float v_aspect;\n\
+#endif\n\
+\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE) || defined(UNDERGROUND_COLOR) || defined(TRANSLUCENT)\n\
+varying float v_distance;\n\
+#endif\n\
+\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
+varying vec3 v_fogRayleighColor;\n\
+varying vec3 v_fogMieColor;\n\
+#endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+varying vec3 v_rayleighColor;\n\
+varying vec3 v_mieColor;\n\
+#endif\n\
+\n\
+#if defined(UNDERGROUND_COLOR) || defined(TRANSLUCENT)\n\
+float interpolateByDistance(vec4 nearFarScalar, float distance)\n\
+{\n\
+    float startDistance = nearFarScalar.x;\n\
+    float startValue = nearFarScalar.y;\n\
+    float endDistance = nearFarScalar.z;\n\
+    float endValue = nearFarScalar.w;\n\
+    float t = clamp((distance - startDistance) / (endDistance - startDistance), 0.0, 1.0);\n\
+    return mix(startValue, endValue, t);\n\
+}\n\
+#endif\n\
+\n\
+#if defined(UNDERGROUND_COLOR) || defined(TRANSLUCENT) || defined(APPLY_MATERIAL)\n\
+vec4 alphaBlend(vec4 sourceColor, vec4 destinationColor)\n\
+{\n\
+    return sourceColor * vec4(sourceColor.aaa, 1.0) + destinationColor * (1.0 - sourceColor.a);\n\
+}\n\
+#endif\n\
+\n\
+#ifdef TRANSLUCENT\n\
+bool inTranslucencyRectangle()\n\
+{\n\
+    return\n\
+        v_textureCoordinates.x > u_translucencyRectangle.x &&\n\
+        v_textureCoordinates.x < u_translucencyRectangle.z &&\n\
+        v_textureCoordinates.y > u_translucencyRectangle.y &&\n\
+        v_textureCoordinates.y < u_translucencyRectangle.w;\n\
+}\n\
+#endif\n\
+\n\
+vec4 sampleAndBlend(\n\
+    vec4 previousColor,\n\
+    sampler2D textureToSample,\n\
+    vec2 tileTextureCoordinates,\n\
+    vec4 textureCoordinateRectangle,\n\
+    vec4 textureCoordinateTranslationAndScale,\n\
+    float textureAlpha,\n\
+    float textureNightAlpha,\n\
+    float textureDayAlpha,\n\
+    float textureBrightness,\n\
+    float textureContrast,\n\
+    float textureHue,\n\
+    float textureSaturation,\n\
+    float textureOneOverGamma,\n\
+    float split,\n\
+    vec4 colorToAlpha,\n\
+    float nightBlend)\n\
+{\n\
+    // This crazy step stuff sets the alpha to 0.0 if this following condition is true:\n\
+    //    tileTextureCoordinates.s < textureCoordinateRectangle.s ||\n\
+    //    tileTextureCoordinates.s > textureCoordinateRectangle.p ||\n\
+    //    tileTextureCoordinates.t < textureCoordinateRectangle.t ||\n\
+    //    tileTextureCoordinates.t > textureCoordinateRectangle.q\n\
+    // In other words, the alpha is zero if the fragment is outside the rectangle\n\
+    // covered by this texture.  Would an actual 'if' yield better performance?\n\
+    vec2 alphaMultiplier = step(textureCoordinateRectangle.st, tileTextureCoordinates);\n\
+    textureAlpha = textureAlpha * alphaMultiplier.x * alphaMultiplier.y;\n\
+\n\
+    alphaMultiplier = step(vec2(0.0), textureCoordinateRectangle.pq - tileTextureCoordinates);\n\
+    textureAlpha = textureAlpha * alphaMultiplier.x * alphaMultiplier.y;\n\
+\n\
+#if defined(APPLY_DAY_NIGHT_ALPHA) && defined(ENABLE_DAYNIGHT_SHADING)\n\
+    textureAlpha *= mix(textureDayAlpha, textureNightAlpha, nightBlend);\n\
+#endif\n\
+\n\
+    vec2 translation = textureCoordinateTranslationAndScale.xy;\n\
+    vec2 scale = textureCoordinateTranslationAndScale.zw;\n\
+    vec2 textureCoordinates = tileTextureCoordinates * scale + translation;\n\
+    vec4 value = texture2D(textureToSample, textureCoordinates);\n\
+    vec3 color = value.rgb;\n\
+    float alpha = value.a;\n\
+\n\
+#ifdef APPLY_COLOR_TO_ALPHA\n\
+    vec3 colorDiff = abs(color.rgb - colorToAlpha.rgb);\n\
+    colorDiff.r = max(max(colorDiff.r, colorDiff.g), colorDiff.b);\n\
+    alpha = czm_branchFreeTernary(colorDiff.r < colorToAlpha.a, 0.0, alpha);\n\
+#endif\n\
+\n\
+#if !defined(APPLY_GAMMA)\n\
+    vec4 tempColor = czm_gammaCorrect(vec4(color, alpha));\n\
+    color = tempColor.rgb;\n\
+    alpha = tempColor.a;\n\
+#else\n\
+    color = pow(color, vec3(textureOneOverGamma));\n\
+#endif\n\
+\n\
+#ifdef APPLY_SPLIT\n\
+    float splitPosition = czm_p_imagerySplitPosition * czm_p_drawingBufferWidth;\n\
+    // 垂直分割 \n\
+    if(split < -2.0 || split > 2.0) {\n\
+        splitPosition = (1.0 - czm_p_imagerySplitPosition) * czm_p_drawingBufferHeight;\n\
+    }\n\
+    if(split < -2.0 && gl_FragCoord.y < splitPosition) {\n\
+        alpha = 0.0;\n\
+    }\n\
+    else if (split > 2.0 && gl_FragCoord.y > splitPosition) {\n\
+        alpha = 0.0;\n\
+    }\n\
+    // Split to the left\n\
+    else if (split > -2.0 && split < 0.0 && gl_FragCoord.x > splitPosition) {\n\
+       alpha = 0.0;\n\
+    }\n\
+    // Split to the right\n\
+    else if (split < 2.0 && split > 0.0 && gl_FragCoord.x < splitPosition) {\n\
+       alpha = 0.0;\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef APPLY_BRIGHTNESS\n\
+    color = mix(vec3(0.0), color, textureBrightness);\n\
+#endif\n\
+\n\
+#ifdef APPLY_CONTRAST\n\
+    color = mix(vec3(0.5), color, textureContrast);\n\
+#endif\n\
+\n\
+#ifdef APPLY_HUE\n\
+    color = czm_hue(color, textureHue);\n\
+#endif\n\
+\n\
+#ifdef APPLY_SATURATION\n\
+    color = czm_saturation(color, textureSaturation);\n\
+#endif\n\
+\n\
+    float sourceAlpha = alpha * textureAlpha;\n\
+    float outAlpha = mix(previousColor.a, 1.0, sourceAlpha);\n\
+    outAlpha += sign(outAlpha) - 1.0;\n\
+\n\
+    vec3 outColor = mix(previousColor.rgb * previousColor.a, color, sourceAlpha) / outAlpha;\n\
+\n\
+    // When rendering imagery for a tile in multiple passes,\n\
+    // some GPU/WebGL implementation combinations will not blend fragments in\n\
+    // additional passes correctly if their computation includes an unmasked\n\
+    // divide-by-zero operation,\n\
+    // even if it's not in the output or if the output has alpha zero.\n\
+    //\n\
+    // For example, without sanitization for outAlpha,\n\
+    // this renders without artifacts:\n\
+    //   if (outAlpha == 0.0) { outColor = vec3(0.0); }\n\
+    //\n\
+    // but using czm_branchFreeTernary will cause portions of the tile that are\n\
+    // alpha-zero in the additional pass to render as black instead of blending\n\
+    // with the previous pass:\n\
+    //   outColor = czm_branchFreeTernary(outAlpha == 0.0, vec3(0.0), outColor);\n\
+    //\n\
+    // So instead, sanitize against divide-by-zero,\n\
+    // store this state on the sign of outAlpha, and correct on return.\n\
+\n\
+    return vec4(outColor, max(outAlpha, 0.0));\n\
+}\n\
+\n\
+vec3 colorCorrect(vec3 rgb) {\n\
+#ifdef COLOR_CORRECT\n\
+    // Convert rgb color to hsb\n\
+    vec3 hsb = czm_RGBToHSB(rgb);\n\
+    // Perform hsb shift\n\
+    hsb.x += u_hsbShift.x; // hue\n\
+    hsb.y = clamp(hsb.y + u_hsbShift.y, 0.0, 1.0); // saturation\n\
+    hsb.z = hsb.z > czm_epsilon7 ? hsb.z + u_hsbShift.z : 0.0; // brightness\n\
+    // Convert shifted hsb back to rgb\n\
+    rgb = czm_HSBToRGB(hsb);\n\
+#endif\n\
+    return rgb;\n\
+}\n\
+\n\
+vec4 computeDayColor(vec4 initialColor, vec3 textureCoordinates, float nightBlend);\n\
+vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float specularMapValue, float fade);\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+vec3 computeGroundAtmosphereColor(vec3 fogColor, vec4 finalColor, vec3 atmosphereLightDirection, float cameraDist);\n\
+#endif\n\
+\n\
+const float fExposure = 2.0;\n\
+\n\
+void main()\n\
+{\n\
+#ifdef TILE_LIMIT_RECTANGLE\n\
+    if (v_textureCoordinates.x < u_cartographicLimitRectangle.x || u_cartographicLimitRectangle.z < v_textureCoordinates.x ||\n\
+        v_textureCoordinates.y < u_cartographicLimitRectangle.y || u_cartographicLimitRectangle.w < v_textureCoordinates.y)\n\
+        {\n\
+            discard;\n\
+        }\n\
+#endif\n\
+\n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+    float clipDistance = clip(gl_FragCoord, u_clippingPlanes, u_clippingPlanesMatrix);\n\
+#endif\n\
+\n\
+#if defined(SHOW_REFLECTIVE_OCEAN) || defined(ENABLE_DAYNIGHT_SHADING) || defined(HDR)\n\
+    vec3 normalMC = czm_geodeticSurfaceNormal(v_positionMC, vec3(0.0), vec3(1.0));   // normalized surface normal in model coordinates\n\
+    vec3 normalEC = czm_normal3D * normalMC;                                         // normalized surface normal in eye coordiantes\n\
+#endif\n\
+\n\
+#if defined(APPLY_DAY_NIGHT_ALPHA) && defined(ENABLE_DAYNIGHT_SHADING)\n\
+    float nightBlend = 1.0 - clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0, 0.0, 1.0);\n\
+#else\n\
+    float nightBlend = 0.0;\n\
+#endif\n\
+\n\
+    // The clamp below works around an apparent bug in Chrome Canary v23.0.1241.0\n\
+    // where the fragment shader sees textures coordinates < 0.0 and > 1.0 for the\n\
+    // fragments on the edges of tiles even though the vertex shader is outputting\n\
+    // coordinates strictly in the 0-1 range.\n\
+    vec4 color = computeDayColor(u_initialColor, clamp(v_textureCoordinates, 0.0, 1.0), nightBlend);\n\
+\n\
+#ifdef SHOW_TILE_BOUNDARIES\n\
+    if (v_textureCoordinates.x < (1.0/256.0) || v_textureCoordinates.x > (255.0/256.0) ||\n\
+        v_textureCoordinates.y < (1.0/256.0) || v_textureCoordinates.y > (255.0/256.0))\n\
+    {\n\
+        color = vec4(1.0, 0.0, 0.0, 1.0);\n\
+    }\n\
+#endif\n\
+\n\
+#if defined(ENABLE_DAYNIGHT_SHADING) || defined(GROUND_ATMOSPHERE)\n\
+    float cameraDist;\n\
+    if (czm_sceneMode == czm_sceneMode2D)\n\
+    {\n\
+        cameraDist = max(czm_frustumPlanes.x - czm_frustumPlanes.y, czm_frustumPlanes.w - czm_frustumPlanes.z) * 0.5;\n\
+    }\n\
+    else if (czm_sceneMode == czm_sceneModeColumbusView)\n\
+    {\n\
+        cameraDist = -czm_view[3].z;\n\
+    }\n\
+    else\n\
+    {\n\
+        cameraDist = length(czm_view[3]);\n\
+    }\n\
+    float fadeOutDist = u_lightingFadeDistance.x;\n\
+    float fadeInDist = u_lightingFadeDistance.y;\n\
+    if (czm_sceneMode != czm_sceneMode3D) {\n\
+        vec3 radii = czm_ellipsoidRadii;\n\
+        float maxRadii = max(radii.x, max(radii.y, radii.z));\n\
+        fadeOutDist -= maxRadii;\n\
+        fadeInDist -= maxRadii;\n\
+    }\n\
+    float fade = clamp((cameraDist - fadeOutDist) / (fadeInDist - fadeOutDist), 0.0, 1.0);\n\
+#else\n\
+    float fade = 0.0;\n\
+#endif\n\
+\n\
+#ifdef SHOW_REFLECTIVE_OCEAN\n\
+    vec2 waterMaskTranslation = u_waterMaskTranslationAndScale.xy;\n\
+    vec2 waterMaskScale = u_waterMaskTranslationAndScale.zw;\n\
+    vec2 waterMaskTextureCoordinates = v_textureCoordinates.xy * waterMaskScale + waterMaskTranslation;\n\
+    waterMaskTextureCoordinates.y = 1.0 - waterMaskTextureCoordinates.y;\n\
+\n\
+    float mask = texture2D(u_waterMask, waterMaskTextureCoordinates).r;\n\
+\n\
+    if (mask > 0.0)\n\
+    {\n\
+        mat3 enuToEye = czm_eastNorthUpToEyeCoordinates(v_positionMC, normalEC);\n\
+\n\
+        vec2 ellipsoidTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC);\n\
+        vec2 ellipsoidFlippedTextureCoordinates = czm_ellipsoidWgs84TextureCoordinates(normalMC.zyx);\n\
+\n\
+        vec2 textureCoordinates = mix(ellipsoidTextureCoordinates, ellipsoidFlippedTextureCoordinates, czm_morphTime * smoothstep(0.9, 0.95, normalMC.z));\n\
+\n\
+        color = computeWaterColor(v_positionEC, textureCoordinates, enuToEye, color, mask, fade);\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef APPLY_MATERIAL\n\
+    czm_materialInput materialInput;\n\
+    materialInput.st = v_textureCoordinates.st;\n\
+    materialInput.normalEC = normalize(v_normalEC);\n\
+    materialInput.positionToEyeEC = -v_positionEC;\n\
+    materialInput.tangentToEyeMatrix = czm_eastNorthUpToEyeCoordinates(v_positionMC, normalize(v_normalEC));     \n\
+    materialInput.slope = v_slope;\n\
+    materialInput.height = v_height;\n\
+    materialInput.aspect = v_aspect;\n\
+    czm_material material = czm_getMaterial(materialInput);\n\
+    vec4 materialColor = vec4(material.diffuse, material.alpha);\n\
+    color = alphaBlend(materialColor, color);\n\
+#endif\n\
+\n\
+#ifdef ENABLE_VERTEX_LIGHTING\n\
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * 0.9 + 0.3, 0.0, 1.0);\n\
+    vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);\n\
+#elif defined(ENABLE_DAYNIGHT_SHADING)\n\
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);\n\
+    diffuseIntensity = mix(1.0, diffuseIntensity, fade);\n\
+    vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);\n\
+#else\n\
+    vec4 finalColor = color;\n\
+#endif\n\
+\n\
+#ifdef ENABLE_CLIPPING_PLANES\n\
+    vec4 clippingPlanesEdgeColor = vec4(1.0);\n\
+    clippingPlanesEdgeColor.rgb = u_clippingPlanesEdgeStyle.rgb;\n\
+    float clippingPlanesEdgeWidth = u_clippingPlanesEdgeStyle.a;\n\
+\n\
+    if (clipDistance < clippingPlanesEdgeWidth)\n\
+    {\n\
+        finalColor = clippingPlanesEdgeColor;\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef HIGHLIGHT_FILL_TILE\n\
+    finalColor = vec4(mix(finalColor.rgb, u_fillHighlightColor.rgb, u_fillHighlightColor.a), finalColor.a);\n\
+#endif\n\
+\n\
+#if defined(FOG) || defined(GROUND_ATMOSPHERE)\n\
+    vec3 fogColor = colorCorrect(v_fogMieColor) + finalColor.rgb * colorCorrect(v_fogRayleighColor);\n\
+#ifndef HDR\n\
+    fogColor = vec3(1.0) - exp(-fExposure * fogColor);\n\
+#endif\n\
+#endif\n\
+\n\
+#if defined(DYNAMIC_ATMOSPHERE_LIGHTING_FROM_SUN)\n\
+    vec3 atmosphereLightDirection = czm_sunDirectionWC;\n\
+#else\n\
+    vec3 atmosphereLightDirection = czm_lightDirectionWC;\n\
+#endif\n\
+\n\
+#ifdef FOG\n\
+#if defined(DYNAMIC_ATMOSPHERE_LIGHTING) && (defined(ENABLE_VERTEX_LIGHTING) || defined(ENABLE_DAYNIGHT_SHADING))\n\
+    float darken = clamp(dot(normalize(czm_viewerPositionWC), atmosphereLightDirection), u_minimumBrightness, 1.0);\n\
+    fogColor *= darken;\n\
+#endif\n\
+\n\
+#ifdef HDR\n\
+    const float modifier = 0.15;\n\
+    finalColor = vec4(czm_fog(v_distance, finalColor.rgb, fogColor, modifier), finalColor.a);\n\
+#else\n\
+    finalColor = vec4(czm_fog(v_distance, finalColor.rgb, fogColor), finalColor.a);\n\
+#endif\n\
+#endif\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+    if (!czm_backFacing())\n\
+    {\n\
+        vec3 groundAtmosphereColor = computeGroundAtmosphereColor(fogColor, finalColor, atmosphereLightDirection, cameraDist);\n\
+        finalColor = vec4(mix(finalColor.rgb, groundAtmosphereColor, fade), finalColor.a);\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef UNDERGROUND_COLOR\n\
+    if (czm_backFacing())\n\
+    {\n\
+        float distanceFromEllipsoid = max(czm_eyeHeight, 0.0);\n\
+        float distance = max(v_distance - distanceFromEllipsoid, 0.0);\n\
+        float blendAmount = interpolateByDistance(u_undergroundColorAlphaByDistance, distance);\n\
+        vec4 undergroundColor = vec4(u_undergroundColor.rgb, u_undergroundColor.a * blendAmount);\n\
+        finalColor = alphaBlend(undergroundColor, finalColor);\n\
+    }\n\
+#endif\n\
+\n\
+#ifdef TRANSLUCENT\n\
+    if (inTranslucencyRectangle())\n\
+    {\n\
+      vec4 alphaByDistance = gl_FrontFacing ? u_frontFaceAlphaByDistance : u_backFaceAlphaByDistance;\n\
+      finalColor.a *= interpolateByDistance(alphaByDistance, v_distance);\n\
+    }\n\
+#endif\n\
+\n\
+    gl_FragColor = finalColor;\n\
+}\n\
+\n\
+#ifdef GROUND_ATMOSPHERE\n\
+vec3 computeGroundAtmosphereColor(vec3 fogColor, vec4 finalColor, vec3 atmosphereLightDirection, float cameraDist)\n\
+{\n\
+#if defined(PER_FRAGMENT_GROUND_ATMOSPHERE) && defined(DYNAMIC_ATMOSPHERE_LIGHTING) && (defined(ENABLE_DAYNIGHT_SHADING) || defined(ENABLE_VERTEX_LIGHTING))\n\
+    float mpp = czm_metersPerPixel(vec4(0.0, 0.0, -czm_currentFrustum.x, 1.0), 1.0);\n\
+    vec2 xy = gl_FragCoord.xy / czm_viewport.zw * 2.0 - vec2(1.0);\n\
+    xy *= czm_viewport.zw * mpp * 0.5;\n\
+\n\
+    vec3 direction = normalize(vec3(xy, -czm_currentFrustum.x));\n\
+    czm_ray ray = czm_ray(vec3(0.0), direction);\n\
+\n\
+    vec3 ellipsoid_center = czm_view[3].xyz;\n\
+\n\
+    czm_raySegment intersection = czm_rayEllipsoidIntersectionInterval(ray, ellipsoid_center, czm_ellipsoidInverseRadii);\n\
+\n\
+    vec3 ellipsoidPosition = czm_pointAlongRay(ray, intersection.start);\n\
+    ellipsoidPosition = (czm_inverseView * vec4(ellipsoidPosition, 1.0)).xyz;\n\
+    AtmosphereColor atmosColor = computeGroundAtmosphereFromSpace(ellipsoidPosition, true, atmosphereLightDirection);\n\
+\n\
+    vec3 groundAtmosphereColor = colorCorrect(atmosColor.mie) + finalColor.rgb * colorCorrect(atmosColor.rayleigh);\n\
+#ifndef HDR\n\
+    groundAtmosphereColor = vec3(1.0) - exp(-fExposure * groundAtmosphereColor);\n\
+#endif\n\
+\n\
+    float fadeInDist = u_nightFadeDistance.x;\n\
+    float fadeOutDist = u_nightFadeDistance.y;\n\
+\n\
+    float sunlitAtmosphereIntensity = clamp((cameraDist - fadeOutDist) / (fadeInDist - fadeOutDist), 0.0, 1.0);\n\
+\n\
+#ifdef HDR\n\
+    // Some tweaking to make HDR look better\n\
+    sunlitAtmosphereIntensity = max(sunlitAtmosphereIntensity * sunlitAtmosphereIntensity, 0.03);\n\
+#endif\n\
+\n\
+    groundAtmosphereColor = mix(groundAtmosphereColor, fogColor, sunlitAtmosphereIntensity);\n\
+#else\n\
+    vec3 groundAtmosphereColor = fogColor;\n\
+#endif\n\
+\n\
+#ifdef HDR\n\
+    // Some tweaking to make HDR look better\n\
+    groundAtmosphereColor = czm_saturation(groundAtmosphereColor, 1.6);\n\
+#endif\n\
+\n\
+    return groundAtmosphereColor;\n\
+}\n\
+#endif\n\
+\n\
+#ifdef SHOW_REFLECTIVE_OCEAN\n\
+\n\
+float waveFade(float edge0, float edge1, float x)\n\
+{\n\
+    float y = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);\n\
+    return pow(1.0 - y, 5.0);\n\
+}\n\
+\n\
+float linearFade(float edge0, float edge1, float x)\n\
+{\n\
+    return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);\n\
+}\n\
+\n\
+// Based on water rendering by Jonas Wagner:\n\
+// http://29a.ch/2012/7/19/webgl-terrain-rendering-water-fog\n\
+\n\
+// low altitude wave settings\n\
+const float oceanFrequencyLowAltitude = 825000.0;\n\
+const float oceanAnimationSpeedLowAltitude = 0.004;\n\
+const float oceanOneOverAmplitudeLowAltitude = 1.0 / 2.0;\n\
+const float oceanSpecularIntensity = 0.5;\n\
+\n\
+// high altitude wave settings\n\
+const float oceanFrequencyHighAltitude = 125000.0;\n\
+const float oceanAnimationSpeedHighAltitude = 0.008;\n\
+const float oceanOneOverAmplitudeHighAltitude = 1.0 / 2.0;\n\
+\n\
+vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat3 enuToEye, vec4 imageryColor, float maskValue, float fade)\n\
+{\n\
+    vec3 positionToEyeEC = -positionEyeCoordinates;\n\
+    float positionToEyeECLength = length(positionToEyeEC);\n\
+\n\
+    // The double normalize below works around a bug in Firefox on Android devices.\n\
+    vec3 normalizedPositionToEyeEC = normalize(normalize(positionToEyeEC));\n\
+\n\
+    // Fade out the waves as the camera moves far from the surface.\n\
+    float waveIntensity = waveFade(70000.0, 1000000.0, positionToEyeECLength);\n\
+\n\
+#ifdef SHOW_OCEAN_WAVES\n\
+    // high altitude waves\n\
+    float time = czm_frameNumber * oceanAnimationSpeedHighAltitude;\n\
+    vec4 noise = czm_getWaterNoise(u_oceanNormalMap, textureCoordinates * oceanFrequencyHighAltitude, time, 0.0);\n\
+    vec3 normalTangentSpaceHighAltitude = vec3(noise.xy, noise.z * oceanOneOverAmplitudeHighAltitude);\n\
+\n\
+    // low altitude waves\n\
+    time = czm_frameNumber * oceanAnimationSpeedLowAltitude;\n\
+    noise = czm_getWaterNoise(u_oceanNormalMap, textureCoordinates * oceanFrequencyLowAltitude, time, 0.0);\n\
+    vec3 normalTangentSpaceLowAltitude = vec3(noise.xy, noise.z * oceanOneOverAmplitudeLowAltitude);\n\
+\n\
+    // blend the 2 wave layers based on distance to surface\n\
+    float highAltitudeFade = linearFade(0.0, 60000.0, positionToEyeECLength);\n\
+    float lowAltitudeFade = 1.0 - linearFade(20000.0, 60000.0, positionToEyeECLength);\n\
+    vec3 normalTangentSpace =\n\
+        (highAltitudeFade * normalTangentSpaceHighAltitude) +\n\
+        (lowAltitudeFade * normalTangentSpaceLowAltitude);\n\
+    normalTangentSpace = normalize(normalTangentSpace);\n\
+\n\
+    // fade out the normal perturbation as we move farther from the water surface\n\
+    normalTangentSpace.xy *= waveIntensity;\n\
+    normalTangentSpace = normalize(normalTangentSpace);\n\
+#else\n\
+    vec3 normalTangentSpace = vec3(0.0, 0.0, 1.0);\n\
+#endif\n\
+\n\
+    vec3 normalEC = enuToEye * normalTangentSpace;\n\
+\n\
+    const vec3 waveHighlightColor = vec3(0.3, 0.45, 0.6);\n\
+\n\
+    // Use diffuse light to highlight the waves\n\
+    float diffuseIntensity = czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * maskValue;\n\
+    vec3 diffuseHighlight = waveHighlightColor * diffuseIntensity * (1.0 - fade);\n\
+\n\
+#ifdef SHOW_OCEAN_WAVES\n\
+    // Where diffuse light is low or non-existent, use wave highlights based solely on\n\
+    // the wave bumpiness and no particular light direction.\n\
+    float tsPerturbationRatio = normalTangentSpace.z;\n\
+    vec3 nonDiffuseHighlight = mix(waveHighlightColor * 5.0 * (1.0 - tsPerturbationRatio), vec3(0.0), diffuseIntensity);\n\
+#else\n\
+    vec3 nonDiffuseHighlight = vec3(0.0);\n\
+#endif\n\
+\n\
+    // Add specular highlights in 3D, and in all modes when zoomed in.\n\
+    float specularIntensity = czm_getSpecular(czm_lightDirectionEC, normalizedPositionToEyeEC, normalEC, 10.0);\n\
+    float surfaceReflectance = mix(0.0, mix(u_zoomedOutOceanSpecularIntensity, oceanSpecularIntensity, waveIntensity), maskValue);\n\
+    float specular = specularIntensity * surfaceReflectance;\n\
+\n\
+#ifdef HDR\n\
+    specular *= 1.4;\n\
+\n\
+    float e = 0.2;\n\
+    float d = 3.3;\n\
+    float c = 1.7;\n\
+\n\
+    vec3 color = imageryColor.rgb + (c * (vec3(e) + imageryColor.rgb * d) * (diffuseHighlight + nonDiffuseHighlight + specular));\n\
+#else\n\
+    vec3 color = imageryColor.rgb + diffuseHighlight + nonDiffuseHighlight + specular;\n\
+#endif\n\
+\n\
+    return vec4(color, imageryColor.a);\n\
+}\n\
+\n\
+#endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
+";
+
+    const { BoundingSphere: BoundingSphere$2, buildModuleUrl, Cartesian3: Cartesian3$1, Cartographic: Cartographic$2, Color: Color$3, defaultValue: defaultValue$1, defined: defined$2, destroyObject: destroyObject$2, DeveloperError: DeveloperError$1, Ellipsoid, EllipsoidTerrainProvider, Event: Event$4, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$1, Texture, when: when$3, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$1, ShadowMode } = Cesium;
+    const GlobeVS = Cesium._shadersGlobeVS;
+    const GroundAtmosphere = Cesium._shadersGroundAtmosphere;
+    /**
+     * The globe rendered in the scene, including its terrain ({@link Globe#terrainProvider})
+     * and imagery layers ({@link Globe#imageryLayers}).  Access the globe using {@link Scene#globe}.
+     *
+     * @alias Globe
+     * @constructor
+     *
+     * @param {Ellipsoid} [ellipsoid=Ellipsoid.WGS84] Determines the size and shape of the
+     * globe.
+     */
+    function Globe(ellipsoid) {
+        ellipsoid = defaultValue$1(ellipsoid, Ellipsoid.WGS84);
+        var terrainProvider = new EllipsoidTerrainProvider({
+            ellipsoid: ellipsoid,
+        });
+        var imageryLayerCollection = new ImageryLayerCollection();
+
+        this._ellipsoid = ellipsoid;
+        this._from = 'cesiumpro-globe';
+        this._imageryLayerCollection = imageryLayerCollection;
+
+        this._surfaceShaderSet = new GlobeSurfaceShaderSet();
+        this._material = undefined;
+
+        this._surface = new QuadtreePrimitive({
+            tileProvider: new GlobeSurfaceTileProvider({
+                terrainProvider: terrainProvider,
+                imageryLayers: imageryLayerCollection,
+                surfaceShaderSet: this._surfaceShaderSet,
+            }),
+        });
+
+        this._terrainProvider = terrainProvider;
+        this._terrainProviderChanged = new Event$4();
+
+        this._undergroundColor = Color$3.clone(Color$3.BLACK);
+        this._undergroundColorAlphaByDistance = new NearFarScalar(
+            ellipsoid.maximumRadius / 1000.0,
+            0.0,
+            ellipsoid.maximumRadius / 5.0,
+            1.0
+        );
+
+        this._translucency = new GlobeTranslucency();
+
+        makeShadersDirty(this);
+
+        /**
+         * Determines if the globe will be shown.
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.show = true;
+
+        this._oceanNormalMapResourceDirty = true;
+        this._oceanNormalMapResource = new Resource$1({
+            url: buildModuleUrl("Assets/Textures/waterNormalsSmall.jpg"),
+        });
+
+        /**
+         * The maximum screen-space error used to drive level-of-detail refinement.  Higher
+         * values will provide better performance but lower visual quality.
+         *
+         * @type {Number}
+         * @default 2
+         */
+        this.maximumScreenSpaceError = 2;
+
+        /**
+         * The size of the terrain tile cache, expressed as a number of tiles.  Any additional
+         * tiles beyond this number will be freed, as long as they aren't needed for rendering
+         * this frame.  A larger number will consume more memory but will show detail faster
+         * when, for example, zooming out and then back in.
+         *
+         * @type {Number}
+         * @default 100
+         */
+        this.tileCacheSize = 100;
+
+        /**
+         * Gets or sets the number of loading descendant tiles that is considered "too many".
+         * If a tile has too many loading descendants, that tile will be loaded and rendered before any of
+         * its descendants are loaded and rendered. This means more feedback for the user that something
+         * is happening at the cost of a longer overall load time. Setting this to 0 will cause each
+         * tile level to be loaded successively, significantly increasing load time. Setting it to a large
+         * number (e.g. 1000) will minimize the number of tiles that are loaded but tend to make
+         * detail appear all at once after a long wait.
+         * @type {Number}
+         * @default 20
+         */
+        this.loadingDescendantLimit = 20;
+
+        /**
+         * Gets or sets a value indicating whether the ancestors of rendered tiles should be preloaded.
+         * Setting this to true optimizes the zoom-out experience and provides more detail in
+         * newly-exposed areas when panning. The down side is that it requires loading more tiles.
+         * @type {Boolean}
+         * @default true
+         */
+        this.preloadAncestors = true;
+
+        /**
+         * Gets or sets a value indicating whether the siblings of rendered tiles should be preloaded.
+         * Setting this to true causes tiles with the same parent as a rendered tile to be loaded, even
+         * if they are culled. Setting this to true may provide a better panning experience at the
+         * cost of loading more tiles.
+         * @type {Boolean}
+         * @default false
+         */
+        this.preloadSiblings = false;
+
+        /**
+         * The color to use to highlight terrain fill tiles. If undefined, fill tiles are not
+         * highlighted at all. The alpha value is used to alpha blend with the tile's
+         * actual color. Because terrain fill tiles do not represent the actual terrain surface,
+         * it may be useful in some applications to indicate visually that they are not to be trusted.
+         * @type {Color}
+         * @default undefined
+         */
+        this.fillHighlightColor = undefined;
+
+        /**
+         * Enable lighting the globe with the scene's light source.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        this.enableLighting = false;
+
+        /**
+         * Enable dynamic lighting effects on atmosphere and fog. This only takes effect
+         * when <code>enableLighting</code> is <code>true</code>.
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.dynamicAtmosphereLighting = true;
+
+        /**
+         * Whether dynamic atmosphere lighting uses the sun direction instead of the scene's
+         * light direction. This only takes effect when <code>enableLighting</code> and
+         * <code>dynamicAtmosphereLighting</code> are <code>true</code>.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        this.dynamicAtmosphereLightingFromSun = false;
+
+        /**
+         * Enable the ground atmosphere, which is drawn over the globe when viewed from a distance between <code>lightingFadeInDistance</code> and <code>lightingFadeOutDistance</code>.
+         *
+         * @demo {@link https://sandcastle.cesium.com/index.html?src=Ground%20Atmosphere.html|Ground atmosphere demo in Sandcastle}
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.showGroundAtmosphere = true;
+
+        /**
+         * The distance where everything becomes lit. This only takes effect
+         * when <code>enableLighting</code> or <code>showGroundAtmosphere</code> is <code>true</code>.
+         *
+         * @type {Number}
+         * @default 10000000.0
+         */
+        this.lightingFadeOutDistance = 1.0e7;
+
+        /**
+         * The distance where lighting resumes. This only takes effect
+         * when <code>enableLighting</code> or <code>showGroundAtmosphere</code> is <code>true</code>.
+         *
+         * @type {Number}
+         * @default 20000000.0
+         */
+        this.lightingFadeInDistance = 2.0e7;
+
+        /**
+         * The distance where the darkness of night from the ground atmosphere fades out to a lit ground atmosphere.
+         * This only takes effect when <code>showGroundAtmosphere</code>, <code>enableLighting</code>, and
+         * <code>dynamicAtmosphereLighting</code> are <code>true</code>.
+         *
+         * @type {Number}
+         * @default 10000000.0
+         */
+        this.nightFadeOutDistance = 1.0e7;
+
+        /**
+         * The distance where the darkness of night from the ground atmosphere fades in to an unlit ground atmosphere.
+         * This only takes effect when <code>showGroundAtmosphere</code>, <code>enableLighting</code>, and
+         * <code>dynamicAtmosphereLighting</code> are <code>true</code>.
+         *
+         * @type {Number}
+         * @default 50000000.0
+         */
+        this.nightFadeInDistance = 5.0e7;
+
+        /**
+         * True if an animated wave effect should be shown in areas of the globe
+         * covered by water; otherwise, false.  This property is ignored if the
+         * <code>terrainProvider</code> does not provide a water mask.
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.showWaterEffect = true;
+
+        /**
+         * True if primitives such as billboards, polylines, labels, etc. should be depth-tested
+         * against the terrain surface, or false if such primitives should always be drawn on top
+         * of terrain unless they're on the opposite side of the globe.  The disadvantage of depth
+         * testing primitives against terrain is that slight numerical noise or terrain level-of-detail
+         * switched can sometimes make a primitive that should be on the surface disappear underneath it.
+         *
+         * @type {Boolean}
+         * @default false
+         *
+         */
+        this.depthTestAgainstTerrain = false;
+
+        /**
+         * Determines whether the globe casts or receives shadows from light sources. Setting the globe
+         * to cast shadows may impact performance since the terrain is rendered again from the light's perspective.
+         * Currently only terrain that is in view casts shadows. By default the globe does not cast shadows.
+         *
+         * @type {ShadowMode}
+         * @default ShadowMode.RECEIVE_ONLY
+         */
+        this.shadows = ShadowMode.RECEIVE_ONLY;
+
+        /**
+         * The hue shift to apply to the atmosphere. Defaults to 0.0 (no shift).
+         * A hue shift of 1.0 indicates a complete rotation of the hues available.
+         * @type {Number}
+         * @default 0.0
+         */
+        this.atmosphereHueShift = 0.0;
+
+        /**
+         * The saturation shift to apply to the atmosphere. Defaults to 0.0 (no shift).
+         * A saturation shift of -1.0 is monochrome.
+         * @type {Number}
+         * @default 0.0
+         */
+        this.atmosphereSaturationShift = 0.0;
+
+        /**
+         * The brightness shift to apply to the atmosphere. Defaults to 0.0 (no shift).
+         * A brightness shift of -1.0 is complete darkness, which will let space show through.
+         * @type {Number}
+         * @default 0.0
+         */
+        this.atmosphereBrightnessShift = 0.0;
+
+        /**
+         * A scalar used to exaggerate the terrain. Defaults to <code>1.0</code> (no exaggeration).
+         * A value of <code>2.0</code> scales the terrain by 2x.
+         * A value of <code>0.0</code> makes the terrain completely flat.
+         * Note that terrain exaggeration will not modify any other primitive as they are positioned relative to the ellipsoid.
+         * @type {Number}
+         * @default 1.0
+         */
+        this.terrainExaggeration = 1.0;
+
+        /**
+         * The height from which terrain is exaggerated. Defaults to <code>0.0</code> (scaled relative to ellipsoid surface).
+         * Terrain that is above this height will scale upwards and terrain that is below this height will scale downwards.
+         * Note that terrain exaggeration will not modify any other primitive as they are positioned relative to the ellipsoid.
+         * If {@link Globe#terrainExaggeration} is <code>1.0</code> this value will have no effect.
+         * @type {Number}
+         * @default 0.0
+         */
+        this.terrainExaggerationRelativeHeight = 0.0;
+
+        /**
+         * Whether to show terrain skirts. Terrain skirts are geometry extending downwards from a tile's edges used to hide seams between neighboring tiles.
+         * Skirts are always hidden when the camera is underground or translucency is enabled.
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.showSkirts = true;
+
+        /**
+         * Whether to cull back-facing terrain. Back faces are not culled when the camera is underground or translucency is enabled.
+         *
+         * @type {Boolean}
+         * @default true
+         */
+        this.backFaceCulling = true;
+
+        this._oceanNormalMap = undefined;
+        this._zoomedOutOceanSpecularIntensity = undefined;
+    }
+
+    Object.defineProperties(Globe.prototype, {
+        /**
+         * Gets an ellipsoid describing the shape of this globe.
+         * @memberof Globe.prototype
+         * @type {Ellipsoid}
+         */
+        ellipsoid: {
+            get: function () {
+                return this._ellipsoid;
+            },
+        },
+        /**
+         * Gets the collection of image layers that will be rendered on this globe.
+         * @memberof Globe.prototype
+         * @type {ImageryLayerCollection}
+         */
+        imageryLayers: {
+            get: function () {
+                return this._imageryLayerCollection;
+            },
+        },
+        /**
+         * Gets an event that's raised when an imagery layer is added, shown, hidden, moved, or removed.
+         *
+         * @memberof Globe.prototype
+         * @type {Event}
+         * @readonly
+         */
+        imageryLayersUpdatedEvent: {
+            get: function () {
+                return this._surface.tileProvider.imageryLayersUpdatedEvent;
+            },
+        },
+        /**
+         * Returns <code>true</code> when the tile load queue is empty, <code>false</code> otherwise.  When the load queue is empty,
+         * all terrain and imagery for the current view have been loaded.
+         * @memberof Globe.prototype
+         * @type {Boolean}
+         * @readonly
+         */
+        tilesLoaded: {
+            get: function () {
+                if (!defined$2(this._surface)) {
+                    return true;
+                }
+                return (
+                    this._surface.tileProvider.ready &&
+                    this._surface._tileLoadQueueHigh.length === 0 &&
+                    this._surface._tileLoadQueueMedium.length === 0 &&
+                    this._surface._tileLoadQueueLow.length === 0
+                );
+            },
+        },
+        /**
+         * Gets or sets the color of the globe when no imagery is available.
+         * @memberof Globe.prototype
+         * @type {Color}
+         */
+        baseColor: {
+            get: function () {
+                return this._surface.tileProvider.baseColor;
+            },
+            set: function (value) {
+                this._surface.tileProvider.baseColor = value;
+            },
+        },
+        /**
+         * A property specifying a {@link ClippingPlaneCollection} used to selectively disable rendering on the outside of each plane.
+         *
+         * @memberof Globe.prototype
+         * @type {ClippingPlaneCollection}
+         */
+        clippingPlanes: {
+            get: function () {
+                return this._surface.tileProvider.clippingPlanes;
+            },
+            set: function (value) {
+                this._surface.tileProvider.clippingPlanes = value;
+            },
+        },
+        /**
+         * A property specifying a {@link Rectangle} used to limit globe rendering to a cartographic area.
+         * Defaults to the maximum extent of cartographic coordinates.
+         *
+         * @memberof Globe.prototype
+         * @type {Rectangle}
+         * @default {@link Rectangle.MAX_VALUE}
+         */
+        cartographicLimitRectangle: {
+            get: function () {
+                return this._surface.tileProvider.cartographicLimitRectangle;
+            },
+            set: function (value) {
+                if (!defined$2(value)) {
+                    value = Rectangle$1.clone(Rectangle$1.MAX_VALUE);
+                }
+                this._surface.tileProvider.cartographicLimitRectangle = value;
+            },
+        },
+        /**
+         * The normal map to use for rendering waves in the ocean.  Setting this property will
+         * only have an effect if the configured terrain provider includes a water mask.
+         * @memberof Globe.prototype
+         * @type {String}
+         * @default buildModuleUrl('Assets/Textures/waterNormalsSmall.jpg')
+         */
+        oceanNormalMapUrl: {
+            get: function () {
+                return this._oceanNormalMapResource.url;
+            },
+            set: function (value) {
+                this._oceanNormalMapResource.url = value;
+                this._oceanNormalMapResourceDirty = true;
+            },
+        },
+        /**
+         * The terrain provider providing surface geometry for this globe.
+         * @type {TerrainProvider}
+         *
+         * @memberof Globe.prototype
+         * @type {TerrainProvider}
+         *
+         */
+        terrainProvider: {
+            get: function () {
+                return this._terrainProvider;
+            },
+            set: function (value) {
+                if (value !== this._terrainProvider) {
+                    this._terrainProvider = value;
+                    this._terrainProviderChanged.raiseEvent(value);
+                    if (defined$2(this._material)) {
+                        makeShadersDirty(this);
+                    }
+                }
+            },
+        },
+        /**
+         * Gets an event that's raised when the terrain provider is changed
+         *
+         * @memberof Globe.prototype
+         * @type {Event}
+         * @readonly
+         */
+        terrainProviderChanged: {
+            get: function () {
+                return this._terrainProviderChanged;
+            },
+        },
+        /**
+         * Gets an event that's raised when the length of the tile load queue has changed since the last render frame.  When the load queue is empty,
+         * all terrain and imagery for the current view have been loaded.  The event passes the new length of the tile load queue.
+         *
+         * @memberof Globe.prototype
+         * @type {Event}
+         */
+        tileLoadProgressEvent: {
+            get: function () {
+                return this._surface.tileLoadProgressEvent;
+            },
+        },
+
+        /**
+         * Gets or sets the material appearance of the Globe.  This can be one of several built-in {@link Material} objects or a custom material, scripted with
+         * {@link https://github.com/CesiumGS/cesium/wiki/Fabric|Fabric}.
+         * @memberof Globe.prototype
+         * @type {Material}
+         */
+        material: {
+            get: function () {
+                return this._material;
+            },
+            set: function (material) {
+                if (this._material !== material) {
+                    this._material = material;
+                    makeShadersDirty(this);
+                }
+            },
+        },
+
+        /**
+         * The color to render the back side of the globe when the camera is underground or the globe is translucent,
+         * blended with the globe color based on the camera's distance.
+         * <br /><br />
+         * To disable underground coloring, set <code>undergroundColor</code> to <code>undefined</code>.
+         *
+         * @memberof Globe.prototype
+         * @type {Color}
+         * @default {@link Color.BLACK}
+         *
+         * @see Globe#undergroundColorAlphaByDistance
+         */
+        undergroundColor: {
+            get: function () {
+                return this._undergroundColor;
+            },
+            set: function (value) {
+                this._undergroundColor = Color$3.clone(value, this._undergroundColor);
+            },
+        },
+
+        /**
+         * Gets or sets the near and far distance for blending {@link Globe#undergroundColor} with the globe color.
+         * The alpha will interpolate between the {@link NearFarScalar#nearValue} and
+         * {@link NearFarScalar#farValue} while the camera distance falls within the lower and upper bounds
+         * of the specified {@link NearFarScalar#near} and {@link NearFarScalar#far}.
+         * Outside of these ranges the alpha remains clamped to the nearest bound. If undefined,
+         * the underground color will not be blended with the globe color.
+         * <br /> <br />
+         * When the camera is above the ellipsoid the distance is computed from the nearest
+         * point on the ellipsoid instead of the camera's position.
+         *
+         * @memberof Globe.prototype
+         * @type {NearFarScalar}
+         *
+         * @see Globe#undergroundColor
+         *
+         */
+        undergroundColorAlphaByDistance: {
+            get: function () {
+                return this._undergroundColorAlphaByDistance;
+            },
+            set: function (value) {
+                //>>includeStart('debug', pragmas.debug);
+                if (defined$2(value) && value.far < value.near) {
+                    throw new DeveloperError$1(
+                        "far distance must be greater than near distance."
+                    );
+                }
+                //>>includeEnd('debug');
+                this._undergroundColorAlphaByDistance = NearFarScalar.clone(
+                    value,
+                    this._undergroundColorAlphaByDistance
+                );
+            },
+        },
+
+        /**
+         * Properties for controlling globe translucency.
+         *
+         * @memberof Globe.prototype
+         * @type {GlobeTranslucency}
+         */
+        translucency: {
+            get: function () {
+                return this._translucency;
+            },
+        },
+    });
+
+    function makeShadersDirty(globe) {
+        var defines = [];
+
+        var requireNormals =
+            defined$2(globe._material) &&
+            (globe._material.shaderSource.match(/slope/) ||
+                globe._material.shaderSource.match("normalEC"));
+
+        var fragmentSources = [GroundAtmosphere];
+        if (
+            defined$2(globe._material) &&
+            (!requireNormals || globe._terrainProvider.requestVertexNormals)
+        ) {
+            fragmentSources.push(globe._material.shaderSource);
+            defines.push("APPLY_MATERIAL");
+            globe._surface._tileProvider.materialUniformMap = globe._material._uniforms;
+        } else {
+            globe._surface._tileProvider.materialUniformMap = undefined;
+        }
+        fragmentSources.push(GlobeFS);
+
+        globe._surfaceShaderSet.baseVertexShaderSource = new ShaderSource$1({
+            sources: [GroundAtmosphere, GlobeVS],
+            defines: defines,
+        });
+
+        globe._surfaceShaderSet.baseFragmentShaderSource = new ShaderSource$1({
+            sources: fragmentSources,
+            defines: defines,
+        });
+        globe._surfaceShaderSet.material = globe._material;
+    }
+
+    function createComparePickTileFunction(rayOrigin) {
+        return function (a, b) {
+            var aDist = BoundingSphere$2.distanceSquaredTo(
+                a.pickBoundingSphere,
+                rayOrigin
+            );
+            var bDist = BoundingSphere$2.distanceSquaredTo(
+                b.pickBoundingSphere,
+                rayOrigin
+            );
+
+            return aDist - bDist;
+        };
+    }
+
+    var scratchArray = [];
+    var scratchSphereIntersectionResult = {
+        start: 0.0,
+        stop: 0.0,
+    };
+
+    /**
+     * Find an intersection between a ray and the globe surface that was rendered. The ray must be given in world coordinates.
+     *
+     * @param {Ray} ray The ray to test for intersection.
+     * @param {Scene} scene The scene.
+     * @param {Boolean} [cullBackFaces=true] Set to true to not pick back faces.
+     * @param {Cartesian3} [result] The object onto which to store the result.
+     * @returns {Cartesian3|undefined} The intersection or <code>undefined</code> if none was found.  The returned position is in projected coordinates for 2D and Columbus View.
+     *
+     * @private
+     */
+    Globe.prototype.pickWorldCoordinates = function (
+        ray,
+        scene,
+        cullBackFaces,
+        result
+    ) {
+        //>>includeStart('debug', pragmas.debug);
+        if (!defined$2(ray)) {
+            throw new DeveloperError$1("ray is required");
+        }
+        if (!defined$2(scene)) {
+            throw new DeveloperError$1("scene is required");
+        }
+        //>>includeEnd('debug');
+
+        cullBackFaces = defaultValue$1(cullBackFaces, true);
+
+        var mode = scene.mode;
+        var projection = scene.mapProjection;
+
+        var sphereIntersections = scratchArray;
+        sphereIntersections.length = 0;
+
+        var tilesToRender = this._surface._tilesToRender;
+        var length = tilesToRender.length;
+
+        var tile;
+        var i;
+
+        for (i = 0; i < length; ++i) {
+            tile = tilesToRender[i];
+            var surfaceTile = tile.data;
+
+            if (!defined$2(surfaceTile)) {
+                continue;
+            }
+
+            var boundingVolume = surfaceTile.pickBoundingSphere;
+            if (mode !== SceneMode$1.SCENE3D) {
+                surfaceTile.pickBoundingSphere = boundingVolume = BoundingSphere$2.fromRectangleWithHeights2D(
+                    tile.rectangle,
+                    projection,
+                    surfaceTile.tileBoundingRegion.minimumHeight,
+                    surfaceTile.tileBoundingRegion.maximumHeight,
+                    boundingVolume
+                );
+                Cartesian3$1.fromElements(
+                    boundingVolume.center.z,
+                    boundingVolume.center.x,
+                    boundingVolume.center.y,
+                    boundingVolume.center
+                );
+            } else if (defined$2(surfaceTile.renderedMesh)) {
+                BoundingSphere$2.clone(
+                    surfaceTile.tileBoundingRegion.boundingSphere,
+                    boundingVolume
+                );
+            } else {
+                // So wait how did we render this thing then? It shouldn't be possible to get here.
+                continue;
+            }
+
+            var boundingSphereIntersection = IntersectionTests.raySphere(
+                ray,
+                boundingVolume,
+                scratchSphereIntersectionResult
+            );
+            if (defined$2(boundingSphereIntersection)) {
+                sphereIntersections.push(surfaceTile);
+            }
+        }
+
+        sphereIntersections.sort(createComparePickTileFunction(ray.origin));
+
+        var intersection;
+        length = sphereIntersections.length;
+        for (i = 0; i < length; ++i) {
+            intersection = sphereIntersections[i].pick(
+                ray,
+                scene.mode,
+                scene.mapProjection,
+                cullBackFaces,
+                result
+            );
+            if (defined$2(intersection)) {
+                break;
+            }
+        }
+
+        return intersection;
+    };
+
+    var cartoScratch = new Cartographic$2();
+    /**
+     * Find an intersection between a ray and the globe surface that was rendered. The ray must be given in world coordinates.
+     *
+     * @param {Ray} ray The ray to test for intersection.
+     * @param {Scene} scene The scene.
+     * @param {Cartesian3} [result] The object onto which to store the result.
+     * @returns {Cartesian3|undefined} The intersection or <code>undefined</code> if none was found.
+     *
+     * @example
+     * // find intersection of ray through a pixel and the globe
+     * var ray = viewer.camera.getPickRay(windowCoordinates);
+     * var intersection = globe.pick(ray, scene);
+     */
+    Globe.prototype.pick = function (ray, scene, result) {
+        result = this.pickWorldCoordinates(ray, scene, true, result);
+        if (defined$2(result) && scene.mode !== SceneMode$1.SCENE3D) {
+            result = Cartesian3$1.fromElements(result.y, result.z, result.x, result);
+            var carto = scene.mapProjection.unproject(result, cartoScratch);
+            result = scene.globe.ellipsoid.cartographicToCartesian(carto, result);
+        }
+
+        return result;
+    };
+
+    var scratchGetHeightCartesian = new Cartesian3$1();
+    var scratchGetHeightIntersection = new Cartesian3$1();
+    var scratchGetHeightCartographic = new Cartographic$2();
+    var scratchGetHeightRay = new Ray();
+
+    function tileIfContainsCartographic(tile, cartographic) {
+        return defined$2(tile) && Rectangle$1.contains(tile.rectangle, cartographic)
+            ? tile
+            : undefined;
+    }
+
+    /**
+     * Get the height of the surface at a given cartographic.
+     *
+     * @param {Cartographic} cartographic The cartographic for which to find the height.
+     * @returns {Number|undefined} The height of the cartographic or undefined if it could not be found.
+     */
+    Globe.prototype.getHeight = function (cartographic) {
+        //>>includeStart('debug', pragmas.debug);
+        if (!defined$2(cartographic)) {
+            throw new DeveloperError$1("cartographic is required");
+        }
+        //>>includeEnd('debug');
+
+        var levelZeroTiles = this._surface._levelZeroTiles;
+        if (!defined$2(levelZeroTiles)) {
+            return;
+        }
+
+        var tile;
+        var i;
+
+        var length = levelZeroTiles.length;
+        for (i = 0; i < length; ++i) {
+            tile = levelZeroTiles[i];
+            if (Rectangle$1.contains(tile.rectangle, cartographic)) {
+                break;
+            }
+        }
+
+        if (i >= length) {
+            return undefined;
+        }
+
+        var tileWithMesh = tile;
+
+        while (defined$2(tile)) {
+            tile =
+                tileIfContainsCartographic(tile._southwestChild, cartographic) ||
+                tileIfContainsCartographic(tile._southeastChild, cartographic) ||
+                tileIfContainsCartographic(tile._northwestChild, cartographic) ||
+                tile._northeastChild;
+
+            if (
+                defined$2(tile) &&
+                defined$2(tile.data) &&
+                defined$2(tile.data.renderedMesh)
+            ) {
+                tileWithMesh = tile;
+            }
+        }
+
+        tile = tileWithMesh;
+
+        // This tile was either rendered or culled.
+        // It is sometimes useful to get a height from a culled tile,
+        // e.g. when we're getting a height in order to place a billboard
+        // on terrain, and the camera is looking at that same billboard.
+        // The culled tile must have a valid mesh, though.
+        if (
+            !defined$2(tile) ||
+            !defined$2(tile.data) ||
+            !defined$2(tile.data.renderedMesh)
+        ) {
+            // Tile was not rendered (culled).
+            return undefined;
+        }
+
+        var projection = this._surface._tileProvider.tilingScheme.projection;
+        var ellipsoid = this._surface._tileProvider.tilingScheme.ellipsoid;
+
+        //cartesian has to be on the ellipsoid surface for `ellipsoid.geodeticSurfaceNormal`
+        var cartesian = Cartesian3$1.fromRadians(
+            cartographic.longitude,
+            cartographic.latitude,
+            0.0,
+            ellipsoid,
+            scratchGetHeightCartesian
+        );
+
+        var ray = scratchGetHeightRay;
+        var surfaceNormal = ellipsoid.geodeticSurfaceNormal(cartesian, ray.direction);
+
+        // Try to find the intersection point between the surface normal and z-axis.
+        // minimum height (-11500.0) for the terrain set, need to get this information from the terrain provider
+        var rayOrigin = ellipsoid.getSurfaceNormalIntersectionWithZAxis(
+            cartesian,
+            11500.0,
+            ray.origin
+        );
+
+        // Theoretically, not with Earth datums, the intersection point can be outside the ellipsoid
+        if (!defined$2(rayOrigin)) {
+            // intersection point is outside the ellipsoid, try other value
+            // minimum height (-11500.0) for the terrain set, need to get this information from the terrain provider
+            var minimumHeight;
+            if (defined$2(tile.data.tileBoundingRegion)) {
+                minimumHeight = tile.data.tileBoundingRegion.minimumHeight;
+            }
+            var magnitude = Math.min(defaultValue$1(minimumHeight, 0.0), -11500.0);
+
+            // multiply by the *positive* value of the magnitude
+            var vectorToMinimumPoint = Cartesian3$1.multiplyByScalar(
+                surfaceNormal,
+                Math.abs(magnitude) + 1,
+                scratchGetHeightIntersection
+            );
+            Cartesian3$1.subtract(cartesian, vectorToMinimumPoint, ray.origin);
+        }
+
+        var intersection = tile.data.pick(
+            ray,
+            undefined,
+            projection,
+            false,
+            scratchGetHeightIntersection
+        );
+        if (!defined$2(intersection)) {
+            return undefined;
+        }
+
+        return ellipsoid.cartesianToCartographic(
+            intersection,
+            scratchGetHeightCartographic
+        ).height;
+    };
+
+    /**
+     * @private
+     */
+    Globe.prototype.update = function (frameState) {
+        if (!this.show) {
+            return;
+        }
+
+        if (frameState.passes.render) {
+            this._surface.update(frameState);
+        }
+    };
+
+    /**
+     * @private
+     */
+    Globe.prototype.beginFrame = function (frameState) {
+        var surface = this._surface;
+        var tileProvider = surface.tileProvider;
+        var terrainProvider = this.terrainProvider;
+        var hasWaterMask =
+            this.showWaterEffect &&
+            terrainProvider.ready &&
+            terrainProvider.hasWaterMask;
+
+        if (hasWaterMask && this._oceanNormalMapResourceDirty) {
+            // url changed, load new normal map asynchronously
+            this._oceanNormalMapResourceDirty = false;
+            var oceanNormalMapResource = this._oceanNormalMapResource;
+            var oceanNormalMapUrl = oceanNormalMapResource.url;
+            if (defined$2(oceanNormalMapUrl)) {
+                var that = this;
+                when$3(oceanNormalMapResource.fetchImage(), function (image) {
+                    if (oceanNormalMapUrl !== that._oceanNormalMapResource.url) {
+                        // url changed while we were loading
+                        return;
+                    }
+
+                    that._oceanNormalMap =
+                        that._oceanNormalMap && that._oceanNormalMap.destroy();
+                    that._oceanNormalMap = new Texture({
+                        context: frameState.context,
+                        source: image,
+                    });
+                });
+            } else {
+                this._oceanNormalMap =
+                    this._oceanNormalMap && this._oceanNormalMap.destroy();
+            }
+        }
+
+        var pass = frameState.passes;
+        var mode = frameState.mode;
+
+        if (pass.render) {
+            if (this.showGroundAtmosphere) {
+                this._zoomedOutOceanSpecularIntensity = 0.4;
+            } else {
+                this._zoomedOutOceanSpecularIntensity = 0.5;
+            }
+
+            surface.maximumScreenSpaceError = this.maximumScreenSpaceError;
+            surface.tileCacheSize = this.tileCacheSize;
+            surface.loadingDescendantLimit = this.loadingDescendantLimit;
+            surface.preloadAncestors = this.preloadAncestors;
+            surface.preloadSiblings = this.preloadSiblings;
+
+            tileProvider.terrainProvider = this.terrainProvider;
+            tileProvider.lightingFadeOutDistance = this.lightingFadeOutDistance;
+            tileProvider.lightingFadeInDistance = this.lightingFadeInDistance;
+            tileProvider.nightFadeOutDistance = this.nightFadeOutDistance;
+            tileProvider.nightFadeInDistance = this.nightFadeInDistance;
+            tileProvider.zoomedOutOceanSpecularIntensity =
+                mode === SceneMode$1.SCENE3D ? this._zoomedOutOceanSpecularIntensity : 0.0;
+            tileProvider.hasWaterMask = hasWaterMask;
+            tileProvider.oceanNormalMap = this._oceanNormalMap;
+            tileProvider.enableLighting = this.enableLighting;
+            tileProvider.dynamicAtmosphereLighting = this.dynamicAtmosphereLighting;
+            tileProvider.dynamicAtmosphereLightingFromSun = this.dynamicAtmosphereLightingFromSun;
+            tileProvider.showGroundAtmosphere = this.showGroundAtmosphere;
+            tileProvider.shadows = this.shadows;
+            tileProvider.hueShift = this.atmosphereHueShift;
+            tileProvider.saturationShift = this.atmosphereSaturationShift;
+            tileProvider.brightnessShift = this.atmosphereBrightnessShift;
+            tileProvider.fillHighlightColor = this.fillHighlightColor;
+            tileProvider.showSkirts = this.showSkirts;
+            tileProvider.backFaceCulling = this.backFaceCulling;
+            tileProvider.undergroundColor = this._undergroundColor;
+            tileProvider.undergroundColorAlphaByDistance = this._undergroundColorAlphaByDistance;
+            surface.beginFrame(frameState);
+        }
+    };
+
+    /**
+     * @private
+     */
+    Globe.prototype.render = function (frameState) {
+        if (!this.show) {
+            return;
+        }
+
+        if (defined$2(this._material)) {
+            this._material.update(frameState.context);
+        }
+
+        this._surface.render(frameState);
+    };
+
+    /**
+     * @private
+     */
+    Globe.prototype.endFrame = function (frameState) {
+        if (!this.show) {
+            return;
+        }
+
+        if (frameState.passes.render) {
+            this._surface.endFrame(frameState);
+        }
+    };
+
+    /**
+     * Returns true if this object was destroyed; otherwise, false.
+     * <br /><br />
+     * If this object was destroyed, it should not be used; calling any function other than
+     * <code>isDestroyed</code> will result in a {@link DeveloperError} exception.
+     *
+     * @returns {Boolean} True if this object was destroyed; otherwise, false.
+     *
+     * @see Globe#destroy
+     */
+    Globe.prototype.isDestroyed = function () {
+        return false;
+    };
+
+    /**
+     * Destroys the WebGL resources held by this object.  Destroying an object allows for deterministic
+     * release of WebGL resources, instead of relying on the garbage collector to destroy this object.
+     * <br /><br />
+     * Once an object is destroyed, it should not be used; calling any function other than
+     * <code>isDestroyed</code> will result in a {@link DeveloperError} exception.  Therefore,
+     * assign the return value (<code>undefined</code>) to the object as done in the example.
+     *
+     * @exception {DeveloperError} This object was destroyed, i.e., destroy() was called.
+     *
+     *
+     * @example
+     * globe = globe && globe.destroy();
+     *
+     * @see Globe#isDestroyed
+     */
+    Globe.prototype.destroy = function () {
+        this._surfaceShaderSet =
+            this._surfaceShaderSet && this._surfaceShaderSet.destroy();
+        this._surface = this._surface && this._surface.destroy();
+        this._oceanNormalMap = this._oceanNormalMap && this._oceanNormalMap.destroy();
+        return destroyObject$2(this);
+    };
+
+    const {
+        ShaderProgram,
+        RuntimeError,
+        createUniform,
+        defined: defined$1,
+        createUniformArray,
+        WebGLConstants
+    } = Cesium;
+    function AutomaticUniform(options) {
+        this._size = options.size;
+        this._datatype = options.datatype;
+        this.getValue = options.getValue;
+    }
+    const CesiumAutomaticUniforms = Cesium.AutomaticUniforms;
+    const consolePrefix = "[Cesium WebGL] ";
+    const AutomaticUniforms = {
+        ...CesiumAutomaticUniforms,
+        czm_p_drawingBufferWidth: new AutomaticUniform({
+            size: 1,
+            datatype: WebGLConstants.FLOAT,
+            getValue: function (uniformState) {
+                return uniformState._frameState.context.drawingBufferWidth;
+            },
+        }),
+        czm_p_drawingBufferHeight: new AutomaticUniform({
+            size: 1,
+            datatype: WebGLConstants.FLOAT,
+            getValue: function (uniformState) {
+                return uniformState._frameState.context.drawingBufferHeight;
+            },
+        }),
+        czm_p_imagerySplitPosition: new AutomaticUniform({
+            size: 1,
+            datatype: WebGLConstants.FLOAT,
+            getValue: function (uniformState) {
+                return uniformState._frameState.imagerySplitPosition;
+            },
+        }),
+    };
+    function initialize(shader) {
+        if (defined$1(shader._program)) {
+            return;
+        }
+
+        reinitialize(shader);
+    }
+    function createAndLinkProgram(gl, shader) {
+        var vsSource = shader._vertexShaderText;
+        var fsSource = shader._fragmentShaderText;
+
+        var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vsSource);
+        gl.compileShader(vertexShader);
+
+        var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fsSource);
+        gl.compileShader(fragmentShader);
+
+        var program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+
+        gl.deleteShader(vertexShader);
+        gl.deleteShader(fragmentShader);
+
+        var attributeLocations = shader._attributeLocations;
+        if (defined$1(attributeLocations)) {
+            for (var attribute in attributeLocations) {
+                if (attributeLocations.hasOwnProperty(attribute)) {
+                    gl.bindAttribLocation(
+                        program,
+                        attributeLocations[attribute],
+                        attribute
+                    );
+                }
+            }
+        }
+
+        gl.linkProgram(program);
+
+        var log;
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            var debugShaders = shader._debugShaders;
+
+            // For performance, only check compile errors if there is a linker error.
+            if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+                log = gl.getShaderInfoLog(fragmentShader);
+                console.error(consolePrefix + "Fragment shader compile log: " + log);
+                if (defined$1(debugShaders)) {
+                    var fragmentSourceTranslation = debugShaders.getTranslatedShaderSource(
+                        fragmentShader
+                    );
+                    if (fragmentSourceTranslation !== "") {
+                        console.error(
+                            consolePrefix +
+                            "Translated fragment shader source:\n" +
+                            fragmentSourceTranslation
+                        );
+                    } else {
+                        console.error(consolePrefix + "Fragment shader translation failed.");
+                    }
+                }
+
+                gl.deleteProgram(program);
+                throw new RuntimeError(
+                    "Fragment shader failed to compile.  Compile log: " + log
+                );
+            }
+
+            if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+                log = gl.getShaderInfoLog(vertexShader);
+                console.error(consolePrefix + "Vertex shader compile log: " + log);
+                if (defined$1(debugShaders)) {
+                    var vertexSourceTranslation = debugShaders.getTranslatedShaderSource(
+                        vertexShader
+                    );
+                    if (vertexSourceTranslation !== "") {
+                        console.error(
+                            consolePrefix +
+                            "Translated vertex shader source:\n" +
+                            vertexSourceTranslation
+                        );
+                    } else {
+                        console.error(consolePrefix + "Vertex shader translation failed.");
+                    }
+                }
+
+                gl.deleteProgram(program);
+                throw new RuntimeError(
+                    "Vertex shader failed to compile.  Compile log: " + log
+                );
+            }
+
+            log = gl.getProgramInfoLog(program);
+            console.error(consolePrefix + "Shader program link log: " + log);
+            if (defined$1(debugShaders)) {
+                console.error(
+                    consolePrefix +
+                    "Translated vertex shader source:\n" +
+                    debugShaders.getTranslatedShaderSource(vertexShader)
+                );
+                console.error(
+                    consolePrefix +
+                    "Translated fragment shader source:\n" +
+                    debugShaders.getTranslatedShaderSource(fragmentShader)
+                );
+            }
+
+            gl.deleteProgram(program);
+            throw new RuntimeError("Program failed to link.  Link log: " + log);
+        }
+
+        var logShaderCompilation = shader._logShaderCompilation;
+
+        if (logShaderCompilation) {
+            log = gl.getShaderInfoLog(vertexShader);
+            if (defined$1(log) && log.length > 0) {
+                console.log(consolePrefix + "Vertex shader compile log: " + log);
+            }
+        }
+
+        if (logShaderCompilation) {
+            log = gl.getShaderInfoLog(fragmentShader);
+            if (defined$1(log) && log.length > 0) {
+                console.log(consolePrefix + "Fragment shader compile log: " + log);
+            }
+        }
+
+        if (logShaderCompilation) {
+            log = gl.getProgramInfoLog(program);
+            if (defined$1(log) && log.length > 0) {
+                console.log(consolePrefix + "Shader program link log: " + log);
+            }
+        }
+
+        return program;
+    }
+    function findUniforms(gl, program) {
+        var uniformsByName = {};
+        var uniforms = [];
+        var samplerUniforms = [];
+
+        var numberOfUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+
+        for (var i = 0; i < numberOfUniforms; ++i) {
+            var activeUniform = gl.getActiveUniform(program, i);
+            var suffix = "[0]";
+            var uniformName =
+                activeUniform.name.indexOf(
+                    suffix,
+                    activeUniform.name.length - suffix.length
+                ) !== -1
+                    ? activeUniform.name.slice(0, activeUniform.name.length - 3)
+                    : activeUniform.name;
+
+            // Ignore GLSL built-in uniforms returned in Firefox.
+            if (uniformName.indexOf("gl_") !== 0) {
+                if (activeUniform.name.indexOf("[") < 0) {
+                    // Single uniform
+                    var location = gl.getUniformLocation(program, uniformName);
+
+                    // IE 11.0.9 needs this check since getUniformLocation can return null
+                    // if the uniform is not active (e.g., it is optimized out).  Looks like
+                    // getActiveUniform() above returns uniforms that are not actually active.
+                    if (location !== null) {
+                        var uniform = createUniform(gl, activeUniform, uniformName, location);
+
+                        uniformsByName[uniformName] = uniform;
+                        uniforms.push(uniform);
+
+                        if (uniform._setSampler) {
+                            samplerUniforms.push(uniform);
+                        }
+                    }
+                } else {
+                    // Uniform array
+
+                    var uniformArray;
+                    var locations;
+                    var value;
+                    var loc;
+
+                    // On some platforms - Nexus 4 in Firefox for one - an array of sampler2D ends up being represented
+                    // as separate uniforms, one for each array element.  Check for and handle that case.
+                    var indexOfBracket = uniformName.indexOf("[");
+                    if (indexOfBracket >= 0) {
+                        // We're assuming the array elements show up in numerical order - it seems to be true.
+                        uniformArray = uniformsByName[uniformName.slice(0, indexOfBracket)];
+
+                        // Nexus 4 with Android 4.3 needs this check, because it reports a uniform
+                        // with the strange name webgl_3467e0265d05c3c1[1] in our globe surface shader.
+                        if (!defined$1(uniformArray)) {
+                            continue;
+                        }
+
+                        locations = uniformArray._locations;
+
+                        // On the Nexus 4 in Chrome, we get one uniform per sampler, just like in Firefox,
+                        // but the size is not 1 like it is in Firefox.  So if we push locations here,
+                        // we'll end up adding too many locations.
+                        if (locations.length <= 1) {
+                            value = uniformArray.value;
+                            loc = gl.getUniformLocation(program, uniformName);
+
+                            // Workaround for IE 11.0.9.  See above.
+                            if (loc !== null) {
+                                locations.push(loc);
+                                value.push(gl.getUniform(program, loc));
+                            }
+                        }
+                    } else {
+                        locations = [];
+                        for (var j = 0; j < activeUniform.size; ++j) {
+                            loc = gl.getUniformLocation(program, uniformName + "[" + j + "]");
+
+                            // Workaround for IE 11.0.9.  See above.
+                            if (loc !== null) {
+                                locations.push(loc);
+                            }
+                        }
+                        uniformArray = createUniformArray(
+                            gl,
+                            activeUniform,
+                            uniformName,
+                            locations
+                        );
+
+                        uniformsByName[uniformName] = uniformArray;
+                        uniforms.push(uniformArray);
+
+                        if (uniformArray._setSampler) {
+                            samplerUniforms.push(uniformArray);
+                        }
+                    }
+                }
+            }
+        }
+
+        return {
+            uniformsByName: uniformsByName,
+            uniforms: uniforms,
+            samplerUniforms: samplerUniforms,
+        };
+    }
+    function partitionUniforms(shader, uniforms) {
+        var automaticUniforms = [];
+        var manualUniforms = [];
+
+        for (var uniform in uniforms) {
+            if (uniforms.hasOwnProperty(uniform)) {
+                var uniformObject = uniforms[uniform];
+                var uniformName = uniform;
+                // if it's a duplicate uniform, use its original name so it is updated correctly
+                var duplicateUniform = shader._duplicateUniformNames[uniformName];
+                if (defined$1(duplicateUniform)) {
+                    uniformObject.name = duplicateUniform;
+                    uniformName = duplicateUniform;
+                }
+                var automaticUniform = AutomaticUniforms[uniformName];
+                if (defined$1(automaticUniform)) {
+                    automaticUniforms.push({
+                        uniform: uniformObject,
+                        automaticUniform: automaticUniform,
+                    });
+                } else {
+                    manualUniforms.push(uniformObject);
+                }
+            }
+        }
+
+        return {
+            automaticUniforms: automaticUniforms,
+            manualUniforms: manualUniforms,
+        };
+    }
+    function findVertexAttributes(gl, program, numberOfAttributes) {
+        var attributes = {};
+        for (var i = 0; i < numberOfAttributes; ++i) {
+            var attr = gl.getActiveAttrib(program, i);
+            var location = gl.getAttribLocation(program, attr.name);
+
+            attributes[attr.name] = {
+                name: attr.name,
+                type: attr.type,
+                index: location,
+            };
+        }
+
+        return attributes;
+    }
+
+    function setSamplerUniforms(gl, program, samplerUniforms) {
+        gl.useProgram(program);
+
+        var textureUnitIndex = 0;
+        var length = samplerUniforms.length;
+        for (var i = 0; i < length; ++i) {
+            textureUnitIndex = samplerUniforms[i]._setSampler(textureUnitIndex);
+        }
+
+        gl.useProgram(null);
+
+        return textureUnitIndex;
+    }
+    function reinitialize(shader) {
+        var oldProgram = shader._program;
+
+        var gl = shader._gl;
+        var program = createAndLinkProgram(gl, shader, shader._debugShaders);
+        var numberOfVertexAttributes = gl.getProgramParameter(
+            program,
+            gl.ACTIVE_ATTRIBUTES
+        );
+        var uniforms = findUniforms(gl, program);
+        var partitionedUniforms = partitionUniforms(shader, uniforms.uniformsByName);
+
+        shader._program = program;
+        shader._numberOfVertexAttributes = numberOfVertexAttributes;
+        shader._vertexAttributes = findVertexAttributes(
+            gl,
+            program,
+            numberOfVertexAttributes
+        );
+        shader._uniformsByName = uniforms.uniformsByName;
+        shader._uniforms = uniforms.uniforms;
+        shader._automaticUniforms = partitionedUniforms.automaticUniforms;
+        shader._manualUniforms = partitionedUniforms.manualUniforms;
+
+        shader.maximumTextureUnitIndex = setSamplerUniforms(
+            gl,
+            program,
+            uniforms.samplerUniforms
+        );
+
+        if (oldProgram) {
+            shader._gl.deleteProgram(oldProgram);
+        }
+
+        // If SpectorJS is active, add the hook to make the shader editor work.
+        // https://github.com/BabylonJS/Spector.js/blob/master/documentation/extension.md#shader-editor
+        if (typeof spector !== "undefined") {
+            shader._program.__SPECTOR_rebuildProgram = function (
+                vertexSourceCode, // The new vertex shader source
+                fragmentSourceCode, // The new fragment shader source
+                onCompiled, // Callback triggered by your engine when the compilation is successful. It needs to send back the new linked program.
+                onError // Callback triggered by your engine in case of error. It needs to send the WebGL error to allow the editor to display the error in the gutter.
+            ) {
+                var originalVS = shader._vertexShaderText;
+                var originalFS = shader._fragmentShaderText;
+
+                // SpectorJS likes to replace `!=` with `! =` for unknown reasons,
+                // and that causes glsl compile failures. So fix that up.
+                var regex = / ! = /g;
+                shader._vertexShaderText = vertexSourceCode.replace(regex, " != ");
+                shader._fragmentShaderText = fragmentSourceCode.replace(regex, " != ");
+
+                try {
+                    reinitialize(shader);
+                    onCompiled(shader._program);
+                } catch (e) {
+                    shader._vertexShaderText = originalVS;
+                    shader._fragmentShaderText = originalFS;
+
+                    // Only pass on the WebGL error:
+                    var errorMatcher = /(?:Compile|Link) error: ([^]*)/;
+                    var match = errorMatcher.exec(e.message);
+                    if (match) {
+                        onError(match[1]);
+                    } else {
+                        onError(e.message);
+                    }
+                }
+            };
+        }
+    }
+    function override$1() {
+        const originPrototype = ShaderProgram.prototype;
+        ShaderProgram.prototype = {};
+        ShaderProgram.prototype._bind = function () {
+            initialize(this);
+            this._gl.useProgram(this._program);
+        };
+        ShaderProgram.prototype.destroy = originPrototype.destroy;
+        ShaderProgram.prototype._setUniforms = function (uniformMap,
+            uniformState,
+            validate) {
+            originPrototype._setUniforms.call(this, uniformMap,
+                uniformState,
+                validate);
+        };
+        ShaderProgram.prototype.isDestroyed = originPrototype.isDestroyed;
+        ShaderProgram.prototype.finalDestroy = originPrototype.finalDestroy;
+
+        Object.defineProperties(ShaderProgram.prototype, {
+            vertexAttributes: {
+                get: function () {
+                    initialize(this);
+                    return this._vertexAttributes;
+                },
+            },
+            numberOfVertexAttributes: {
+                get: function () {
+                    initialize(this);
+                    return this._numberOfVertexAttributes;
+                },
+            },
+            allUniforms: {
+                get: function () {
+                    initialize(this);
+                    return this._uniformsByName;
+                },
+            },
+            vertexShaderSource: {
+                get: function () {
+                    return this._vertexShaderSource;
+                },
+            },
+            fragmentShaderSource: {
+                get: function () {
+                    return this._fragmentShaderSource;
+                },
+            },
+        });
+    }
+
+    const CesiumScene = Cesium.Scene;
+    const {
+        JulianDate,
+        defined,
+        RequestScheduler,
+        PerformanceDisplay,
+        Cesium3DTilePassState,
+        Cesium3DTilePass,
+        defaultValue,
+        Color: Color$2,
+        BoundingRectangle,
+        Pass,
+        SunLight,
+        Cartesian3
+    } = Cesium;
+    const preloadTilesetPassState = new Cesium3DTilePassState({
+        pass: Cesium3DTilePass.PRELOAD,
+    });
+
+    const preloadFlightTilesetPassState = new Cesium3DTilePassState({
+        pass: Cesium3DTilePass.PRELOAD_FLIGHT,
+    });
+
+    const requestRenderModeDeferCheckPassState = new Cesium3DTilePassState({
+        pass: Cesium3DTilePass.REQUEST_RENDER_MODE_DEFER_CHECK,
+    });
+
+    function updateFrameNumber(scene, frameNumber, time) {
+        var frameState = scene._frameState;
+        frameState.frameNumber = frameNumber;
+        frameState.time = JulianDate.clone(time, frameState.time);
+    }
+    function tryAndCatchError(scene, functionToExecute) {
+        try {
+            functionToExecute(scene);
+        } catch (error) {
+            scene._renderError.raiseEvent(scene, error);
+
+            if (scene.rethrowRenderErrors) {
+                throw error;
+            }
+        }
+    }
+    function updateDebugShowFramesPerSecond(scene, renderedThisFrame) {
+        if (scene.debugShowFramesPerSecond) {
+            if (!defined(scene._performanceDisplay)) {
+                var performanceContainer = document.createElement("div");
+                performanceContainer.className =
+                    "cesium-performanceDisplay-defaultContainer";
+                var container = scene._canvas.parentNode;
+                container.appendChild(performanceContainer);
+                var performanceDisplay = new PerformanceDisplay({
+                    container: performanceContainer,
+                });
+                scene._performanceDisplay = performanceDisplay;
+                scene._performanceContainer = performanceContainer;
+            }
+
+            scene._performanceDisplay.throttled = scene.requestRenderMode;
+            scene._performanceDisplay.update(renderedThisFrame);
+        } else if (defined(scene._performanceDisplay)) {
+            scene._performanceDisplay =
+                scene._performanceDisplay && scene._performanceDisplay.destroy();
+            scene._performanceContainer.parentNode.removeChild(
+                scene._performanceContainer
+            );
+        }
+    }
+    function callAfterRenderFunctions(scene) {
+        // Functions are queued up during primitive update and executed here in case
+        // the function modifies scene state that should remain constant over the frame.
+        var functions = scene._frameState.afterRender;
+        for (var i = 0, length = functions.length; i < length; ++i) {
+            functions[i]();
+            scene.requestRender();
+        }
+
+        functions.length = 0;
+    }
+    function prePassesUpdate(scene) {
+        scene._jobScheduler.resetBudgets();
+
+        var frameState = scene._frameState;
+        var primitives = scene.primitives;
+        primitives.prePassesUpdate(frameState);
+
+        if (defined(scene.globe)) {
+            scene.globe.update(frameState);
+        }
+
+        scene._picking.update();
+        frameState.creditDisplay.update();
+    }
+    function updateMostDetailedRayPicks(scene) {
+        return scene._picking.updateMostDetailedRayPicks(scene);
+    }
+    function updatePreloadPass(scene) {
+        var frameState = scene._frameState;
+        preloadTilesetPassState.camera = frameState.camera;
+        preloadTilesetPassState.cullingVolume = frameState.cullingVolume;
+
+        var primitives = scene.primitives;
+        primitives.updateForPass(frameState, preloadTilesetPassState);
+    }
+    function updatePreloadFlightPass(scene) {
+        var frameState = scene._frameState;
+        var camera = frameState.camera;
+        if (!camera.canPreloadFlight()) {
+            return;
+        }
+
+        preloadFlightTilesetPassState.camera = scene.preloadFlightCamera;
+        preloadFlightTilesetPassState.cullingVolume =
+            scene.preloadFlightCullingVolume;
+
+        var primitives = scene.primitives;
+        primitives.updateForPass(frameState, preloadFlightTilesetPassState);
+    }
+    const renderTilesetPassState = new Cesium3DTilePassState({
+        pass: Cesium3DTilePass.RENDER,
+    });
+    function updateRequestRenderModeDeferCheckPass(scene) {
+        // Check if any ignored requests are ready to go (to wake rendering up again)
+        scene.primitives.updateForPass(
+            scene._frameState,
+            requestRenderModeDeferCheckPassState
+        );
+    }
+    function postPassesUpdate(scene) {
+        var frameState = scene._frameState;
+        var primitives = scene.primitives;
+        primitives.postPassesUpdate(frameState);
+
+        RequestScheduler.update();
+    }
+    function render(scene) {
+        var frameState = scene._frameState;
+
+        var context = scene.context;
+        var us = context.uniformState;
+
+        var view = scene._defaultView;
+        scene._view = view;
+
+        scene.updateFrameState();
+        frameState.passes.render = true;
+        frameState.passes.postProcess = scene.postProcessStages.hasSelected;
+        frameState.tilesetPassState = renderTilesetPassState;
+
+        var backgroundColor = defaultValue(scene.backgroundColor, Color$2.BLACK);
+        if (scene._hdr) {
+            backgroundColor = Color$2.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
+            backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
+            backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
+        }
+        frameState.backgroundColor = backgroundColor;
+
+        scene.fog.update(frameState);
+
+        us.update(frameState);
+
+        var shadowMap = scene.shadowMap;
+        if (defined(shadowMap) && shadowMap.enabled) {
+            if (!defined(scene.light) || scene.light instanceof SunLight) {
+                // Negate the sun direction so that it is from the Sun, not to the Sun
+                Cartesian3.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+            } else {
+                Cartesian3.clone(scene.light.direction, scene._shadowMapCamera.direction);
+            }
+            frameState.shadowMaps.push(shadowMap);
+        }
+
+        scene._computeCommandList.length = 0;
+        scene._overlayCommandList.length = 0;
+
+        var viewport = view.viewport;
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = context.drawingBufferWidth;
+        viewport.height = context.drawingBufferHeight;
+
+        var passState = view.passState;
+        passState.framebuffer = undefined;
+        passState.blendingEnabled = undefined;
+        passState.scissorTest = undefined;
+        passState.viewport = BoundingRectangle.clone(viewport, passState.viewport);
+
+        if (defined(scene.globe)) {
+            scene.globe.beginFrame(frameState);
+            scene._LodGraphic.beginFrame(frameState);
+        }
+        scene.updateEnvironment();
+        scene.updateAndExecuteCommands(passState, backgroundColor);
+        scene.globe && scene._LodGraphic.render(frameState);
+        scene.resolveFramebuffers(passState);
+
+        passState.framebuffer = undefined;
+        executeOverlayCommands(scene, passState);
+
+        if (defined(scene.globe)) {
+            scene.globe.endFrame(frameState);
+            scene._LodGraphic.endFrame(frameState);
+
+            if (!scene.globe.tilesLoaded) {
+                scene._renderRequested = true;
+            }
+        }
+        context.endFrame();
+    }
+    function executeOverlayCommands(scene, passState) {
+        var us = scene.context.uniformState;
+        us.updatePass(Pass.OVERLAY);
+
+        var context = scene.context;
+        var commandList = scene._overlayCommandList;
+        var length = commandList.length;
+        for (var i = 0; i < length; ++i) {
+            commandList[i].execute(context, passState);
+        }
+    }
+    function sceneRender(time) {
+        this._preUpdate.raiseEvent(this, time);
+
+        var frameState = this._frameState;
+        frameState.newFrame = false;
+
+        if (!defined(time)) {
+            time = JulianDate.now();
+        }
+
+        // Determine if shouldRender
+        var cameraChanged = this._view.checkForCameraUpdates(this);
+        var shouldRender =
+            !this.requestRenderMode ||
+            this._renderRequested ||
+            cameraChanged ||
+            this._logDepthBufferDirty ||
+            this._hdrDirty ||
+            this.mode === SceneMode.MORPHING;
+        if (
+            !shouldRender &&
+            defined(this.maximumRenderTimeChange) &&
+            defined(this._lastRenderTime)
+        ) {
+            var difference = Math.abs(
+                JulianDate.secondsDifference(this._lastRenderTime, time)
+            );
+            shouldRender = shouldRender || difference > this.maximumRenderTimeChange;
+        }
+
+        if (shouldRender) {
+            this._lastRenderTime = JulianDate.clone(time, this._lastRenderTime);
+            this._renderRequested = false;
+            this._logDepthBufferDirty = false;
+            this._hdrDirty = false;
+
+            var frameNumber = Cesium.Math.incrementWrap(
+                frameState.frameNumber,
+                15000000.0,
+                1.0
+            );
+            updateFrameNumber(this, frameNumber, time);
+            frameState.newFrame = true;
+        }
+
+        tryAndCatchError(this, prePassesUpdate);
+
+        /**
+         *
+         * Passes update. Add any passes here
+         *
+         */
+        if (this.primitives.show) {
+            tryAndCatchError(this, updateMostDetailedRayPicks);
+            tryAndCatchError(this, updatePreloadPass);
+            tryAndCatchError(this, updatePreloadFlightPass);
+            if (!shouldRender) {
+                tryAndCatchError(this, updateRequestRenderModeDeferCheckPass);
+            }
+        }
+
+        this._postUpdate.raiseEvent(this, time);
+
+        if (shouldRender) {
+            this._preRender.raiseEvent(this, time);
+            frameState.creditDisplay.beginFrame();
+            tryAndCatchError(this, render);
+        }
+
+        /**
+         *
+         * Post passes update. Execute any pass invariant code that should run after the passes here.
+         *
+         */
+        updateDebugShowFramesPerSecond(this, shouldRender);
+        tryAndCatchError(this, postPassesUpdate);
+
+        // Often used to trigger events (so don't want in trycatch) that the user might be subscribed to. Things like the tile load events, ready promises, etc.
+        // We don't want those events to resolve during the render loop because the events might add new primitives
+        callAfterRenderFunctions(this);
+
+        if (shouldRender) {
+            this._postRender.raiseEvent(this, time);
+            frameState.creditDisplay.endFrame();
+        }
+    }
+    class Scene {
+        static overrideRenderFunction() {
+            CesiumScene.prototype.render = sceneRender;
+        }
+
+    }
+    function override() {    
+        Scene.overrideRenderFunction();
+    }
+
+    function overrideCesium() {
+        override();
+        override$1();
     }
 
     const {
@@ -6978,10 +9156,10 @@
     let fpsCount = 0, msCount = 0;
     let fps = 'N/A', ms = 'N/A';
     function updateFps() {
-        if (!defined$5(lastFpsTime)) {
+        if (!defined$7(lastFpsTime)) {
             lastFpsTime = Cesium.getTimestamp();
         }
-        if (!defined$5(lastMsTime)) {
+        if (!defined$7(lastMsTime)) {
             lastMsTime = Cesium.getTimestamp();
         }
         fpsCount++;
@@ -7019,7 +9197,7 @@
         const icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(
             viewer.clock.currentTime
         );
-        if (defined$5(icrfToFixed)) {
+        if (defined$7(icrfToFixed)) {
             const camera = viewer.camera;
             const offset = Cesium.Cartesian3.clone(camera.position);
             const transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
@@ -7055,9 +9233,9 @@
         const {
             camera
         } = viewer;
-        const step1 = defaultValue$4(options.step1Duration, 3);
-        const step2 = defaultValue$4(options.step2Duration, 3);
-        const step3 = defaultValue$4(options.step3Duration, 3);
+        const step1 = defaultValue$5(options.step1Duration, 3);
+        const step2 = defaultValue$5(options.step2Duration, 3);
+        const step3 = defaultValue$5(options.step3Duration, 3);
 
         const cartographic = options.destination;
         // 第一步改变位置
@@ -7261,7 +9439,11 @@
             const superOptions = Object.assign({}, options, {
                 infoBox: false
             });
-            Scene.overrideRenderFunction();
+            if(superOptions.globe) {
+                superOptions.globe = new Globe(superOptions.globe._ellipsoid);
+            } else if(superOptions.globe !== false) {
+                superOptions.globe = new Globe();
+            }
             super(container, superOptions);
             // remove default logo image
             const logo = document.querySelector('.cesium-credit-logoContainer');
@@ -7319,13 +9501,13 @@
          * @type {Boolean}
          */
         get enableLighting() {
-            if (!defined$5(this.globe)) {
+            if (!defined$7(this.globe)) {
                 return;
             }
             return this.scene.globe.enableLighting
         }
         set enableLighting(val) {
-            if (!defined$5(this.globe)) {
+            if (!defined$7(this.globe)) {
                 return;
             }
             this.scene.globe.enableLighting = val;
@@ -7423,7 +9605,7 @@
             return this.terrainProvider;
         }
         set terrain(value) {
-            if (!defined$5(value) || value === false) {
+            if (!defined$7(value) || value === false) {
                 this.terrainProvider = new Cesium.EllipsoidTerrainProvider();
             }
             if (value !== this.terrainProvider) {
@@ -7598,7 +9780,7 @@
          * cancelLink();
          */
         linkView(viewer) {
-            if (!defined$5(viewer)) {
+            if (!defined$7(viewer)) {
                 throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
@@ -7629,7 +9811,7 @@
             }
             if (target instanceof Cesium.Cartesian3) {
                 const zoomPromise = viewer._zoomPromise = Cesium.when.defer();
-                const radius = defaultValue$4(options.radius, 1000);
+                const radius = defaultValue$5(options.radius, 1000);
                 delete options.radius;
                 const boundingSphere = new Cesium.BoundingSphere(target, radius);
                 flyTo(this, boundingSphere, options);
@@ -7667,12 +9849,12 @@
                 //>>includeStart('debug', pragmas.debug);
                 throw new CesiumProError('point不是一个有效值。')
             }
-            const multiplier = defaultValue$4(options.multiplier, 1);
-            const offset = defaultValue$4(options.offset, {});
+            const multiplier = defaultValue$5(options.multiplier, 1);
+            const offset = defaultValue$5(options.offset, {});
             function rotate() {
-                const heading = Cesium.Math.toRadians(defaultValue$4(offset.heading, viewer.heading) + 1 * multiplier);
-                const pitch = Cesium.Math.toRadians(defaultValue$4(offset.pitch, -20));
-                const range = defaultValue$4(offset.range, 10000);
+                const heading = Cesium.Math.toRadians(defaultValue$5(offset.heading, viewer.heading) + 1 * multiplier);
+                const pitch = Cesium.Math.toRadians(defaultValue$5(offset.pitch, -20));
+                const range = defaultValue$5(offset.range, 10000);
                 viewer.flyTo(target, {
                     duration: 0,
                     offset: new Cesium.HeadingPitchRange(heading, pitch, range)
@@ -7804,6 +9986,8 @@
             return super.isDestroyed();
         }
     }
+    // 生写Cesium中的部分函数
+    overrideCesium();
 
     function buildImageUrl(imageryProvider, x, y, level) {
         let url = imageryProvider.url + "&x={x}&y={y}&z={z}";
@@ -7829,8 +10013,8 @@
          * @see {@link http://lbsyun.baidu.com/custom/list.htm|百度个性化地图列表}
          */
         constructor(options) {
-            options = defaultValue$4(options, {});
-            options.url = defaultValue$4(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
+            options = defaultValue$5(options, {});
+            options.url = defaultValue$5(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
             if (options.customid) {
                 options.url = `https://api.map.baidu.com/customimage/tile?customid=${options.customid}`;
             }
@@ -7872,8 +10056,8 @@
          */
         constructor(options = {}) {
             options.url = 'https://dev.virtualearth.net';
-            options.mapStyle = defaultValue$4(options.mapStyle, BingLayer.mapStyle.AERIAL);
-            options.key = defaultValue$4(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
+            options.mapStyle = defaultValue$5(options.mapStyle, BingLayer.mapStyle.AERIAL);
+            options.key = defaultValue$5(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
             super(options);
         }
         /**
@@ -8048,14 +10232,14 @@
          *
          */
         constructor(options) {
-            options = defaultValue$4(options, {});
+            options = defaultValue$5(options, {});
 
-            const layer = defaultValue$4(options.layer, 'img');
+            const layer = defaultValue$5(options.layer, 'img');
             const {
                 scl,
                 style
             } = GaoDeLayer.getParametersByLayer(layer);
-            const lang = defaultValue$4(options.lang, 'zh_cn');
+            const lang = defaultValue$5(options.lang, 'zh_cn');
             options.url = `https://webst0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=${lang}&size=1&scl=${scl}&style=${style}`;
             options.subdomains = '1234';
             super(options);
@@ -8130,21 +10314,21 @@
                 rectangle: Cesium.Rectangle.MAX_VALUE,
                 intervalOfZeorLevel: options.intervalOfZeorLevel
             });
-            this._hasAlphaChannel = defaultValue$4(options.hasAlphaChannel, true);
+            this._hasAlphaChannel = defaultValue$5(options.hasAlphaChannel, true);
             this._tilingScheme = tilingScheme;
             this._image = undefined;
             this._texture = undefined;
 
-            this._errorEvent = new Event$6();
+            this._errorEvent = new Event$7();
 
             this._ready = true;
             this._readyPromise = Cesium.when.defer();
             this._readyPromise.resolve(true);
 
-            this._font = defaultValue$4(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$4(options.color, 'white');
-            this._borderColor = defaultValue$4(options.borderColor, 'gold');
-            this._borderWidth = defaultValue$4(options.borderWidth, 2);
+            this._font = defaultValue$5(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$5(options.color, 'white');
+            this._borderColor = defaultValue$5(options.borderColor, 'gold');
+            this._borderWidth = defaultValue$5(options.borderWidth, 2);
             this.canvas = document.createElement('canvas');
             this.ctx = this.canvas.getContext('2d');
             this.canvas.width = 256;
@@ -8524,24 +10708,24 @@
        *
        */
       constructor(options) {
-        options = defaultValue$4(options, {});
+        options = defaultValue$5(options, {});
         const key = options.key;
         if (!key) {
           console.warn('未定义key，地图服务将不可用');
           console.warn('请前往http://lbs.tianditu.gov.cn/server/MapService.html获取地图key');
         }
-        const tilingScheme = defaultValue$4(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
+        const tilingScheme = defaultValue$5(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
         let crs = 'w',
           tileMatrixSet = 'w',
           tileMatrixLabels = options.tileMatrixLabels;
         if (tilingScheme instanceof Cesium.GeographicTilingScheme) {
           crs = 'c';
           tileMatrixSet = 'c';
-          if (!defined$5(tileMatrixLabels)) {
+          if (!defined$7(tileMatrixLabels)) {
             tileMatrixLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
           }
         }
-        const layer = defaultValue$4(options.layer, 'img');
+        const layer = defaultValue$5(options.layer, 'img');
         const url = `http://t{s}.tianditu.com/${layer}_${crs}/wmts?service=wmts&tileMatrixSet=${tileMatrixSet}&request=GetTile&version=1.0.0&LAYER=${layer}&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${key}`;
         return new Cesium.WebMapTileServiceImageryProvider({
           url,
@@ -8621,7 +10805,7 @@
          * @extends XYZLayer
          */
         constructor(options = {}) {
-            options.layer = defaultValue$4(options.layer, 'img');
+            options.layer = defaultValue$5(options.layer, 'img');
             options.subdomains = '123';
             options.url = layerMap[options.layer];
             options.customTags = {
@@ -8658,20 +10842,20 @@
          * @param {Cesium.TilingScheme} [options.tilingScheme = proj.get('EPSG:4326')] 瓦片分割坐标系
          */
         constructor(options = {}) {
-            options.tileWidth = defaultValue$4(options.tileWidth, 256);
-            options.tileHeight = defaultValue$4(options.tileHeight, 256);
-            this._tilingScheme = defined$5(options.tilingScheme)
+            options.tileWidth = defaultValue$5(options.tileWidth, 256);
+            options.tileHeight = defaultValue$5(options.tileHeight, 256);
+            this._tilingScheme = defined$7(options.tilingScheme)
                 ? options.tilingScheme
                 : proj.get('EPSG:4326', { ellipsoid: options.ellipsoid });
-            this._errorEvent = new Event$6();
-            this._tileWidth = defaultValue$4(options.tileWidth, 256);
-            this._tileHeight = defaultValue$4(options.tileHeight, 256);
+            this._errorEvent = new Event$7();
+            this._tileWidth = defaultValue$5(options.tileWidth, 256);
+            this._tileHeight = defaultValue$5(options.tileHeight, 256);
             this._readyPromise = Cesium.when.resolve(true);
 
-            this._font = defaultValue$4(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$4(options.color, new Cesium.Color(1,1,1,1));
-            this._borderColor = defaultValue$4(options.borderColor, Cesium.Color.GOLD);
-            this._borderWidth = defaultValue$4(options.borderWidth, 2);    
+            this._font = defaultValue$5(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$5(options.color, new Cesium.Color(1,1,1,1));
+            this._borderColor = defaultValue$5(options.borderColor, Cesium.Color.GOLD);
+            this._borderWidth = defaultValue$5(options.borderWidth, 2);    
         }
         /**
          * 表示图层是否已准备完成。
@@ -8835,16 +11019,16 @@
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            this._errorEvent = new Event$6();
+            this._errorEvent = new Event$7();
             this._tilingScheme = proj.get('EPSG:4326');
             this._readyPromise = when$2.defer();
             this._ready = false;
             this._ready = true;
-            this._minimumLevel = defaultValue$4(options.minimumLevel, 0);
+            this._minimumLevel = defaultValue$5(options.minimumLevel, 0);
             this._maximumLevel = options.maximumLevel;
-            this._tileWidth = defaultValue$4(options.tileWidth, 256);
-            this._tileHeight = defaultValue$4(options.tileHeight, 256);
-            this._rectangle = defaultValue$4(options.rectangle, Rectangle.MAX_VALUE);
+            this._tileWidth = defaultValue$5(options.tileWidth, 256);
+            this._tileHeight = defaultValue$5(options.tileHeight, 256);
+            this._rectangle = defaultValue$5(options.rectangle, Rectangle.MAX_VALUE);
             this._readyPromise.resolve(true);
             this._errorEvent.addEventListener((x, y, z) => {
                 // 主要是为了不让TileProviderError.handleError打印错误
@@ -9143,10 +11327,10 @@
             this._url = options.url;
             this._typeName = options.typeName;
             this._style = options.style;
-            if (!defined$5(this._url)) {
+            if (!defined$7(this._url)) {
                 throw new CesiumProError('parameter url must be provided.')
             }
-            if (!defined$5(this._typeName)) {
+            if (!defined$7(this._typeName)) {
                 throw new CesiumProError('parameter typeName must be provided.')
             }
             const resource = new Resource({
@@ -9216,10 +11400,10 @@
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            if (!defined$5(options.parameters)) {
+            if (!defined$7(options.parameters)) {
                 options.parameters = WMSLayer.DefaultParameters;
             }
-            if (!defined$5(options.GetFeatureInfoDefaultParameters)) ;
+            if (!defined$7(options.GetFeatureInfoDefaultParameters)) ;
             super(options);
         }
         /**
@@ -9391,7 +11575,7 @@
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(options.objects)) {
+            if (!defined$7(options.objects)) {
                 throw new CesiumProError('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -9402,13 +11586,13 @@
             //     throw new CesiumProError('property scene must be defined.')
             // }
             super(options);
-            this._id = defaultValue$4(options.id, createGuid$2());
+            this._id = defaultValue$5(options.id, createGuid$2());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$3();
-            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$5(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$5(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
         }
@@ -9604,7 +11788,7 @@
             if(tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$4(this._createGeometryFunction, defaultCreateGeometryFunction$1);
+            const createGeometry = defaultValue$5(this._createGeometryFunction, defaultCreateGeometryFunction$1);
             const geometry = createGeometry(object);
             const keys = Object.keys(object);
             for (let key of keys) {
@@ -9682,8 +11866,8 @@
                 id: object.id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$4(object.pixelSize, options.pixelSize),
-                    color: defaultValue$4(object.color, options.color)
+                    pixelSize: defaultValue$5(object.pixelSize, options.pixelSize),
+                    color: defaultValue$5(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -9702,10 +11886,10 @@
          * @param {MassiveBillboardLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$4(options.objects, []);
-            options.pixelSize = defaultValue$4(options.pixelSize, 5);
-            options.color = defaultValue$4(options.color, Color$1.fromRandom);
-            options.createGeometryFunction = defaultValue$4(options.createGeometryFunction, defaultCreateFn$1(options));
+            options.objects = defaultValue$5(options.objects, []);
+            options.pixelSize = defaultValue$5(options.pixelSize, 5);
+            options.color = defaultValue$5(options.color, Color$1.fromRandom);
+            options.createGeometryFunction = defaultValue$5(options.createGeometryFunction, defaultCreateFn$1(options));
             super(options);
         }
     }
@@ -9730,13 +11914,13 @@
             modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
             object.modelMatrix = modelOption.modelMatrix;
         }
-        modelOption.minimumPixelSize = defaultValue$4(object.minimumPixelSize, options.minimumPixelSize);
-        modelOption.maximumScale = defaultValue$4(object.maximumScale, options.maximumScale);
-        modelOption.scale  = defaultValue$4(object.scale, options.scale);
-        modelOption.allowPicking = defaultValue$4(object.allowPicking, options.allowPicking);
-        modelOption.shadows = defaultValue$4(object.shadows, options.shadows);
+        modelOption.minimumPixelSize = defaultValue$5(object.minimumPixelSize, options.minimumPixelSize);
+        modelOption.maximumScale = defaultValue$5(object.maximumScale, options.maximumScale);
+        modelOption.scale  = defaultValue$5(object.scale, options.scale);
+        modelOption.allowPicking = defaultValue$5(object.allowPicking, options.allowPicking);
+        modelOption.shadows = defaultValue$5(object.shadows, options.shadows);
         modelOption.id = object._id;
-        modelOption.url = defaultValue$4(object.url, options.url);
+        modelOption.url = defaultValue$5(object.url, options.url);
         return Cesium.Model.fromGltf(modelOption)
     };
     const ZEROLEVELHEIGHT = 31638318;
@@ -9767,7 +11951,7 @@
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$5(options.objects)) {
+            if (!defined$7(options.objects)) {
                 throw new CesiumProError('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -9783,13 +11967,13 @@
                 delete _.id;
             });
             super(options);
-            this._id = defaultValue$4(options.id, createGuid$2());
+            this._id = defaultValue$5(options.id, createGuid$2());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$1();
-            this._maxClusterLevel = defaultValue$4(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$4(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$5(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$5(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
             this._options = options;
@@ -9898,7 +12082,7 @@
             if(tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$4(this._createGeometryFunction, defaultCreateGeometryFunction);
+            const createGeometry = defaultValue$5(this._createGeometryFunction, defaultCreateGeometryFunction);
             const geometry = createGeometry(object, this._options);
             this.add(geometry);
             return geometry;
@@ -9962,8 +12146,8 @@
                 id: object.id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$4(object.pixelSize, options.pixelSize),
-                    color: defaultValue$4(object.color, options.color)
+                    pixelSize: defaultValue$5(object.pixelSize, options.pixelSize),
+                    color: defaultValue$5(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -9982,15 +12166,25 @@
          * @param {MassivePointLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$4(options.objects, []);
-            options.pixelSize = defaultValue$4(options.pixelSize, 5);
-            options.color = defaultValue$4(options.color, Color.fromRandom);
-            options.createGeometryFunction = defaultValue$4(options.createGeometryFunction, defaultCreateFn(options));
+            options.objects = defaultValue$5(options.objects, []);
+            options.pixelSize = defaultValue$5(options.pixelSize, 5);
+            options.color = defaultValue$5(options.color, Color.fromRandom);
+            options.createGeometryFunction = defaultValue$5(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
     }
 
     function line(){}
+
+    const {ShaderSource} = Cesium;
+    /**
+     * 自自定全局glsl函数
+     * @param {String} builtinName 必须以czm开头
+     * @param {*} shader 
+     */
+    function buildUniforms(builtinName, shader) {
+        ShaderSource._czmBuiltinsAndUniforms[builtinName] = shader;
+    }
 
     const VERSION = '1.0.3';
 
@@ -9999,11 +12193,13 @@
     exports.CesiumProError = CesiumProError;
     exports.CesiumProTerrainProvider = CesiumProTerrainProvider;
     exports.Cluster = Cluster;
-    exports.Event = Event$6;
+    exports.Event = Event$7;
     exports.GaoDeLayer = GaoDeLayer;
     exports.GeoJsonDataSource = GeoJsonDataSource;
     exports.GeoPoint = GeoPoint;
+    exports.Globe = Globe;
     exports.GroundSkyBox = GroundSkyBox;
+    exports.ImagerySplitDirection = ImagerySplitDirection;
     exports.InfoBox = InfoBox;
     exports.LonLatNetLayer = LonLatNetLayer;
     exports.LonlatTilingScheme = LonlatTilingScheme;
@@ -10017,8 +12213,9 @@
     exports.MultipleTerrainProvider = MultipleTerrainProvider;
     exports.PbfDataSource = PbfDataSource;
     exports.QuadTreeProvider = QuadTreeProvider;
-    exports.Scene = Scene;
+    exports.Scene = override;
     exports.Selection = Selection;
+    exports.ShaderProgram = override$1;
     exports.ShapefileDataSource = ShapefileDataSource;
     exports.TDTLayer = TDTLayer;
     exports.TMSLayer = TMSLayer;
@@ -10033,6 +12230,8 @@
     exports.WMSLayer = WMSLayer;
     exports.WMTSLayer = WMTSLayer;
     exports.XYZLayer = XYZLayer;
+    exports._shaderBuildUniforms = buildUniforms;
+    exports._shaderGlobeFS = GlobeFS;
     exports._shaderGroundSkyBoxFS = shader$1;
     exports._shaderGroundSkyBoxVS = shader;
     exports._shaderLine = line;
@@ -10042,8 +12241,9 @@
     exports.createDefaultLayer = createDefaultLayer;
     exports.createGuid = createGuid$2;
     exports.dateFormat = dateFormat;
-    exports.defaultValue = defaultValue$4;
-    exports.defined = defined$5;
+    exports.defaultValue = defaultValue$5;
+    exports.defined = defined$7;
+    exports.index = overrideCesium;
     exports.proj = proj;
 
     Object.defineProperty(exports, '__esModule', { value: true });

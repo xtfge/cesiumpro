@@ -223,6 +223,11 @@
             "thumb": "./images/groundskybox.gif"
           },
           {
+            "label": "巻帘",
+            "value": "1.1.6imagerySplit",
+            "thumb": "./images/imagerySplit.gif"
+          },
+          {
             "label": "kml漫游",
             "value": "2.1.10kmltour",
             "thumb": "./images/kmltour.gif"
@@ -277,6 +282,11 @@
             "label": "模型（矩阵）变换",
             "value": "3.1.3modelMatrix",
             "thumb": "./images/modelMatrix.gif"
+          },
+          {
+            "label": "模型剖切",
+            "value": "3.1.4modelclip",
+            "thumb": "./images/modelclip.gif"
           }
         ]
       },

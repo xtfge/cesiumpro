@@ -11,8 +11,9 @@ import ShapefileDataSource from "../layer/ShapefileDataSource.js";
 import InfoBox from '../widgets/InfoBox.js'
 import CesiumProError from "./CesiumProError.js";
 import Model from "../scene/Model.js";
-import Scene from '../scene/Scene.js'
 import QuadTreeProvider from "../scene/QuadTreeProvider.js";
+import Globe from '../scene/Globe.js'
+import overrideCesium from '../override/index.js'
 const {
     Matrix4,
     BoundingSphere,
@@ -350,7 +351,11 @@ class Viewer extends Cesium.Viewer {
         const superOptions = Object.assign({}, options, {
             infoBox: false
         })
-        Scene.overrideRenderFunction();
+        if(superOptions.globe) {
+            superOptions.globe = new Globe(superOptions.globe._ellipsoid);
+        } else if(superOptions.globe !== false) {
+            superOptions.globe = new Globe()
+        }
         super(container, superOptions);
         // remove default logo image
         const logo = document.querySelector('.cesium-credit-logoContainer');
@@ -895,4 +900,6 @@ class Viewer extends Cesium.Viewer {
         return super.isDestroyed();
     }
 }
+// 生写Cesium中的部分函数
+overrideCesium();
 export default Viewer;
