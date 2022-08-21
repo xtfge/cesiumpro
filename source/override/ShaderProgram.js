@@ -13,6 +13,7 @@ function AutomaticUniform(options) {
 }
 const CesiumAutomaticUniforms = Cesium.AutomaticUniforms;
 const consolePrefix = "[Cesium WebGL] ";
+// override
 const AutomaticUniforms = {
     ...CesiumAutomaticUniforms,
     czm_p_drawingBufferWidth: new AutomaticUniform({

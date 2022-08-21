@@ -1,0 +1,3260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Globe - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        Globe
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="Globe">
+    <a href="#Globe" class="doc-link"></a>
+    new CesiumPro.Globe<span class="signature">(<span class="optional">ellipsoid</span>)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L15">scene/Globe.js 15</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  The globe rendered in the scene, including its terrain (<a href="Globe.html#terrainProvider"><code>Globe#terrainProvider</code></a>)and imagery layers (<a href="Globe.html#imageryLayers"><code>Globe#imageryLayers</code></a>).  Access the globe using <code>Scene#globe</code>.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ellipsoid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Ellipsoid</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Ellipsoid.WGS84</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Determines the size and shape of theglobe.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereBrightnessShift">
+    <a href="#atmosphereBrightnessShift" class="doc-link"></a>
+    atmosphereBrightnessShift<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L257">scene/Globe.js 257</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The brightness shift to apply to the atmosphere. Defaults to 0.0 (no shift).A brightness shift of -1.0 is complete darkness, which will let space show through.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereHueShift">
+    <a href="#atmosphereHueShift" class="doc-link"></a>
+    atmosphereHueShift<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L241">scene/Globe.js 241</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The hue shift to apply to the atmosphere. Defaults to 0.0 (no shift).A hue shift of 1.0 indicates a complete rotation of the hues available.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereSaturationShift">
+    <a href="#atmosphereSaturationShift" class="doc-link"></a>
+    atmosphereSaturationShift<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L249">scene/Globe.js 249</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The saturation shift to apply to the atmosphere. Defaults to 0.0 (no shift).A saturation shift of -1.0 is monochrome.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="backFaceCulling">
+    <a href="#backFaceCulling" class="doc-link"></a>
+    backFaceCulling<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L294">scene/Globe.js 294</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Whether to cull back-facing terrain. Back faces are not culled when the camera is underground or translucency is enabled.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="baseColor">
+    <a href="#baseColor" class="doc-link"></a>
+    baseColor<span class="type-signature"> : Color</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L358">scene/Globe.js 358</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets the color of the globe when no imagery is available.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="cartographicLimitRectangle">
+    <a href="#cartographicLimitRectangle" class="doc-link"></a>
+    cartographicLimitRectangle<span class="type-signature"> : Rectangle</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L388">scene/Globe.js 388</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  A property specifying a <code>Rectangle</code> used to limit globe rendering to a cartographic area.Defaults to the maximum extent of cartographic coordinates.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript"><code>Rectangle.MAX_VALUE</code></code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clippingPlanes">
+    <a href="#clippingPlanes" class="doc-link"></a>
+    clippingPlanes<span class="type-signature"> : ClippingPlaneCollection</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L372">scene/Globe.js 372</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  A property specifying a <code>ClippingPlaneCollection</code> used to selectively disable rendering on the outside of each plane.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="depthTestAgainstTerrain">
+    <a href="#depthTestAgainstTerrain" class="doc-link"></a>
+    depthTestAgainstTerrain<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L223">scene/Globe.js 223</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  True if primitives such as billboards, polylines, labels, etc. should be depth-testedagainst the terrain surface, or false if such primitives should always be drawn on topof terrain unless they're on the opposite side of the globe.  The disadvantage of depthtesting primitives against terrain is that slight numerical noise or terrain level-of-detailswitched can sometimes make a primitive that should be on the surface disappear underneath it.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dynamicAtmosphereLighting">
+    <a href="#dynamicAtmosphereLighting" class="doc-link"></a>
+    dynamicAtmosphereLighting<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L142">scene/Globe.js 142</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Enable dynamic lighting effects on atmosphere and fog. This only takes effectwhen <code>enableLighting</code> is <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dynamicAtmosphereLightingFromSun">
+    <a href="#dynamicAtmosphereLightingFromSun" class="doc-link"></a>
+    dynamicAtmosphereLightingFromSun<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L152">scene/Globe.js 152</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Whether dynamic atmosphere lighting uses the sun direction instead of the scene'slight direction. This only takes effect when <code>enableLighting</code> and<code>dynamicAtmosphereLighting</code> are <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="ellipsoid">
+    <a href="#ellipsoid" class="doc-link"></a>
+    ellipsoid<span class="type-signature"> : Ellipsoid</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L306">scene/Globe.js 306</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets an ellipsoid describing the shape of this globe.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="enableLighting">
+    <a href="#enableLighting" class="doc-link"></a>
+    enableLighting<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L133">scene/Globe.js 133</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Enable lighting the globe with the scene's light source.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="fillHighlightColor">
+    <a href="#fillHighlightColor" class="doc-link"></a>
+    fillHighlightColor<span class="type-signature"> : Color</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L125">scene/Globe.js 125</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The color to use to highlight terrain fill tiles. If undefined, fill tiles are nothighlighted at all. The alpha value is used to alpha blend with the tile'sactual color. Because terrain fill tiles do not represent the actual terrain surface,it may be useful in some applications to indicate visually that they are not to be trusted.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="imageryLayers">
+    <a href="#imageryLayers" class="doc-link"></a>
+    imageryLayers<span class="type-signature"> : ImageryLayerCollection</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L316">scene/Globe.js 316</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets the collection of image layers that will be rendered on this globe.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="imageryLayersUpdatedEvent">
+    <a href="#imageryLayersUpdatedEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> imageryLayersUpdatedEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L328">scene/Globe.js 328</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets an event that's raised when an imagery layer is added, shown, hidden, moved, or removed.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="lightingFadeInDistance">
+    <a href="#lightingFadeInDistance" class="doc-link"></a>
+    lightingFadeInDistance<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L180">scene/Globe.js 180</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The distance where lighting resumes. This only takes effectwhen <code>enableLighting</code> or <code>showGroundAtmosphere</code> is <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">20000000.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="lightingFadeOutDistance">
+    <a href="#lightingFadeOutDistance" class="doc-link"></a>
+    lightingFadeOutDistance<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L171">scene/Globe.js 171</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The distance where everything becomes lit. This only takes effectwhen <code>enableLighting</code> or <code>showGroundAtmosphere</code> is <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">10000000.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="loadingDescendantLimit">
+    <a href="#loadingDescendantLimit" class="doc-link"></a>
+    loadingDescendantLimit<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L96">scene/Globe.js 96</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets the number of loading descendant tiles that is considered "too many".If a tile has too many loading descendants, that tile will be loaded and rendered before any ofits descendants are loaded and rendered. This means more feedback for the user that somethingis happening at the cost of a longer overall load time. Setting this to 0 will cause eachtile level to be loaded successively, significantly increasing load time. Setting it to a largenumber (e.g. 1000) will minimize the number of tiles that are loaded but tend to makedetail appear all at once after a long wait.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">20</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="material">
+    <a href="#material" class="doc-link"></a>
+    material<span class="type-signature"> : Material</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L468">scene/Globe.js 468</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets the material appearance of the Globe.  This can be one of several built-in <code>Material</code> objects or a custom material, scripted with<a href="https://github.com/CesiumGS/cesium/wiki/Fabric">Fabric</a>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="maximumScreenSpaceError">
+    <a href="#maximumScreenSpaceError" class="doc-link"></a>
+    maximumScreenSpaceError<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L72">scene/Globe.js 72</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The maximum screen-space error used to drive level-of-detail refinement.  Highervalues will provide better performance but lower visual quality.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">2</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="nightFadeInDistance">
+    <a href="#nightFadeInDistance" class="doc-link"></a>
+    nightFadeInDistance<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L200">scene/Globe.js 200</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The distance where the darkness of night from the ground atmosphere fades in to an unlit ground atmosphere.This only takes effect when <code>showGroundAtmosphere</code>, <code>enableLighting</code>, and<code>dynamicAtmosphereLighting</code> are <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">50000000.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="nightFadeOutDistance">
+    <a href="#nightFadeOutDistance" class="doc-link"></a>
+    nightFadeOutDistance<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L190">scene/Globe.js 190</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The distance where the darkness of night from the ground atmosphere fades out to a lit ground atmosphere.This only takes effect when <code>showGroundAtmosphere</code>, <code>enableLighting</code>, and<code>dynamicAtmosphereLighting</code> are <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">10000000.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="oceanNormalMapUrl">
+    <a href="#oceanNormalMapUrl" class="doc-link"></a>
+    oceanNormalMapUrl<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L406">scene/Globe.js 406</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The normal map to use for rendering waves in the ocean.  Setting this property willonly have an effect if the configured terrain provider includes a water mask.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">buildModuleUrl('Assets/Textures/waterNormalsSmall.jpg')</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preloadAncestors">
+    <a href="#preloadAncestors" class="doc-link"></a>
+    preloadAncestors<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L105">scene/Globe.js 105</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets a value indicating whether the ancestors of rendered tiles should be preloaded.Setting this to true optimizes the zoom-out experience and provides more detail innewly-exposed areas when panning. The down side is that it requires loading more tiles.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preloadSiblings">
+    <a href="#preloadSiblings" class="doc-link"></a>
+    preloadSiblings<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L115">scene/Globe.js 115</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets a value indicating whether the siblings of rendered tiles should be preloaded.Setting this to true causes tiles with the same parent as a rendered tile to be loaded, evenif they are culled. Setting this to true may provide a better panning experience at thecost of loading more tiles.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="shadows">
+    <a href="#shadows" class="doc-link"></a>
+    shadows<span class="type-signature"> : ShadowMode</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L233">scene/Globe.js 233</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Determines whether the globe casts or receives shadows from light sources. Setting the globeto cast shadows may impact performance since the terrain is rendered again from the light's perspective.Currently only terrain that is in view casts shadows. By default the globe does not cast shadows.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">ShadowMode.RECEIVE_ONLY</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L58">scene/Globe.js 58</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Determines if the globe will be shown.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="showGroundAtmosphere">
+    <a href="#showGroundAtmosphere" class="doc-link"></a>
+    showGroundAtmosphere<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L162">scene/Globe.js 162</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Enable the ground atmosphere, which is drawn over the globe when viewed from a distance between <code>lightingFadeInDistance</code> and <code>lightingFadeOutDistance</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+    <h5>Demo:</h5>
+    <ul class="see-list">
+        <li><a href="https://sandcastle.cesium.com/index.html?src=Ground%2520Atmosphere.html">Ground atmosphere demo in Sandcastle</a></li>
+    </ul>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="showSkirts">
+    <a href="#showSkirts" class="doc-link"></a>
+    showSkirts<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L286">scene/Globe.js 286</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Whether to show terrain skirts. Terrain skirts are geometry extending downwards from a tile's edges used to hide seams between neighboring tiles.Skirts are always hidden when the camera is underground or translucency is enabled.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="showWaterEffect">
+    <a href="#showWaterEffect" class="doc-link"></a>
+    showWaterEffect<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L210">scene/Globe.js 210</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  True if an animated wave effect should be shown in areas of the globecovered by water; otherwise, false.  This property is ignored if the<code>terrainProvider</code> does not provide a water mask.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainExaggeration">
+    <a href="#terrainExaggeration" class="doc-link"></a>
+    terrainExaggeration<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L267">scene/Globe.js 267</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  A scalar used to exaggerate the terrain. Defaults to <code>1.0</code> (no exaggeration).A value of <code>2.0</code> scales the terrain by 2x.A value of <code>0.0</code> makes the terrain completely flat.Note that terrain exaggeration will not modify any other primitive as they are positioned relative to the ellipsoid.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">1.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainExaggerationRelativeHeight">
+    <a href="#terrainExaggerationRelativeHeight" class="doc-link"></a>
+    terrainExaggerationRelativeHeight<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L277">scene/Globe.js 277</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The height from which terrain is exaggerated. Defaults to <code>0.0</code> (scaled relative to ellipsoid surface).Terrain that is above this height will scale upwards and terrain that is below this height will scale downwards.Note that terrain exaggeration will not modify any other primitive as they are positioned relative to the ellipsoid.If <a href="Globe.html#terrainExaggeration"><code>Globe#terrainExaggeration</code></a> is <code>1.0</code> this value will have no effect.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainProvider">
+    <a href="#terrainProvider" class="doc-link"></a>
+    terrainProvider<span class="type-signature"> : TerrainProvider</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L423">scene/Globe.js 423</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The terrain provider providing surface geometry for this globe.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="terrainProviderChanged">
+    <a href="#terrainProviderChanged" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> terrainProviderChanged<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L444">scene/Globe.js 444</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets an event that's raised when the terrain provider is changed
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileCacheSize">
+    <a href="#tileCacheSize" class="doc-link"></a>
+    tileCacheSize<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L83">scene/Globe.js 83</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The size of the terrain tile cache, expressed as a number of tiles.  Any additionaltiles beyond this number will be freed, as long as they aren't needed for renderingthis frame.  A larger number will consume more memory but will show detail fasterwhen, for example, zooming out and then back in.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">100</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileLoadProgressEvent">
+    <a href="#tileLoadProgressEvent" class="doc-link"></a>
+    tileLoadProgressEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L456">scene/Globe.js 456</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets an event that's raised when the length of the tile load queue has changed since the last render frame.  When the load queue is empty,all terrain and imagery for the current view have been loaded.  The event passes the new length of the tile load queue.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tilesLoaded">
+    <a href="#tilesLoaded" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tilesLoaded<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L340">scene/Globe.js 340</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Returns <code>true</code> when the tile load queue is empty, <code>false</code> otherwise.  When the load queue is empty,all terrain and imagery for the current view have been loaded.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="translucency">
+    <a href="#translucency" class="doc-link"></a>
+    translucency<span class="type-signature"> : GlobeTranslucency</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L543">scene/Globe.js 543</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Properties for controlling globe translucency.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="undergroundColor">
+    <a href="#undergroundColor" class="doc-link"></a>
+    undergroundColor<span class="type-signature"> : Color</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L492">scene/Globe.js 492</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The color to render the back side of the globe when the camera is underground or the globe is translucent,blended with the globe color based on the camera's distance.<br /><br />To disable underground coloring, set <code>undergroundColor</code> to <code>undefined</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript"><code>Color.BLACK</code></code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="Globe.html#undergroundColorAlphaByDistance">Globe#undergroundColorAlphaByDistance</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="undergroundColorAlphaByDistance">
+    <a href="#undergroundColorAlphaByDistance" class="doc-link"></a>
+    undergroundColorAlphaByDistance<span class="type-signature"> : NearFarScalar</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L518">scene/Globe.js 518</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets the near and far distance for blending <a href="Globe.html#undergroundColor"><code>Globe#undergroundColor</code></a> with the globe color.The alpha will interpolate between the <code>NearFarScalar#nearValue</code> and<code>NearFarScalar#farValue</code> while the camera distance falls within the lower and upper boundsof the specified <code>NearFarScalar#near</code> and <code>NearFarScalar#far</code>.Outside of these ranges the alpha remains clamped to the nearest bound. If undefined,the underground color will not be blended with the globe color.<br /> <br />When the camera is above the ellipsoid the distance is computed from the nearestpoint on the ellipsoid instead of the camera's position.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="Globe.html#undergroundColor">Globe#undergroundColor</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1020">scene/Globe.js 1020</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  Destroys the WebGL resources held by this object.  Destroying an object allows for deterministicrelease of WebGL resources, instead of relying on the garbage collector to destroy this object.<br /><br />Once an object is destroyed, it should not be used; calling any function other than<code>isDestroyed</code> will result in a <code>DeveloperError</code> exception.  Therefore,assign the return value (<code>undefined</code>) to the object as done in the example.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+  
+  <li>
+    
+
+    <div class="param-desc">
+        
+<span class="param-type">
+  DeveloperError</span>
+
+: This object was destroyed, i.e., destroy() was called.
+    </div>
+
+
+  </li>
+  
+</ul>
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">globe = globe &amp;&amp; globe.destroy();</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="Globe.html#isDestroyed">Globe#isDestroyed</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="getHeight">
+    <a href="#getHeight" class="doc-link"></a>
+    getHeight<span class="signature">(cartographic)</span> &rarr; <span class="type-signature returnType">Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L749">scene/Globe.js 749</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  Get the height of the surface at a given cartographic.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cartographic</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartographic</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The cartographic for which to find the height.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    The height of the cartographic or undefined if it could not be found.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="isDestroyed">
+    <a href="#isDestroyed" class="doc-link"></a>
+    isDestroyed<span class="signature">()</span> &rarr; <span class="type-signature returnType">Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1000">scene/Globe.js 1000</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  Returns true if this object was destroyed; otherwise, false.<br /><br />If this object was destroyed, it should not be used; calling any function other than<code>isDestroyed</code> will result in a <code>DeveloperError</code> exception.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    True if this object was destroyed; otherwise, false.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="Globe.html#destroy">Globe#destroy</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pick">
+    <a href="#pick" class="doc-link"></a>
+    pick<span class="signature">(ray, scene, <span class="optional">result</span>)</span> &rarr; <span class="type-signature returnType">Cartesian3|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L721">scene/Globe.js 721</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  Find an intersection between a ray and the globe surface that was rendered. The ray must be given in world coordinates.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ray</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Ray</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                The ray to test for intersection.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scene</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Scene</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                The scene.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartesian3</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                The object onto which to store the result.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    The intersection or <code>undefined</code> if none was found.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">// find intersection of ray through a pixel and the globevar ray = viewer.camera.getPickRay(windowCoordinates);var intersection = globe.pick(ray, scene);</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="buildUniforms"><a href="global.html#buildUniforms">buildUniforms</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="ImagerySplitDirection"><a href="global.html#ImagerySplitDirection">ImagerySplitDirection</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

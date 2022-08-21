@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/Sandcastle.js'></script>
+    <link href='./editor/Sandcastle.css' rel='stylesheet' />
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #toolbar {
+            color: #FFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'>
+        请通过键盘A、D、W、S、Q、E控制起重臂<br>
+        按空格键播放动画
+    </div>
+
+    </div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const p = new CesiumPro.LonLat(110, 30, 0).toCartesian();
+        let model = new CesiumPro.Model({
+            url: '../data/models/diaoche.glb',
+            minimumPixelSize: 64,
+            position: p
+        })
+        viewer.addModel(model)
+        viewer.flyTo(model, {
+            offset: {
+                heading: -Cesium.Math.toRadians(150),
+                pitch: -Cesium.Math.toRadians(45),
+                range: 30
+            }
+        })
+        let node, node1, node2, node3, node0, node4, node5;
+        model.readyPromise.then(() => {
+            node1 = model.getNode("node_Ctrl_Spin02_-1362");
+            // 起重臂节点 node_Dummy006_-1454
+            node = model.getNode('node_Ctrl_Spin01_-1378');
+            node2 = model.getNode('node_Dummy005_-1380');
+            node3 = model.getNode('node_Dummy006_-1454')
+            // 钩子
+            node0 = model.getNode('node_Bone006_-1438');
+            node4 = model.getNode('node_Bone003_-1428')
+            node5 = model.getNode('node_Bone007_-1434')
+        })
+        const { Matrix3, Matrix4, Cartesian3 } = Cesium;
+        const { toRadians } = Cesium.Math;
+        /**
+         * 计算世界坐标
+         */
+        function computeModelPosition(name) {
+            const node = model.nodes[name];
+            function fn(node, matrix) {
+                Matrix4.multiply(node.publicNode.matrix, matrix, matrix);
+                if (node.parents && node.parents.length) {
+                    return fn(node.parents[0], matrix)
+                }
+                Matrix4.multiply(node.computedMatrix, matrix, matrix);
+
+            }
+            const m = Matrix4.clone(Matrix4.IDENTITY);
+            fn(node, m);
+            const position = Matrix4.getTranslation(m, new Cartesian3);
+            return position;
+        }
+        let pitch = 0, l = 0, heading = 0;
+        function rotateX(angle) {
+            if (!node) {
+                throw new Error('node 尚未初始化')
+            }
+            pitch += angle;
+            if (pitch < 0) {
+                pitch = 0;
+                return;
+            }
+            if (pitch > 60) {
+                pitch = 60;
+                return;
+            }
+            const modelMatrix = node.matrix;
+            let rotation = Matrix3.fromRotationX(toRadians(angle));
+            let node2Origin = computeModelPosition(node2.name);
+            let node3Origin = computeModelPosition(node3.name);
+            const direction1 = new Cartesian3();
+            const direction2 = new Cartesian3();
+            Cartesian3.subtract(node2Origin, node3Origin, direction1);
+            node.matrix = Matrix4.multiplyByMatrix3(modelMatrix, rotation, modelMatrix)
+            node2Origin = computeModelPosition(node2.name);
+            node3Origin = computeModelPosition(node3.name);
+            Cartesian3.subtract(node2Origin, node3Origin, direction2);
+            angle1 = angle / Math.abs(angle) * Cartesian3.angleBetween(direction1, direction2)
+            rotation = Matrix3.fromRotationX(angle1);
+            node2.matrix = Matrix4.multiplyByMatrix3(node2.matrix, rotation, node2.matrix)
+            rotation = Matrix3.fromRotationX(angle1 - toRadians(angle));
+            node3.matrix = Matrix4.multiplyByMatrix3(node3.matrix, rotation, node3.matrix)
+
+            // 改变钩子的方向，使其垂直地面
+            const rotation2 = Matrix3.fromRotationZ(toRadians(angle))
+            node0.matrix = Matrix4.multiplyByMatrix3(node0.matrix, rotation2, node0.matrix)
+            const rotation3 = Matrix3.fromRotationZ(toRadians(-angle))
+            node4.matrix = Matrix4.multiplyByMatrix3(node4.matrix, rotation3, node4.matrix)
+        }
+        function rotateZ(angle) {
+            if (!node1) {
+                throw new Error('node1 尚未初始化')
+            }
+            heading += angle;
+            const modelMatrix = node1.matrix;
+            const rotation = Matrix3.fromRotationZ(toRadians(angle));
+            node1.matrix = Matrix4.multiplyByMatrix3(modelMatrix, rotation, modelMatrix)
+        }
+        function stretch(length) {
+            l += length;
+            if (l > 0) {
+                l = 0;
+                return;
+            }
+            node5.matrix = Matrix4.multiplyByTranslation(node5.matrix,
+                new Cartesian3(length, 0, 0), node5.matrix)
+        }
+        parent.onkeypress = function (e) {
+            if (e.code === 'KeyA') {
+                rotateZ(-5)
+                console.log('left rotate')
+            } else if (e.code === 'KeyD') {
+                rotateZ(5)
+                console.log('right rotate')
+            } else if (e.code === 'KeyW') {
+                rotateX(5)
+                console.log('up rotate')
+            } else if (e.code === 'KeyS') {
+                rotateX(-5)
+                console.log('down rotate')
+            } else if (e.code === 'KeyQ') {
+                stretch(1)
+            } else if (e.code === 'KeyE') {
+                stretch(-1)
+            } else if (e.code === 'Space') {
+                animate();
+            }
+
+        }
+
+        let timer
+        function animate() {
+            if (timer) {
+                rotateX(-pitch);
+                rotateZ(-heading);
+                stretch(-l)
+                clearInterval(timer)
+                timer = null;
+                return;
+            }
+            timer = setInterval(() => {
+                if (pitch === 50) {
+                    if (heading < -40) {
+                        stretch(-0.1)
+                        if (l < -5) {
+                            rotateX(-pitch);
+                            rotateZ(-heading);
+                            stretch(-l)
+                            clearInterval(timer)
+                            timer = null;
+                        }
+                    } else {
+                        rotateZ(-1)
+                    }
+                } else {
+                    rotateX(1);
+                }
+            }, 100)
+        }
+
+
+        parent.viewer = viewer;
+        parent.model = model;
+        parent.Matrix4 = Matrix4
+    </script>
+</body>
+
+</html>

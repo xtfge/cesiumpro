@@ -1,6 +1,6 @@
 import CesiumProError from "../core/CesiumProError.js";
 import defined from "../core/defined.js";
-import GeoPoint from "../core/GeoPoint.js";
+import LonLat from "../core/LonLat.js";
 const {
     Transforms,
     Cartesian3
@@ -11,7 +11,7 @@ class Model{
      * @param {Model.ModelOptions} optinos 模型参数
      * @example
      *  // 1. 通过position设置模型位置
-     *  const p = new CesiumPro.GeoPoint(110, 30, 10).toCartesian();
+     *  const p = new CesiumPro.LonLat(110, 30, 10).toCartesian();
      *  const model = new CesiumPro.Model({
      *      url: '../data/models/Cesium_Air.glb',
      *      minimumPixelSize: 16,
@@ -40,7 +40,7 @@ class Model{
             let cartesian;
             if(options.position instanceof Cartesian3) {
                 cartesian = options.position
-            } else if(options.position instanceof GeoPoint) {
+            } else if(options.position instanceof LonLat) {
                 cartesian = options.position.toCartesian();
             }
             if(cartesian) {
@@ -394,7 +394,7 @@ class Model{
  * @memberof Model
  * @property {Object|ArrayBuffer|Uint8Array} [gltf] 一个gltf的JSON对象或gltf二进制buffer
  * @property {Cesium.Resource|String} [url] 一个glb/gltlf文件的url
- * @property {GeoPoint|Cesium.Cartesian3} position 模型位置，如果定义了modelMatrix则该属性不生效。
+ * @property {LonLat|Cesium.Cartesian3} position 模型位置，如果定义了modelMatrix则该属性不生效。
  * @property {Cesium.Resource|String} [basePath=''] url的相对路径
  * @property {Boolean} [show=true] 决定模型是否被显示
  * @property {Cesium.Matrix4} [modelMatrix=Cesium.Matrix4.IDENTITY] 模型矩阵，用于将模型从模型坐标转换到世界坐标，如果未定义将使用position计算模型矩阵

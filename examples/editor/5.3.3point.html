@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+   <script src='./editor/Sandcastle.js'></script>
+   <link href='./editor/Sandcastle.css' rel='stylesheet'/>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+        body,html {
+            margin: 0;
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+   <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        parent.viewer = viewer;
+        const pc = new Cesium.PointPrimitiveCollection();
+        viewer.primitives.add(pc);
+        // 直接在构造函数设置参数
+        const point = new Cesium.PointPrimitive({
+            position: new CesiumPro.LonLat(110, 30).toCartesian(),
+            pixelSize: 5,
+            color: Cesium.Color.RED
+        }, pc)
+        pc.add(point);
+
+        // const p = viewer.entities.add({
+        //     position: new CesiumPro.LonLat(110, 40).toCartesian(),
+        //     point: {
+        //         pixelSize: 5,
+        //         color: Cesium.Color.GOLD
+        //     }
+        // }, pc)
+        // parent.point = point;
+        // parent.p = p;
+        parent.Cesium = Cesium;
+    </script>
+</body>
+</html>

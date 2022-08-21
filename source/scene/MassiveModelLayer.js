@@ -2,7 +2,7 @@ import defaultValue from "../core/defaultValue.js";
 import createGuid from '../core/createGuid.js';
 import defined from "../core/defined.js";
 import CesiumProError from "../core/CesiumProError.js";
-import GeoPoint from "../core/GeoPoint.js";
+import LonLat from "../core/LonLat.js";
 import MassiveGraphicLayer from './MassiveGraphicLayer.js'
 const {
     destroyObject,
@@ -15,7 +15,7 @@ const defaultCreateGeometryFunction = function (object, options) {
         modelOption.modelMatrix = object.modelMatrix;
     } else if(object.position) {
         let cartesian = object.position;
-        if(object.position instanceof GeoPoint) {
+        if(object.position instanceof LonLat) {
             cartesian = object.position.toCartesian();
         }
         if(!cartesian) {

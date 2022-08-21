@@ -1,7 +1,7 @@
 import defined from '../core/defined.js';
 import MassiveGraphicLayerCollection from './MassiveGraphicLayerCollection.js';
 import createGuid from '../core/createGuid.js';
-import GeoPoint from "../core/GeoPoint.js";
+import LonLat from "../core/LonLat.js";
 const {
     GeographicTilingScheme,
     GlobeSurfaceTileProvider,
@@ -143,7 +143,7 @@ function getObjectByTile(objects, tile) {
         } else if (object.position instanceof Cartographic) {
             object.cartesian = Cartographic.toCartesian(object.position);
             object.catographic = object.position;
-        } else if (object.position instanceof GeoPoint) {
+        } else if (object.position instanceof LonLat) {
             object.cartesian = object.position.toCartesian();
             object.cartographic = object.position.toCartoGraphic()
         } else {

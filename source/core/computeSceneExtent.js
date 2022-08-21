@@ -1,5 +1,5 @@
 import defined from "./defined.js";
-import GeoPoint from "./GeoPoint.js";
+import LonLat from "./LonLat.js";
 
 function computeSceneExtent(viewer) {
     // const rect = viewer.camera.computeViewRectangle();
@@ -21,10 +21,10 @@ function computeSceneExtent(viewer) {
     }
     const canvas = viewer.canvas;
     const bounding = canvas.getBoundingClientRect();
-    const left = GeoPoint.fromPixel(new Cesium.Cartesian2(0, bounding.height / 2), viewer)|| {lon: -180};
-    const right = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width, bounding.height / 2), viewer) || {lon: 180};
-    const top = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width / 2, 0), viewer) || {lat: 90};
-    const bottom = GeoPoint.fromPixel(new Cesium.Cartesian2(bounding.width / 2, bounding.height), viewer) || {lat: -90};
+    const left = LonLat.fromPixel(new Cesium.Cartesian2(0, bounding.height / 2), viewer)|| {lon: -180};
+    const right = LonLat.fromPixel(new Cesium.Cartesian2(bounding.width, bounding.height / 2), viewer) || {lon: 180};
+    const top = LonLat.fromPixel(new Cesium.Cartesian2(bounding.width / 2, 0), viewer) || {lat: 90};
+    const bottom = LonLat.fromPixel(new Cesium.Cartesian2(bounding.width / 2, bounding.height), viewer) || {lat: -90};
 
     return {
         west: left.lon,

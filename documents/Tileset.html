@@ -1,0 +1,6710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Tileset - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        Tileset
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="Tileset">
+    <a href="#Tileset" class="doc-link"></a>
+    new CesiumPro.Tileset<span class="signature">(options)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L43">scene/Tileset.js 43</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  添加3d tile set数据集。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="Tileset.html#.Options">Tileset.Options</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="allTilesLoaded">
+    <a href="#allTilesLoaded" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> allTilesLoaded<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L112">scene/Tileset.js 112</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  满足此帧屏幕空间错误的所有瓦片加载完成后触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.allTilesLoaded.addEventListener(function() {   console.log('All tiles are loaded');});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="baseScreenSpaceError">
+    <a href="#baseScreenSpaceError" class="doc-link"></a>
+    baseScreenSpaceError<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L805">scene/Tileset.js 805</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  在跳过详细级别之前必须达到的屏幕空间误差。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">1024</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="boundingSphere">
+    <a href="#boundingSphere" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> boundingSphere<span class="type-signature"> : <a href="../cesiumDocumentation/BoundingSphere.html" target = '_blank'>Cesium.BoundingSphere</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L137">scene/Tileset.js 137</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型的包围球
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({    url : 'http://localhost:8002/tilesets/Seattle/tileset.json'}));tileset.readyPromise.then(function(tileset) {    // Set the camera to view the newly added tileset    viewer.camera.viewBoundingSphere(tileset.boundingSphere, new Cesium.HeadingPitchRange(0, -0.5, 0));});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="classificationType">
+    <a href="#classificationType" class="doc-link"></a>
+    classificationType<span class="type-signature"> : <a href="../cesiumDocumentation/ClassificationType.html" target = '_blank'>Cesium.ClassificationType</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L794">scene/Tileset.js 794</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  决定地形、3D 瓦片是否被此瓦片集分类。此选项仅适用于包含批处理 3D 模型、几何数据或矢量数据的瓦片集。即使未定义，矢量数据和几何数据也必须作为分类渲染，并且默认在地形和其他 3D Tiles 瓦片集上渲染
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clippingPlanes">
+    <a href="#clippingPlanes" class="doc-link"></a>
+    clippingPlanes<span class="type-signature"> : <a href="../cesiumDocumentation/ClippingPlaneCollection.html" target = '_blank'>Cesium.ClippingPlaneCollection</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L673">scene/Tileset.js 673</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型裁剪平面
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="colorBlendAmount">
+    <a href="#colorBlendAmount" class="doc-link"></a>
+    colorBlendAmount<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L146">scene/Tileset.js 146</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  样式颜色和模型颜色的混合比例，仅当<a href="Tileset.html#colorBlendMode"><code>Tileset#colorBlendMode</code></a> 为<code>MIX</code>时生效, 如果为0，将完全显示模型的颜色，如果为1，将完全显示样式的颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.5</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="colorBlendMode">
+    <a href="#colorBlendMode" class="doc-link"></a>
+    colorBlendMode<span class="type-signature"> : <a href="../cesiumDocumentation/Cesium3DTileColorBlendMode.html" target = '_blank'>Cesium.Cesium3DTileColorBlendMode</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L157">scene/Tileset.js 157</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  样式颜色和模型颜色的混合模式
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Cesium3DTileColorBlendMode.HIGHLIGHT</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="customShader">
+    <a href="#customShader" class="doc-link"></a>
+    customShader<span class="type-signature"> : <a href="../cesiumDocumentation/CustomShader.html" target = '_blank'>Cesium.CustomShader</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L194">scene/Tileset.js 194</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  自定义着色器，仅在Cesium.ExperimentalFeatures.enableModelExperimental为true时生效
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugColorizeTiles">
+    <a href="#debugColorizeTiles" class="doc-link"></a>
+    debugColorizeTiles<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L205">scene/Tileset.js 205</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  为每个瓦片随机设置不同的颜色，仅用于调试
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugFreezeFrame">
+    <a href="#debugFreezeFrame" class="doc-link"></a>
+    debugFreezeFrame<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L216">scene/Tileset.js 216</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为true，则将数据冻结到上一帧。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowBoundingVolume">
+    <a href="#debugShowBoundingVolume" class="doc-link"></a>
+    debugShowBoundingVolume<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L228">scene/Tileset.js 228</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为 true，则为每个可见图块渲染边界体积。如果图块具有内容边界体积或为空，则边界体积为白色；否则，它是红色的。不符合屏幕空间错误且仍在对其后代进行加载的瓦片为黄色。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowContentBoundingVolume">
+    <a href="#debugShowContentBoundingVolume" class="doc-link"></a>
+    debugShowContentBoundingVolume<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L239">scene/Tileset.js 239</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为 true，则为每个可见图块的内容渲染边界体积。如果图块具有内容边界体积，则边界体积为蓝色；否则它是红色的。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowGeometricError">
+    <a href="#debugShowGeometricError" class="doc-link"></a>
+    debugShowGeometricError<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L250">scene/Tileset.js 250</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为true，将使用label显示每个瓦片的几何误差。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowMemoryUsage">
+    <a href="#debugShowMemoryUsage" class="doc-link"></a>
+    debugShowMemoryUsage<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L261">scene/Tileset.js 261</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试如果为true，将使用label显示每个瓦片的内存使用情况
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowRenderingStatistics">
+    <a href="#debugShowRenderingStatistics" class="doc-link"></a>
+    debugShowRenderingStatistics<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L272">scene/Tileset.js 272</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为 true，则绘制标签以指示每个图块的命令、点、三角形和特征的数量。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugShowUrl">
+    <a href="#debugShowUrl" class="doc-link"></a>
+    debugShowUrl<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L283">scene/Tileset.js 283</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为true，将显示每个瓦片的url。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="debugWireframe">
+    <a href="#debugWireframe" class="doc-link"></a>
+    debugWireframe<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L294">scene/Tileset.js 294</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  仅用于调试。如果为true，将使用线框模式显示模型。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dynamicScreenSpaceError">
+    <a href="#dynamicScreenSpaceError" class="doc-link"></a>
+    dynamicScreenSpaceError<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L308">scene/Tileset.js 308</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。如果为true, 瓦片集是将根据动态屏幕空间误差进行优化，较远的图块将呈现比更近的图块更低的细节。这可以通过渲染更少的图块和发出更少的请求来提高性能，但可能会导致远处图块的视觉质量略有下降。对于紧密拟合的边界体积，结果更准确。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dynamicScreenSpaceErrorDensity">
+    <a href="#dynamicScreenSpaceErrorDensity" class="doc-link"></a>
+    dynamicScreenSpaceErrorDensity<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L348">scene/Tileset.js 348</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。范围为[0, 1)。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.00278</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="dynamicScreenSpaceErrorFactor">
+    <a href="#dynamicScreenSpaceErrorFactor" class="doc-link"></a>
+    dynamicScreenSpaceErrorFactor<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L320">scene/Tileset.js 320</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  用于增加动态屏幕空间误差的图块屏幕空间误差的因子。该值越大，渲染请求的图块越少，远处的图块的细节就越少。如果设置为零，该功能将被禁用。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">4.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="extensions">
+    <a href="#extensions" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> extensions<span class="type-signature"> : Object</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L331">scene/Tileset.js 331</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取瓦片集的扩展对象属性。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="extras">
+    <a href="#extras" class="doc-link"></a>
+    extras<span class="type-signature"> : any</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L339">scene/Tileset.js 339</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  返回extras图块集JSON顶层的属性，其中包含特定于应用程序的元数据。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="https://github.com/CesiumGS/3d-tiles/tree/main/specification#specifying-extensions-and-application-specific-extras">3D Tiles 规范中</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="foveatedConeSize">
+    <a href="#foveatedConeSize" class="doc-link"></a>
+    foveatedConeSize<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L374">scene/Tileset.js 374</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项, 仅当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时生效。用来控制决定延迟哪些图块的锥体大小。立即加载此圆锥内的瓷砖，圆锥外的瓷砖可能会根据它们在圆锥外的距离而延迟加载。将此设置为0.0意味着圆锥将是由相机位置及其视图方向形成的线。将此设置为1.0意味着锥体包含相机的整个视野​​，基本上禁用效果。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.3</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="foveatedInterpolationCallback">
+    <a href="#foveatedInterpolationCallback" class="doc-link"></a>
+    foveatedInterpolationCallback<span class="type-signature"> : <a href="Tileset.html#.FoveatedInterpolationCallback">Tileset.FoveatedInterpolationCallback</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L385">scene/Tileset.js 385</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取或设置一个回调，以控制为中心锥体外的图块提高多少屏幕空间错误，<a href="Tileset.html#foveatedMinimumScreenSpaceErrorRelaxation"><code>Tileset#foveatedMinimumScreenSpaceErrorRelaxation</code></a>和<a href="Tileset.html#maximumScreenSpaceError"><code>Tileset#maximumScreenSpaceError</code></a>之间插值获得。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="foveatedMinimumScreenSpaceErrorRelaxation">
+    <a href="#foveatedMinimumScreenSpaceErrorRelaxation" class="doc-link"></a>
+    foveatedMinimumScreenSpaceErrorRelaxation<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L396">scene/Tileset.js 396</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  <code>当Tileset#foveatedScreenSpaceError</code>为true时，用于控制锥体外的瓦片的起始屏幕空间误差。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="foveatedScreenSpaceError">
+    <a href="#foveatedScreenSpaceError" class="doc-link"></a>
+    foveatedScreenSpaceError<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L360">scene/Tileset.js 360</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。通过暂时提高屏幕边缘周围图块的屏幕空间错误，优先加载屏幕中心的图块。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="foveatedTimeDelay">
+    <a href="#foveatedTimeDelay" class="doc-link"></a>
+    foveatedTimeDelay<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L407">scene/Tileset.js 407</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时，用于控制锥体外的瓦片延迟多长时间加载。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.2</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="imageBasedLightingFactor">
+    <a href="#imageBasedLightingFactor" class="doc-link"></a>
+    imageBasedLightingFactor<span class="type-signature"> : <a href="../cesiumDocumentation/Cartesian2.html" target = '_blank'>Cesium.Cartesian2</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L419">scene/Tileset.js 419</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型接收了来自地球、天空、大气和星空天空盒的光照。该值用于增加或降低这些光照强度。值0.0将禁用这些光源。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">new Cesium.Cartesian2(1, 1)</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="immediateLoadDesiredLevelOfDetail">
+    <a href="#immediateLoadDesiredLevelOfDetail" class="doc-link"></a>
+    immediateLoadDesiredLevelOfDetail<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L431">scene/Tileset.js 431</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  只下载满足最大屏幕空间误差的瓦片，忽略跳过因子。只有<a href="Tileset.html#skipLevelOfDetail"><code>Tileset#skipLevelOfDetail</code></a>为true时使用。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false;</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="initialTilesLoaded">
+    <a href="#initialTilesLoaded" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> initialTilesLoaded<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L446">scene/Tileset.js 446</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  满足当前屏幕空间误差的所有瓦片第一次加载完成后触发该事件。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.initialTilesLoaded.addEventListener(function() {    console.log('Initial tiles are loaded');});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="lightColor">
+    <a href="#lightColor" class="doc-link"></a>
+    lightColor<span class="type-signature"> : <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L454">scene/Tileset.js 454</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  使用该光线代替环境光。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="loadProgress">
+    <a href="#loadProgress" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> loadProgress<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L475">scene/Tileset.js 475</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  触发事件以指示加载新图块的进度。当请求新切片时、请求的切片完成下载以及下载的切片已处理并准备好渲染时，将触发此事件。请求挂起的瓦片数numberOfPendingRequests数和处理完成的瓦片数numberOfTilesProcessing将传递给事件侦听器。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.loadProgress.addEventListener(function(numberOfPendingRequests, numberOfTilesProcessing) {   if ((numberOfPendingRequests === 0) &amp;&amp; (numberOfTilesProcessing === 0)) {       console.log('Stopped loading');       return;   }   console.log('Loading: requests: ' + numberOfPendingRequests + ', processing: ' + numberOfTilesProcessing);});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="loadSiblings">
+    <a href="#loadSiblings" class="doc-link"></a>
+    loadSiblings<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L483">scene/Tileset.js 483</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否下载可见瓦片的兄弟瓦片。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="maximumMemoryUsage">
+    <a href="#maximumMemoryUsage" class="doc-link"></a>
+    maximumMemoryUsage<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L494">scene/Tileset.js 494</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  可用于缓存切片的最大GPU内存（以 MB 为单位）。该值是根据已加载切片的几何、纹理和批处理表纹理估计的,对于点云，此值还包括每点元数据。如果满足当前屏幕空间误差（由<a href="Tileset.html#maximumScreenSpaceError"><code>Tileset#maximumScreenSpaceError</code></a>确定）的图块所需的内存大小超过了maximumMemoryUsage，则使用真正需要的内存大小。例如，如果最大值为256 MB，但需要300MB的图块来满足屏幕空间错误，则可能会加载300MB的图块，当这些瓷砖消失时，它们将被卸载。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">512</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="maximumScreenSpaceError">
+    <a href="#maximumScreenSpaceError" class="doc-link"></a>
+    maximumScreenSpaceError<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L506">scene/Tileset.js 506</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  用于驱动细节细化级别的最大屏幕空间误差。如果瓦片的屏幕空间误差超过maximumScreenSpaceError，则会对其后代进行细化。根据模型数据，maximumScreenSpaceError可能需要进行调整以达到适当的平衡。较高的值可提供更好的性能，但会降低视觉质量。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">16</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="modelMatrix">
+    <a href="#modelMatrix" class="doc-link"></a>
+    modelMatrix<span class="type-signature"> : <a href="../cesiumDocumentation/Matrix4.html" target = '_blank'>Cesium.Matrix4</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L526">scene/Tileset.js 526</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型矩阵
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Matrix4.IDENTITY</code>
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">// 调整模型高度var heightOffset = 20.0;var boundingSphere = tileset.boundingSphere;var cartographic = Cesium.Cartographic.fromCartesian(boundingSphere.center);var surface = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, 0.0);var offset = Cesium.Cartesian3.fromRadians(cartographic.longitude, cartographic.latitude, heightOffset);var translation = Cesium.Cartesian3.subtract(offset, surface, new Cesium.Cartesian3());tileset.modelMatrix = Cesium.Matrix4.fromTranslation(translation);</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="pointCloudShading">
+    <a href="#pointCloudShading" class="doc-link"></a>
+    pointCloudShading<span class="type-signature"> : <a href="../cesiumDocumentation/PointCloudShading.html" target = '_blank'>Cesium.PointCloudShading</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L536">scene/Tileset.js 536</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  使用 3D Tiles 渲染点云时基于几何误差执行点衰减的选项。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preferLeaves">
+    <a href="#preferLeaves" class="doc-link"></a>
+    preferLeaves<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L548">scene/Tileset.js 548</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。如果为true，将优先装载叶子节点。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preloadFlightDestinations">
+    <a href="#preloadFlightDestinations" class="doc-link"></a>
+    preloadFlightDestinations<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L560">scene/Tileset.js 560</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。如果为true, 将在相机飞行过程中加载目的地的瓦片。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preloadWhenHidden">
+    <a href="#preloadWhenHidden" class="doc-link"></a>
+    preloadWhenHidden<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L572">scene/Tileset.js 572</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。如果为true，将在瓦片隐藏的情况下预加载瓦片。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="progressResolutionHeightFraction">
+    <a href="#progressResolutionHeightFraction" class="doc-link"></a>
+    progressResolutionHeightFraction<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L582">scene/Tileset.js 582</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。如果介于 (0.0, 0.5] 之间，将助于在瓦片继续加载的同时快速铺设一层瓦片。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="properties">
+    <a href="#properties" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> properties<span class="type-signature"> : Object</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L593">scene/Tileset.js 593</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取瓦片集的属性字典对象，其中包含有关每个特征属性的元数据.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="readyPromise">
+    <a href="#readyPromise" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> readyPromise<span class="type-signature"> : Promise</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L120">scene/Tileset.js 120</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  返回一个promise,指示模型是否准备完成
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="resource">
+    <a href="#resource" class="doc-link"></a>
+    resource<span class="type-signature"> : <a href="../cesiumDocumentation/Resource.html" target = '_blank'>Cesium.Resource</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L600">scene/Tileset.js 600</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  定义模型资源的对象。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="root">
+    <a href="#root" class="doc-link"></a>
+    root<span class="type-signature"> : Cesium3DTile</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L607">scene/Tileset.js 607</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型根瓦片。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="shadows">
+    <a href="#shadows" class="doc-link"></a>
+    shadows<span class="type-signature"> : <a href="../cesiumDocumentation/ShadowMode.html" target = '_blank'>Cesium.ShadowMode</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L617">scene/Tileset.js 617</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  确定瓦片集是投射还是接收来自光源的阴影。启用阴影将降低性能。只有<a href="../cesiumDocumentation/Viewer.html#shadow" target = '_blank'><code>Cesium.Viewer#shadow</code></a>为true时，才会渲染阴影。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.ShadowMode.ENABLED</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="showOutline">
+    <a href="#showOutline" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> showOutline<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L628">scene/Tileset.js 628</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否显示模型轮廓
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="skipLevelOfDetail">
+    <a href="#skipLevelOfDetail" class="doc-link"></a>
+    skipLevelOfDetail<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L637">scene/Tileset.js 637</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  优化选项。确定是否应在遍历期间应用详细级别跳过，当为true时，tilese需要的内存显著减少。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">false</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="skipLevels">
+    <a href="#skipLevels" class="doc-link"></a>
+    skipLevels<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L650">scene/Tileset.js 650</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  常量定义加载图块时要跳过的最小级别数。例如，如果图块为1级，则不会加载图块，除非它们的级别大于 2。为0时，不跳过任何级别。仅当<a href="Tileset.html#skipLevelOfDetail"><code>Tileset#skipLevelOfDetail</code></a>为true时使用。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">1</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="skipScreenSpaceErrorFactor">
+    <a href="#skipScreenSpaceErrorFactor" class="doc-link"></a>
+    skipScreenSpaceErrorFactor<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L662">scene/Tileset.js 662</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  定义要跳过的最小屏幕空间错误的乘数。例如，如果图块的屏幕空间误差为100，则不会加载图块，除非它们是叶子或屏幕空间误差<= 100 / skipScreenSpaceErrorFactor。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">16</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="specularEnvironmentMaps">
+    <a href="#specularEnvironmentMaps" class="doc-link"></a>
+    specularEnvironmentMaps<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L684">scene/Tileset.js 684</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  KTX 文件的 URL，其中包含高光照明的立方体贴图和卷积高光 mipmap。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="https://sandcastle.cesium.com/index.html?src=Image-Based%2520Lighting.html">https://sandcastle.cesium.com/index.html?src=Image-Based%20Lighting.html</a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="style">
+    <a href="#style" class="doc-link"></a>
+    style<span class="type-signature"> : <a href="../cesiumDocumentation/Cesium3DTileStyle.html" target = '_blank'>Cesium.Cesium3DTileStyle</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L184">scene/Tileset.js 184</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型样式
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.style = new Cesium.Cesium3DTileStyle({  color: "rgba(255, 0, 0, 0.5)",});tileset.style = new Cesium.Cesium3DTileStyle({   color : {       conditions : [           ['${Height} >= 100', 'color("purple", 0.5)'],           ['${Height} >= 50', 'color("red")'],           ['true', 'color("blue")']       ]   },   show : '${Height} > 0',   meta : {       description : '"Building id ${id} has height ${Height}."'   }});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileFailed">
+    <a href="#tileFailed" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tileFailed<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L706">scene/Tileset.js 706</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  瓦片加载失败时触发的事件如果没有事件侦听器，错误消息将记录到控制台。传递给侦听器的错误对象包含两个属性：<ul> <li>url: 失败磁贴的 url。</li> <li>message: 错误信息。<li></ul>
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.tileFailed.addEventListener(function(error) {    console.log('An error occurred loading tile: ' + error.url);    console.log('Error: ' + error.message);});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileLoad">
+    <a href="#tileLoad" class="doc-link"></a>
+    tileLoad<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L719">scene/Tileset.js 719</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  触发事件以指示已加载磁贴的内容。加载Cesium3DTile的内容被传递给事件监听器。此事件在帧被渲染时在图块集遍历期间被触发，以便对图块的更新在同一帧中生效。不要在事件监听期间创建或修改entities或primitives.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset.tileLoad.addEventListener(function(tile) {    console.log('A tile was loaded.');});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tilesLoaded">
+    <a href="#tilesLoaded" class="doc-link"></a>
+    tilesLoaded<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L746">scene/Tileset.js 746</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  如果为true, 当前视图的所有瓦片被加载完成。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileUnload">
+    <a href="#tileUnload" class="doc-link"></a>
+    tileUnload<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L736">scene/Tileset.js 736</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  触发该事件以指示已卸载磁贴的内容。卸载Cesium3DTile的被传递给事件监听器。不要在事件监听期间创建或修改entities或primitives.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="Tileset.html#maximumMemoryUsage"><code>Tileset#maximumMemoryUsage</code></a></li>
+    
+        <li><a href="Tileset.html#trimLoadedTiles"><code>Tileset#trimLoadedTiles</code></a></li>
+    </ul>
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tileVisible">
+    <a href="#tileVisible" class="doc-link"></a>
+    tileVisible<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L767">scene/Tileset.js 767</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  对于帧中的每个可见图块，此事件每帧都会触发一次。这可用于手动设置图块集的样式。可见Cesium3DTile的被传递给事件监听器。不要在事件监听期间创建或修改entities或primitives.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">// Apply a red style and then manually set random colors for every other feature when the tile becomes visible.tileset.style = new Cesium.Cesium3DTileStyle({    color : 'color("red")'});tileset.tileVisible.addEventListener(function(tile) {    var content = tile.content;    var featuresLength = content.featuresLength;    for (var i = 0; i &lt; featuresLength; i+=2) {        content.getFeature(i).color = Cesium.Color.fromRandom();    }});</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="timeSinceLoad">
+    <a href="#timeSinceLoad" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> timeSinceLoad<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L778">scene/Tileset.js 778</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  返回瓦片集加载和第一次更新以来的时间，以毫秒为单位。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="totalMemoryUsageInBytes">
+    <a href="#totalMemoryUsageInBytes" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> totalMemoryUsageInBytes<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L786">scene/Tileset.js 786</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  瓦片集使用的GPU内存总量（以字节为单位）。该值是根据加载的切片的几何、纹理和批处理表纹理估计的。对于点云，此值还包括每点元数据。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".loadJson">
+    <a href="#.loadJson" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.Tileset.loadJson<span class="signature">(json)</span> &rarr; <span class="type-signature returnType">Promise.&lt;Object></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L849">scene/Tileset.js 849</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  提供一个钩子来覆盖用于请求从远程服务器获取图块集时有用的图块集json的方法
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Resource.html" target = '_blank'>Cesium.Resource</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                要获取的json文件的url</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    json解析结果
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L818">scene/Tileset.js 818</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  销毁此对象占用的WebGL资源。销毁一个对象允许确定性地释放WebGL资源，而不是依赖垃圾收集器来销毁这个对象。一旦一个对象被销毁，它就不应该被使用；调用除此之外的任何函数 isDestroyed都会导致DeveloperError异常。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+  
+  <li>
+    
+
+    <div class="param-desc">
+    
+        
+<span class="param-type">
+  <a href="../cesiumDocumentation/DeveloperError.html" target = '_blank'>Cesium.DeveloperError</a></span>
+
+
+    
+    </div>
+
+
+  </li>
+  
+</ul>
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">tileset = tileset &amp;&amp; tileset.destroy();</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="isDestroyed">
+    <a href="#isDestroyed" class="doc-link"></a>
+    isDestroyed<span class="signature">()</span> &rarr; <span class="type-signature returnType">Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L828">scene/Tileset.js 828</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  如果此对象被销毁，则返回 true；否则返回false。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="makeStyleDirty">
+    <a href="#makeStyleDirty" class="doc-link"></a>
+    makeStyleDirty<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L834">scene/Tileset.js 834</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将图块集标记Tileset#style为dirty，这会强制所有功能重新评估下一帧中的样式。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="trimLoadedTiles">
+    <a href="#trimLoadedTiles" class="doc-link"></a>
+    trimLoadedTiles<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L841">scene/Tileset.js 841</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  卸载上一帧未选择的所有图块。这可用于显式管理切片缓存并减少下面加载的切片总数<a href="Tileset.html#maximumMemoryUsage"><code>Tileset#maximumMemoryUsage</code></a>瓦片将在下一帧被卸载。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Type Definitions</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".FoveatedInterpolationCallback">
+    <a href="#.FoveatedInterpolationCallback" class="doc-link"></a>
+    CesiumPro.Tileset.FoveatedInterpolationCallback
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L853">scene/Tileset.js 853</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时，计算中心锥体外的图块屏幕空间误差的插值函数
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>p</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">要插值的开始值</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>q</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">要插值的结束值</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">插值的时间一般在<code>[0.0, 1.0]</code>范围内</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cesium.Math.lerp</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".Options">
+    <a href="#.Options" class="doc-link"></a>
+    CesiumPro.Tileset.Options
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Tileset.js#L866">scene/Tileset.js 866</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  定义Cesium Tileset数据初始加载的选项。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Resource.html" target = '_blank'>Cesium.Resource</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">模型url</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>show</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">是否显示模型</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>modelMatrix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Matrix4.html" target = '_blank'>Cesium.Matrix4</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">模型矩阵</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shadows</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  ShadowMode</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    ShadowMode.ENABLED
+                
+                </td>
+            
+
+            <td class="description last">是否接收或投射阴影</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumScreenSpaceError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    16
+                
+                </td>
+            
+
+            <td class="description last">最大屏东空间误差</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumMemoryUsage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    512
+                
+                </td>
+            
+
+            <td class="description last">可以使用的最大GPU内存</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cullWithChildrenBounds</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">是否使用子节点的边界包围盒来剔除图块</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cullRequestsWhileMoving</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">相机移动时是否不请求数据</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cullRequestsWhileMovingMultiplier</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    60.0
+                
+                </td>
+            
+
+            <td class="description last">值越大剔除的内容越多</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>preloadWhenHidden</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">当瓦片隐藏时是否预加载数据</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>preloadFlightDestinations</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">相机移动时是否预加载目的地的瓦片</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>preferLeaves</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">是否优先加载叶子节点</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dynamicScreenSpaceError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">是否启用动态最大屏幕误差</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dynamicScreenSpaceErrorDensity</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.00278
+                
+                </td>
+            
+
+            <td class="description last">动态最大屏幕误差密度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dynamicScreenSpaceErrorFactor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    4.0
+                
+                </td>
+            
+
+            <td class="description last">用于增加计算的动态屏幕空间误差的系数。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dynamicScreenSpaceErrorHeightFalloff</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.25
+                
+                </td>
+            
+
+            <td class="description last">密度开始衰减时瓷砖集高度的比率。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>progressiveResolutionHeightFraction</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.3
+                
+                </td>
+            
+
+            <td class="description last">如果介于 (0.0, 0.5] 之间，将助于在瓦片继续加载的同时快速铺设一层瓦片。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>foveatedScreenSpaceError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时，计算中心锥体外的图块屏幕空间误差的插值函数</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>foveatedConeSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.1
+                
+                </td>
+            
+
+            <td class="description last">优化选项, 仅当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时生效。用来控制决定延迟哪些图块的锥体大小。立即加载此圆锥内的瓷砖，圆锥外的瓷砖可能会根据它们在圆锥外的距离  * 而延迟加载。将此设置为0.0意味着圆锥将是由相机位置及其视图方向形成的线。将此设置为1.0意味着锥体包含相机的整个视野​​，基本上禁用效果。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>foveatedMinimumScreenSpaceErrorRelaxation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.0
+                
+                </td>
+            
+
+            <td class="description last"><code>当Tileset#foveatedScreenSpaceError</code>为true时，用于控制锥体外的瓦片的起始屏幕空间误差。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>foveatedInterpolationCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="Tileset.html#.FoveatedInterpolationCallback">Tileset.FoveatedInterpolationCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Cesium.Math.lerp
+                
+                </td>
+            
+
+            <td class="description last">当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时，计算中心锥体外的图块屏幕空间误差的插值函数</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>foveatedTimeDelay</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.2
+                
+                </td>
+            
+
+            <td class="description last">当<a href="Tileset.html#foveatedScreenSpaceError"><code>Tileset#foveatedScreenSpaceError</code></a>为true时，用于控制锥体外的瓦片延迟多长时间加载</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skipLevelOfDetail</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">常量定义加载图块时要跳过的最小级别数。例如，如果图块为1级，则不会加载图块，除非它们的级别大于 2。为0时，不跳过任何级别。@type {Number}</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>baseScreenSpaceError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1024
+                
+                </td>
+            
+
+            <td class="description last">在跳过详细级别之前必须达到的屏幕空间误差。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skipScreenSpaceErrorFactor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    16
+                
+                </td>
+            
+
+            <td class="description last">定义要跳过的最小屏幕空间错误的乘数。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>skipLevels</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    1
+                
+                </td>
+            
+
+            <td class="description last">常量定义加载图块时要跳过的最小级别数。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>immediatelyLoadDesiredLevelOfDetail</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">只下载满足最大屏幕空间误差的瓦片，忽略跳过因子。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>loadSiblings</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">是否下载可见瓦片的兄弟瓦片。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>clippingPlanes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  ClippingPlaneCollection</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">裁剪平面</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>classificationType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  ClassificationType</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">确定此瓷砖集是对地形、3D瓷砖还是两者进行分类</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ellipsoid</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Ellipsoid</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Ellipsoid.WGS84
+                
+                </td>
+            
+
+            <td class="description last">椭球体</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pointCloudShading</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">使用 3D Tiles 渲染点云时基于几何误差执行点衰减的选项。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imageBasedLightingFactor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartesian2</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    new Cartesian2(1.0, 1.0)
+                
+                </td>
+            
+
+            <td class="description last">环境光强度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lightColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartesian3</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">光线，用来代替imageBasedLightingFactor</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>luminanceAtZenith</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0.2
+                
+                </td>
+            
+
+            <td class="description last">用于该模型的环境贴图</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sphericalHarmonicCoefficients</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Array.&lt;Cartesian3></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">三阶球谐系数用于基于图像的照明的漫反射颜色。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>specularEnvironmentMaps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">KTX2文件的URL，该文件包含镜面反射照明的立方体贴图和卷积镜面反射贴图</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>backFaceCulling</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">是否启用背面剔除</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>showOutline</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">是否显示模型轮廓线</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vectorClassificationOnly</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">指示仅应使用tileset的向量Tile进行分类</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vectorKeepDecodedPositions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">矢量块是否应在内存中保留解码位置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugHeatmapTilePropertyName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">属性变量名。所有渲染的瓦片都将使用指定变量值着色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugFreezeFrame</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否冻结上一帧</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugColorizeTiles</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否给瓦片随机着色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugWireframe</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否以线框模式渲染模型</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowBoundingVolume</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示瓦片的包围球</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowContentBoundingVolume</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示瓦片内容的包围球</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowViewerRequestVolume</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示每个图块的查看器请求量</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowGeometricError</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试， 是否显示每个瓦片的屏幕空间误差</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowRenderingStatistics</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示每个瓦片的统计信息</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowMemoryUsage</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示每个瓦片使用的GPU内存</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debugShowUrl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">仅用于调试，是否显示每个瓦片的URL</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>transform</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Matrix4.html" target = '_blank'>Cesium.Matrix4</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">用于变换瓦片集的根瓦片的矩阵, 将覆盖position属性。</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">模型高度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">模型位置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>debug</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">开启高度模式，允许使用键盘QWEASDZX微调模型位置和姿态。</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="buildUniforms"><a href="global.html#buildUniforms">buildUniforms</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="ImagerySplitDirection"><a href="global.html#ImagerySplitDirection">ImagerySplitDirection</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

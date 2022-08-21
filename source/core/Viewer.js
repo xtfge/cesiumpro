@@ -4,16 +4,18 @@ import defaultValue from "./defaultValue.js";
 import defined from './defined.js'
 import computeDistancePerPixel from './computeDistancePerPixel.js'
 import computeSceneExtent from "./computeSceneExtent.js";
-import GeoPoint from "./GeoPoint.js";
+import LonLat from "./LonLat.js";
 import computeSceneCenterPoint from "./computeSceneCenterPoint.js";
 import GeoJsonDataSource from "../layer/GeoJsonDataSource.js";
 import ShapefileDataSource from "../layer/ShapefileDataSource.js";
 import InfoBox from '../widgets/InfoBox.js'
 import CesiumProError from "./CesiumProError.js";
 import Model from "../scene/Model.js";
+import Tileset from "../scene/Tileset.js";
 import QuadTreeProvider from "../scene/QuadTreeProvider.js";
 import Globe from '../scene/Globe.js'
 import overrideCesium from '../override/index.js'
+import GraphicGroup from "./GraphicGroup.js";
 const {
     Matrix4,
     BoundingSphere,
@@ -364,7 +366,7 @@ class Viewer extends Cesium.Viewer {
         }
         createWidgets(options, this)
         this._options = options;
-        this.scene.preRender.addEventListener(this.update, this);
+        this.scene.postRender.addEventListener(this.update, this);
 
         this._distancePerPixel = undefined;
         this._extent = undefined;
@@ -383,6 +385,16 @@ class Viewer extends Cesium.Viewer {
             this.scene._LodGraphic = quadtree;
         }
         this.scene.dataSources = this.dataSources;
+
+        this._graphicGroup = new GraphicGroup(this);
+    }
+    /**
+     * 自定义图形集合
+     * @readonly
+     * @type {GraphicGroup}
+     */
+    get graphicGroup() {
+        return this._graphicGroup;
     }
     /**
      * 大数据图层集合
@@ -461,7 +473,7 @@ class Viewer extends Cesium.Viewer {
     /**
      * 返回场景的中心点坐标, 如果中心没有内容，则返回undefined
      * @readonly
-     * @type {GeoPoint}
+     * @type {LonLat}
      */
     get center() {
         return this._center;
@@ -629,18 +641,18 @@ class Viewer extends Cesium.Viewer {
     }
     /**
      * 设置地球场景的视图位置。
-     * @param {GeoPoint|Cesium.Cartesian3|Cesium.Cartographic} target 默认位置
+     * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic} target 默认位置
      * @example 
-     * viewer.setView(new CesiumPro.GeoPoint(110, 30, 10000))
+     * viewer.setView(new CesiumPro.LonLat(110, 30, 10000))
      * viewer.setView(Cesium.Cartesian3.fromDegrees(110, 30, 10000))
      */
     setView(target) {
         let geopoint;
         if (target instanceof Cesium.Cartographic) {
-            geopoint = GeoPoint.fromCartographic(target)
+            geopoint = LonLat.fromCartographic(target)
         } else if (target instanceof Cesium.Cartesian3) {
-            geopoint = GeoPoint.fromCartesian(target);
-        } else if (target instanceof GeoPoint) {
+            geopoint = LonLat.fromCartesian(target);
+        } else if (target instanceof LonLat) {
             geopoint = target
         } else {
             //>>includeStart('debug', pragmas.debug);
@@ -665,10 +677,10 @@ class Viewer extends Cesium.Viewer {
     stepFlyTo(options = {}) {
         let destination;
         if (options.destination instanceof Cesium.Cartesian3) {
-            destination = GeoPoint.fromCartesian(options.destination)
+            destination = LonLat.fromCartesian(options.destination)
         } else if (options.destination instanceof Cesium.Cartographic) {
-            destination = GeoPoint.fromCartographic(options.destination)
-        } else if (options.destination instanceof GeoPoint) {
+            destination = LonLat.fromCartographic(options.destination)
+        } else if (options.destination instanceof LonLat) {
             destination = options.destination;
         } else {
             //>>includeStart('debug', pragmas.debug);
@@ -700,7 +712,7 @@ class Viewer extends Cesium.Viewer {
     /**
      * 将相机移动到提供的Cartesian, entity, primitive, 或dataSource,如果数据源仍在加载过程中，或者可视化仍在加载，
      * 此方法将在数据准备就绪后执行。
-     * @param {GeoPoint|Cesium.Cartesian|Cesium.Primitive|Cesium.Entity|Cesium.Entity[]|Cesium.EntityCollection|Cesium.DataSource|Cesium.ImageryLayer|Cesium.Cesium3DTileset|Cesium.TimeDynamicPointCloud|Promise<Cesium.Entity|Cesium.Entity[]|Cesium.EntityCollection|Cesium.DataSource|Cesium.ImageryLayer|Cesium.Cesium3DTileset|Cesium.TimeDynamicPointCloud>} target 需要定位的Cartesian, Entity, Primitive, ImageryLayer, Datasource等 
+     * @param {LonLat|Cesium.Cartesian|Cesium.Primitive|Cesium.Entity|Cesium.Entity[]|Cesium.EntityCollection|Cesium.DataSource|Cesium.ImageryLayer|Cesium.Cesium3DTileset|Cesium.TimeDynamicPointCloud|Promise<Cesium.Entity|Cesium.Entity[]|Cesium.EntityCollection|Cesium.DataSource|Cesium.ImageryLayer|Cesium.Cesium3DTileset|Cesium.TimeDynamicPointCloud>} target 需要定位的Cartesian, Entity, Primitive, ImageryLayer, Datasource等 
      * @param {Object} options 具有以下属性
      * @param {Number} [options.duration = 3000] 相机飞行持续时间，单位毫秒
      * @param {Number} [options.maximumHeight] 相机飞行最大高度
@@ -717,7 +729,7 @@ class Viewer extends Cesium.Viewer {
      * });
      */
     flyTo(target, options = {}) {
-        if (target instanceof GeoPoint) {
+        if (target instanceof LonLat) {
             const catresian = target.toCartesian();
             return this.flyTo(catresian, options)
         }
@@ -733,19 +745,21 @@ class Viewer extends Cesium.Viewer {
         } else if (target instanceof Cesium.Model) {
             return flyToPrimitive(this, target, options)
         } else if (target instanceof Model) {
-            return flyToPrimitive(this, target, options)
+            return flyToPrimitive(this, target.delegate, options)
+        } else if(target instanceof Tileset) {
+            return super.flyTo(target.delegate, options)
         }
         return super.flyTo(target, options);
     }
     /**
      * 使场景绕指定点旋转。
-     * @param {Cesium.Cartesian3|Cesium.Cartographic|GeoPoint} point 相机旋转的中心点
+     * @param {Cesium.Cartesian3|Cesium.Cartographic|LonLat} point 相机旋转的中心点
      * @param {Object} options 具有以下属性
      * @param {Cesium.HeadingPitchRange} [options.offset] 相机的角度
      * @param {Number} [options.multiplier = 1] 旋转倍速，大小1的值使旋转速度变快，小于1的值使旋转速度变慢，小于0的值将使地球反方向旋转。
      * @returns {Function} 用于取消旋转的函数
      * @example
-     * const p = new CesiumPro.GeoPoint(110,30)
+     * const p = new CesiumPro.LonLat(110,30)
      * let cancel = viewer.rotateAroundPoint(p);
      */
     rotateAroundPoint(point, options = {}) {
@@ -755,7 +769,7 @@ class Viewer extends Cesium.Viewer {
             target = point;
         } else if (point instanceof Cesium.Cartographic) {
             target = Cesium.Cartographic.toCartesian(point);
-        } else if (point instanceof GeoPoint) {
+        } else if (point instanceof LonLat) {
             target = point.toCartesian()
         } else {
             //>>includeStart('debug', pragmas.debug);
@@ -862,17 +876,18 @@ class Viewer extends Cesium.Viewer {
         const value = updateFps();
         this._fps = value.fps;
         this._ms = value.ms;
-        const distance = computeDistancePerPixel(viewer);
+        const distance = computeDistancePerPixel(this);
         if (distance) {
             this._distancePerPixel = distance;
         }
         // 计算场景范围和中心位置
         this._extent = computeSceneExtent(this);
-        this._center = computeSceneCenterPoint(viewer);
+        this._center = computeSceneCenterPoint(this);
         // 地球自转
         if (this._autoRotation) {
             icrf(this);
         }
+        this.graphicGroup.update();
     }
     /**
     * 调整小部件的大小，以适应container，该函数会自动被调用，除非<code>useDefaultRenderLoop</code> 设为false;

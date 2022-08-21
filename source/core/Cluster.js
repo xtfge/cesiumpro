@@ -24,7 +24,7 @@ function computedScreenPosition(objects, scene) {
             scene,
             object.position,
         );
-        // object.__pixel = GeoPoint.toPixel(object.position, scene);
+        // object.__pixel = LonLat.toPixel(object.position, scene);
         object.__pixel && result.push(object);
     }
     return result;

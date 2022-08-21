@@ -188,6 +188,7 @@ function render(scene) {
 
     if (defined(scene.globe)) {
         scene.globe.beginFrame(frameState);
+        // override
         scene._LodGraphic.beginFrame(frameState)
     }
     scene.updateEnvironment();

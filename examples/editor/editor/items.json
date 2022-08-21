@@ -187,6 +187,46 @@
     ]
   },
   {
+    "label": "矢量要素",
+    "value": "feature",
+    "icon": "glyphicon glyphicon-search",
+    "status": false,
+    "children": [
+      {
+        "label": "Entity要素",
+        "value": "entity",
+        "children": []        
+      },
+      {
+        "label": "Primitive要素",
+        "value": "primitive",
+        "children": [
+          {
+            "label": "点",
+            "value": "5.3.3point",
+            "thumb": "./assets/images/5.3.3point.gif"
+          }
+        ]
+      },
+      {
+        "label": "特殊要素",
+        "value": "other",
+        "children": [
+          {
+            "label": "雷达扫描",
+            "value": "5.3.1-radarscan",
+            "thumb": "5.3.1-radarscan.gif"
+          }
+        ]
+      },
+      {
+        "label": "大批量要素",
+        "value": "batch",
+        "children": []
+      }
+    ]
+  },
+  {
     "label": "视图控件",
     "value": "view",
     "icon": "glyphicon glyphicon-search",
@@ -295,9 +335,9 @@
         "value": "tileset",
         "children": [
           {
-            "label": "gltf/glb模型加载",
-            "value": "3.1.1gltf",
-            "thumb": "./images/gltf.gif"
+            "label": "gltf/倾斜摄影(3DTileset)",
+            "value": "3.2.1tileset",
+            "thumb": "./images/tileset.gif"
           },
           {
             "label": "无球模式",
@@ -321,6 +361,17 @@
             "label": "大量点加载(100万点数据)",
             "value": "4.1.1mag-point",
             "thumb": "./images/mag-point.gif"
+          }
+        ]
+      },
+      {
+        "label": "特效",
+        "value": "effect",
+        "children": [
+          {
+            "label": "多边形拉伸",
+            "value": "4.2.1polygonEffect",
+            "thumb": "./images/polygonEffect.gif"
           }
         ]
       }

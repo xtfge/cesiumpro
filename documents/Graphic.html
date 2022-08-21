@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Graphic - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        Graphic
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="Graphic">
+    <a href="#Graphic" class="doc-link"></a>
+    new CesiumPro.Graphic<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L9">core/Graphic.js 9</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  所有CesiumPro自定义图形基类
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clampToGround">
+    <a href="#clampToGround" class="doc-link"></a>
+    clampToGround<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L31">core/Graphic.js 31</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获取或设置图形是否贴地
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="definedChanged">
+    <a href="#definedChanged" class="doc-link"></a>
+    definedChanged<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L69">core/Graphic.js 69</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  要素的属性发生变化时触发的事件。事件订阅者接收3个参数，第一个是发生变化的属性，第二是个变化后的属性，第三个是变化前的属性
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="id">
+    <a href="#id" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> id<span class="type-signature"> : *</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L24">core/Graphic.js 24</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形id，如果创建图形时定义了id，该属性将会被拾取到
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="primitive">
+    <a href="#primitive" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> primitive<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L61">core/Graphic.js 61</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形对象，包含了渲染图形所老百姓的几何信息和材质
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L46">core/Graphic.js 46</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  显示或隐藏图形
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addTo">
+    <a href="#addTo" class="doc-link"></a>
+    addTo<span class="signature">(viewer)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/Graphic.js#L86">core/Graphic.js 86</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将图形要素直接添加到指定viewer
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  *</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="buildUniforms"><a href="global.html#buildUniforms">buildUniforms</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="ImagerySplitDirection"><a href="global.html#ImagerySplitDirection">ImagerySplitDirection</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

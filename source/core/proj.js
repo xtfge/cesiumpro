@@ -1,5 +1,5 @@
 import CesiumProError from './CesiumProError.js';
-import GeoPoint from './GeoPoint.js'
+import LonLat from './LonLat.js'
 const BD_FACTOR = (3.14159265358979324 * 3000.0) / 180.0
 const PI = 3.1415926535897932384626
 const RADIUS = 6378245.0
@@ -100,7 +100,7 @@ proj.get = function (epsgCode = 'EPSG:3857', options) {
  * BD-09转GCJ-02
  * @param {Number} lon 经度坐标，-180~180之间
  * @param {Number} lat 纬度坐标，-90~90之间
- * @returns {GeoPoint.Lonlat}
+ * @returns {LonLat.Lonlat}
  * @see {@link https://blog.csdn.net/a13570320979/article/details/51366355|百度09、GCJ02、WGS84坐标互转}
  */
 proj.BD09ToGCJ02 = function (lon, lat) {
@@ -116,7 +116,7 @@ proj.BD09ToGCJ02 = function (lon, lat) {
   * GCJ-02转BD-09
   * @param {Number} lon 经度坐标，-180~180之间
   * @param {Number} lat 纬度坐标，-90~90之间
-  * @returns {GeoPoint.Lonlat}
+  * @returns {LonLat.Lonlat}
   * @see {@link https://blog.csdn.net/a13570320979/article/details/51366355|百度09、GCJ02、WGS84坐标互转}
   */
 proj.GCJ02ToBD09 = function (lon, lat) {
@@ -134,13 +134,13 @@ proj.GCJ02ToBD09 = function (lon, lat) {
  * WGS-84转GCJ-02
  * @param {Number} lon 经度坐标，-180~180之间
  * @param {Number} lat 纬度坐标，-90~90之间
- * @returns {GeoPoint.Lonlat}
+ * @returns {LonLat.Lonlat}
  * @see {@link https://blog.csdn.net/a13570320979/article/details/51366355|百度09、GCJ02、WGS84坐标互转}
  */
 proj.WGS84ToGCJ02 = function (lon, lat) {
     lat = +lat
     lon = +lon
-    if (GeoPoint.inChina(lon, lat)) {
+    if (LonLat.inChina(lon, lat)) {
         const d = delta(lon, lat)
         return [lon + d[0], lat + d[1]];        
     } else {
@@ -152,13 +152,13 @@ proj.WGS84ToGCJ02 = function (lon, lat) {
  * GCJ-02转WGS-84
  * @param {Number} lon 经度坐标，-180~180之间
  * @param {Number} lat 纬度坐标，-90~90之间
- * @returns {GeoPoint.Lonlat}
+ * @returns {LonLat.Lonlat}
  * @see {@link https://blog.csdn.net/a13570320979/article/details/51366355|百度09、GCJ02、WGS84坐标互转}
  */
 proj.GCJ02ToWGS84 = function (lon, lat) {
     lat = +lat
     lon = +lon
-    if(GeoPoint.inChina(lon, lat)) {
+    if(LonLat.inChina(lon, lat)) {
         const d = delta(lon, lat)
         const mgLng = lon + d[0]
         const mgLat = lat + d[1]

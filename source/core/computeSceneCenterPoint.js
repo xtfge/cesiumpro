@@ -1,4 +1,4 @@
-import GeoPoint from "./GeoPoint.js";
+import LonLat from "./LonLat.js";
 /**
  * 计算场景中心的坐标
  * @ignore
@@ -10,6 +10,6 @@ function computeSceneCenterPoint(viewer) {
 
     // center pixel
     const pixel = new Cesium.Cartesian2(bounding.width / 2, bounding.height / 2);
-    return GeoPoint.fromPixel(pixel, viewer);
+    return LonLat.fromPixel(pixel, viewer);
 }
 export default computeSceneCenterPoint;
