@@ -22,6 +22,9 @@ class GraphicGroup {
             object.group = this;
         }
     }
+    get(graphicId) {
+        return this.values.get(graphicId);
+    }
     remove(graphic) {
         this.values.remove(graphic.id);
         if (graphic instanceof GraphicGroup) {
@@ -30,6 +33,7 @@ class GraphicGroup {
         if (graphic.primitive) {
             this.viewer.primitives.remove(graphic.primitive);
         }
+        graphic.destroy()
     }
     removeById(graphicId) {
         const graphic = this.values.get(graphicId);
@@ -38,17 +42,15 @@ class GraphicGroup {
     has(object) {
         return this.values.contains(object);
     }
-    update() {
+    update(time) {
         const values = this.values._array;
         for (let val of values) {
-            if (val instanceof GraphicGroup) {
-                val.update();
-            }
             if (defined(val.oldPrimitive)) {
                 this.viewer.primitives.remove(val.oldPrimitive);
                 this.viewer.primitives.add(val.primitive);
                 val.oldPrimitive = null;
             }
+            val.update(time);
         }
     }
     clear() {

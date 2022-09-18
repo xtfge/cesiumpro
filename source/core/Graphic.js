@@ -15,14 +15,51 @@ class Graphic{
         this._clampToGround = defaultValue(!!options.clampToGround, false);
         this._show = defaultValue(!!options.show, true);
         this._removed = false;
+        this._allowPicking = defaultValue(options.allowPicking, true);
+        this._property = defaultValue(options, options.property);
     }
     /**
-     * 图形id，如果创建图形时定义了id，该属性将会被拾取到
+     * 图形id，可以使用它获取图形
      * @readonly
-     * @type {*}
+     * @type {String}
+     * @example 
+     * const graphic = new CesiumPro.CircleScanGraphic({
+     *   id: "xxx",
+     *   position: new CesiumPro.LonLat(lon , lat + 0.05),
+     *   radius: 1000,
+     *   color: '#FF0000',
+     *   speed: 10,
+     *   clampToGround: parameters['贴地'],
+     *   property: {
+     *       name: "贴地圆",
+     *       color: 'red',
+     *   }
+     * );
+     * graphic.addTo(viewer);
+     * viewer.graphicGroup.get('xxx');
      */
     get id() {
         return this._id;
+    }
+    /**
+     * 图形的属性信息，当元素被拾取的时候该属性会通过id字段返回
+     * @type {any}
+     */
+    get property() {
+        return this._property;
+    }
+    /**
+     * 获得或设置图形是否允许被拾取
+     * @type {Boolean}
+     */
+    get allowPicking() {
+        return this._allowPicking;
+    }
+    set allowPicking(v) {
+        if ((!!v) !== this._allowPicking) {
+            this._allowPicking = v;
+            this.updatePrimitive && this.updatePrimitive();
+        }
     }
     /**
      * 获取或设置图形是否贴地
@@ -69,11 +106,33 @@ class Graphic{
     get definedChanged() {
         return this._definedChanged;
     }
+    /**
+     * 得到一个promise对象，指示图形是否创建完成
+     * @type {Promise}
+     */
+    get readyPromise() {
+        if (!this.primitive) {
+            return new Primise();
+        }
+        return this.primitive.readyPromise;
+    }
+    /**
+     * @private
+     */
+    get material() {
+        if (this.primitive) {
+            return this.primitive.appearance.material;
+        }
+    }
     toJson() {
         if(!defined(this.primitive)) {
             return;
         }
     }
+    /**
+     * @private
+     */
+    update() {}
     /**
      * 更新要素外观材质相关的属性
      * @private
@@ -81,6 +140,9 @@ class Graphic{
      * @param {*} v 
      */
     updateAttribute(k, v) {
+        if (this.isDestroyed()) {
+            return;
+        }
         if (!this.primitive) {
             return;
         }
@@ -106,6 +168,7 @@ class Graphic{
         this._viewer = viewer;
         viewer.graphicGroup.add(this);
     }
+    zoomTo() {}
     /**
      * 将当前要素从场景中移除
      * @returns 被移除的要素
@@ -115,9 +178,19 @@ class Graphic{
             return;
         }
         if (this._viewer) {
-            this.group.remove(this);        
+            this.group.remove(this);
             return this;
         }
+    }
+    isDestroyed() {
+        return false;
+    }
+    destroy() {
+        if (this.primitive && !this.primitive.isDestroyed()) {
+            this.primitive.destroy();
+            this.primitive = undefined;
+        }
+        Cesium.destroyObject(this);
     }
 }
 export default Graphic

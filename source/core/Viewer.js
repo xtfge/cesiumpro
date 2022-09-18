@@ -19,6 +19,8 @@ import GraphicGroup from "./GraphicGroup.js";
 const {
     Matrix4,
     BoundingSphere,
+    ScreenSpaceEventType,
+    ScreenSpaceEventHandler
 } = Cesium;
 function flyTo(viewer, target, options) {
     viewer.camera.flyToBoundingSphere(target, {
@@ -45,7 +47,7 @@ function getDefaultOptions() {
         baseLayerPicker: false,
         fullscreenElement: 'cesiumContainer',
         fullscreenButton: false,
-        shouldAnimate: false,
+        shouldAnimate: true,
         infoBox: false,
         selectionIndicator: false,
         sceneModePicker: false,
@@ -748,6 +750,8 @@ class Viewer extends Cesium.Viewer {
             return flyToPrimitive(this, target.delegate, options)
         } else if(target instanceof Tileset) {
             return super.flyTo(target.delegate, options)
+        } else if(target.boundingSphere) {
+            return this.camera.flyToBoundingSphere(target.boundingSphere);
         }
         return super.flyTo(target, options);
     }
@@ -887,7 +891,7 @@ class Viewer extends Cesium.Viewer {
         if (this._autoRotation) {
             icrf(this);
         }
-        this.graphicGroup.update();
+        this.graphicGroup.update(this.clock.currentTime);
     }
     /**
     * 调整小部件的大小，以适应container，该函数会自动被调用，除非<code>useDefaultRenderLoop</code> 设为false;
@@ -913,6 +917,29 @@ class Viewer extends Cesium.Viewer {
      */
     isDestroyed() {
         return super.isDestroyed();
+    }
+    /**
+     * 鼠标事件监听
+     * @param {Function} fn 回调函数
+     * @param {String} [event = 'LEFT_CLICK'] 事件类型
+     * @param {Element} [target = this.canvas] 触发事件的元素，默认为球的canvas
+     * @returns 取消事件监听的函数
+     * @example
+     * const removeAction = viewer.on(function(e) {});
+     * const removeAction = viewer.on(function(e) {}, 'MOUSE_MOVE');
+     * // 移除事件监听
+     * removeAction();
+     */
+    on(fn, event = 'LEFT_CLICK', target = this.canvas) {
+        const handler = new ScreenSpaceEventHandler(target);
+        const removeInputAction = handler.setInputAction(fn, ScreenSpaceEventType[event]);
+        return function() {
+            if (handler.isDestroyed()) {
+                return;
+            }
+            removeInputAction();
+            handler.destroy();
+        }
     }
 }
 // 生写Cesium中的部分函数

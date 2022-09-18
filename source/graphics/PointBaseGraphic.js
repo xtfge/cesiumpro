@@ -38,17 +38,50 @@ class PointBaseGraphic extends Graphic {
         this._height = defaultValue(options.height, 0);
         this._extrudedHeight = defaultValue(options.extrudedHeight, 0);
         this._asynchronous = defaultValue(options.asynchronous, true);
-        if (this._clampToGround) {
-            this.createGroundPrimitive();
-        } else {
-            this.createPrimitive();
-        }
-        
     }
     /**
      * @private
      */
-    createPrimitive() {
+    createGraphic() {
+        if (this._clampToGround) {
+            this.createGroundPrimitive(this._asynchronous);
+        } else {
+            this.createPrimitive(this._asynchronous);
+        }
+    }
+    /**
+     * @private
+     */
+    createPrimitive(asynchronous = true) {
+        if (this.isDestroyed()) {
+            return;
+        }
+        const geometry = new CircleGeometry({
+            center: LonLat.toCartesian(this._position),
+            radius: this._radius,
+            stRotation: this._stRotation,
+            extrudedHeight: this._extrudedHeight,
+            height: this._height,
+            granularity: 0.01
+        })
+        this._primitive = new Primitive({
+            geometryInstances: new GeometryInstance({
+                geometry,
+                id: this.property
+            }),
+            appearance: this.createAppearance(),
+            asynchronous,
+            allowPicking: this._allowPicking
+        });
+        return this._primitive;
+    }
+    /**
+     * @private
+     */
+    createGroundPrimitive(asynchronous = true) {
+        if (this.isDestroyed()) {
+            return;
+        }
         const geometry = new CircleGeometry({
             center: LonLat.toCartesian(this._position),
             radius: this._radius,
@@ -56,32 +89,16 @@ class PointBaseGraphic extends Graphic {
             extrudedHeight: this._extrudedHeight,
             height: this._height
         })
-        this._primitive = new Primitive({
-            geometryInstances: new GeometryInstance({
-                geometry
-            }),
-            appearance: this.createAppearance(),
-            asynchronous: this._asynchronous
-        })
-    }
-    /**
-     * @private
-     */
-    createGroundPrimitive() {
-        const geometry = new CircleGeometry({
-            center: LonLat.toCartesian(this._position),
-            radius: this._radius,
-            stRotation: this._stRotation,
-            extrudedHeight: this._extrudedHeight,
-            height: this._height            
-        })
         this._primitive = new GroundPrimitive({
             geometryInstances: new GeometryInstance({
-                geometry
+                geometry,
+                id: this.property
             }),
             appearance: this.createAppearance(),
-            asynchronous: this._asynchronous
-        })
+            asynchronous,
+            allowPicking: this._allowPicking,
+        });
+        return this._primitive;
     }
     /**
      * @private
@@ -129,6 +146,21 @@ class PointBaseGraphic extends Graphic {
         this.updatePrimitive();
     }
     /**
+     * 获得或设置高度
+     */
+     get height() {
+        return this._height;
+    }
+    set height(val) {
+        if (val === this._height) {
+            return;
+        }
+        this.definedChanged.raise('height', val, this._height);
+        this._height = val;
+        this._extrudedHeight = val;
+        this.updatePrimitive();
+    }
+    /**
      * 要素颜色
      * @type {String|Cesium.Color}
      * @example
@@ -159,34 +191,47 @@ class PointBaseGraphic extends Graphic {
     }
     /**
      * @private
+     * 
      * 重新生成primitive并移除旧的，一般在更新位置或半径后调用
-     * @returns 
      */
     updatePrimitive() {
         if (!this._viewer) {
             return;
         }
         const oldPrimitive = this.primitive;
-        const options = Object.assign(this.toJson(), {asynchronous: false});
-        options.position = LonLat.fromArray(options.position)
-        this._primitive = (new this.constructor(options)).primitive;
+        this.createGraphic();
         this._viewer.primitives.add(this._primitive);
         this._viewer.primitives.remove(oldPrimitive)
+    }
+    zoomTo(options) {
+        if (!this._viewer) {
+            return;
+        }
+        if (!this._primitive) {
+            return;
+        }
+        this.readyPromise.then(() => {
+            const boundingSphere = graphic.primitive._boundingSpheres[0];
+            if (boundingSphere) {
+                this._viewer.camera.flyToBoundingSphere(boundingSphere, options)
+            }
+        })
     }
 }
 
 /**
  * @typedef {Object} PointBaseGraphic.ConstructorOptions
  *
- * 加载GeoJson数据源时的配置项
+ * 所有点类图形的公共属性
  *
  * @property {LonLat} position 要素的位置信息
  * @property {Number} radius 要素半径
  * @property {Cesium.Color | String} [color] 要素颜色
  * @property {Boolean} [clampToGround = false] 是否贴地
- * @property {Number} [height = 0] 要素高度， 如果为贴地要素，该属性不生效
+ * @property {Number} [height = 0] 要素距离地面的高度， 如果为贴地要素，该属性不生效
  * @property {Number} [extrudedHeight = 0] 要素拉升高度， 如果为贴地要素，该属性不生效
  * @property {Number} [stRotation = 0] 统计量旋转角度，单位度
  * @property {Object} [property] 要素属性
+ * @property {Boolean} [allowPicking = true] 是否允许pick
  */
 export default PointBaseGraphic;

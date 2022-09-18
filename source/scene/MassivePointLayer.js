@@ -8,12 +8,17 @@ const {
     Event,
     Cartographic,
     Color,
-    Entity
+    Entity,
+    createGuid
 } = Cesium;
 function defaultCreateFn(options) {
     return function (object) {
+        let id = createGuid()
+        if (typeof object.id === 'string' || typeof object.id === 'number') {
+            id = object.id;
+        }
         const entityOptions = {
-            id: object.id,
+            id: id,
             position: object.position,
             point: {
                 pixelSize: defaultValue(object.pixelSize, options.pixelSize),
@@ -34,6 +39,24 @@ class MassivePointLayer extends MassiveEntityLayer {
      * 创建大量点要素（Entity)
      * @extends MassiveEntityLayer
      * @param {MassivePointLayer.Options} options 选项
+     * const objects = positions.map(_ => {
+     *     i++
+     *     return {
+     *         id: Cesium.createGuid(),
+     *         position:_,
+     *         // color: Cesium.Color.fromRandom({alpha:1}),
+     *         pixelSize: 5
+     *     }
+     * })
+     *
+     * const pointlayer = new CesiumPro.MassivePointLayer({
+     *     objects: objects,
+     *     color: Cesium.Color.GOLD,
+     *     pixelSize: 5
+     * })
+     * viewer.massiveGraphicLayers.add(pointlayer)
+     * 
+     * @demo {@link examples/apps/index.html#/5.4.1mag-point|100万点加载示例}
      */
     constructor(options = {}) {
         options.objects = defaultValue(options.objects, []);

@@ -11,14 +11,14 @@ const {
 } = Cesium;
 const defaultCreateGeometryFunction = function (object, options) {
     const modelOption = {}
-    if(object.modelMatrix) {
+    if (object.modelMatrix) {
         modelOption.modelMatrix = object.modelMatrix;
-    } else if(object.position) {
+    } else if (object.position) {
         let cartesian = object.position;
-        if(object.position instanceof LonLat) {
+        if (object.position instanceof LonLat) {
             cartesian = object.position.toCartesian();
         }
-        if(!cartesian) {
+        if (!cartesian) {
             return;
         }
         modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian)
@@ -26,7 +26,7 @@ const defaultCreateGeometryFunction = function (object, options) {
     }
     modelOption.minimumPixelSize = defaultValue(object.minimumPixelSize, options.minimumPixelSize);
     modelOption.maximumScale = defaultValue(object.maximumScale, options.maximumScale);
-    modelOption.scale  = defaultValue(object.scale, options.scale);
+    modelOption.scale = defaultValue(object.scale, options.scale);
     modelOption.allowPicking = defaultValue(object.allowPicking, options.allowPicking);
     modelOption.shadows = defaultValue(object.shadows, options.shadows);
     modelOption.id = object._id;
@@ -48,7 +48,7 @@ function getLevelByHeight(height) {
     }
     return level;
 }
-class MassiveModelLayer extends MassiveGraphicLayer{
+class MassiveModelLayer extends MassiveGraphicLayer {
     /**
      * 海量模型(gltf/glb）加载。该图层会基于四叉树对数据进行分块，搂需加载，以优化性能。
      * @param {Object} options 具有以下属性
@@ -58,6 +58,24 @@ class MassiveModelLayer extends MassiveGraphicLayer{
      * 
      * @see MassivePointLayer
      * @see MassiveBillboardLayer
+     * 
+     * @example
+     * const positions = Cesium.Cartesian3.fromDegreesArray([...])
+     * let i = 0
+     * const objects = positions.map(_ => {
+     *     i++
+     *     return {
+     *         id: {name: 'model' + i}, // 自定义属性，该对象会在pick中返回
+     *         position: _,
+     *     }
+     * })
+     * const massiveModel = new CesiumPro.MassiveModelLayer({
+     *     objects,
+     *     url: '../data/models/Cesium_Air.glb',
+     *     minimumPixelSize:64
+     * })
+     * viewer.massiveGraphicLayers.add(massiveModel)
+     * @demo {@link examples/apps/index.html#/5.4.2massiveModel|50万模型加载示例}
      */
     constructor(options = {}) {
         //>>includeStart('debug', pragmas.debug);
@@ -151,7 +169,7 @@ class MassiveModelLayer extends MassiveGraphicLayer{
     beginUpdate(framestate) {
         const height = framestate.camera.positionCartographic.height;
         const level = getLevelByHeight(height);
-        if(level < this._minLoadLevel) {
+        if (level < this._minLoadLevel) {
             this._objects = []
         } else {
             this._objects = this._data;
@@ -189,7 +207,7 @@ class MassiveModelLayer extends MassiveGraphicLayer{
      * @returns {Object} 被创建的对象
      */
     createGeometry(tile, framestate, object) {
-        if(tile.level < this._minLoadLevel) {
+        if (tile.level < this._minLoadLevel) {
             return;
         }
         const createGeometry = defaultValue(this._createGeometryFunction, defaultCreateGeometryFunction);

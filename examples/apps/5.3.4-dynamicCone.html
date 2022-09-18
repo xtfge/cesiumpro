@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+        body,html {
+            margin: 0;
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+   <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map', {
+            imageryProvider: new CesiumPro.TDTLayer({
+              key: 'ac7f26daf5b1a54c746e93a414dd9c6a'
+            })
+        });
+        parent.viewer = viewer;
+
+        viewer.flyTo(Cesium.Cartesian3.fromDegrees(107.766, 34.488, 5000), {
+            duration: 0,
+            offset: new Cesium.HeadingPitchRange(0, -0.65554, 0)
+        })
+        // viewer.entities.add({
+        //     position: Cesium.Cartesian3.fromDegrees(108, 34),
+        //     ellipse: {
+        //         semiMajorAxis:10000,
+        //         semiMinorAxis: 10000
+        //     }
+        // })
+        
+        const gui = new GUI();
+        const parameters = {
+            color: '#FF0000',
+            '修改位置': function() {
+                const lon = Math.random() * 0.1 + 107.766;
+                const lat = Math.random() * 0.1 + 34.548;
+                const p = new CesiumPro.LonLat(lon, lat);
+                graphic.position = p;
+            },
+            "添加": function() {
+                if (window.graphic) {
+                    return;
+                }
+                window.graphic = new CesiumPro.DynamicConeGraphic({
+                    position: new CesiumPro.LonLat(107.766, 34.548),
+                    radius: 1000,
+                    color: '#FF000099',
+                    speed: parameters['速度']
+                });
+                parent.graphic = graphic;
+                viewer.graphicGroup.add(graphic)
+                // graphic.addTo(viewer);
+            },
+            "删除": function() {
+                graphic.remove();
+                window.graphic = null;
+            },
+            '颜色': '#FF000099',
+            '速度': 1,
+            "贴地": false
+
+        }
+        gui.add(parameters, '添加')
+        gui.add(parameters, '删除')
+        gui.add(parameters, '修改位置')
+        gui.addColor(parameters, '颜色').onChange(() => {
+            if(window.graphic) {
+                window.graphic.color = parameters['颜色'];
+            }
+        });
+        gui.add(parameters, '速度', 0.5, 10, 1).onChange(() => {
+            if(window.graphic) {
+                window.graphic.speed = parameters['速度']
+            }
+        })
+        gui.add(parameters, '贴地').onChange(() => {
+            if(window.graphic) {
+                window.graphic.clampToGround = parameters['贴地']
+            }
+        })
+    </script>
+</body>
+</html>

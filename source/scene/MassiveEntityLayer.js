@@ -9,7 +9,7 @@ const {
     CustomDataSource,
     Event
 } = Cesium;
-const defaultCreateGeometryFunction = function () { };
+const defaultCreateGeometryFunction = function () {return {} };
 const ZEROLEVELHEIGHT = 31638318;
 const cameraHeightForLevel = [ZEROLEVELHEIGHT]
 for (let i = 1; i < 20; i++) {
@@ -262,7 +262,7 @@ class MassiveEntityLayer extends MassiveGraphicLayer{
             return;
         }
         const createGeometry = defaultValue(this._createGeometryFunction, defaultCreateGeometryFunction);
-        const geometry = createGeometry(object);
+        const geometry = createGeometry(object, tile, framestate);
         const keys = Object.keys(object);
         for (let key of keys) {
             if (key === 'position'

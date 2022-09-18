@@ -78,6 +78,8 @@ class MultipleTerrainProvider {
      *     terrain.createBoundingRectangle(viewer);
      * })
      * viewer.terrain = terrain;
+     * 
+     *  @demo {@link examples/apps/index.html#/5.4.1mag-point|多地形加载示例}
      */
     constructor(terrainList, options = {}) {
         this._heightmapWidth = 65;

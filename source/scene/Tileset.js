@@ -741,7 +741,7 @@ class Tileset {
     }
     /**
      * 如果为true, 当前视图的所有瓦片被加载完成。
-     * @type {Boolean
+     * @type {Boolean}
      */
     get tilesLoaded () {
         return this.delegate.tilesLoaded;

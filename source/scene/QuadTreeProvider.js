@@ -372,6 +372,9 @@ class QuadTreeProvider {
      * @param {Cesium.QuadTile} tile 瓦片信息
      */
     loadTile(framestate, tile) {
+        if (!this.terrainProvider.ready) {
+            return;
+        }
         let terrainStateBefore;
         let terrainOnly = true;
         if (tile.data) {

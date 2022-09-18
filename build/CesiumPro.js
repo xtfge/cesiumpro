@@ -10,7 +10,7 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.CesiumPro = {}));
 })(this, (function (exports) { 'use strict';
 
-    class CesiumProError extends Error {
+    class CesiumProError$1 extends Error {
         /**
          * 定义CesiumPro抛出的错误
          * @extends Error
@@ -29,13 +29,13 @@
             this.name = 'CesiumProError';
         }
     }
-    CesiumProError.throwInstantiationError = function () {
+    CesiumProError$1.throwInstantiationError = function () {
         throw new DeveloperError(
             "This function defines an interface and should not be called directly."
         );
     };
-    CesiumProError.throwNoInstance = function () {
-        throw new CesiumProError('它的定义了一个接口，不能被以直接调用.')
+    CesiumProError$1.throwNoInstance = function () {
+        throw new CesiumProError$1('它的定义了一个接口，不能被以直接调用.')
     };
 
     /* eslint-disable prefer-rest-params */
@@ -87,7 +87,7 @@
 
       addEventListener(listener, scope) {
         if (typeof listener !== 'function') {
-          throw new CesiumProError('侦听器应该是一个函数');
+          throw new CesiumProError$1('侦听器应该是一个函数');
         }
 
         this._listeners.push(listener);
@@ -110,7 +110,7 @@
        */
       removeEventListener(listener, scope) {
         if (typeof listener !== 'function') {
-          throw new CesiumProError('侦听器应该是一个函数');
+          throw new CesiumProError$1('侦听器应该是一个函数');
         }
         const listeners = this._listeners;
         const scopes = this._scopes;
@@ -188,7 +188,7 @@
         when: when$7,
         AttributeCompression,
         BoundingSphere: BoundingSphere$3,
-        Cartesian3: Cartesian3$9,
+        Cartesian3: Cartesian3$a,
         Credit: Credit$1,
         defaultValue: defaultValue$7,
         defined: defined$9,
@@ -755,7 +755,7 @@
         var triangleLength = bytesPerIndex * triangleElements;
 
         var view = new DataView(buffer);
-        var center = new Cartesian3$9(
+        var center = new Cartesian3$a(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -768,7 +768,7 @@
         pos += Float32Array.BYTES_PER_ELEMENT;
 
         var boundingSphere = new BoundingSphere$3(
-            new Cartesian3$9(
+            new Cartesian3$a(
                 view.getFloat64(pos, true),
                 view.getFloat64(pos + 8, true),
                 view.getFloat64(pos + 16, true)
@@ -777,7 +777,7 @@
         );
         pos += boundingSphereLength;
 
-        var horizonOcclusionPoint = new Cartesian3$9(
+        var horizonOcclusionPoint = new Cartesian3$a(
             view.getFloat64(pos, true),
             view.getFloat64(pos + 8, true),
             view.getFloat64(pos + 16, true)
@@ -1607,7 +1607,7 @@
       }
       // >>includeStart('debug');
       if (!defined$8(baseUrlString)) {
-        throw new CesiumProError(
+        throw new CesiumProError$1(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
@@ -1781,7 +1781,7 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$8,
+        Cartesian3: Cartesian3$9,
         Cartographic: Cartographic$4,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$1,
@@ -1860,7 +1860,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$8.clone(object.position);
+                const clusterPosition = Cartesian3$9.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -1872,16 +1872,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$8.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$9.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$1.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$8.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$9.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$8(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$9(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -1938,10 +1938,10 @@
          */
         constructor(lon, lat, alt) {
             if (!defined$8(lon)) {
-                throw new CesiumProError('longitude is required.')
+                throw new CesiumProError$1('longitude is required.')
             }
             if (!defined$8(lat)) {
-                throw new CesiumProError('latitude is required.')
+                throw new CesiumProError$1('latitude is required.')
             }
             this.lon = lon;
             this.lat = lat;
@@ -2020,10 +2020,10 @@
          */
         static isVisible(point, viewer) {
             if (viewer instanceof Cesium.Viewer) {
-                throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             if (!defined$8(point)) {
-                throw new CesiumProError('point is not defined.')
+                throw new CesiumProError$1('point is not defined.')
             }
             const position = LonLat.toCartesian(point);
             if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
@@ -2061,10 +2061,10 @@
         static toPixel(point, scene) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(scene)) {
-                throw new CesiumProError('scene未定义。')
+                throw new CesiumProError$1('scene未定义。')
             }
             if (!defined$8(point)) {
-                throw new CesiumProError('point is not defined.')
+                throw new CesiumProError$1('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartesian = LonLat.toCartesian(point);
@@ -2084,7 +2084,7 @@
         static toCartographic(point) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(point)) {
-                throw new CesiumProError('point is not defined.')
+                throw new CesiumProError$1('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
@@ -2098,7 +2098,7 @@
         static toCartesian(point, viewer) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(point)) {
-                throw new CesiumProError('point is not defined.')
+                throw new CesiumProError$1('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             if (point instanceof Cesium.Cartesian3) {
@@ -2127,7 +2127,7 @@
         static fromCartesian(cartesian) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(cartesian)) {
-                throw new CesiumProError('cartesian is not defined.')
+                throw new CesiumProError$1('cartesian is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -2144,7 +2144,7 @@
         static fromCartographic(cartographic) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(cartographic)) {
-                throw new CesiumProError('cartographic is not defined.')
+                throw new CesiumProError$1('cartographic is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
             return new LonLat(
@@ -2165,10 +2165,10 @@
             }
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(pixel)) {
-                throw new CesiumProError('pixel is not defined.')
+                throw new CesiumProError$1('pixel is not defined.')
             }
             if (viewer instanceof Cesium.Viewer === false) {
-                throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             //>>includeEnd('debug', pragmas.debug);
             const ray = viewer.scene.camera.getPickRay(pixel);
@@ -2313,7 +2313,7 @@
      *
      * @see {@link http://www.ietf.org/rfc/rfc4122.txt|RFC 4122 A Universally Unique IDentifier (UUID) URN Namespace}
      */
-    function createGuid$2() {
+    function createGuid$3() {
         // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
             const r = (Math.random() * 16) | 0;
@@ -2367,21 +2367,58 @@
         */
         constructor(options) {
             this._options = options;
-            this._id = defaultValue$6(options.id, createGuid$2());
+            this._id = defaultValue$6(options.id, createGuid$3());
             this._primitive = null;
             this._oldPrimitive = null;
             this._definedChanged = new Event$7();
             this._clampToGround = defaultValue$6(!!options.clampToGround, false);
             this._show = defaultValue$6(!!options.show, true);
             this._removed = false;
+            this._allowPicking = defaultValue$6(options.allowPicking, true);
+            this._property = defaultValue$6(options, options.property);
         }
         /**
-         * 图形id，如果创建图形时定义了id，该属性将会被拾取到
+         * 图形id，可以使用它获取图形
          * @readonly
-         * @type {*}
+         * @type {String}
+         * @example 
+         * const graphic = new CesiumPro.CircleScanGraphic({
+         *   id: "xxx",
+         *   position: new CesiumPro.LonLat(lon , lat + 0.05),
+         *   radius: 1000,
+         *   color: '#FF0000',
+         *   speed: 10,
+         *   clampToGround: parameters['贴地'],
+         *   property: {
+         *       name: "贴地圆",
+         *       color: 'red',
+         *   }
+         * );
+         * graphic.addTo(viewer);
+         * viewer.graphicGroup.get('xxx');
          */
         get id() {
             return this._id;
+        }
+        /**
+         * 图形的属性信息，当元素被拾取的时候该属性会通过id字段返回
+         * @type {any}
+         */
+        get property() {
+            return this._property;
+        }
+        /**
+         * 获得或设置图形是否允许被拾取
+         * @type {Boolean}
+         */
+        get allowPicking() {
+            return this._allowPicking;
+        }
+        set allowPicking(v) {
+            if ((!!v) !== this._allowPicking) {
+                this._allowPicking = v;
+                this.updatePrimitive && this.updatePrimitive();
+            }
         }
         /**
          * 获取或设置图形是否贴地
@@ -2428,11 +2465,33 @@
         get definedChanged() {
             return this._definedChanged;
         }
+        /**
+         * 得到一个promise对象，指示图形是否创建完成
+         * @type {Promise}
+         */
+        get readyPromise() {
+            if (!this.primitive) {
+                return new Primise();
+            }
+            return this.primitive.readyPromise;
+        }
+        /**
+         * @private
+         */
+        get material() {
+            if (this.primitive) {
+                return this.primitive.appearance.material;
+            }
+        }
         toJson() {
             if(!defined$8(this.primitive)) {
                 return;
             }
         }
+        /**
+         * @private
+         */
+        update() {}
         /**
          * 更新要素外观材质相关的属性
          * @private
@@ -2440,6 +2499,9 @@
          * @param {*} v 
          */
         updateAttribute(k, v) {
+            if (this.isDestroyed()) {
+                return;
+            }
             if (!this.primitive) {
                 return;
             }
@@ -2465,6 +2527,7 @@
             this._viewer = viewer;
             viewer.graphicGroup.add(this);
         }
+        zoomTo() {}
         /**
          * 将当前要素从场景中移除
          * @returns 被移除的要素
@@ -2474,9 +2537,19 @@
                 return;
             }
             if (this._viewer) {
-                this.group.remove(this);        
+                this.group.remove(this);
                 return this;
             }
+        }
+        isDestroyed() {
+            return false;
+        }
+        destroy() {
+            if (this.primitive && !this.primitive.isDestroyed()) {
+                this.primitive.destroy();
+                this.primitive = undefined;
+            }
+            Cesium.destroyObject(this);
         }
     }
 
@@ -2484,7 +2557,7 @@
     class GraphicGroup {
         constructor(viewer) {
             this.values = new AssociativeArray$3();
-            this.id = createGuid$2();
+            this.id = createGuid$3();
             this.viewer = viewer;
         }
         add(object) {
@@ -2500,6 +2573,9 @@
                 object.group = this;
             }
         }
+        get(graphicId) {
+            return this.values.get(graphicId);
+        }
         remove(graphic) {
             this.values.remove(graphic.id);
             if (graphic instanceof GraphicGroup) {
@@ -2508,6 +2584,7 @@
             if (graphic.primitive) {
                 this.viewer.primitives.remove(graphic.primitive);
             }
+            graphic.destroy();
         }
         removeById(graphicId) {
             const graphic = this.values.get(graphicId);
@@ -2516,17 +2593,15 @@
         has(object) {
             return this.values.contains(object);
         }
-        update() {
+        update(time) {
             const values = this.values._array;
             for (let val of values) {
-                if (val instanceof GraphicGroup) {
-                    val.update();
-                }
                 if (defined$8(val.oldPrimitive)) {
                     this.viewer.primitives.remove(val.oldPrimitive);
                     this.viewer.primitives.add(val.primitive);
                     val.oldPrimitive = null;
                 }
+                val.update(time);
             }
         }
         clear() {
@@ -2540,7 +2615,7 @@
         }
     }
 
-    const shader$1 = 'uniform samplerCube u_cubeMap;\n\
+    const shader$3 = 'uniform samplerCube u_cubeMap;\n\
   varying vec3 v_texCoord;\n\
   void main()\n\
   {\n\
@@ -2549,7 +2624,7 @@
   }\n\
   ';
 
-    const shader = 'attribute vec3 position;\n\
+    const shader$2 = 'attribute vec3 position;\n\
   varying vec3 v_texCoord;\n\
   uniform mat3 u_rotateMatrix;\n\
   void main()\n\
@@ -2563,13 +2638,13 @@
     const {
         defaultValue: defaultValue$5,
         destroyObject: destroyObject$4,
-        Matrix4: Matrix4$1,
+        Matrix4: Matrix4$2,
         DrawCommand,
         BoxGeometry,
-        Cartesian3: Cartesian3$7,
+        Cartesian3: Cartesian3$8,
         defined: defined$7,
         GeometryPipeline,
-        Transforms: Transforms$2,
+        Transforms: Transforms$3,
         VertexFormat,
         BufferUsage,
         CubeMap,
@@ -2582,8 +2657,8 @@
         ShaderSource: ShaderSource$3,
         Matrix3,
     } = Cesium;
-    const SkyBoxFS = shader$1;
-    const SkyBoxVS = shader;
+    const SkyBoxFS = shader$3;
+    const SkyBoxVS = shader$2;
     class GroundSkyBox {
         /**
          * A sky box around the scene to draw stars.  The sky box is defined using the True Equator Mean Equinox (TEME) axes.
@@ -2630,7 +2705,7 @@
             this.show = defaultValue$5(options.show, true);
 
             this._command = new DrawCommand({
-                modelMatrix: Matrix4$1.clone(Matrix4$1.IDENTITY),
+                modelMatrix: Matrix4$2.clone(Matrix4$2.IDENTITY),
                 owner: this,
             });
             this._cubeMap = undefined;
@@ -2680,7 +2755,7 @@
                     || (!defined$7(sources.negativeY))
                     || (!defined$7(sources.positiveZ))
                     || (!defined$7(sources.negativeZ))) {
-                    throw new CesiumProError('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
+                    throw new CesiumProError$1('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
                 }
 
                 if ((typeof sources.positiveX !== typeof sources.negativeX)
@@ -2688,7 +2763,7 @@
                     || (typeof sources.positiveX !== typeof sources.negativeY)
                     || (typeof sources.positiveX !== typeof sources.positiveZ)
                     || (typeof sources.positiveX !== typeof sources.negativeZ)) {
-                    throw new CesiumProError('this.sources properties must all be the same type.');
+                    throw new CesiumProError$1('this.sources properties must all be the same type.');
                 }
 
                 if (typeof sources.positiveX === 'string') {
@@ -2708,22 +2783,22 @@
 
             const command = this._command;
 
-            command.modelMatrix = Transforms$2.eastNorthUpToFixedFrame(frameState.camera._positionWC);
+            command.modelMatrix = Transforms$3.eastNorthUpToFixedFrame(frameState.camera._positionWC);
             if (!defined$7(command.vertexArray)) {
                 command.uniformMap = {
                     u_cubeMap() {
                         return that._cubeMap;
                     },
                     u_rotateMatrix() {
-                        if (typeof Matrix4$1.getRotation === 'function') {
-                            return Matrix4$1.getRotation(command.modelMatrix, skyboxMatrix3);
+                        if (typeof Matrix4$2.getRotation === 'function') {
+                            return Matrix4$2.getRotation(command.modelMatrix, skyboxMatrix3);
                         }
-                        return Matrix4$1.getMatrix3(command.modelMatrix, skyboxMatrix3);
+                        return Matrix4$2.getMatrix3(command.modelMatrix, skyboxMatrix3);
                     },
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$7(2.0, 2.0, 2.0),
+                    dimensions: new Cartesian3$8(2.0, 2.0, 2.0),
                     vertexFormat: VertexFormat.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
@@ -2791,25 +2866,25 @@
          * @type {Number}
          * @constant
          */
-        LEFT:-1,
+        LEFT: -1,
         /**
          * 影像显示在屏幕右侧
          * @type {Number}
          * @constant
          */
-        RIGHT:1,
+        RIGHT: 1,
         /**
          * 一直显示该影像
          * @type {Number}
          * @constant
          */
-        NONE:0,
+        NONE: 0,
         /**
          * 影像显示在屏幕上方
          * @type {Number}
          * @constant
          */
-        TOP:-10,
+        TOP: -10,
         /**
          * 影像显示在屏幕下方
          * @type {Number}
@@ -3079,7 +3154,7 @@
         TerrainProvider,
         Resource: Resource$4,
         CustomDataSource: CustomDataSource$1,
-        Cartesian3: Cartesian3$6,
+        Cartesian3: Cartesian3$7,
         Entity: Entity$2,
         Color: Color$9,
         Rectangle: Rectangle$3
@@ -3098,7 +3173,7 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$6.fromRadiansArray(positions),
+                positions: Cartesian3$7.fromRadiansArray(positions),
                 material: Color$9.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
@@ -3146,6 +3221,8 @@
          *     terrain.createBoundingRectangle(viewer);
          * })
          * viewer.terrain = terrain;
+         * 
+         *  @demo {@link examples/apps/index.html#/5.4.1mag-point|多地形加载示例}
          */
         constructor(terrainList, options = {}) {
             this._heightmapWidth = 65;
@@ -3308,7 +3385,7 @@
         } else if (code === 'EPSG:4326') {
             return new Cesium.GeographicTilingScheme(options);
         }
-        throw new CesiumProError('未知的坐标系.')
+        throw new CesiumProError$1('未知的坐标系.')
     };
     /**
      * BD-09转GCJ-02
@@ -3712,8 +3789,8 @@
         PolylineGraphics: PolylineGraphics$1,
         EntityCluster,
         PinBuilder,
-        createGuid: createGuid$1,
-        Cartesian3: Cartesian3$5,
+        createGuid: createGuid$2,
+        Cartesian3: Cartesian3$6,
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$1,
@@ -3792,7 +3869,7 @@
     function createObject$1(geoJson, entityCollection, describe) {
         var id = geoJson.id;
         if (!defined$6(id) || geoJson.type !== 'Feature') {
-            id = createGuid$1();
+            id = createGuid$2();
         } else {
             var i = 2;
             var finalId = id;
@@ -3863,13 +3940,13 @@
         }
 
         if (!defined$6(feature.geometry)) {
-            throw new CesiumProError('feature.geometry is required.');
+            throw new CesiumProError$1('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes$1[geometryType];
         if (!defined$6(geometryHandler)) {
-            throw new CesiumProError('Unknown geometry type: ' + geometryType);
+            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
     }
@@ -3888,7 +3965,7 @@
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes$1[geometryType];
             if (!defined$6(geometryHandler)) {
-                throw new CesiumProError('Unknown geometry type: ' + geometryType);
+                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
         }
@@ -4137,7 +4214,7 @@
         return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
     }
     function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$5.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$6.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load$1(that, geoJson, options, sourceUri) {
         let name;
@@ -4152,7 +4229,7 @@
 
         const typeHandler = geoJsonObjectTypes$1[geoJson.type];
         if (!defined$6(typeHandler)) {
-            throw new CesiumProError('Unsupported GeoJSON object type: ' + geoJson.type);
+            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
         //Check for a Coordinate Reference System.
@@ -4161,14 +4238,14 @@
 
         if (defined$6(crs)) {
             if (!defined$6(crs.properties)) {
-                throw new CesiumProError('crs.properties is undefined.');
+                throw new CesiumProError$1('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames$1[properties.name];
                 if (!defined$6(crsFunction)) {
-                    throw new CesiumProError('Unknown crs name: ' + properties.name);
+                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs$1[properties.href];
@@ -4177,17 +4254,17 @@
                 }
 
                 if (!defined$6(handler)) {
-                    throw new CesiumProError('Unable to resolve crs link: ' + JSON.stringify(properties));
+                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames$1['EPSG:' + properties.code];
                 if (!defined$6(crsFunction)) {
-                    throw new CesiumProError('Unknown crs EPSG code: ' + properties.code);
+                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
-                throw new CesiumProError('Unknown crs type: ' + crs.type);
+                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
             }
         }
 
@@ -4420,7 +4497,7 @@
         load(data, options) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$6(data)) {
-                throw new CesiumProError("data is required.");
+                throw new CesiumProError$1("data is required.");
             }
             //>>includeEnd('debug');
 
@@ -5008,8 +5085,8 @@
         DataSource,
         PolygonGraphics,
         PolylineGraphics,
-        createGuid,
-        Cartesian3: Cartesian3$4,
+        createGuid: createGuid$1,
+        Cartesian3: Cartesian3$5,
         PointGraphics,
         ArcType,
         PolygonHierarchy,
@@ -5071,7 +5148,7 @@
     function createObject(geoJson, entityCollection, describe) {
         var id = geoJson.id;
         if (!defined$5(id) || geoJson.type !== 'Feature') {
-            id = createGuid();
+            id = createGuid$1();
         } else {
             var i = 2;
             var finalId = id;
@@ -5142,13 +5219,13 @@
         }
 
         if (!defined$5(feature.geometry)) {
-            throw new CesiumProError('feature.geometry is required.');
+            throw new CesiumProError$1('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes[geometryType];
         if (!defined$5(geometryHandler)) {
-            throw new CesiumProError('Unknown geometry type: ' + geometryType);
+            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
     }
@@ -5167,7 +5244,7 @@
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes[geometryType];
             if (!defined$5(geometryHandler)) {
-                throw new CesiumProError('Unknown geometry type: ' + geometryType);
+                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
         }
@@ -5428,7 +5505,7 @@
         return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
     }
     function defaultCrsFunction(coordinates) {
-        return Cartesian3$4.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$5.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load(that, geoJson, options, sourceUri) {
         let name;
@@ -5443,7 +5520,7 @@
 
         const typeHandler = geoJsonObjectTypes[geoJson.type];
         if (!defined$5(typeHandler)) {
-            throw new CesiumProError('Unsupported GeoJSON object type: ' + geoJson.type);
+            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
         //Check for a Coordinate Reference System.
@@ -5452,14 +5529,14 @@
 
         if (defined$5(crs)) {
             if (!defined$5(crs.properties)) {
-                throw new CesiumProError('crs.properties is undefined.');
+                throw new CesiumProError$1('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames[properties.name];
                 if (!defined$5(crsFunction)) {
-                    throw new CesiumProError('Unknown crs name: ' + properties.name);
+                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs[properties.href];
@@ -5468,17 +5545,17 @@
                 }
 
                 if (!defined$5(handler)) {
-                    throw new CesiumProError('Unable to resolve crs link: ' + JSON.stringify(properties));
+                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames['EPSG:' + properties.code];
                 if (!defined$5(crsFunction)) {
-                    throw new CesiumProError('Unknown crs EPSG code: ' + properties.code);
+                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
-                throw new CesiumProError('Unknown crs type: ' + crs.type);
+                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
             }
         }
 
@@ -5607,7 +5684,7 @@
          */
         load(data, options = { encoding: 'utf-8' }) {
             if (!defined$5(data)) {
-                throw new CesiumProError('data is required.');
+                throw new CesiumProError$1('data is required.');
             }
 
             Cesium.DataSource.setLoading(this, true);
@@ -5840,8 +5917,8 @@
     }
 
     const {
-        Transforms: Transforms$1,
-        Cartesian3: Cartesian3$3
+        Transforms: Transforms$2,
+        Cartesian3: Cartesian3$4
     } = Cesium;
     class Model{
         /**
@@ -5876,13 +5953,13 @@
         constructor(options = {}) {
             if(!defined$8(options.modelMatrix)&&defined$8(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$3) {
+                if(options.position instanceof Cartesian3$4) {
                     cartesian = options.position;
                 } else if(options.position instanceof LonLat) {
                     cartesian = options.position.toCartesian();
                 }
                 if(cartesian) {
-                    options.modelMatrix = Transforms$1.eastNorthUpToFixedFrame(cartesian);
+                    options.modelMatrix = Transforms$2.eastNorthUpToFixedFrame(cartesian);
                 }
             }
             if(defined$8(options.gltf)) {
@@ -5890,7 +5967,7 @@
             } else if(defined$8(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
-                throw new CesiumProError('one of parameters url or gltf must be provided.')
+                throw new CesiumProError$1('one of parameters url or gltf must be provided.')
             }
             this._readyPromise = this.delegate._readyPromise;
             this._ready = this.delegate._ready;
@@ -7093,13 +7170,13 @@
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(options.objects)) {
-                throw new CesiumProError('objects property must be provided.')
+                throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
-                throw new CesiumProError('objects property must be an array')
+                throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
-            this._id = defaultValue$6(options.id, createGuid$2());
+            this._id = defaultValue$6(options.id, createGuid$3());
             this._maxClusterLevel = defaultValue$6(options.maxClusterLevel, 12);
             this._minLoadLevel = defaultValue$6(options.minLoadLevel, 12);
             this._objects = undefined;
@@ -7138,21 +7215,21 @@
          * @returns {Boolean} 更新前后数据是否发生变化。
          */
         updateCluster(height) {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 所有要素创建前调用，一般不需要主动调用，每帧会自动调用一次
          * @param {Cesium.FrameState} framestate framestate
          */
         beginUpdate(framestate) {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 所有要素创建完成后调用，一般不需要主动调用，每帧会自动调用一次
          * @param {Cesium.FrameState} framestate framestate
          */
         endUpdate(framestate) {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 初始化图层
@@ -7161,7 +7238,7 @@
          * @param {Cesium.Scene} scene 
          */
         initialize(framestate, scene) {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 根据object创建点要素，一般不需要主动调用。
@@ -7171,7 +7248,7 @@
          * @returns {Object} 被创建的对象
          */
         createGeometry(tile, framestate, object) {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 删除点要素，一般不需要主动调用。
@@ -7186,7 +7263,7 @@
          * 移除所有要素
          */
         removeAll() {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
         /**
          * 判断图层是否被销毁
@@ -7195,7 +7272,7 @@
             return false;
         }
         destroy() {
-            CesiumProError.throwInstantiationError();
+            CesiumProError$1.throwInstantiationError();
         }
     }
 
@@ -7285,7 +7362,7 @@
         QuadtreeTileLoadState,
         Visibility,
         AssociativeArray: AssociativeArray$1,
-        Cartesian3: Cartesian3$2,
+        Cartesian3: Cartesian3$3,
         Cartographic: Cartographic$3,
         getTimestamp
     } = Cesium;
@@ -7403,12 +7480,12 @@
                 continue;
             }
             if (!defined$8(object.id)) {
-                object.id = createGuid$2();
+                object.id = createGuid$3();
             }
             if (!(defined$8(object) && defined$8(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3$2) {
+            if (object.position instanceof Cartesian3$3) {
                 object.cartesian = object.position;
             } else if (object.position instanceof Cartographic$3) {
                 object.cartesian = Cartographic$3.toCartesian(object.position);
@@ -7638,6 +7715,9 @@
          * @param {Cesium.QuadTile} tile 瓦片信息
          */
         loadTile(framestate, tile) {
+            if (!this.terrainProvider.ready) {
+                return;
+            }
             let terrainStateBefore;
             let terrainOnly = true;
             if (tile.data) {
@@ -8356,7 +8436,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 #endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
 ";
 
-    const { BoundingSphere: BoundingSphere$2, buildModuleUrl, Cartesian3: Cartesian3$1, Cartographic: Cartographic$2, Color: Color$4, defaultValue: defaultValue$2, defined: defined$3, destroyObject: destroyObject$2, DeveloperError: DeveloperError$2, Ellipsoid, EllipsoidTerrainProvider, Event: Event$4, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$2, Texture, when: when$3, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$1, ShadowMode } = Cesium;
+    const { BoundingSphere: BoundingSphere$2, buildModuleUrl, Cartesian3: Cartesian3$2, Cartographic: Cartographic$2, Color: Color$4, defaultValue: defaultValue$2, defined: defined$3, destroyObject: destroyObject$2, DeveloperError: DeveloperError$2, Ellipsoid, EllipsoidTerrainProvider, Event: Event$4, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$2, Texture, when: when$3, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$1, ShadowMode } = Cesium;
     const GlobeVS = Cesium._shadersGlobeVS;
     const GroundAtmosphere = Cesium._shadersGroundAtmosphere;
     /**
@@ -9015,7 +9095,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                     surfaceTile.tileBoundingRegion.maximumHeight,
                     boundingVolume
                 );
-                Cartesian3$1.fromElements(
+                Cartesian3$2.fromElements(
                     boundingVolume.center.z,
                     boundingVolume.center.x,
                     boundingVolume.center.y,
@@ -9078,7 +9158,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     Globe.prototype.pick = function (ray, scene, result) {
         result = this.pickWorldCoordinates(ray, scene, true, result);
         if (defined$3(result) && scene.mode !== SceneMode$1.SCENE3D) {
-            result = Cartesian3$1.fromElements(result.y, result.z, result.x, result);
+            result = Cartesian3$2.fromElements(result.y, result.z, result.x, result);
             var carto = scene.mapProjection.unproject(result, cartoScratch);
             result = scene.globe.ellipsoid.cartographicToCartesian(carto, result);
         }
@@ -9086,8 +9166,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         return result;
     };
 
-    var scratchGetHeightCartesian = new Cartesian3$1();
-    var scratchGetHeightIntersection = new Cartesian3$1();
+    var scratchGetHeightCartesian = new Cartesian3$2();
+    var scratchGetHeightIntersection = new Cartesian3$2();
     var scratchGetHeightCartographic = new Cartographic$2();
     var scratchGetHeightRay = new Ray();
 
@@ -9168,7 +9248,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         var ellipsoid = this._surface._tileProvider.tilingScheme.ellipsoid;
 
         //cartesian has to be on the ellipsoid surface for `ellipsoid.geodeticSurfaceNormal`
-        var cartesian = Cartesian3$1.fromRadians(
+        var cartesian = Cartesian3$2.fromRadians(
             cartographic.longitude,
             cartographic.latitude,
             0.0,
@@ -9198,12 +9278,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             var magnitude = Math.min(defaultValue$2(minimumHeight, 0.0), -11500.0);
 
             // multiply by the *positive* value of the magnitude
-            var vectorToMinimumPoint = Cartesian3$1.multiplyByScalar(
+            var vectorToMinimumPoint = Cartesian3$2.multiplyByScalar(
                 surfaceNormal,
                 Math.abs(magnitude) + 1,
                 scratchGetHeightIntersection
             );
-            Cartesian3$1.subtract(cartesian, vectorToMinimumPoint, ray.origin);
+            Cartesian3$2.subtract(cartesian, vectorToMinimumPoint, ray.origin);
         }
 
         var intersection = tile.data.pick(
@@ -9861,7 +9941,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         BoundingRectangle,
         Pass,
         SunLight,
-        Cartesian3
+        Cartesian3: Cartesian3$1
     } = Cesium;
     const preloadTilesetPassState = new Cesium3DTilePassState({
         pass: Cesium3DTilePass.PRELOAD,
@@ -10014,9 +10094,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         if (defined$1(shadowMap) && shadowMap.enabled) {
             if (!defined$1(scene.light) || scene.light instanceof SunLight) {
                 // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+                Cartesian3$1.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
             } else {
-                Cartesian3.clone(scene.light.direction, scene._shadowMapCamera.direction);
+                Cartesian3$1.clone(scene.light.direction, scene._shadowMapCamera.direction);
             }
             frameState.shadowMaps.push(shadowMap);
         }
@@ -10167,7 +10247,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Primitive: Primitive$1,
+        Primitive: Primitive$2,
         ShaderProgram,
         defined,
         DeveloperError: DeveloperError$1,
@@ -10175,7 +10255,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         ShaderSource: ShaderSource$1 
     } = Cesium;
 
-    const update = Primitive$1.prototype.update;
+    const update = Primitive$2.prototype.update;
     function appendPickToVertexShader(source) {
         var renamedVS = ShaderSource$1.replaceMain(source, "czm_non_pick_main");
         var pickMain =
@@ -10349,17 +10429,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         let vs = primitive._batchTable.getVertexShaderCallback()(
             appearance.vertexShaderSource
         );
-        vs = Primitive$1._appendOffsetToShader(primitive, vs);
-        vs = Primitive$1._appendShowToShader(primitive, vs);
-        vs = Primitive$1._appendDistanceDisplayConditionToShader(
+        vs = Primitive$2._appendOffsetToShader(primitive, vs);
+        vs = Primitive$2._appendShowToShader(primitive, vs);
+        vs = Primitive$2._appendDistanceDisplayConditionToShader(
             primitive,
             vs,
             frameState.scene3DOnly
         );
         vs = appendPickToVertexShader(vs);
-        vs = Primitive$1._updateColorAttribute(primitive, vs, false);
+        vs = Primitive$2._updateColorAttribute(primitive, vs, false);
         vs = modifyForEncodedNormals(primitive, vs);
-        vs = Primitive$1._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
+        vs = Primitive$2._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
         var fs = appearance.getFragmentShaderSource();
         fs = appendPickToFragmentShader(fs);
 
@@ -10376,16 +10456,16 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             vs = primitive._batchTable.getVertexShaderCallback()(
                 primitive._depthFailAppearance.vertexShaderSource
             );
-            vs = Primitive$1._appendShowToShader(primitive, vs);
-            vs = Primitive$1._appendDistanceDisplayConditionToShader(
+            vs = Primitive$2._appendShowToShader(primitive, vs);
+            vs = Primitive$2._appendDistanceDisplayConditionToShader(
                 primitive,
                 vs,
                 frameState.scene3DOnly
             );
             vs = appendPickToVertexShader(vs);
-            vs = Primitive$1._updateColorAttribute(primitive, vs, true);
+            vs = Primitive$2._updateColorAttribute(primitive, vs, true);
             vs = modifyForEncodedNormals(primitive, vs);
-            vs = Primitive$1._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
+            vs = Primitive$2._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
             vs = depthClampVS(vs);
 
             fs = primitive._depthFailAppearance.getFragmentShaderSource();
@@ -10403,8 +10483,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
 
-    function Primitive$2 () {
-        Object.defineProperty(Primitive$1.prototype, 'needUpdate', {
+    function Primitive$3 () {
+        Object.defineProperty(Primitive$2.prototype, 'needUpdate', {
             get() {
                 return !!this._needUpdate;
             },
@@ -10412,7 +10492,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 this._needUpdate = val;
             }
         });
-        Primitive$1.prototype.update = function (frameState) {
+        Primitive$2.prototype.update = function (frameState) {
             update.call(this, frameState);
             // override
             if (this.needUpdate) {
@@ -10434,8 +10514,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Matrix4,
+        Matrix4: Matrix4$1,
         BoundingSphere: BoundingSphere$1,
+        ScreenSpaceEventType,
+        ScreenSpaceEventHandler
     } = Cesium;
     function flyTo(viewer, target, options) {
         viewer.camera.flyToBoundingSphere(target, {
@@ -10462,7 +10544,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             baseLayerPicker: false,
             fullscreenElement: 'cesiumContainer',
             fullscreenButton: false,
-            shouldAnimate: false,
+            shouldAnimate: true,
             infoBox: false,
             selectionIndicator: false,
             sceneModePicker: false,
@@ -10708,7 +10790,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 let boundingSphere = target.boundingSphere;
                 boundingSphere = BoundingSphere$1.clone(boundingSphere);
                 if (target.modelMatrix) {
-                    Matrix4.multiplyByPoint(target.modelMatrix, boundingSphere.center, boundingSphere.center);
+                    Matrix4$1.multiplyByPoint(target.modelMatrix, boundingSphere.center, boundingSphere.center);
                 }
                 flyTo(viewer, boundingSphere, options);
             }
@@ -11073,7 +11155,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 geopoint = target;
             } else {
                 //>>includeStart('debug', pragmas.debug);
-                throw new CesiumProError('target不是一个有效值')
+                throw new CesiumProError$1('target不是一个有效值')
                 //>>includeEnd('debug')
             }
             if (geopoint) {
@@ -11101,7 +11183,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 destination = options.destination;
             } else {
                 //>>includeStart('debug', pragmas.debug);
-                throw new CesiumProError('target不是一个有效值')
+                throw new CesiumProError$1('target不是一个有效值')
                 //>>includeEnd('debug')
             }
             if (destination) {
@@ -11122,7 +11204,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         linkView(viewer) {
             if (!defined$8(viewer)) {
-                throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
         }
@@ -11165,6 +11247,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return flyToPrimitive(this, target.delegate, options)
             } else if(target instanceof Tileset) {
                 return super.flyTo(target.delegate, options)
+            } else if(target.boundingSphere) {
+                return this.camera.flyToBoundingSphere(target.boundingSphere);
             }
             return super.flyTo(target, options);
         }
@@ -11190,7 +11274,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 target = point.toCartesian();
             } else {
                 //>>includeStart('debug', pragmas.debug);
-                throw new CesiumProError('point不是一个有效值。')
+                throw new CesiumProError$1('point不是一个有效值。')
             }
             const multiplier = defaultValue$6(options.multiplier, 1);
             const offset = defaultValue$6(options.offset, {});
@@ -11302,7 +11386,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (this._autoRotation) {
                 icrf(this);
             }
-            this.graphicGroup.update();
+            this.graphicGroup.update(this.clock.currentTime);
         }
         /**
         * 调整小部件的大小，以适应container，该函数会自动被调用，除非<code>useDefaultRenderLoop</code> 设为false;
@@ -11329,18 +11413,41 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         isDestroyed() {
             return super.isDestroyed();
         }
+        /**
+         * 鼠标事件监听
+         * @param {Function} fn 回调函数
+         * @param {String} [event = 'LEFT_CLICK'] 事件类型
+         * @param {Element} [target = this.canvas] 触发事件的元素，默认为球的canvas
+         * @returns 取消事件监听的函数
+         * @example
+         * const removeAction = viewer.on(function(e) {});
+         * const removeAction = viewer.on(function(e) {}, 'MOUSE_MOVE');
+         * // 移除事件监听
+         * removeAction();
+         */
+        on(fn, event = 'LEFT_CLICK', target = this.canvas) {
+            const handler = new ScreenSpaceEventHandler(target);
+            const removeInputAction = handler.setInputAction(fn, ScreenSpaceEventType[event]);
+            return function() {
+                if (handler.isDestroyed()) {
+                    return;
+                }
+                removeInputAction();
+                handler.destroy();
+            }
+        }
     }
     // 生写Cesium中的部分函数
     overrideCesium();
 
     const {
         Color: Color$2,
-        MaterialAppearance: MaterialAppearance$1,
-        CircleGeometry,
-        GroundPrimitive,
-        Primitive,
-        GeometryInstance,
-        Material: Material$1
+        MaterialAppearance: MaterialAppearance$4,
+        CircleGeometry: CircleGeometry$1,
+        GroundPrimitive: GroundPrimitive$1,
+        Primitive: Primitive$1,
+        GeometryInstance: GeometryInstance$1,
+        Material: Material$4
     } = Cesium;
     class PointBaseGraphic extends Graphic {
         /**
@@ -11349,13 +11456,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         constructor(options) {
             if (!defined$8(options)) {
-                throw new CesiumProError("options must be provided.")
+                throw new CesiumProError$1("options must be provided.")
             }
             if (LonLat.isValid(options.position) === false) {
-                throw new CesiumProError('options.position parameter is invalid.');
+                throw new CesiumProError$1('options.position parameter is invalid.');
             }
             if (isNaN(options.radius) && options.radius <= 0) {
-                throw new CesiumProError("options.radius parameter must be a number greater than 0.");
+                throw new CesiumProError$1("options.radius parameter must be a number greater than 0.");
             }
             super(options);
             this._color = defaultValue$6(options.color, Color$2.WHITE);
@@ -11368,50 +11475,67 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._height = defaultValue$6(options.height, 0);
             this._extrudedHeight = defaultValue$6(options.extrudedHeight, 0);
             this._asynchronous = defaultValue$6(options.asynchronous, true);
-            if (this._clampToGround) {
-                this.createGroundPrimitive();
-            } else {
-                this.createPrimitive();
-            }
-            
         }
         /**
          * @private
          */
-        createPrimitive() {
-            const geometry = new CircleGeometry({
+        createGraphic() {
+            if (this._clampToGround) {
+                this.createGroundPrimitive(this._asynchronous);
+            } else {
+                this.createPrimitive(this._asynchronous);
+            }
+        }
+        /**
+         * @private
+         */
+        createPrimitive(asynchronous = true) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            const geometry = new CircleGeometry$1({
+                center: LonLat.toCartesian(this._position),
+                radius: this._radius,
+                stRotation: this._stRotation,
+                extrudedHeight: this._extrudedHeight,
+                height: this._height,
+                granularity: 0.01
+            });
+            this._primitive = new Primitive$1({
+                geometryInstances: new GeometryInstance$1({
+                    geometry,
+                    id: this.property
+                }),
+                appearance: this.createAppearance(),
+                asynchronous,
+                allowPicking: this._allowPicking
+            });
+            return this._primitive;
+        }
+        /**
+         * @private
+         */
+        createGroundPrimitive(asynchronous = true) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            const geometry = new CircleGeometry$1({
                 center: LonLat.toCartesian(this._position),
                 radius: this._radius,
                 stRotation: this._stRotation,
                 extrudedHeight: this._extrudedHeight,
                 height: this._height
             });
-            this._primitive = new Primitive({
-                geometryInstances: new GeometryInstance({
-                    geometry
+            this._primitive = new GroundPrimitive$1({
+                geometryInstances: new GeometryInstance$1({
+                    geometry,
+                    id: this.property
                 }),
                 appearance: this.createAppearance(),
-                asynchronous: this._asynchronous
+                asynchronous,
+                allowPicking: this._allowPicking,
             });
-        }
-        /**
-         * @private
-         */
-        createGroundPrimitive() {
-            const geometry = new CircleGeometry({
-                center: LonLat.toCartesian(this._position),
-                radius: this._radius,
-                stRotation: this._stRotation,
-                extrudedHeight: this._extrudedHeight,
-                height: this._height            
-            });
-            this._primitive = new GroundPrimitive({
-                geometryInstances: new GeometryInstance({
-                    geometry
-                }),
-                appearance: this.createAppearance(),
-                asynchronous: this._asynchronous
-            });
+            return this._primitive;
         }
         /**
          * @private
@@ -11421,8 +11545,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (defined$8(this._appearance)) {
                 return this._appearance;
             }
-            this._appearance = new MaterialAppearance$1({
-                material: Material$1.fromType('Color', {
+            this._appearance = new MaterialAppearance$4({
+                material: Material$4.fromType('Color', {
                     color: this._color
                 })
             });
@@ -11459,6 +11583,21 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this.updatePrimitive();
         }
         /**
+         * 获得或设置高度
+         */
+         get height() {
+            return this._height;
+        }
+        set height(val) {
+            if (val === this._height) {
+                return;
+            }
+            this.definedChanged.raise('height', val, this._height);
+            this._height = val;
+            this._extrudedHeight = val;
+            this.updatePrimitive();
+        }
+        /**
          * 要素颜色
          * @type {String|Cesium.Color}
          * @example
@@ -11490,29 +11629,581 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         /**
          * @private
          * 重新生成primitive并移除旧的，一般在更新位置或半径后调用
-         * @returns 
          */
         updatePrimitive() {
             if (!this._viewer) {
                 return;
             }
             const oldPrimitive = this.primitive;
-            const options = Object.assign(this.toJson(), {asynchronous: false});
-            options.position = LonLat.fromArray(options.position);
-            this._primitive = (new this.constructor(options)).primitive;
+            this.createGraphic();
             this._viewer.primitives.add(this._primitive);
             this._viewer.primitives.remove(oldPrimitive);
         }
+        zoomTo(options) {
+            if (!this._viewer) {
+                return;
+            }
+            if (!this._primitive) {
+                return;
+            }
+            this.readyPromise.then(() => {
+                const boundingSphere = graphic.primitive._boundingSpheres[0];
+                if (boundingSphere) {
+                    this._viewer.camera.flyToBoundingSphere(boundingSphere, options);
+                }
+            });
+        }
     }
 
-    const glsl = `
+    const glsl$1 = `
+    float circle(vec2 uv, float r, float blur) {
+        float d = length(uv);
+        float c = smoothstep(r+blur, r, d);
+        return c;
+    }
     czm_material czm_getMaterial(czm_materialInput materialInput) {
         czm_material material = czm_getDefaultMaterial(materialInput);
-        vec2 st = materialInput.st;
-        float imageColor = texture2D(image, st);
-        material.alpha = 1.0;
+        mat2 rotateMatrix = mat2(stRotation.x, stRotation.y, stRotation.z, stRotation.w);
+        vec2 st = rotateMatrix * (materialInput.st - vec2(0.5));
+        float t = time;
+        float s = 0.4;
+        float radius1 = smoothstep(.0, s, 1.0) * 0.5;
+        float alpha1 = circle(st, radius1, 0.02) * circle(st, radius1, -0.02);
+        float alpha2 = circle(st, radius1, 0.02 - radius1) * circle(st, radius1, 0.02);
+        float radius2 = 0.5 + smoothstep(s, 1.0, t) * 0.5;
+        float alpha3 = circle(st, radius1, radius2 + 0.01 - radius1) * circle(st, radius1, -0.02);
+    
+        float circleAlpha = color.a * smoothstep(1.0, s, 0.0) * (alpha1 + alpha2*0.1 + alpha3*0.2);
+        vec4 imageColor = texture2D(image, st + vec2(0.5));
+        material.diffuse = color.rgb;
+        material.alpha = imageColor.a * color.a + circleAlpha;
         return material;
     }
+`;
+
+    const {
+        MaterialAppearance: MaterialAppearance$3,
+        Material: Material$3
+    } = Cesium;
+    class CircleScanGraphic extends PointBaseGraphic {
+        /**
+         * 圆形扫描波
+         * @extends PointBaseGraphic
+         * @param {CircleScanGraphic.ConstructorOptions} options 定义该图形的属性
+         * @example
+         * graphic = new CesiumPro.CircleScanGraphic({
+         *   position: new CesiumPro.LonLat(107.766, 34.548),
+         *   radius: 1000,
+         *   color: '#FF0000',
+         *   speed: 5000
+         * });
+         * graphic.addTo(viewer);
+         * // or
+         * viewer.graphicGraphic.add(graphic);
+         * @demo {@link examples/apps/index.html#/5.3.1-circlescan|圆形扫描波示例}
+         */
+        constructor(options) {
+            super(options);
+            this._speed = defaultValue$6(options.speed, 10);
+            this._time = 0;
+            this.createGraphic();
+        }
+        /**
+         * 扫描速度
+         * @type {Number}
+         * @default 10
+         */
+        get speed() {
+            return this._speed;
+        }
+        set speed(val) {
+            if (this._speed !== val) {
+                return;
+            }
+            if (val <= 0) {
+                throw new CesiumProError("速度不能小于0")
+            }
+            this.definedChanged.raise('speed', val, this._speed);
+            this._speed = val;
+        }
+        createAppearance() {
+            if (this._appearance) {
+                return this._appearance;
+            }
+            this._appearance = new MaterialAppearance$3({
+                material: new Material$3({
+                    translucent: true,
+                    fabric: {
+                        uniforms: {
+                            image: Url.buildModuleUrl("./assets/img/radarScan.png"),
+                            stRotation: Cesium.Matrix2.IDENTITY,
+                            color: this._color,
+                            time: 0
+                        },
+                        source: glsl$1
+                    },
+                })
+            });
+            return this._appearance;
+        }
+        update(time) {
+            if (!this.material) {
+                return;
+            }
+            const t = Cesium.JulianDate.toDate(time).getTime() / this.speed;
+            const normalizeAngle = t % (360);
+            const rotation = Cesium.Matrix2.fromRotation(Cesium.Math.toRadians(-normalizeAngle));
+            this.material.uniforms.stRotation = {
+                x: rotation[0],
+                y: rotation[1],
+                z: rotation[2],
+                w: rotation[3]
+            };
+            this.material.uniforms.time = t - parseInt(t);
+        }
+    }
+
+    const shader$1 = `
+float circle(vec2 uv, float r, float blur) {
+    float d = length(uv) * 2.0;
+    float c = smoothstep(r+blur, r, d);
+    return c;
+}
+
+uniform vec4 color;
+uniform float time;
+czm_material czm_getMaterial(czm_materialInput materialInput)
+{
+    czm_material material = czm_getDefaultMaterial(materialInput);
+    vec2 st = materialInput.st - .5;
+    material.diffuse = color.rgb;
+    material.emission = vec3(0);
+    float t = time;
+    float s = 0.3;
+    float radius1 = smoothstep(.0, s, t) * 0.5;
+    float alpha1 = circle(st, radius1, 0.01) * circle(st, radius1, -0.01);
+    float alpha2 = circle(st, radius1, 0.01 - radius1) * circle(st, radius1, 0.01);
+    float radius2 = 0.5 + smoothstep(s, 1.0, t) * 0.5;
+    float alpha3 = circle(st, radius1, radius2 + 0.01 - radius1) * circle(st, radius1, -0.01);
+
+    material.alpha = smoothstep(1.0, s, t) * (alpha1 + alpha2*0.1 + alpha3*0.1);
+    material.alpha *= color.a;
+
+    return material;
+}
+`;
+
+    const {
+        MaterialAppearance: MaterialAppearance$2,
+        Material: Material$2
+    } = Cesium;
+    class CircleSpreadGraphic extends PointBaseGraphic {
+        /**
+         * 圆形扩散波
+         * @extends PointBaseGraphic
+         * @param {CircleScanGraphic.ConstructorOptions} options 定义该图形的属性
+         * @example
+         * graphic = new CesiumPro.CircleSpreadGraphic({
+         *   position: new CesiumPro.LonLat(107.766, 34.548),
+         *   radius: 1000,
+         *   color: '#FF0000',
+         *   speed: 5000
+         * });
+         * graphic.addTo(viewer);
+         * // or
+         * viewer.graphicGraphic.add(graphic);
+         * @demo {@link examples/apps/index.html#/5.3.2-circleSpread|圆形扩散波示例}
+         */
+        constructor(options) {
+            super(options);
+            this._speed = defaultValue$6(options.speed, 10);
+            this._time = 0.0;
+            this.createGraphic();
+        }
+        /**
+         * 扫描速度
+         * @type {Number}
+         * @default 10
+         */
+        get speed() {
+            return this._speed;
+        }
+        set speed(val) {
+            if (val === this._speed) {
+                return;
+            }
+            if (val <= 0) {
+                throw new CesiumProError("速度不能小于0")
+            }
+            this.definedChanged.raise('speed', val, this._speed);
+            this._speed = val;        
+        }
+        createAppearance() {
+            if (this._appearance) {
+                return this._appearance;
+            }
+            this._appearance = new MaterialAppearance$2({
+                material: new Material$2({
+                    translucent: true,
+                    fabric: {
+                        uniforms: {
+                            color: this._color,
+                            time: 0.0,
+                        },
+                        source: shader$1
+                    },
+                })
+            });
+            return this._appearance;
+        }
+        update(time) {
+            if (!this.material) {
+                return;
+            }
+            const t = Cesium.JulianDate.toDate(time).getTime() / this.speed;
+            this.material.uniforms.time = t - parseInt(t);
+            
+        }
+    }
+
+    const baseMaterialShader$1 = `
+uniform sampler2D image;
+uniform vec4 color;
+
+float glow(float var, float radius, float blur) {
+    float innerRadius = radius - blur;
+    float outerRadius = radius + blur;
+    float alpha = 1.0 - step(var, innerRadius);
+    alpha *= step(var, outerRadius);
+    float innerBlur = (1.0 - step(var, innerRadius)) * var;
+    float outerBlur = (1.0 - abs(var - radius) / blur) * alpha;
+    return outerBlur ;
+}
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+  czm_material material = czm_getDefaultMaterial(materialInput);
+  vec2 st = materialInput.st;
+  // calculate distance from the fragment to circle center and normalize it.
+  float length = distance(st, vec2(0.5)) * 2.0;
+  float innerCircle = glow(length, 0.35, 0.2);
+  float outerCircle = glow(length, 0.8, 0.2);
+  float alpha = innerCircle + outerCircle;
+  material.diffuse = color.rgb * vec3(color.a);
+  material.alpha = pow(alpha, 4.0) * color.a;
+  return material;
+}
+`;
+    const dashCircleMaterialShader$1 = `
+float dashCircle(vec2 st, float time) {
+  float slice = 18.0;
+  time = 3.1415926 / 180.0 * time;
+  float cost = cos(time);
+  float sint = sin(time);
+  mat2 rotateMatrix = mat2(cost, -sint, sint, cost);
+  st = rotateMatrix * st;
+  float cos = dot(normalize(st), vec2(1.0, 0.0));
+  float angle  = acos(cos);
+  float sliceAngle = 3.1415926 * 2.0 / slice;
+  float index = mod(floor(angle / sliceAngle), 2.0);
+  if (st.t > 0.0) {
+    return 1.0 - index;
+  }
+  return index;
+}
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+  czm_material material = czm_getDefaultMaterial(materialInput);
+  vec2 st = materialInput.st;
+  float length = distance(st, vec2(0.5)) * 2.0;
+  vec2 center = st - vec2(0.5, 0.5);
+  float time = -czm_frameNumber * 3.1415926 / 180.;//扫描速度1度
+  float sin_t = sin(time);
+  float cos_t = cos(time);
+  float alpha = step(length, 0.7);
+  alpha *= step(0.55, length);
+  alpha *= dashCircle(st - vec2(0.5), mod(czm_frameNumber * speed, 180.0 * 2.0));
+  alpha *= min((1.0 - abs(length - 0.625) / 0.15), 1.0);
+  material.diffuse = color.rgb;
+  material.alpha = alpha * color.a;
+  return material;
+}
+`;
+    const coneMaterialShader$1 = `
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+  czm_material material = czm_getDefaultMaterial(materialInput);
+  vec2 st = materialInput.st;
+  float powerRatio = 1.0 / (fract(czm_frameNumber / 30.0) + 1.0);
+  float alpha = pow(1.0 - st.t, powerRatio);
+  material.diffuse = color.rgb;
+  material.alpha = alpha * color.a;
+  return material;
+}
+`;
+    const cylinderMaterialShader$1 = `
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+  czm_material material = czm_getDefaultMaterial(materialInput);
+  vec2 st = materialInput.st;
+  float time = fract(czm_frameNumber / 90.0 * speed);
+  vec4 color = texture2D(image, fract(st - vec2(time)));
+  float alpha = color.a;
+  alpha *= color.a;
+  material.diffuse = color.rgb;
+  material.alpha = alpha * pow(1.0 - st.t, color.a);
+  return material;
+}
+`;
+    var glsl = {
+        baseMaterialShader: baseMaterialShader$1,
+        dashCircleMaterialShader: dashCircleMaterialShader$1,
+        coneMaterialShader: coneMaterialShader$1,
+        cylinderMaterialShader: cylinderMaterialShader$1
+    };
+
+    const { baseMaterialShader, dashCircleMaterialShader, coneMaterialShader, cylinderMaterialShader } = glsl;
+    const {
+        MaterialAppearance: MaterialAppearance$1,
+        Material: Material$1,
+        CircleGeometry,
+        GroundPrimitive,
+        Primitive,
+        GeometryInstance,
+        PrimitiveCollection,
+        CylinderGeometry,
+        Transforms: Transforms$1,
+        Matrix4,
+        Cartesian3
+    } = Cesium;
+    class DynamicConeGraphic extends PointBaseGraphic {
+        /**
+         * 
+         * @extends PointBaseGraphic
+         * @param {DynamicConeGraphic.ConstructorOptions} options 定义该图形的属性
+         * @example
+         * graphic = new CesiumPro.RadarScanGraphic({
+         *   position: new CesiumPro.LonLat(107.766, 34.548),
+         *   radius: 1000,
+         *   color: '#FF0000',
+         *   speed: 5000
+         * });
+         * graphic.addTo(viewer);
+         * // or
+         * viewer.graphicGraphic.add(graphic);
+         * @demo {@link examples/apps/index.html#/5.3.4-dynamicCone|DynamicConeGraphic示例}
+         */
+        constructor(options) {
+            super(options);
+            this._speed = defaultValue$6(options.speed, 1);
+            this._image = defaultValue$6(options.image, Url.buildModuleUrl('assets/img/particle.png'));
+            this._appearance = {};
+            this._length = options.length;
+            this._primitive = new PrimitiveCollection();
+            this.createGraphic();
+        }
+        /**
+         * 速度
+         * @type {Number}
+         * @default 10
+         */
+        get speed() {
+            return this._speed;
+        }
+        set speed(val) {
+            if (val === this._speed) {
+                return;
+            }
+            if (val <= 0) {
+                throw new CesiumProError$1("速度不能小于0")
+            }
+            this.definedChanged.raise('speed', val, this._speed);
+            this._speed = val;
+            const appearances = Object.values(this._appearance);
+            for (let appearance of appearances) {
+                const material = appearance.material;
+                console.log(material.uniforms);
+                material.uniforms.speed = val;
+            }
+        }
+        /**
+         * 获得或设置圆锥高度
+         */
+        get length() {
+            return this._length;
+        }
+        set length(val) {
+            if (val === this._length) {
+                return;
+            }
+            this.definedChanged.raise('length', val, this._length);
+            this._length = val;
+            this.updatePrimitive();
+        }
+        /**
+         * @override
+         */
+         updatePrimitive() {
+            if (!this._viewer) {
+                return;
+            }
+            const oldPrimitive = this.primitive;
+            oldPrimitive.removeAll();
+            this.createGraphic();
+            this._viewer.primitives.add(this._primitive);
+        }
+        /**
+         * @override
+         * @private
+         * @param {*} k 
+         * @param {*} v 
+         * @returns 
+         */
+        updateAttribute(k, v) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            if (!this.primitive) {
+                return;
+            }
+            const primitives = this.primitive._primitives;
+            for (let primitive of primitives) {
+                super.updateAttribute.call({primitive, isDestroyed: this.isDestroyed}, k, v);
+            }
+        }
+        /**
+         * @private
+         */
+        createGraphic() {
+            const appearance1 = this.createAppearance(baseMaterialShader);
+            const appearance2 = this.createAppearance(dashCircleMaterialShader);
+            const appearance3 = this.createAppearance(coneMaterialShader);
+            const appearance4 = this.createAppearance(cylinderMaterialShader);
+            if (this._clampToGround) {
+                this.createCircleGroundPrimitive(appearance1, this._asynchronous);
+                this.createCircleGroundPrimitive(appearance2, this._asynchronous);
+                this.createCylinder(this._radius * 0.35, appearance3, this._asynchronous);
+                this.createCylinder(this._radius * 0.4, appearance4, this._asynchronous);
+            } else {
+                this.createCirclePrimitive(appearance1, this._asynchronous);
+                this.createCirclePrimitive(appearance2, this._asynchronous);
+                this.createCylinder(this._radius * 0.35, appearance3, this._asynchronous);
+                this.createCylinder(this._radius * 0.4, appearance4, this._asynchronous);
+            }
+        }
+        createCylinder(radius, appearance, asynchronous = true) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            const length = defaultValue$6(this._length, this._radius * 0.35 * 8);
+            const matrix = Transforms$1.eastNorthUpToFixedFrame(LonLat.toCartesian(this._position));
+            const translation = Matrix4.fromTranslation(new Cartesian3(0, 0, length / 2 + this._height));
+            Matrix4.multiply(matrix, translation, matrix);
+            const geometry = new CylinderGeometry({
+                radius: this._radius,
+                topRadius: 0,
+                bottomRadius: radius,
+                length,
+            });
+            const primitive = new Primitive({
+                geometryInstances: new GeometryInstance({
+                    geometry,
+                    id: this.property
+                }),
+                appearance: appearance,
+                asynchronous,
+                allowPicking: this._allowPicking,
+                modelMatrix: matrix
+            });
+
+            this._primitive.add(primitive);
+            return primitive;
+        }
+        /**
+         * @private
+         */
+        createCirclePrimitive(appearance, asynchronous = true) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            const geometry = new CircleGeometry({
+                center: LonLat.toCartesian(this._position),
+                radius: this._radius,
+                stRotation: this._stRotation,
+                extrudedHeight: this._extrudedHeight,
+                height: this._height,
+                granularity: 0.01
+            });
+            const primitive = new Primitive({
+                geometryInstances: new GeometryInstance({
+                    geometry,
+                    id: this.property
+                }),
+                appearance: appearance,
+                asynchronous,
+                allowPicking: this._allowPicking
+            });
+            this._primitive.add(primitive);
+            return primitive;
+        }
+        /**
+         * @private
+         */
+        createCircleGroundPrimitive(appearance, asynchronous = true) {
+            if (this.isDestroyed()) {
+                return;
+            }
+            const geometry = new CircleGeometry({
+                center: LonLat.toCartesian(this._position),
+                radius: this._radius,
+                stRotation: this._stRotation,
+                extrudedHeight: this._extrudedHeight,
+                height: this._height
+            });
+            const primitive = new GroundPrimitive({
+                geometryInstances: new GeometryInstance({
+                    geometry,
+                    id: this.property
+                }),
+                appearance: appearance,
+                asynchronous,
+                allowPicking: this._allowPicking,
+            });
+            this._primitive.add(primitive);
+            return primitive;
+        }
+        createAppearance(shader) {
+            if (this._appearance[shader]) {
+                return this._appearance[shader];
+            }
+            this._appearance[shader] = new MaterialAppearance$1({
+                material: new Material$1({
+                    translucent: true,
+                    fabric: {
+                        uniforms: {
+                            color: this._color,
+                            image: this._image,
+                            speed: this._speed
+                        },
+                        source: shader//baseMaterialShader
+                    },
+                })
+            });
+            return this._appearance[shader];
+        }
+        update(time) {
+        }
+    }
+
+    const shader = `
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+    czm_material material = czm_getDefaultMaterial(materialInput);
+    material.diffuse = color.rgb;
+    vec2 st = materialInput.st - vec2(0.5);
+    float dis = distance(st, vec2(0.0));
+    // material.alpha = min(pow(dis * 2.0, 5.0) * color.a, 1.0);
+    if (dis * 2.0 > fract(time)) {
+        discard;
+    }  
+    float scale = 1.0 / (max(time, 0.0001));
+    material.alpha = min(pow(dis * 2.0 * scale, 5.0), 1.0) * color.a;
+    return material;
+}
 `;
 
     const {
@@ -11520,10 +12211,45 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         Material
     } = Cesium;
     class RadarScanGraphic extends PointBaseGraphic {
+        /**
+         * 圆形扩散波
+         * @extends PointBaseGraphic
+         * @param {CircleScanGraphic.ConstructorOptions} options 定义该图形的属性
+         * @example
+         * graphic = new CesiumPro.RadarScanGraphic({
+         *   position: new CesiumPro.LonLat(107.766, 34.548),
+         *   radius: 1000,
+         *   color: '#FF0000',
+         *   speed: 5000
+         * });
+         * graphic.addTo(viewer);
+         * // or
+         * viewer.graphicGraphic.add(graphic);
+         * @demo {@link examples/apps/index.html#/5.3.3-radarScan|雷达扫描波示例}
+         */
         constructor(options) {
             super(options);
-            this.speed = defaultValue$6(options.speed, 1000);
-            
+            this._speed = defaultValue$6(options.speed, 10);
+            this._time = 0.0;
+            this.createGraphic();
+        }
+        /**
+         * 扫描速度
+         * @type {Number}
+         * @default 10
+         */
+         get speed() {
+            return this._speed;
+        }
+        set speed(val) {
+            if (val === this._speed) {
+                return;
+            }
+            if (val <= 0) {
+                throw new CesiumProError("速度不能小于0")
+            }
+            this.definedChanged.raise('speed', val, this._speed);
+            this._speed = val;
         }
         createAppearance() {
             if (this._appearance) {
@@ -11531,15 +12257,25 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             }
             this._appearance = new MaterialAppearance({
                 material: new Material({
+                    translucent: true,
                     fabric: {
                         uniforms: {
-                            image: Url.buildModuleUrl("./assets/img/radarScan.png")
-                        }
+                            color: this._color,
+                            time: 0.0,
+                        },
+                        source: shader
                     },
-                    source: glsl
                 })
             });
             return this._appearance;
+        }
+        update(time) {
+            if (!this.material) {
+                return;
+            }
+            const t = Cesium.JulianDate.toDate(time).getTime() / this.speed;
+            this.material.uniforms.time = t - parseInt(t);
+            
         }
     }
 
@@ -12882,10 +13618,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._typeName = options.typeName;
             this._style = options.style;
             if (!defined$8(this._url)) {
-                throw new CesiumProError('parameter url must be provided.')
+                throw new CesiumProError$1('parameter url must be provided.')
             }
             if (!defined$8(this._typeName)) {
-                throw new CesiumProError('parameter typeName must be provided.')
+                throw new CesiumProError$1('parameter typeName must be provided.')
             }
             const resource = new Resource({
                 url: options.url,
@@ -13090,7 +13826,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         CustomDataSource,
         Event: Event$3
     } = Cesium;
-    const defaultCreateGeometryFunction$1 = function () { };
+    const defaultCreateGeometryFunction$1 = function () {return {} };
     const ZEROLEVELHEIGHT$1 = 31638318;
     const cameraHeightForLevel$1 = [ZEROLEVELHEIGHT$1];
     for (let i = 1; i < 20; i++) {
@@ -13130,17 +13866,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(options.objects)) {
-                throw new CesiumProError('objects property must be provided.')
+                throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
-                throw new CesiumProError('objects property must be an array')
+                throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
             // if(!options.scene) {
             //     throw new CesiumProError('property scene must be defined.')
             // }
             super(options);
-            this._id = defaultValue$6(options.id, createGuid$2());
+            this._id = defaultValue$6(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
@@ -13252,7 +13988,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             // }
             if (!this._dataSource) {
                 this._scene = scene;
-                this._dataSource = new CustomDataSource('massive-layer' + createGuid$2());
+                this._dataSource = new CustomDataSource('massive-layer' + createGuid$3());
                 this._scene.dataSources.add(this._dataSource);
 
                 // 太耗费性能
@@ -13343,7 +14079,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return;
             }
             const createGeometry = defaultValue$6(this._createGeometryFunction, defaultCreateGeometryFunction$1);
-            const geometry = createGeometry(object);
+            const geometry = createGeometry(object, tile, framestate);
             const keys = Object.keys(object);
             for (let key of keys) {
                 if (key === 'position'
@@ -13455,14 +14191,14 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     } = Cesium;
     const defaultCreateGeometryFunction = function (object, options) {
         const modelOption = {};
-        if(object.modelMatrix) {
+        if (object.modelMatrix) {
             modelOption.modelMatrix = object.modelMatrix;
-        } else if(object.position) {
+        } else if (object.position) {
             let cartesian = object.position;
-            if(object.position instanceof LonLat) {
+            if (object.position instanceof LonLat) {
                 cartesian = object.position.toCartesian();
             }
-            if(!cartesian) {
+            if (!cartesian) {
                 return;
             }
             modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
@@ -13470,7 +14206,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
         modelOption.minimumPixelSize = defaultValue$6(object.minimumPixelSize, options.minimumPixelSize);
         modelOption.maximumScale = defaultValue$6(object.maximumScale, options.maximumScale);
-        modelOption.scale  = defaultValue$6(object.scale, options.scale);
+        modelOption.scale = defaultValue$6(object.scale, options.scale);
         modelOption.allowPicking = defaultValue$6(object.allowPicking, options.allowPicking);
         modelOption.shadows = defaultValue$6(object.shadows, options.shadows);
         modelOption.id = object._id;
@@ -13492,7 +14228,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
         return level;
     }
-    class MassiveModelLayer extends MassiveGraphicLayer{
+    class MassiveModelLayer extends MassiveGraphicLayer {
         /**
          * 海量模型(gltf/glb）加载。该图层会基于四叉树对数据进行分块，搂需加载，以优化性能。
          * @param {Object} options 具有以下属性
@@ -13502,14 +14238,32 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * 
          * @see MassivePointLayer
          * @see MassiveBillboardLayer
+         * 
+         * @example
+         * const positions = Cesium.Cartesian3.fromDegreesArray([...])
+         * let i = 0
+         * const objects = positions.map(_ => {
+         *     i++
+         *     return {
+         *         id: {name: 'model' + i}, // 自定义属性，该对象会在pick中返回
+         *         position: _,
+         *     }
+         * })
+         * const massiveModel = new CesiumPro.MassiveModelLayer({
+         *     objects,
+         *     url: '../data/models/Cesium_Air.glb',
+         *     minimumPixelSize:64
+         * })
+         * viewer.massiveGraphicLayers.add(massiveModel)
+         * @demo {@link examples/apps/index.html#/5.4.2massiveModel|50万模型加载示例}
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
             if (!defined$8(options.objects)) {
-                throw new CesiumProError('objects property must be provided.')
+                throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
-                throw new CesiumProError('objects property must be an array')
+                throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
             // if(!options.scene) {
@@ -13521,7 +14275,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 delete _.id;
             });
             super(options);
-            this._id = defaultValue$6(options.id, createGuid$2());
+            this._id = defaultValue$6(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
@@ -13595,7 +14349,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         beginUpdate(framestate) {
             const height = framestate.camera.positionCartographic.height;
             const level = getLevelByHeight(height);
-            if(level < this._minLoadLevel) {
+            if (level < this._minLoadLevel) {
                 this._objects = [];
             } else {
                 this._objects = this._data;
@@ -13633,7 +14387,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @returns {Object} 被创建的对象
          */
         createGeometry(tile, framestate, object) {
-            if(tile.level < this._minLoadLevel) {
+            if (tile.level < this._minLoadLevel) {
                 return;
             }
             const createGeometry = defaultValue$6(this._createGeometryFunction, defaultCreateGeometryFunction);
@@ -13692,12 +14446,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         Event,
         Cartographic,
         Color,
-        Entity
+        Entity,
+        createGuid
     } = Cesium;
     function defaultCreateFn(options) {
         return function (object) {
+            let id = createGuid();
+            if (typeof object.id === 'string' || typeof object.id === 'number') {
+                id = object.id;
+            }
             const entityOptions = {
-                id: object.id,
+                id: id,
                 position: object.position,
                 point: {
                     pixelSize: defaultValue$6(object.pixelSize, options.pixelSize),
@@ -13718,6 +14477,24 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * 创建大量点要素（Entity)
          * @extends MassiveEntityLayer
          * @param {MassivePointLayer.Options} options 选项
+         * const objects = positions.map(_ => {
+         *     i++
+         *     return {
+         *         id: Cesium.createGuid(),
+         *         position:_,
+         *         // color: Cesium.Color.fromRandom({alpha:1}),
+         *         pixelSize: 5
+         *     }
+         * })
+         *
+         * const pointlayer = new CesiumPro.MassivePointLayer({
+         *     objects: objects,
+         *     color: Cesium.Color.GOLD,
+         *     pixelSize: 5
+         * })
+         * viewer.massiveGraphicLayers.add(pointlayer)
+         * 
+         * @demo {@link examples/apps/index.html#/5.4.1mag-point|100万点加载示例}
          */
         constructor(options = {}) {
             options.objects = defaultValue$6(options.objects, []);
@@ -13744,9 +14521,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     exports.BaiDuLayer = BaiDuLayer;
     exports.BingLayer = BingLayer;
-    exports.CesiumProError = CesiumProError;
+    exports.CesiumProError = CesiumProError$1;
     exports.CesiumProTerrainProvider = CesiumProTerrainProvider;
+    exports.CircleScanGraphic = CircleScanGraphic;
+    exports.CircleSpreadGraphic = CircleSpreadGraphic;
     exports.Cluster = Cluster;
+    exports.DynamicConeGraphic = DynamicConeGraphic;
     exports.Event = Event$7;
     exports.GaoDeLayer = GaoDeLayer;
     exports.GeoJsonDataSource = GeoJsonDataSource;
@@ -13769,7 +14549,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     exports.MultipleTerrainProvider = MultipleTerrainProvider;
     exports.PbfDataSource = PbfDataSource;
     exports.PointBaseGraphic = PointBaseGraphic;
-    exports.Primitive = Primitive$2;
+    exports.Primitive = Primitive$3;
     exports.QuadTreeProvider = QuadTreeProvider;
     exports.RadarScanGraphic = RadarScanGraphic;
     exports.Scene = override;
@@ -13791,16 +14571,19 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     exports.WMTSLayer = WMTSLayer;
     exports.XYZLayer = XYZLayer;
     exports._shaderBuildUniforms = buildUniforms;
+    exports._shaderCircleScan = glsl$1;
+    exports._shaderCircleSpread = shader$1;
+    exports._shaderDynamicCone = glsl;
     exports._shaderGlobeFS = GlobeFS;
-    exports._shaderGroundSkyBoxFS = shader$1;
-    exports._shaderGroundSkyBoxVS = shader;
+    exports._shaderGroundSkyBoxFS = shader$3;
+    exports._shaderGroundSkyBoxVS = shader$2;
     exports._shaderLine = line;
-    exports._shaderRadarScan = glsl;
+    exports._shaderRadarScan = shader;
     exports.computeDistancePerPixel = computeDistancePerPixel;
     exports.computeSceneCenterPoint = computeSceneCenterPoint;
     exports.computeSceneExtent = computeSceneExtent;
     exports.createDefaultLayer = createDefaultLayer;
-    exports.createGuid = createGuid$2;
+    exports.createGuid = createGuid$3;
     exports.dateFormat = dateFormat;
     exports.defaultValue = defaultValue$6;
     exports.defined = defined$8;
