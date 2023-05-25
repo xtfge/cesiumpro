@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +23,7 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './RuntimeError-346a3079', './ComponentDatatype-f194c48b', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './combine-83860057', './WebGLConstants-1c8239cc'], (function (when, Transforms, Matrix2, RuntimeError, ComponentDatatype, GeometryAttribute, GeometryAttributes, combine, WebGLConstants) { 'use strict';
+define(['./defaultValue-135942ca', './Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84a28', './ComponentDatatype-ebdce3ba', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './Math-efde0c7b', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './WebGLConstants-fcb70ee3'], (function (defaultValue, Transforms, Matrix3, Check, ComponentDatatype, GeometryAttribute, GeometryAttributes, Math$1, Matrix2, RuntimeError, combine, WebGLConstants) { 'use strict';
 
   /**
    * Describes geometry representing the outline of a plane centered at the origin, with a unit width and length.
@@ -50,8 +52,8 @@ define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './Run
    */
   PlaneOutlineGeometry.pack = function (value, array) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.defined("value", value);
-    RuntimeError.Check.defined("array", array);
+    Check.Check.defined("value", value);
+    Check.Check.defined("array", array);
     //>>includeEnd('debug');
 
     return array;
@@ -67,18 +69,18 @@ define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './Run
    */
   PlaneOutlineGeometry.unpack = function (array, startingIndex, result) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.defined("array", array);
+    Check.Check.defined("array", array);
     //>>includeEnd('debug');
 
-    if (!when.defined(result)) {
+    if (!defaultValue.defined(result)) {
       return new PlaneOutlineGeometry();
     }
 
     return result;
   };
 
-  var min = new Matrix2.Cartesian3(-0.5, -0.5, 0.0);
-  var max = new Matrix2.Cartesian3(0.5, 0.5, 0.0);
+  const min = new Matrix3.Cartesian3(-0.5, -0.5, 0.0);
+  const max = new Matrix3.Cartesian3(0.5, 0.5, 0.0);
 
   /**
    * Computes the geometric representation of an outline of a plane, including its vertices, indices, and a bounding sphere.
@@ -86,9 +88,9 @@ define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './Run
    * @returns {Geometry|undefined} The computed vertices and indices.
    */
   PlaneOutlineGeometry.createGeometry = function () {
-    var attributes = new GeometryAttributes.GeometryAttributes();
-    var indices = new Uint16Array(4 * 2);
-    var positions = new Float64Array(4 * 3);
+    const attributes = new GeometryAttributes.GeometryAttributes();
+    const indices = new Uint16Array(4 * 2);
+    const positions = new Float64Array(4 * 3);
 
     positions[0] = min.x;
     positions[1] = min.y;
@@ -122,12 +124,12 @@ define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './Run
       attributes: attributes,
       indices: indices,
       primitiveType: GeometryAttribute.PrimitiveType.LINES,
-      boundingSphere: new Transforms.BoundingSphere(Matrix2.Cartesian3.ZERO, Math.sqrt(2.0)),
+      boundingSphere: new Transforms.BoundingSphere(Matrix3.Cartesian3.ZERO, Math.sqrt(2.0)),
     });
   };
 
   function createPlaneOutlineGeometry(planeGeometry, offset) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       planeGeometry = PlaneOutlineGeometry.unpack(planeGeometry, offset);
     }
     return PlaneOutlineGeometry.createGeometry(planeGeometry);
@@ -136,4 +138,3 @@ define(['./when-4bbc8319', './Transforms-86b6fa28', './Matrix2-91d5b6af', './Run
   return createPlaneOutlineGeometry;
 
 }));
-//# sourceMappingURL=createPlaneOutlineGeometry.js.map

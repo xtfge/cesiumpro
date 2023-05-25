@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/dat.gui.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .function .property-name {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const position = Cesium.Cartesian3.fromDegrees(110, 30);
+        const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+        var customShader = new Cesium.CustomShader({
+            uniforms: {
+                u_colorIndex: {
+                    type: Cesium.UniformType.FLOAT,
+                    value: 1.0
+                },
+            },
+            vertexShaderText: `
+  void vertexMain(VertexInput vsInput, inout vec3 position) {
+    // v_selectedColor = mix(vsInput.attributes.color_0, vsInput.attributes.color_1, u_colorIndex);
+    position.z *= 10.0;
+  }
+  `,
+        });
+        const tileset = new CesiumPro.Tileset({
+            url: "../data/tileset/dayanta/tileset.json",
+            debug: true,
+            // customShader: customShader
+            // modelMatrix
+        })
+        parent.Cesium = Cesium;
+        viewer.addModel(tileset);
+        viewer.flyTo(tileset,
+            {
+                offset: {
+                    heading: 0,
+                    pitch: Cesium.Math.toRadians(-85.0),
+                    range: 200
+                }
+            });
+        const flatten = new CesiumPro.FlattenPolygonCollection(tileset, viewer);
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+        var pm = new CesiumPro.PlotManager(viewer, {
+            polygonStyle: {
+                perPositionHeight: true,
+                material: Cesium.Color.GOLD
+            }
+        });
+
+        pm.postEdit.addEventListener((graphic) => {
+            if (!graphic) {
+                returnn;
+            }
+            const coordinates = graphic.positions;
+            if (!(coordinates && coordinates.length)) {
+                return;
+            }
+            const positions = coordinates;
+            // flatten.clear();
+            flatten.addPolygonFromPositionArray(positions);
+        })
+        viewer.depthTest = true
+        parent.viewer = viewer;
+    </script>
+    <script>
+        const gui = new GUI();
+        const opt = {
+            'draw flatten polygon': function () {
+                alert('请用鼠标绘制压平平面')
+                pm.pick(CesiumPro.PlotType.POLYGON);
+            },
+            enabled: true,
+            height: 425
+        };
+
+        gui.add(opt, 'draw flatten polygon');
+        gui.add(opt, 'enabled').onChange(val => {
+            flatten.enabled = val;
+        })
+    </script>
+</body>
+
+</html>

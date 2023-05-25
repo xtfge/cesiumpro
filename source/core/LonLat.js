@@ -17,7 +17,10 @@ class LonLat {
         }
         this.lon = lon;
         this.lat = lat;
-        this.alt = defaultValue(alt, 0)
+        this.alt = defaultValue(alt, 0);
+    }
+    get height() {
+        return this.alt;
     }
     /**
      * 转为屏幕坐标

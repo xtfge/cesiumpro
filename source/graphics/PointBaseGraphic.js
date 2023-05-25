@@ -190,9 +190,8 @@ class PointBaseGraphic extends Graphic {
         }
     }
     /**
-     * @private
-     * 
      * 重新生成primitive并移除旧的，一般在更新位置或半径后调用
+     * @private
      */
     updatePrimitive() {
         if (!this._viewer) {

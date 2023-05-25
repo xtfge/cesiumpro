@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,69 +23,69 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb15512', './when-4bbc8319', './IndexDatatype-ee69f1fd', './ComponentDatatype-f194c48b', './OrientedBoundingBox-79e3c3fe', './createTaskProcessorWorker', './RuntimeError-346a3079', './Transforms-86b6fa28', './combine-83860057', './WebGLConstants-1c8239cc', './EllipsoidTangentPlane-164dcfc9', './AxisAlignedBoundingBox-4171efdd', './IntersectionTests-26599c5e', './Plane-4f333bc4'], (function (AttributeCompression, Matrix2, Color, when, IndexDatatype, ComponentDatatype, OrientedBoundingBox, createTaskProcessorWorker, RuntimeError, Transforms, combine, WebGLConstants, EllipsoidTangentPlane, AxisAlignedBoundingBox, IntersectionTests, Plane) { 'use strict';
+define(['./AttributeCompression-53c7fda2', './Matrix3-ea964448', './Color-7ea3613e', './defaultValue-135942ca', './IndexDatatype-fa75fe25', './Math-efde0c7b', './OrientedBoundingBox-14c97a6c', './Matrix2-f9f1b94b', './createTaskProcessorWorker', './ComponentDatatype-ebdce3ba', './Check-40d84a28', './WebGLConstants-fcb70ee3', './Transforms-ac2d28a9', './combine-462d91dd', './RuntimeError-f0dada00', './EllipsoidTangentPlane-244dda7a', './AxisAlignedBoundingBox-48df2a2e', './IntersectionTests-4ab30dca', './Plane-93af52b2'], (function (AttributeCompression, Matrix3, Color, defaultValue, IndexDatatype, Math$1, OrientedBoundingBox, Matrix2, createTaskProcessorWorker, ComponentDatatype, Check, WebGLConstants, Transforms, combine, RuntimeError, EllipsoidTangentPlane, AxisAlignedBoundingBox, IntersectionTests, Plane) { 'use strict';
 
-  var scratchCenter = new Matrix2.Cartesian3();
-  var scratchEllipsoid = new Matrix2.Ellipsoid();
-  var scratchRectangle = new Matrix2.Rectangle();
-  var scratchScalars = {
+  const scratchCenter = new Matrix3.Cartesian3();
+  const scratchEllipsoid = new Matrix3.Ellipsoid();
+  const scratchRectangle = new Matrix2.Rectangle();
+  const scratchScalars = {
     min: undefined,
     max: undefined,
     indexBytesPerElement: undefined,
   };
 
   function unpackBuffer(buffer) {
-    var packedBuffer = new Float64Array(buffer);
+    const packedBuffer = new Float64Array(buffer);
 
-    var offset = 0;
+    let offset = 0;
     scratchScalars.indexBytesPerElement = packedBuffer[offset++];
 
     scratchScalars.min = packedBuffer[offset++];
     scratchScalars.max = packedBuffer[offset++];
 
-    Matrix2.Cartesian3.unpack(packedBuffer, offset, scratchCenter);
-    offset += Matrix2.Cartesian3.packedLength;
+    Matrix3.Cartesian3.unpack(packedBuffer, offset, scratchCenter);
+    offset += Matrix3.Cartesian3.packedLength;
 
-    Matrix2.Ellipsoid.unpack(packedBuffer, offset, scratchEllipsoid);
-    offset += Matrix2.Ellipsoid.packedLength;
+    Matrix3.Ellipsoid.unpack(packedBuffer, offset, scratchEllipsoid);
+    offset += Matrix3.Ellipsoid.packedLength;
 
     Matrix2.Rectangle.unpack(packedBuffer, offset, scratchRectangle);
   }
 
   function packedBatchedIndicesLength(batchedIndices) {
-    var length = batchedIndices.length;
-    var count = 0;
-    for (var i = 0; i < length; ++i) {
+    const length = batchedIndices.length;
+    let count = 0;
+    for (let i = 0; i < length; ++i) {
       count += Color.Color.packedLength + 3 + batchedIndices[i].batchIds.length;
     }
     return count;
   }
 
   function packBuffer(indexDatatype, boundingVolumes, batchedIndices) {
-    var numBVs = boundingVolumes.length;
-    var length =
+    const numBVs = boundingVolumes.length;
+    const length =
       1 +
       1 +
       numBVs * OrientedBoundingBox.OrientedBoundingBox.packedLength +
       1 +
       packedBatchedIndicesLength(batchedIndices);
 
-    var packedBuffer = new Float64Array(length);
+    const packedBuffer = new Float64Array(length);
 
-    var offset = 0;
+    let offset = 0;
     packedBuffer[offset++] = indexDatatype;
     packedBuffer[offset++] = numBVs;
 
-    for (var i = 0; i < numBVs; ++i) {
+    for (let i = 0; i < numBVs; ++i) {
       OrientedBoundingBox.OrientedBoundingBox.pack(boundingVolumes[i], packedBuffer, offset);
       offset += OrientedBoundingBox.OrientedBoundingBox.packedLength;
     }
 
-    var indicesLength = batchedIndices.length;
+    const indicesLength = batchedIndices.length;
     packedBuffer[offset++] = indicesLength;
 
-    for (var j = 0; j < indicesLength; ++j) {
-      var batchedIndex = batchedIndices[j];
+    for (let j = 0; j < indicesLength; ++j) {
+      const batchedIndex = batchedIndices[j];
 
       Color.Color.pack(batchedIndex.color, packedBuffer, offset);
       offset += Color.Color.packedLength;
@@ -91,11 +93,11 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
       packedBuffer[offset++] = batchedIndex.offset;
       packedBuffer[offset++] = batchedIndex.count;
 
-      var batchIds = batchedIndex.batchIds;
-      var batchIdsLength = batchIds.length;
+      const batchIds = batchedIndex.batchIds;
+      const batchIdsLength = batchIds.length;
       packedBuffer[offset++] = batchIdsLength;
 
-      for (var k = 0; k < batchIdsLength; ++k) {
+      for (let k = 0; k < batchIdsLength; ++k) {
         packedBuffer[offset++] = batchIds[k];
       }
     }
@@ -103,78 +105,78 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
     return packedBuffer;
   }
 
-  var maxShort = 32767;
+  const maxShort = 32767;
 
-  var scratchEncodedPosition = new Matrix2.Cartesian3();
-  var scratchNormal = new Matrix2.Cartesian3();
-  var scratchScaledNormal = new Matrix2.Cartesian3();
-  var scratchMinHeightPosition = new Matrix2.Cartesian3();
-  var scratchMaxHeightPosition = new Matrix2.Cartesian3();
-  var scratchBVCartographic = new Matrix2.Cartographic();
-  var scratchBVRectangle = new Matrix2.Rectangle();
+  const scratchEncodedPosition = new Matrix3.Cartesian3();
+  const scratchNormal = new Matrix3.Cartesian3();
+  const scratchScaledNormal = new Matrix3.Cartesian3();
+  const scratchMinHeightPosition = new Matrix3.Cartesian3();
+  const scratchMaxHeightPosition = new Matrix3.Cartesian3();
+  const scratchBVCartographic = new Matrix3.Cartographic();
+  const scratchBVRectangle = new Matrix2.Rectangle();
 
   function createVectorTilePolygons(parameters, transferableObjects) {
     unpackBuffer(parameters.packedBuffer);
 
-    var indices;
-    var indexBytesPerElement = scratchScalars.indexBytesPerElement;
+    let indices;
+    const indexBytesPerElement = scratchScalars.indexBytesPerElement;
     if (indexBytesPerElement === 2) {
       indices = new Uint16Array(parameters.indices);
     } else {
       indices = new Uint32Array(parameters.indices);
     }
 
-    var positions = new Uint16Array(parameters.positions);
-    var counts = new Uint32Array(parameters.counts);
-    var indexCounts = new Uint32Array(parameters.indexCounts);
-    var batchIds = new Uint32Array(parameters.batchIds);
-    var batchTableColors = new Uint32Array(parameters.batchTableColors);
+    const positions = new Uint16Array(parameters.positions);
+    const counts = new Uint32Array(parameters.counts);
+    const indexCounts = new Uint32Array(parameters.indexCounts);
+    const batchIds = new Uint32Array(parameters.batchIds);
+    const batchTableColors = new Uint32Array(parameters.batchTableColors);
 
-    var boundingVolumes = new Array(counts.length);
+    const boundingVolumes = new Array(counts.length);
 
-    var center = scratchCenter;
-    var ellipsoid = scratchEllipsoid;
-    var rectangle = scratchRectangle;
-    var minHeight = scratchScalars.min;
-    var maxHeight = scratchScalars.max;
+    const center = scratchCenter;
+    const ellipsoid = scratchEllipsoid;
+    let rectangle = scratchRectangle;
+    const minHeight = scratchScalars.min;
+    const maxHeight = scratchScalars.max;
 
-    var minimumHeights = parameters.minimumHeights;
-    var maximumHeights = parameters.maximumHeights;
-    if (when.defined(minimumHeights) && when.defined(maximumHeights)) {
+    let minimumHeights = parameters.minimumHeights;
+    let maximumHeights = parameters.maximumHeights;
+    if (defaultValue.defined(minimumHeights) && defaultValue.defined(maximumHeights)) {
       minimumHeights = new Float32Array(minimumHeights);
       maximumHeights = new Float32Array(maximumHeights);
     }
 
-    var i;
-    var j;
-    var rgba;
+    let i;
+    let j;
+    let rgba;
 
-    var positionsLength = positions.length / 2;
-    var uBuffer = positions.subarray(0, positionsLength);
-    var vBuffer = positions.subarray(positionsLength, 2 * positionsLength);
+    const positionsLength = positions.length / 2;
+    const uBuffer = positions.subarray(0, positionsLength);
+    const vBuffer = positions.subarray(positionsLength, 2 * positionsLength);
     AttributeCompression.AttributeCompression.zigZagDeltaDecode(uBuffer, vBuffer);
 
-    var decodedPositions = new Float64Array(positionsLength * 3);
+    const decodedPositions = new Float64Array(positionsLength * 3);
     for (i = 0; i < positionsLength; ++i) {
-      var u = uBuffer[i];
-      var v = vBuffer[i];
+      const u = uBuffer[i];
+      const v = vBuffer[i];
 
-      var x = ComponentDatatype.CesiumMath.lerp(rectangle.west, rectangle.east, u / maxShort);
-      var y = ComponentDatatype.CesiumMath.lerp(rectangle.south, rectangle.north, v / maxShort);
+      const x = Math$1.CesiumMath.lerp(rectangle.west, rectangle.east, u / maxShort);
+      const y = Math$1.CesiumMath.lerp(rectangle.south, rectangle.north, v / maxShort);
 
-      var cart = Matrix2.Cartographic.fromRadians(x, y, 0.0, scratchBVCartographic);
-      var decodedPosition = ellipsoid.cartographicToCartesian(
+      const cart = Matrix3.Cartographic.fromRadians(x, y, 0.0, scratchBVCartographic);
+      const decodedPosition = ellipsoid.cartographicToCartesian(
         cart,
         scratchEncodedPosition
       );
-      Matrix2.Cartesian3.pack(decodedPosition, decodedPositions, i * 3);
+      Matrix3.Cartesian3.pack(decodedPosition, decodedPositions, i * 3);
     }
 
-    var countsLength = counts.length;
-    var offsets = new Array(countsLength);
-    var indexOffsets = new Array(countsLength);
-    var currentOffset = 0;
-    var currentIndexOffset = 0;
+    const countsLength = counts.length;
+    const offsets = new Array(countsLength);
+    const indexOffsets = new Array(countsLength);
+    let currentOffset = 0;
+    let currentIndexOffset = 0;
     for (i = 0; i < countsLength; ++i) {
       offsets[i] = currentOffset;
       indexOffsets[i] = currentIndexOffset;
@@ -183,16 +185,16 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
       currentIndexOffset += indexCounts[i];
     }
 
-    var batchedPositions = new Float32Array(positionsLength * 3 * 2);
-    var batchedIds = new Uint16Array(positionsLength * 2);
-    var batchedIndexOffsets = new Uint32Array(indexOffsets.length);
-    var batchedIndexCounts = new Uint32Array(indexCounts.length);
-    var batchedIndices = [];
+    const batchedPositions = new Float32Array(positionsLength * 3 * 2);
+    const batchedIds = new Uint16Array(positionsLength * 2);
+    const batchedIndexOffsets = new Uint32Array(indexOffsets.length);
+    const batchedIndexCounts = new Uint32Array(indexCounts.length);
+    let batchedIndices = [];
 
-    var colorToBuffers = {};
+    const colorToBuffers = {};
     for (i = 0; i < countsLength; ++i) {
       rgba = batchTableColors[i];
-      if (!when.defined(colorToBuffers[rgba])) {
+      if (!defaultValue.defined(colorToBuffers[rgba])) {
         colorToBuffers[rgba] = {
           positionLength: counts[i],
           indexLength: indexCounts[i],
@@ -208,17 +210,17 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
     }
 
     // get the offsets and counts for the positions and indices of each primitive
-    var buffer;
-    var byColorPositionOffset = 0;
-    var byColorIndexOffset = 0;
+    let buffer;
+    let byColorPositionOffset = 0;
+    let byColorIndexOffset = 0;
     for (rgba in colorToBuffers) {
       if (colorToBuffers.hasOwnProperty(rgba)) {
         buffer = colorToBuffers[rgba];
         buffer.offset = byColorPositionOffset;
         buffer.indexOffset = byColorIndexOffset;
 
-        var positionLength = buffer.positionLength * 2;
-        var indexLength = buffer.indexLength * 2 + buffer.positionLength * 6;
+        const positionLength = buffer.positionLength * 2;
+        const indexLength = buffer.indexLength * 2 + buffer.positionLength * 6;
 
         byColorPositionOffset += positionLength;
         byColorIndexOffset += indexLength;
@@ -227,7 +229,7 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
       }
     }
 
-    var batchedDrawCalls = [];
+    const batchedDrawCalls = [];
 
     for (rgba in colorToBuffers) {
       if (colorToBuffers.hasOwnProperty(rgba)) {
@@ -246,74 +248,74 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
       rgba = batchTableColors[i];
 
       buffer = colorToBuffers[rgba];
-      var positionOffset = buffer.offset;
-      var positionIndex = positionOffset * 3;
-      var batchIdIndex = positionOffset;
+      const positionOffset = buffer.offset;
+      let positionIndex = positionOffset * 3;
+      let batchIdIndex = positionOffset;
 
-      var polygonOffset = offsets[i];
-      var polygonCount = counts[i];
-      var batchId = batchIds[i];
+      const polygonOffset = offsets[i];
+      const polygonCount = counts[i];
+      const batchId = batchIds[i];
 
-      var polygonMinimumHeight = minHeight;
-      var polygonMaximumHeight = maxHeight;
-      if (when.defined(minimumHeights) && when.defined(maximumHeights)) {
+      let polygonMinimumHeight = minHeight;
+      let polygonMaximumHeight = maxHeight;
+      if (defaultValue.defined(minimumHeights) && defaultValue.defined(maximumHeights)) {
         polygonMinimumHeight = minimumHeights[i];
         polygonMaximumHeight = maximumHeights[i];
       }
 
-      var minLat = Number.POSITIVE_INFINITY;
-      var maxLat = Number.NEGATIVE_INFINITY;
-      var minLon = Number.POSITIVE_INFINITY;
-      var maxLon = Number.NEGATIVE_INFINITY;
+      let minLat = Number.POSITIVE_INFINITY;
+      let maxLat = Number.NEGATIVE_INFINITY;
+      let minLon = Number.POSITIVE_INFINITY;
+      let maxLon = Number.NEGATIVE_INFINITY;
 
       for (j = 0; j < polygonCount; ++j) {
-        var position = Matrix2.Cartesian3.unpack(
+        const position = Matrix3.Cartesian3.unpack(
           decodedPositions,
           polygonOffset * 3 + j * 3,
           scratchEncodedPosition
         );
         ellipsoid.scaleToGeodeticSurface(position, position);
 
-        var carto = ellipsoid.cartesianToCartographic(
+        const carto = ellipsoid.cartesianToCartographic(
           position,
           scratchBVCartographic
         );
-        var lat = carto.latitude;
-        var lon = carto.longitude;
+        const lat = carto.latitude;
+        const lon = carto.longitude;
 
         minLat = Math.min(lat, minLat);
         maxLat = Math.max(lat, maxLat);
         minLon = Math.min(lon, minLon);
         maxLon = Math.max(lon, maxLon);
 
-        var normal = ellipsoid.geodeticSurfaceNormal(position, scratchNormal);
-        var scaledNormal = Matrix2.Cartesian3.multiplyByScalar(
+        const normal = ellipsoid.geodeticSurfaceNormal(position, scratchNormal);
+        let scaledNormal = Matrix3.Cartesian3.multiplyByScalar(
           normal,
           polygonMinimumHeight,
           scratchScaledNormal
         );
-        var minHeightPosition = Matrix2.Cartesian3.add(
+        const minHeightPosition = Matrix3.Cartesian3.add(
           position,
           scaledNormal,
           scratchMinHeightPosition
         );
 
-        scaledNormal = Matrix2.Cartesian3.multiplyByScalar(
+        scaledNormal = Matrix3.Cartesian3.multiplyByScalar(
           normal,
           polygonMaximumHeight,
           scaledNormal
         );
-        var maxHeightPosition = Matrix2.Cartesian3.add(
+        const maxHeightPosition = Matrix3.Cartesian3.add(
           position,
           scaledNormal,
           scratchMaxHeightPosition
         );
 
-        Matrix2.Cartesian3.subtract(maxHeightPosition, center, maxHeightPosition);
-        Matrix2.Cartesian3.subtract(minHeightPosition, center, minHeightPosition);
+        Matrix3.Cartesian3.subtract(maxHeightPosition, center, maxHeightPosition);
+        Matrix3.Cartesian3.subtract(minHeightPosition, center, minHeightPosition);
 
-        Matrix2.Cartesian3.pack(maxHeightPosition, batchedPositions, positionIndex);
-        Matrix2.Cartesian3.pack(minHeightPosition, batchedPositions, positionIndex + 3);
+        Matrix3.Cartesian3.pack(maxHeightPosition, batchedPositions, positionIndex);
+        Matrix3.Cartesian3.pack(minHeightPosition, batchedPositions, positionIndex + 3);
 
         batchedIds[batchIdIndex] = batchId;
         batchedIds[batchIdIndex + 1] = batchId;
@@ -335,17 +337,17 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
         ellipsoid
       );
 
-      var indicesIndex = buffer.indexOffset;
+      let indicesIndex = buffer.indexOffset;
 
-      var indexOffset = indexOffsets[i];
-      var indexCount = indexCounts[i];
+      const indexOffset = indexOffsets[i];
+      const indexCount = indexCounts[i];
 
       batchedIndexOffsets[i] = indicesIndex;
 
       for (j = 0; j < indexCount; j += 3) {
-        var i0 = indices[indexOffset + j] - polygonOffset;
-        var i1 = indices[indexOffset + j + 1] - polygonOffset;
-        var i2 = indices[indexOffset + j + 2] - polygonOffset;
+        const i0 = indices[indexOffset + j] - polygonOffset;
+        const i1 = indices[indexOffset + j + 1] - polygonOffset;
+        const i2 = indices[indexOffset + j + 2] - polygonOffset;
 
         // triangle on the top of the extruded polygon
         batchedIndices[indicesIndex++] = i0 * 2 + positionOffset;
@@ -360,8 +362,8 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
 
       // indices for the walls of the extruded polygon
       for (j = 0; j < polygonCount; ++j) {
-        var v0 = j;
-        var v1 = (j + 1) % polygonCount;
+        const v0 = j;
+        const v1 = (j + 1) % polygonCount;
 
         batchedIndices[indicesIndex++] = v0 * 2 + 1 + positionOffset;
         batchedIndices[indicesIndex++] = v1 * 2 + positionOffset;
@@ -383,22 +385,22 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
       batchedIndices
     );
 
-    var batchedIndicesLength = batchedDrawCalls.length;
-    for (var m = 0; m < batchedIndicesLength; ++m) {
-      var tempIds = batchedDrawCalls[m].batchIds;
-      var count = 0;
-      var tempIdsLength = tempIds.length;
-      for (var n = 0; n < tempIdsLength; ++n) {
+    const batchedIndicesLength = batchedDrawCalls.length;
+    for (let m = 0; m < batchedIndicesLength; ++m) {
+      const tempIds = batchedDrawCalls[m].batchIds;
+      let count = 0;
+      const tempIdsLength = tempIds.length;
+      for (let n = 0; n < tempIdsLength; ++n) {
         count += batchedIndexCounts[tempIds[n]];
       }
       batchedDrawCalls[m].count = count;
     }
 
-    var indexDatatype =
+    const indexDatatype =
       batchedIndices.BYTES_PER_ELEMENT === 2
         ? IndexDatatype.IndexDatatype.UNSIGNED_SHORT
         : IndexDatatype.IndexDatatype.UNSIGNED_INT;
-    var packedBuffer = packBuffer(
+    const packedBuffer = packBuffer(
       indexDatatype,
       boundingVolumes,
       batchedDrawCalls
@@ -427,4 +429,3 @@ define(['./AttributeCompression-1f6679e1', './Matrix2-91d5b6af', './Color-0cb155
   return createVectorTilePolygons$1;
 
 }));
-//# sourceMappingURL=createVectorTilePolygons.js.map

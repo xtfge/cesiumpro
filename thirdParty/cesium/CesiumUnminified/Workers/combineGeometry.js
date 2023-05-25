@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +23,13 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./PrimitivePipeline-44fdb064', './createTaskProcessorWorker', './Transforms-86b6fa28', './Matrix2-91d5b6af', './RuntimeError-346a3079', './when-4bbc8319', './ComponentDatatype-f194c48b', './WebGLConstants-1c8239cc', './combine-83860057', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './GeometryPipeline-e3097c85', './AttributeCompression-1f6679e1', './EncodedCartesian3-882fbcbd', './IndexDatatype-ee69f1fd', './IntersectionTests-26599c5e', './Plane-4f333bc4', './WebMercatorProjection-c196164d'], (function (PrimitivePipeline, createTaskProcessorWorker, Transforms, Matrix2, RuntimeError, when, ComponentDatatype, WebGLConstants, combine, GeometryAttribute, GeometryAttributes, GeometryPipeline, AttributeCompression, EncodedCartesian3, IndexDatatype, IntersectionTests, Plane, WebMercatorProjection) { 'use strict';
+define(['./PrimitivePipeline-27f11d3f', './createTaskProcessorWorker', './Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84a28', './defaultValue-135942ca', './Math-efde0c7b', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './ComponentDatatype-ebdce3ba', './WebGLConstants-fcb70ee3', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './GeometryPipeline-576f16cd', './AttributeCompression-53c7fda2', './EncodedCartesian3-4040c81e', './IndexDatatype-fa75fe25', './IntersectionTests-4ab30dca', './Plane-93af52b2', './WebMercatorProjection-7dd32693'], (function (PrimitivePipeline, createTaskProcessorWorker, Transforms, Matrix3, Check, defaultValue, Math, Matrix2, RuntimeError, combine, ComponentDatatype, WebGLConstants, GeometryAttribute, GeometryAttributes, GeometryPipeline, AttributeCompression, EncodedCartesian3, IndexDatatype, IntersectionTests, Plane, WebMercatorProjection) { 'use strict';
 
   function combineGeometry(packedParameters, transferableObjects) {
-    var parameters = PrimitivePipeline.PrimitivePipeline.unpackCombineGeometryParameters(
+    const parameters = PrimitivePipeline.PrimitivePipeline.unpackCombineGeometryParameters(
       packedParameters
     );
-    var results = PrimitivePipeline.PrimitivePipeline.combineGeometry(parameters);
+    const results = PrimitivePipeline.PrimitivePipeline.combineGeometry(parameters);
     return PrimitivePipeline.PrimitivePipeline.packCombineGeometryResults(
       results,
       transferableObjects
@@ -38,4 +40,3 @@ define(['./PrimitivePipeline-44fdb064', './createTaskProcessorWorker', './Transf
   return combineGeometry$1;
 
 }));
-//# sourceMappingURL=combineGeometry.js.map

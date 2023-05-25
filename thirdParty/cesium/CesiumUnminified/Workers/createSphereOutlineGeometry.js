@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +23,7 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './EllipsoidOutlineGeometry-ee987302', './ComponentDatatype-f194c48b', './WebGLConstants-1c8239cc', './GeometryOffsetAttribute-6a692b56', './Transforms-86b6fa28', './combine-83860057', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './IndexDatatype-ee69f1fd'], (function (when, Matrix2, RuntimeError, EllipsoidOutlineGeometry, ComponentDatatype, WebGLConstants, GeometryOffsetAttribute, Transforms, combine, GeometryAttribute, GeometryAttributes, IndexDatatype) { 'use strict';
+define(['./defaultValue-135942ca', './Matrix3-ea964448', './Check-40d84a28', './EllipsoidOutlineGeometry-b2ff16b8', './Math-efde0c7b', './Transforms-ac2d28a9', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './ComponentDatatype-ebdce3ba', './WebGLConstants-fcb70ee3', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './GeometryOffsetAttribute-d3a42805', './IndexDatatype-fa75fe25'], (function (defaultValue, Matrix3, Check, EllipsoidOutlineGeometry, Math, Transforms, Matrix2, RuntimeError, combine, ComponentDatatype, WebGLConstants, GeometryAttribute, GeometryAttributes, GeometryOffsetAttribute, IndexDatatype) { 'use strict';
 
   /**
    * A description of the outline of a sphere.
@@ -40,17 +42,17 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
    * @exception {DeveloperError} options.subdivisions must be greater than or equal to zero.
    *
    * @example
-   * var sphere = new Cesium.SphereOutlineGeometry({
+   * const sphere = new Cesium.SphereOutlineGeometry({
    *   radius : 100.0,
    *   stackPartitions : 6,
    *   slicePartitions: 5
    * });
-   * var geometry = Cesium.SphereOutlineGeometry.createGeometry(sphere);
+   * const geometry = Cesium.SphereOutlineGeometry.createGeometry(sphere);
    */
   function SphereOutlineGeometry(options) {
-    var radius = when.defaultValue(options.radius, 1.0);
-    var radii = new Matrix2.Cartesian3(radius, radius, radius);
-    var ellipsoidOptions = {
+    const radius = defaultValue.defaultValue(options.radius, 1.0);
+    const radii = new Matrix3.Cartesian3(radius, radius, radius);
+    const ellipsoidOptions = {
       radii: radii,
       stackPartitions: options.stackPartitions,
       slicePartitions: options.slicePartitions,
@@ -78,7 +80,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
    */
   SphereOutlineGeometry.pack = function (value, array, startingIndex) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.typeOf.object("value", value);
+    Check.Check.typeOf.object("value", value);
     //>>includeEnd('debug');
 
     return EllipsoidOutlineGeometry.EllipsoidOutlineGeometry.pack(
@@ -88,10 +90,10 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
     );
   };
 
-  var scratchEllipsoidGeometry = new EllipsoidOutlineGeometry.EllipsoidOutlineGeometry();
-  var scratchOptions = {
+  const scratchEllipsoidGeometry = new EllipsoidOutlineGeometry.EllipsoidOutlineGeometry();
+  const scratchOptions = {
     radius: undefined,
-    radii: new Matrix2.Cartesian3(),
+    radii: new Matrix3.Cartesian3(),
     stackPartitions: undefined,
     slicePartitions: undefined,
     subdivisions: undefined,
@@ -106,7 +108,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
    * @returns {SphereOutlineGeometry} The modified result parameter or a new SphereOutlineGeometry instance if one was not provided.
    */
   SphereOutlineGeometry.unpack = function (array, startingIndex, result) {
-    var ellipsoidGeometry = EllipsoidOutlineGeometry.EllipsoidOutlineGeometry.unpack(
+    const ellipsoidGeometry = EllipsoidOutlineGeometry.EllipsoidOutlineGeometry.unpack(
       array,
       startingIndex,
       scratchEllipsoidGeometry
@@ -115,12 +117,12 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
     scratchOptions.slicePartitions = ellipsoidGeometry._slicePartitions;
     scratchOptions.subdivisions = ellipsoidGeometry._subdivisions;
 
-    if (!when.defined(result)) {
+    if (!defaultValue.defined(result)) {
       scratchOptions.radius = ellipsoidGeometry._radii.x;
       return new SphereOutlineGeometry(scratchOptions);
     }
 
-    Matrix2.Cartesian3.clone(ellipsoidGeometry._radii, scratchOptions.radii);
+    Matrix3.Cartesian3.clone(ellipsoidGeometry._radii, scratchOptions.radii);
     result._ellipsoidGeometry = new EllipsoidOutlineGeometry.EllipsoidOutlineGeometry(scratchOptions);
     return result;
   };
@@ -138,7 +140,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
   };
 
   function createSphereOutlineGeometry(sphereGeometry, offset) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       sphereGeometry = SphereOutlineGeometry.unpack(sphereGeometry, offset);
     }
     return SphereOutlineGeometry.createGeometry(sphereGeometry);
@@ -147,4 +149,3 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './RuntimeError-346a3079', './E
   return createSphereOutlineGeometry;
 
 }));
-//# sourceMappingURL=createSphereOutlineGeometry.js.map

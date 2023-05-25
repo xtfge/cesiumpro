@@ -45,7 +45,17 @@
         //         semiMinorAxis: 10000
         //     }
         // })
-        
+        const cc = viewer.entities.add({
+            position:Cesium.Cartesian3.fromDegrees(107.766, 34.548),
+            cylinder: {
+                bottomRadius: 10000,
+                topRadius: 10000,
+                length: 20000,
+                fill:false,
+                material: '../data/img/colors.png'
+            }
+        })
+        viewer.flyTo(cc)
         const gui = new GUI();
         const parameters = {
             color: '#FF0000',
@@ -62,7 +72,7 @@
                 window.graphic = new CesiumPro.DynamicConeGraphic({
                     position: new CesiumPro.LonLat(107.766, 34.548),
                     radius: 1000,
-                    color: '#FF000099',
+                    color: '#FF0000',
                     speed: parameters['速度']
                 });
                 parent.graphic = graphic;
@@ -73,7 +83,7 @@
                 graphic.remove();
                 window.graphic = null;
             },
-            '颜色': '#FF000099',
+            '颜色': '#FF0000',
             '速度': 1,
             "贴地": false
 

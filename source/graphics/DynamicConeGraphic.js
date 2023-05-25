@@ -127,13 +127,13 @@ class DynamicConeGraphic extends PointBaseGraphic {
             this.createCylinder(this._radius * 0.35, appearance3, this._asynchronous);
             this.createCylinder(this._radius * 0.4, appearance4, this._asynchronous)
         } else {
-            this.createCirclePrimitive(appearance1, this._asynchronous);
-            this.createCirclePrimitive(appearance2, this._asynchronous);
-            this.createCylinder(this._radius * 0.35, appearance3, this._asynchronous);
-            this.createCylinder(this._radius * 0.4, appearance4, this._asynchronous);
+            // this.createCirclePrimitive(appearance1, this._asynchronous);
+            // this.createCirclePrimitive(appearance2, this._asynchronous);
+            // this.createCylinder(0, this._radius * 0.35, appearance3, this._asynchronous);
+            this.createCylinder(this._radius * 0.4, this._radius * 0.4, appearance4, this._asynchronous);
         }
     }
-    createCylinder(radius, appearance, asynchronous = true) {
+    createCylinder(topRadius, bottmRadius, appearance, asynchronous = true) {
         if (this.isDestroyed()) {
             return;
         }
@@ -142,9 +142,8 @@ class DynamicConeGraphic extends PointBaseGraphic {
         const translation = Matrix4.fromTranslation(new Cartesian3(0, 0, length / 2 + this._height))
         Matrix4.multiply(matrix, translation, matrix);
         const geometry = new CylinderGeometry({
-            radius: this._radius,
-            topRadius: 0,
-            bottomRadius: radius,
+            topRadius: topRadius,
+            bottomRadius: bottmRadius,
             length,
         })
         const primitive = new Primitive({
@@ -224,7 +223,7 @@ class DynamicConeGraphic extends PointBaseGraphic {
                 fabric: {
                     uniforms: {
                         color: this._color,
-                        image: this._image,
+                        image: `data:image/png;base64,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`,
                         speed: this._speed
                     },
                     source: shader//baseMaterialShader

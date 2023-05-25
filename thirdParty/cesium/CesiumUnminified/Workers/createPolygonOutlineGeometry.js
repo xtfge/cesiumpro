@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +23,10 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './GeometryOffsetAttribute-6a692b56', './Transforms-86b6fa28', './RuntimeError-346a3079', './ComponentDatatype-f194c48b', './EllipsoidTangentPlane-164dcfc9', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './GeometryInstance-a3cff41c', './GeometryPipeline-e3097c85', './IndexDatatype-ee69f1fd', './PolygonGeometryLibrary-110b8a9d', './PolygonPipeline-d65e2b8f', './combine-83860057', './WebGLConstants-1c8239cc', './AxisAlignedBoundingBox-4171efdd', './IntersectionTests-26599c5e', './Plane-4f333bc4', './AttributeCompression-1f6679e1', './EncodedCartesian3-882fbcbd', './arrayRemoveDuplicates-cf5c3227', './EllipsoidRhumbLine-447d6334'], (function (when, Matrix2, ArcType, GeometryOffsetAttribute, Transforms, RuntimeError, ComponentDatatype, EllipsoidTangentPlane, GeometryAttribute, GeometryAttributes, GeometryInstance, GeometryPipeline, IndexDatatype, PolygonGeometryLibrary, PolygonPipeline, combine, WebGLConstants, AxisAlignedBoundingBox, IntersectionTests, Plane, AttributeCompression, EncodedCartesian3, arrayRemoveDuplicates, EllipsoidRhumbLine) { 'use strict';
+define(['./defaultValue-135942ca', './Matrix3-ea964448', './ArcType-89067bf8', './Transforms-ac2d28a9', './Check-40d84a28', './ComponentDatatype-ebdce3ba', './EllipsoidTangentPlane-244dda7a', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './GeometryInstance-bb34b63f', './GeometryOffsetAttribute-d3a42805', './GeometryPipeline-576f16cd', './IndexDatatype-fa75fe25', './Math-efde0c7b', './PolygonGeometryLibrary-81e6c436', './PolygonPipeline-cf232713', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './WebGLConstants-fcb70ee3', './AxisAlignedBoundingBox-48df2a2e', './IntersectionTests-4ab30dca', './Plane-93af52b2', './AttributeCompression-53c7fda2', './EncodedCartesian3-4040c81e', './arrayRemoveDuplicates-3fb00ed2', './EllipsoidRhumbLine-6161ec8c'], (function (defaultValue, Matrix3, ArcType, Transforms, Check, ComponentDatatype, EllipsoidTangentPlane, GeometryAttribute, GeometryAttributes, GeometryInstance, GeometryOffsetAttribute, GeometryPipeline, IndexDatatype, Math$1, PolygonGeometryLibrary, PolygonPipeline, Matrix2, RuntimeError, combine, WebGLConstants, AxisAlignedBoundingBox, IntersectionTests, Plane, AttributeCompression, EncodedCartesian3, arrayRemoveDuplicates, EllipsoidRhumbLine) { 'use strict';
 
-  var createGeometryFromPositionsPositions = [];
-  var createGeometryFromPositionsSubdivided = [];
+  const createGeometryFromPositionsPositions = [];
+  const createGeometryFromPositionsSubdivided = [];
 
   function createGeometryFromPositions(
     ellipsoid,
@@ -33,26 +35,28 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     perPositionHeight,
     arcType
   ) {
-    var tangentPlane = EllipsoidTangentPlane.EllipsoidTangentPlane.fromPoints(positions, ellipsoid);
-    var positions2D = tangentPlane.projectPointsOntoPlane(
+    const tangentPlane = EllipsoidTangentPlane.EllipsoidTangentPlane.fromPoints(positions, ellipsoid);
+    const positions2D = tangentPlane.projectPointsOntoPlane(
       positions,
       createGeometryFromPositionsPositions
     );
 
-    var originalWindingOrder = PolygonPipeline.PolygonPipeline.computeWindingOrder2D(positions2D);
+    const originalWindingOrder = PolygonPipeline.PolygonPipeline.computeWindingOrder2D(
+      positions2D
+    );
     if (originalWindingOrder === PolygonPipeline.WindingOrder.CLOCKWISE) {
       positions2D.reverse();
       positions = positions.slice().reverse();
     }
 
-    var subdividedPositions;
-    var i;
+    let subdividedPositions;
+    let i;
 
-    var length = positions.length;
-    var index = 0;
+    let length = positions.length;
+    let index = 0;
 
     if (!perPositionHeight) {
-      var numVertices = 0;
+      let numVertices = 0;
       if (arcType === ArcType.ArcType.GEODESIC) {
         for (i = 0; i < length; i++) {
           numVertices += PolygonGeometryLibrary.PolygonGeometryLibrary.subdivideLineCount(
@@ -73,7 +77,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
       }
       subdividedPositions = new Float64Array(numVertices * 3);
       for (i = 0; i < length; i++) {
-        var tempPositions;
+        let tempPositions;
         if (arcType === ArcType.ArcType.GEODESIC) {
           tempPositions = PolygonGeometryLibrary.PolygonGeometryLibrary.subdivideLine(
             positions[i],
@@ -90,16 +94,16 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
             createGeometryFromPositionsSubdivided
           );
         }
-        var tempPositionsLength = tempPositions.length;
-        for (var j = 0; j < tempPositionsLength; ++j) {
+        const tempPositionsLength = tempPositions.length;
+        for (let j = 0; j < tempPositionsLength; ++j) {
           subdividedPositions[index++] = tempPositions[j];
         }
       }
     } else {
       subdividedPositions = new Float64Array(length * 2 * 3);
       for (i = 0; i < length; i++) {
-        var p0 = positions[i];
-        var p1 = positions[(i + 1) % length];
+        const p0 = positions[i];
+        const p1 = positions[(i + 1) % length];
         subdividedPositions[index++] = p0.x;
         subdividedPositions[index++] = p0.y;
         subdividedPositions[index++] = p0.z;
@@ -110,8 +114,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     }
 
     length = subdividedPositions.length / 3;
-    var indicesSize = length * 2;
-    var indices = IndexDatatype.IndexDatatype.createTypedArray(length, indicesSize);
+    const indicesSize = length * 2;
+    const indices = IndexDatatype.IndexDatatype.createTypedArray(length, indicesSize);
     index = 0;
     for (i = 0; i < length - 1; i++) {
       indices[index++] = i;
@@ -142,27 +146,29 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     perPositionHeight,
     arcType
   ) {
-    var tangentPlane = EllipsoidTangentPlane.EllipsoidTangentPlane.fromPoints(positions, ellipsoid);
-    var positions2D = tangentPlane.projectPointsOntoPlane(
+    const tangentPlane = EllipsoidTangentPlane.EllipsoidTangentPlane.fromPoints(positions, ellipsoid);
+    const positions2D = tangentPlane.projectPointsOntoPlane(
       positions,
       createGeometryFromPositionsPositions
     );
 
-    var originalWindingOrder = PolygonPipeline.PolygonPipeline.computeWindingOrder2D(positions2D);
+    const originalWindingOrder = PolygonPipeline.PolygonPipeline.computeWindingOrder2D(
+      positions2D
+    );
     if (originalWindingOrder === PolygonPipeline.WindingOrder.CLOCKWISE) {
       positions2D.reverse();
       positions = positions.slice().reverse();
     }
 
-    var subdividedPositions;
-    var i;
+    let subdividedPositions;
+    let i;
 
-    var length = positions.length;
-    var corners = new Array(length);
-    var index = 0;
+    let length = positions.length;
+    const corners = new Array(length);
+    let index = 0;
 
     if (!perPositionHeight) {
-      var numVertices = 0;
+      let numVertices = 0;
       if (arcType === ArcType.ArcType.GEODESIC) {
         for (i = 0; i < length; i++) {
           numVertices += PolygonGeometryLibrary.PolygonGeometryLibrary.subdivideLineCount(
@@ -185,7 +191,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
       subdividedPositions = new Float64Array(numVertices * 3 * 2);
       for (i = 0; i < length; ++i) {
         corners[i] = index / 3;
-        var tempPositions;
+        let tempPositions;
         if (arcType === ArcType.ArcType.GEODESIC) {
           tempPositions = PolygonGeometryLibrary.PolygonGeometryLibrary.subdivideLine(
             positions[i],
@@ -202,8 +208,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
             createGeometryFromPositionsSubdivided
           );
         }
-        var tempPositionsLength = tempPositions.length;
-        for (var j = 0; j < tempPositionsLength; ++j) {
+        const tempPositionsLength = tempPositions.length;
+        for (let j = 0; j < tempPositionsLength; ++j) {
           subdividedPositions[index++] = tempPositions[j];
         }
       }
@@ -211,8 +217,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
       subdividedPositions = new Float64Array(length * 2 * 3 * 2);
       for (i = 0; i < length; ++i) {
         corners[i] = index / 3;
-        var p0 = positions[i];
-        var p1 = positions[(i + 1) % length];
+        const p0 = positions[i];
+        const p1 = positions[(i + 1) % length];
 
         subdividedPositions[index++] = p0.x;
         subdividedPositions[index++] = p0.y;
@@ -224,10 +230,10 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     }
 
     length = subdividedPositions.length / (3 * 2);
-    var cornersLength = corners.length;
+    const cornersLength = corners.length;
 
-    var indicesSize = (length * 2 + cornersLength) * 2;
-    var indices = IndexDatatype.IndexDatatype.createTypedArray(
+    const indicesSize = (length * 2 + cornersLength) * 2;
+    const indices = IndexDatatype.IndexDatatype.createTypedArray(
       length + cornersLength,
       indicesSize
     );
@@ -241,7 +247,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     }
 
     for (i = 0; i < cornersLength; i++) {
-      var corner = corners[i];
+      const corner = corners[i];
       indices[index++] = corner;
       indices[index++] = corner + length;
     }
@@ -282,7 +288,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *
    * @example
    * // 1. create a polygon outline from points
-   * var polygon = new Cesium.PolygonOutlineGeometry({
+   * const polygon = new Cesium.PolygonOutlineGeometry({
    *   polygonHierarchy : new Cesium.PolygonHierarchy(
    *     Cesium.Cartesian3.fromDegreesArray([
    *       -72.0, 40.0,
@@ -293,10 +299,10 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *     ])
    *   )
    * });
-   * var geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygon);
+   * const geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygon);
    *
    * // 2. create a nested polygon with holes outline
-   * var polygonWithHole = new Cesium.PolygonOutlineGeometry({
+   * const polygonWithHole = new Cesium.PolygonOutlineGeometry({
    *   polygonHierarchy : new Cesium.PolygonHierarchy(
    *     Cesium.Cartesian3.fromDegreesArray([
    *       -109.0, 30.0,
@@ -330,10 +336,10 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *     )]
    *   )
    * });
-   * var geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygonWithHole);
+   * const geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygonWithHole);
    *
    * // 3. create extruded polygon outline
-   * var extrudedPolygon = new Cesium.PolygonOutlineGeometry({
+   * const extrudedPolygon = new Cesium.PolygonOutlineGeometry({
    *   polygonHierarchy : new Cesium.PolygonHierarchy(
    *     Cesium.Cartesian3.fromDegreesArray([
    *       -72.0, 40.0,
@@ -345,50 +351,50 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *   ),
    *   extrudedHeight: 300000
    * });
-   * var geometry = Cesium.PolygonOutlineGeometry.createGeometry(extrudedPolygon);
+   * const geometry = Cesium.PolygonOutlineGeometry.createGeometry(extrudedPolygon);
    */
   function PolygonOutlineGeometry(options) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.typeOf.object("options", options);
-    RuntimeError.Check.typeOf.object("options.polygonHierarchy", options.polygonHierarchy);
+    Check.Check.typeOf.object("options", options);
+    Check.Check.typeOf.object("options.polygonHierarchy", options.polygonHierarchy);
 
-    if (options.perPositionHeight && when.defined(options.height)) {
-      throw new RuntimeError.DeveloperError(
+    if (options.perPositionHeight && defaultValue.defined(options.height)) {
+      throw new Check.DeveloperError(
         "Cannot use both options.perPositionHeight and options.height"
       );
     }
     if (
-      when.defined(options.arcType) &&
+      defaultValue.defined(options.arcType) &&
       options.arcType !== ArcType.ArcType.GEODESIC &&
       options.arcType !== ArcType.ArcType.RHUMB
     ) {
-      throw new RuntimeError.DeveloperError(
+      throw new Check.DeveloperError(
         "Invalid arcType. Valid options are ArcType.GEODESIC and ArcType.RHUMB."
       );
     }
     //>>includeEnd('debug');
 
-    var polygonHierarchy = options.polygonHierarchy;
-    var ellipsoid = when.defaultValue(options.ellipsoid, Matrix2.Ellipsoid.WGS84);
-    var granularity = when.defaultValue(
+    const polygonHierarchy = options.polygonHierarchy;
+    const ellipsoid = defaultValue.defaultValue(options.ellipsoid, Matrix3.Ellipsoid.WGS84);
+    const granularity = defaultValue.defaultValue(
       options.granularity,
-      ComponentDatatype.CesiumMath.RADIANS_PER_DEGREE
+      Math$1.CesiumMath.RADIANS_PER_DEGREE
     );
-    var perPositionHeight = when.defaultValue(options.perPositionHeight, false);
-    var perPositionHeightExtrude =
-      perPositionHeight && when.defined(options.extrudedHeight);
-    var arcType = when.defaultValue(options.arcType, ArcType.ArcType.GEODESIC);
+    const perPositionHeight = defaultValue.defaultValue(options.perPositionHeight, false);
+    const perPositionHeightExtrude =
+      perPositionHeight && defaultValue.defined(options.extrudedHeight);
+    const arcType = defaultValue.defaultValue(options.arcType, ArcType.ArcType.GEODESIC);
 
-    var height = when.defaultValue(options.height, 0.0);
-    var extrudedHeight = when.defaultValue(options.extrudedHeight, height);
+    let height = defaultValue.defaultValue(options.height, 0.0);
+    let extrudedHeight = defaultValue.defaultValue(options.extrudedHeight, height);
 
     if (!perPositionHeightExtrude) {
-      var h = Math.max(height, extrudedHeight);
+      const h = Math.max(height, extrudedHeight);
       extrudedHeight = Math.min(height, extrudedHeight);
       height = h;
     }
 
-    this._ellipsoid = Matrix2.Ellipsoid.clone(ellipsoid);
+    this._ellipsoid = Matrix3.Ellipsoid.clone(ellipsoid);
     this._granularity = granularity;
     this._height = height;
     this._extrudedHeight = extrudedHeight;
@@ -404,8 +410,11 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
      * @type {Number}
      */
     this.packedLength =
-      PolygonGeometryLibrary.PolygonGeometryLibrary.computeHierarchyPackedLength(polygonHierarchy) +
-      Matrix2.Ellipsoid.packedLength +
+      PolygonGeometryLibrary.PolygonGeometryLibrary.computeHierarchyPackedLength(
+        polygonHierarchy,
+        Matrix3.Cartesian3
+      ) +
+      Matrix3.Ellipsoid.packedLength +
       8;
   }
 
@@ -420,20 +429,21 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    */
   PolygonOutlineGeometry.pack = function (value, array, startingIndex) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.typeOf.object("value", value);
-    RuntimeError.Check.defined("array", array);
+    Check.Check.typeOf.object("value", value);
+    Check.Check.defined("array", array);
     //>>includeEnd('debug');
 
-    startingIndex = when.defaultValue(startingIndex, 0);
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
 
     startingIndex = PolygonGeometryLibrary.PolygonGeometryLibrary.packPolygonHierarchy(
       value._polygonHierarchy,
       array,
-      startingIndex
+      startingIndex,
+      Matrix3.Cartesian3
     );
 
-    Matrix2.Ellipsoid.pack(value._ellipsoid, array, startingIndex);
-    startingIndex += Matrix2.Ellipsoid.packedLength;
+    Matrix3.Ellipsoid.pack(value._ellipsoid, array, startingIndex);
+    startingIndex += Matrix3.Ellipsoid.packedLength;
 
     array[startingIndex++] = value._height;
     array[startingIndex++] = value._extrudedHeight;
@@ -441,14 +451,14 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
     array[startingIndex++] = value._perPositionHeightExtrude ? 1.0 : 0.0;
     array[startingIndex++] = value._perPositionHeight ? 1.0 : 0.0;
     array[startingIndex++] = value._arcType;
-    array[startingIndex++] = when.defaultValue(value._offsetAttribute, -1);
+    array[startingIndex++] = defaultValue.defaultValue(value._offsetAttribute, -1);
     array[startingIndex] = value.packedLength;
 
     return array;
   };
 
-  var scratchEllipsoid = Matrix2.Ellipsoid.clone(Matrix2.Ellipsoid.UNIT_SPHERE);
-  var dummyOptions = {
+  const scratchEllipsoid = Matrix3.Ellipsoid.clone(Matrix3.Ellipsoid.UNIT_SPHERE);
+  const dummyOptions = {
     polygonHierarchy: {},
   };
 
@@ -462,36 +472,37 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    */
   PolygonOutlineGeometry.unpack = function (array, startingIndex, result) {
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.defined("array", array);
+    Check.Check.defined("array", array);
     //>>includeEnd('debug');
 
-    startingIndex = when.defaultValue(startingIndex, 0);
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
 
-    var polygonHierarchy = PolygonGeometryLibrary.PolygonGeometryLibrary.unpackPolygonHierarchy(
+    const polygonHierarchy = PolygonGeometryLibrary.PolygonGeometryLibrary.unpackPolygonHierarchy(
       array,
-      startingIndex
+      startingIndex,
+      Matrix3.Cartesian3
     );
     startingIndex = polygonHierarchy.startingIndex;
     delete polygonHierarchy.startingIndex;
 
-    var ellipsoid = Matrix2.Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
-    startingIndex += Matrix2.Ellipsoid.packedLength;
+    const ellipsoid = Matrix3.Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
+    startingIndex += Matrix3.Ellipsoid.packedLength;
 
-    var height = array[startingIndex++];
-    var extrudedHeight = array[startingIndex++];
-    var granularity = array[startingIndex++];
-    var perPositionHeightExtrude = array[startingIndex++] === 1.0;
-    var perPositionHeight = array[startingIndex++] === 1.0;
-    var arcType = array[startingIndex++];
-    var offsetAttribute = array[startingIndex++];
-    var packedLength = array[startingIndex];
+    const height = array[startingIndex++];
+    const extrudedHeight = array[startingIndex++];
+    const granularity = array[startingIndex++];
+    const perPositionHeightExtrude = array[startingIndex++] === 1.0;
+    const perPositionHeight = array[startingIndex++] === 1.0;
+    const arcType = array[startingIndex++];
+    const offsetAttribute = array[startingIndex++];
+    const packedLength = array[startingIndex];
 
-    if (!when.defined(result)) {
+    if (!defaultValue.defined(result)) {
       result = new PolygonOutlineGeometry(dummyOptions);
     }
 
     result._polygonHierarchy = polygonHierarchy;
-    result._ellipsoid = Matrix2.Ellipsoid.clone(ellipsoid, result._ellipsoid);
+    result._ellipsoid = Matrix3.Ellipsoid.clone(ellipsoid, result._ellipsoid);
     result._height = height;
     result._extrudedHeight = extrudedHeight;
     result._granularity = granularity;
@@ -521,7 +532,7 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *
    * @example
    * // create a polygon from points
-   * var polygon = Cesium.PolygonOutlineGeometry.fromPositions({
+   * const polygon = Cesium.PolygonOutlineGeometry.fromPositions({
    *   positions : Cesium.Cartesian3.fromDegreesArray([
    *     -72.0, 40.0,
    *     -70.0, 35.0,
@@ -530,18 +541,18 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    *     -68.0, 40.0
    *   ])
    * });
-   * var geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygon);
+   * const geometry = Cesium.PolygonOutlineGeometry.createGeometry(polygon);
    *
    * @see PolygonOutlineGeometry#createGeometry
    */
   PolygonOutlineGeometry.fromPositions = function (options) {
-    options = when.defaultValue(options, when.defaultValue.EMPTY_OBJECT);
+    options = defaultValue.defaultValue(options, defaultValue.defaultValue.EMPTY_OBJECT);
 
     //>>includeStart('debug', pragmas.debug);
-    RuntimeError.Check.defined("options.positions", options.positions);
+    Check.Check.defined("options.positions", options.positions);
     //>>includeEnd('debug');
 
-    var newOptions = {
+    const newOptions = {
       polygonHierarchy: {
         positions: options.positions,
       },
@@ -563,13 +574,13 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
    * @returns {Geometry|undefined} The computed vertices and indices.
    */
   PolygonOutlineGeometry.createGeometry = function (polygonGeometry) {
-    var ellipsoid = polygonGeometry._ellipsoid;
-    var granularity = polygonGeometry._granularity;
-    var polygonHierarchy = polygonGeometry._polygonHierarchy;
-    var perPositionHeight = polygonGeometry._perPositionHeight;
-    var arcType = polygonGeometry._arcType;
+    const ellipsoid = polygonGeometry._ellipsoid;
+    const granularity = polygonGeometry._granularity;
+    const polygonHierarchy = polygonGeometry._polygonHierarchy;
+    const perPositionHeight = polygonGeometry._perPositionHeight;
+    const arcType = polygonGeometry._arcType;
 
-    var polygons = PolygonGeometryLibrary.PolygonGeometryLibrary.polygonOutlinesFromHierarchy(
+    const polygons = PolygonGeometryLibrary.PolygonGeometryLibrary.polygonOutlinesFromHierarchy(
       polygonHierarchy,
       !perPositionHeight,
       ellipsoid
@@ -579,20 +590,20 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
       return undefined;
     }
 
-    var geometryInstance;
-    var geometries = [];
-    var minDistance = ComponentDatatype.CesiumMath.chordLength(
+    let geometryInstance;
+    const geometries = [];
+    const minDistance = Math$1.CesiumMath.chordLength(
       granularity,
       ellipsoid.maximumRadius
     );
 
-    var height = polygonGeometry._height;
-    var extrudedHeight = polygonGeometry._extrudedHeight;
-    var extrude =
+    const height = polygonGeometry._height;
+    const extrudedHeight = polygonGeometry._extrudedHeight;
+    const extrude =
       polygonGeometry._perPositionHeightExtrude ||
-      !ComponentDatatype.CesiumMath.equalsEpsilon(height, extrudedHeight, 0, ComponentDatatype.CesiumMath.EPSILON2);
-    var offsetValue;
-    var i;
+      !Math$1.CesiumMath.equalsEpsilon(height, extrudedHeight, 0, Math$1.CesiumMath.EPSILON2);
+    let offsetValue;
+    let i;
     if (extrude) {
       for (i = 0; i < polygons.length; i++) {
         geometryInstance = createGeometryFromPositionsExtruded(
@@ -609,18 +620,18 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
           ellipsoid,
           perPositionHeight
         );
-        if (when.defined(polygonGeometry._offsetAttribute)) {
-          var size =
+        if (defaultValue.defined(polygonGeometry._offsetAttribute)) {
+          const size =
             geometryInstance.geometry.attributes.position.values.length / 3;
-          var offsetAttribute = new Uint8Array(size);
+          let offsetAttribute = new Uint8Array(size);
           if (polygonGeometry._offsetAttribute === GeometryOffsetAttribute.GeometryOffsetAttribute.TOP) {
-            offsetAttribute = GeometryOffsetAttribute.arrayFill(offsetAttribute, 1, 0, size / 2);
+            offsetAttribute = offsetAttribute.fill(1, 0, size / 2);
           } else {
             offsetValue =
               polygonGeometry._offsetAttribute === GeometryOffsetAttribute.GeometryOffsetAttribute.NONE
                 ? 0
                 : 1;
-            offsetAttribute = GeometryOffsetAttribute.arrayFill(offsetAttribute, offsetValue);
+            offsetAttribute = offsetAttribute.fill(offsetValue);
           }
 
           geometryInstance.geometry.attributes.applyOffset = new GeometryAttribute.GeometryAttribute(
@@ -649,15 +660,14 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
           !perPositionHeight
         );
 
-        if (when.defined(polygonGeometry._offsetAttribute)) {
-          var length =
+        if (defaultValue.defined(polygonGeometry._offsetAttribute)) {
+          const length =
             geometryInstance.geometry.attributes.position.values.length;
-          var applyOffset = new Uint8Array(length / 3);
           offsetValue =
             polygonGeometry._offsetAttribute === GeometryOffsetAttribute.GeometryOffsetAttribute.NONE
               ? 0
               : 1;
-          GeometryOffsetAttribute.arrayFill(applyOffset, offsetValue);
+          const applyOffset = new Uint8Array(length / 3).fill(offsetValue);
           geometryInstance.geometry.attributes.applyOffset = new GeometryAttribute.GeometryAttribute(
             {
               componentDatatype: ComponentDatatype.ComponentDatatype.UNSIGNED_BYTE,
@@ -671,8 +681,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
       }
     }
 
-    var geometry = GeometryPipeline.GeometryPipeline.combineInstances(geometries)[0];
-    var boundingSphere = Transforms.BoundingSphere.fromVertices(
+    const geometry = GeometryPipeline.GeometryPipeline.combineInstances(geometries)[0];
+    const boundingSphere = Transforms.BoundingSphere.fromVertices(
       geometry.attributes.position.values
     );
 
@@ -686,14 +696,13 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './ArcType-98ec98bf', './Geomet
   };
 
   function createPolygonOutlineGeometry(polygonGeometry, offset) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       polygonGeometry = PolygonOutlineGeometry.unpack(polygonGeometry, offset);
     }
-    polygonGeometry._ellipsoid = Matrix2.Ellipsoid.clone(polygonGeometry._ellipsoid);
+    polygonGeometry._ellipsoid = Matrix3.Ellipsoid.clone(polygonGeometry._ellipsoid);
     return PolygonOutlineGeometry.createGeometry(polygonGeometry);
   }
 
   return createPolygonOutlineGeometry;
 
 }));
-//# sourceMappingURL=createPolygonOutlineGeometry.js.map

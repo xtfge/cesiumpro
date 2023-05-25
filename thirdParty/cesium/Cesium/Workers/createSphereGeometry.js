@@ -1,1 +1,25 @@
-define(["./when-4bbc8319","./Matrix2-9aa31791","./RuntimeError-346a3079","./EllipsoidGeometry-9a4ae869","./VertexFormat-71718faa","./ComponentDatatype-93750d1a","./WebGLConstants-1c8239cc","./GeometryOffsetAttribute-1772960d","./Transforms-d13cc04e","./combine-83860057","./GeometryAttribute-43536dc0","./GeometryAttributes-7827a6c2","./IndexDatatype-b7d979a6"],(function(e,t,r,i,a,o,n,s,c,d,l,m,u){"use strict";function p(r){var a=e.defaultValue(r.radius,1),o={radii:new t.Cartesian3(a,a,a),stackPartitions:r.stackPartitions,slicePartitions:r.slicePartitions,vertexFormat:r.vertexFormat};this._ellipsoidGeometry=new i.EllipsoidGeometry(o),this._workerName="createSphereGeometry"}p.packedLength=i.EllipsoidGeometry.packedLength,p.pack=function(e,t,r){return i.EllipsoidGeometry.pack(e._ellipsoidGeometry,t,r)};var y=new i.EllipsoidGeometry,G={radius:void 0,radii:new t.Cartesian3,vertexFormat:new a.VertexFormat,stackPartitions:void 0,slicePartitions:void 0};return p.unpack=function(r,o,n){var s=i.EllipsoidGeometry.unpack(r,o,y);return G.vertexFormat=a.VertexFormat.clone(s._vertexFormat,G.vertexFormat),G.stackPartitions=s._stackPartitions,G.slicePartitions=s._slicePartitions,e.defined(n)?(t.Cartesian3.clone(s._radii,G.radii),n._ellipsoidGeometry=new i.EllipsoidGeometry(G),n):(G.radius=s._radii.x,new p(G))},p.createGeometry=function(e){return i.EllipsoidGeometry.createGeometry(e._ellipsoidGeometry)},function(t,r){return e.defined(r)&&(t=p.unpack(t,r)),p.createGeometry(t)}}));
+/**
+ * @license
+ * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
+ *
+ * Copyright 2011-2022 Cesium Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Columbus View (Pat. Pend.)
+ *
+ * Portions licensed separately.
+ * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
+ */
+define(["./defaultValue-135942ca","./Matrix3-edb29a7e","./EllipsoidGeometry-ba11d28b","./VertexFormat-7d5b4d7e","./Math-a304e2d6","./Transforms-3ea76111","./Matrix2-7a2bab7e","./RuntimeError-f0dada00","./combine-462d91dd","./ComponentDatatype-e86a9f87","./WebGLConstants-fcb70ee3","./GeometryAttribute-dacddb3f","./GeometryAttributes-899f8bd0","./GeometryOffsetAttribute-d3a42805","./IndexDatatype-3a8ea78f"],(function(e,t,i,r,a,o,n,s,d,c,l,m,u,p,y){"use strict";function f(r){const a=e.defaultValue(r.radius,1),o={radii:new t.Cartesian3(a,a,a),stackPartitions:r.stackPartitions,slicePartitions:r.slicePartitions,vertexFormat:r.vertexFormat};this._ellipsoidGeometry=new i.EllipsoidGeometry(o),this._workerName="createSphereGeometry"}f.packedLength=i.EllipsoidGeometry.packedLength,f.pack=function(e,t,r){return i.EllipsoidGeometry.pack(e._ellipsoidGeometry,t,r)};const G=new i.EllipsoidGeometry,b={radius:void 0,radii:new t.Cartesian3,vertexFormat:new r.VertexFormat,stackPartitions:void 0,slicePartitions:void 0};return f.unpack=function(a,o,n){const s=i.EllipsoidGeometry.unpack(a,o,G);return b.vertexFormat=r.VertexFormat.clone(s._vertexFormat,b.vertexFormat),b.stackPartitions=s._stackPartitions,b.slicePartitions=s._slicePartitions,e.defined(n)?(t.Cartesian3.clone(s._radii,b.radii),n._ellipsoidGeometry=new i.EllipsoidGeometry(b),n):(b.radius=s._radii.x,new f(b))},f.createGeometry=function(e){return i.EllipsoidGeometry.createGeometry(e._ellipsoidGeometry)},function(t,i){return e.defined(i)&&(t=f.unpack(t,i)),f.createGeometry(t)}}));

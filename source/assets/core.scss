@@ -1,0 +1,90 @@
+@import './global.scss';
+@import './fa/font-awesome.scss';
+//跟随鼠标的提示信息
+.cursor-tip-class{
+  position : fixed;
+  // border : 1px $border-color solid;
+  padding-left : 10px;
+  padding-right : 20px;
+  background-color : $bg-color;
+  color : $font-color;
+  border-radius : $b-radius;
+  pointer-events : none;
+  z-index : 999;
+  min-width:  140px;
+  font-size: $font-size;
+  line-height: 32px;
+}
+.context-root{
+  position: absolute;
+  padding: 0;
+  z-index: 999;
+}
+.context-menu{
+  list-style: none;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  li{
+    height:36px;
+  }
+  li::before{
+    content: "";
+    display: block;
+    height: 1px;
+    width: 100%;
+    background: -webkit-linear-gradient(270deg,transparent,hsla(0,0%,100%,.2),transparent);
+    background: linear-gradient(270deg,transparent,hsla(0,0%,100%,.2),transparent);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+.context-submenu{
+  min-width: 160px;
+  top: -38px;
+  left: calc(100% + 5px);
+  display: none
+}
+.context-ul{
+  background: rgba(43,44,47,.8);
+  border: 1px solid #2b2c2f;
+  min-width: 110px;
+}
+.context-item,.context-item-disabled{
+  padding: 6px 10px;
+  -webkit-transition: background-color .25s;
+  -o-transition: background-color .25s;
+  transition: background-color .25s;
+  display: block;
+  clear: both;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #76838f;
+  white-space: nowrap;
+  color: #edffff;
+  text-decoration: none;
+  cursor: pointer;
+  &:hover{
+    color: #fff;
+    background-color: #444d59;
+    text-decoration: none;
+  }
+  i{
+    padding-right: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+  span{
+    display: inline;
+  }
+}
+.context-item-disabled{
+  color:rgba(180,180,180,1.0);
+  cursor: not-allowed;
+  &:hover{
+    color: rgba(180,180,180,1.0);
+    background-color: rgba(43, 44, 47, 0.8);
+    text-decoration: none;
+  }
+}

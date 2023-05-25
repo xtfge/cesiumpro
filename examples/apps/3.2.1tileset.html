@@ -44,7 +44,6 @@
             // rtcCenterTransform:Cesium.Matrix4.fromArray([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1])
         })
         parent.Cesium = Cesium;
-        console.log(Cesium.Matrix4.fromArray([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]))
         viewer.addModel(tileset);
         tileset.colorBlendMode = Cesium.Cesium3DTileColorBlendMode.REPLACE
         tileset.colorBlendAmount = 1
@@ -65,7 +64,7 @@
             console.log('An error occurred loading tile: ' + error.url);
             console.log('Error: ' + error.message);
         });
-        viewer.flyTo(tileset.delegate)
+        viewer.flyTo(tileset)
         parent.tileset = tileset;
         tileset.allTilesLoaded.addEventListener(() => {
             console.log('所有瓦片加载完成')

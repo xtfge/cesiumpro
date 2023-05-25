@@ -28,7 +28,7 @@
     "globby": "11.0.0",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",
-    "gulp-sass": "4.1.0",
+    "gulp-sass": "^5.1.0",
     "http-server": "^14.0.0",
     "jsdoc": "^3.6.7",
     "request": "^2.88.2",
@@ -37,6 +37,9 @@
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-strip-pragma": "^1.0.0",
     "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-uglify-es": "^0.0.1",
+    "sass": "^1.62.1",
     "stream-to-promise": "^3.0.0"
   }
 }

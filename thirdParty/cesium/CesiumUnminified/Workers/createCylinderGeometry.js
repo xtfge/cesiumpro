@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +23,10 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./CylinderGeometry-921f1ae9', './when-4bbc8319', './GeometryOffsetAttribute-6a692b56', './RuntimeError-346a3079', './Transforms-86b6fa28', './Matrix2-91d5b6af', './ComponentDatatype-f194c48b', './WebGLConstants-1c8239cc', './combine-83860057', './CylinderGeometryLibrary-c09ae083', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './IndexDatatype-ee69f1fd', './VertexFormat-f9c1a155'], (function (CylinderGeometry, when, GeometryOffsetAttribute, RuntimeError, Transforms, Matrix2, ComponentDatatype, WebGLConstants, combine, CylinderGeometryLibrary, GeometryAttribute, GeometryAttributes, IndexDatatype, VertexFormat) { 'use strict';
+define(['./CylinderGeometry-6ab4de6a', './defaultValue-135942ca', './Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84a28', './Math-efde0c7b', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './ComponentDatatype-ebdce3ba', './WebGLConstants-fcb70ee3', './CylinderGeometryLibrary-c7bef0a3', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './GeometryOffsetAttribute-d3a42805', './IndexDatatype-fa75fe25', './VertexFormat-1d6950e1'], (function (CylinderGeometry, defaultValue, Transforms, Matrix3, Check, Math, Matrix2, RuntimeError, combine, ComponentDatatype, WebGLConstants, CylinderGeometryLibrary, GeometryAttribute, GeometryAttributes, GeometryOffsetAttribute, IndexDatatype, VertexFormat) { 'use strict';
 
   function createCylinderGeometry(cylinderGeometry, offset) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       cylinderGeometry = CylinderGeometry.CylinderGeometry.unpack(cylinderGeometry, offset);
     }
     return CylinderGeometry.CylinderGeometry.createGeometry(cylinderGeometry);
@@ -33,4 +35,3 @@ define(['./CylinderGeometry-921f1ae9', './when-4bbc8319', './GeometryOffsetAttri
   return createCylinderGeometry;
 
 }));
-//# sourceMappingURL=createCylinderGeometry.js.map

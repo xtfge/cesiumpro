@@ -2,12 +2,11 @@ import defined from '../core/defined.js';
 import MassiveGraphicLayerCollection from './MassiveGraphicLayerCollection.js';
 import createGuid from '../core/createGuid.js';
 import LonLat from "../core/LonLat.js";
+import when from '../../thirdParty/when.js'
 const {
     GeographicTilingScheme,
     GlobeSurfaceTileProvider,
-    when,
     Event,
-    GlobeSurfaceTile,
     TerrainState,
     RequestType,
     Request,

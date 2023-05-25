@@ -73,12 +73,30 @@ const cylinderMaterialShader = `
 czm_material czm_getMaterial(czm_materialInput materialInput) {
   czm_material material = czm_getDefaultMaterial(materialInput);
   vec2 st = materialInput.st;
-  float time = fract(czm_frameNumber / 90.0 * speed);
-  vec4 color = texture2D(image, fract(st - vec2(time)));
+  float time = fract(czm_frameNumber / 90.0);
+  vec4 imageColor = texture2D(image, fract(st - vec2(time)));
   float alpha = color.a;
-  alpha *= color.a;
+  alpha *= imageColor.a;
   material.diffuse = color.rgb;
-  material.alpha = alpha * pow(1.0 - st.t, color.a);
+  material.alpha = st.s;//pow(1.0 - st.t, color.a);
+  return material;
+}
+`
+var a = 
+`material czm_getMaterial(czm_materialInput materialInput) {
+  czm_material material = czm_getDefaultMaterial(materialInput);
+  vec2 st = materialInput.st;
+  float time = fract(czm_frameNumber / 90.);
+  vec2 new_st = fract(st - vec2(time, time));
+  vec4 color = texture2D(image_1, new_st);
+
+  vec3 diffuse = color.rgb;
+  float alpha = color.a;
+  diffuse *= u_color_0.rgb;
+  alpha *= u_color_0.a;
+  alpha *= u_color_0.a;
+  material.diffuse = diffuse;
+  material.alpha = alpha * pow(1. - st.t, u_color_0.a) * globalAlpha_2;
   return material;
 }
 `

@@ -209,9 +209,9 @@ class Tileset {
         this.delegate.debugColorizeTiles = val;
     }
     /**
-     * @type {Boolean}
      * 仅用于调试。
      * 如果为true，则将数据冻结到上一帧。
+     * @type {Boolean}
      */
     get debugFreezeFrame() {
         return this.delegate.debugFreezeFrame;
@@ -220,10 +220,10 @@ class Tileset {
         this.delegate.debugFreezeFrame = val;
     }
     /**
-     * @type {Boolean}
      * 仅用于调试。
      * 如果为 true，则为每个可见图块渲染边界体积。如果图块具有内容边界体积或为空，则边界体积为白色；
      * 否则，它是红色的。不符合屏幕空间错误且仍在对其后代进行加载的瓦片为黄色。
+     * @type {Boolean}
      */
     get debugShowBoundingVolume() {
         return this.delegate.debugShowBoundingVolume;
@@ -232,9 +232,9 @@ class Tileset {
         this.delegate.debugShowBoundingVolume = val;
     }
     /**
-     * @type {Boolean}
      * 仅用于调试。
      * 如果为 true，则为每个可见图块的内容渲染边界体积。如果图块具有内容边界体积，则边界体积为蓝色；否则它是红色的。
+     * @type {Boolean}
      */
     get debugShowContentBoundingVolume() {
         return this.delegate.debugShowContentBoundingVolume;
@@ -243,9 +243,9 @@ class Tileset {
         this.delegate.debugShowContentBoundingVolume = val;
     }
     /**
-     * @type {Boolean}
      * 仅用于调试。
      * 如果为true，将使用label显示每个瓦片的几何误差。
+     * @type {Boolean}
      */
     get debugShowGeometricError() {
         return this.delegate.debugShowGeometricError;
@@ -254,9 +254,9 @@ class Tileset {
         this.delegate.debugShowGeometricError = val;
     }
     /**
-     * @type {Boolean}
      * 仅用于调试
      * 如果为true，将使用label显示每个瓦片的内存使用情况
+     * @type {Boolean}
      */
     get debugShowMemoryUsage() {
         return this.delegate.debugShowMemoryUsage;
@@ -413,7 +413,7 @@ class Tileset {
     /**
      * 模型接收了来自地球、天空、大气和星空天空盒的光照。该值用于增加或降低这些光照强度。
      * 值0.0将禁用这些光源。
-     * @type {Cesium.Cartesian2};
+     * @type {Cesium.Cartesian2}
      * @default new Cesium.Cartesian2(1, 1)
      */
     get imageBasedLightingFactor() {
@@ -727,6 +727,8 @@ class Tileset {
      * 卸载Cesium3DTile的被传递给事件监听器。
      * 不要在事件监听期间创建或修改entities或primitives.
      * @type {Event}
+     * 
+     * @example
      * tileset.tileUnload.addEventListener(function(tile) {
      *     console.log('A tile was unloaded from the cache.');
      * });

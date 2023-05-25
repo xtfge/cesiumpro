@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +23,10 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./when-4bbc8319', './EllipsoidGeometry-aa017f9c', './GeometryOffsetAttribute-6a692b56', './RuntimeError-346a3079', './Transforms-86b6fa28', './Matrix2-91d5b6af', './ComponentDatatype-f194c48b', './WebGLConstants-1c8239cc', './combine-83860057', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './IndexDatatype-ee69f1fd', './VertexFormat-f9c1a155'], (function (when, EllipsoidGeometry, GeometryOffsetAttribute, RuntimeError, Transforms, Matrix2, ComponentDatatype, WebGLConstants, combine, GeometryAttribute, GeometryAttributes, IndexDatatype, VertexFormat) { 'use strict';
+define(['./defaultValue-135942ca', './EllipsoidGeometry-fb52d895', './Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84a28', './Math-efde0c7b', './Matrix2-f9f1b94b', './RuntimeError-f0dada00', './combine-462d91dd', './ComponentDatatype-ebdce3ba', './WebGLConstants-fcb70ee3', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './GeometryOffsetAttribute-d3a42805', './IndexDatatype-fa75fe25', './VertexFormat-1d6950e1'], (function (defaultValue, EllipsoidGeometry, Transforms, Matrix3, Check, Math, Matrix2, RuntimeError, combine, ComponentDatatype, WebGLConstants, GeometryAttribute, GeometryAttributes, GeometryOffsetAttribute, IndexDatatype, VertexFormat) { 'use strict';
 
   function createEllipsoidGeometry(ellipsoidGeometry, offset) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       ellipsoidGeometry = EllipsoidGeometry.EllipsoidGeometry.unpack(ellipsoidGeometry, offset);
     }
     return EllipsoidGeometry.EllipsoidGeometry.createGeometry(ellipsoidGeometry);
@@ -33,4 +35,3 @@ define(['./when-4bbc8319', './EllipsoidGeometry-aa017f9c', './GeometryOffsetAttr
   return createEllipsoidGeometry;
 
 }));
-//# sourceMappingURL=createEllipsoidGeometry.js.map

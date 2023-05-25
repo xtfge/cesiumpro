@@ -1,7 +1,9 @@
 /**
+ * @license
  * Cesium - https://github.com/CesiumGS/cesium
+ * Version 1.99
  *
- * Copyright 2011-2020 Cesium Contributors
+ * Copyright 2011-2022 Cesium Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +23,28 @@
  * See https://github.com/CesiumGS/cesium/blob/main/LICENSE.md for full licensing details.
  */
 
-define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c3227', './BoundingRectangle-285b0f2f', './Transforms-86b6fa28', './ComponentDatatype-f194c48b', './PolylineVolumeGeometryLibrary-7c5a0257', './RuntimeError-346a3079', './GeometryAttribute-e0d0d297', './GeometryAttributes-7827a6c2', './IndexDatatype-ee69f1fd', './PolygonPipeline-d65e2b8f', './combine-83860057', './WebGLConstants-1c8239cc', './EllipsoidTangentPlane-164dcfc9', './AxisAlignedBoundingBox-4171efdd', './IntersectionTests-26599c5e', './Plane-4f333bc4', './PolylinePipeline-3cab578f', './EllipsoidGeodesic-6a52e412', './EllipsoidRhumbLine-447d6334'], (function (when, Matrix2, arrayRemoveDuplicates, BoundingRectangle, Transforms, ComponentDatatype, PolylineVolumeGeometryLibrary, RuntimeError, GeometryAttribute, GeometryAttributes, IndexDatatype, PolygonPipeline, combine, WebGLConstants, EllipsoidTangentPlane, AxisAlignedBoundingBox, IntersectionTests, Plane, PolylinePipeline, EllipsoidGeodesic, EllipsoidRhumbLine) { 'use strict';
+define(['./defaultValue-135942ca', './Matrix3-ea964448', './arrayRemoveDuplicates-3fb00ed2', './BoundingRectangle-02351bff', './Transforms-ac2d28a9', './Matrix2-f9f1b94b', './ComponentDatatype-ebdce3ba', './PolylineVolumeGeometryLibrary-e460dd46', './Check-40d84a28', './GeometryAttribute-51d61732', './GeometryAttributes-899f8bd0', './IndexDatatype-fa75fe25', './Math-efde0c7b', './PolygonPipeline-cf232713', './combine-462d91dd', './RuntimeError-f0dada00', './WebGLConstants-fcb70ee3', './EllipsoidTangentPlane-244dda7a', './AxisAlignedBoundingBox-48df2a2e', './IntersectionTests-4ab30dca', './Plane-93af52b2', './PolylinePipeline-b636012e', './EllipsoidGeodesic-08772132', './EllipsoidRhumbLine-6161ec8c'], (function (defaultValue, Matrix3, arrayRemoveDuplicates, BoundingRectangle, Transforms, Matrix2, ComponentDatatype, PolylineVolumeGeometryLibrary, Check, GeometryAttribute, GeometryAttributes, IndexDatatype, Math, PolygonPipeline, combine, RuntimeError, WebGLConstants, EllipsoidTangentPlane, AxisAlignedBoundingBox, IntersectionTests, Plane, PolylinePipeline, EllipsoidGeodesic, EllipsoidRhumbLine) { 'use strict';
 
   function computeAttributes(positions, shape) {
-    var attributes = new GeometryAttributes.GeometryAttributes();
+    const attributes = new GeometryAttributes.GeometryAttributes();
     attributes.position = new GeometryAttribute.GeometryAttribute({
       componentDatatype: ComponentDatatype.ComponentDatatype.DOUBLE,
       componentsPerAttribute: 3,
       values: positions,
     });
 
-    var shapeLength = shape.length;
-    var vertexCount = attributes.position.values.length / 3;
-    var positionLength = positions.length / 3;
-    var shapeCount = positionLength / shapeLength;
-    var indices = IndexDatatype.IndexDatatype.createTypedArray(
+    const shapeLength = shape.length;
+    const vertexCount = attributes.position.values.length / 3;
+    const positionLength = positions.length / 3;
+    const shapeCount = positionLength / shapeLength;
+    const indices = IndexDatatype.IndexDatatype.createTypedArray(
       vertexCount,
       2 * shapeLength * (shapeCount + 1)
     );
-    var i, j;
-    var index = 0;
+    let i, j;
+    let index = 0;
     i = 0;
-    var offset = i * shapeLength;
+    let offset = i * shapeLength;
     for (j = 0; j < shapeLength - 1; j++) {
       indices[index++] = j + offset;
       indices[index++] = j + offset + 1;
@@ -60,15 +62,15 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
     indices[index++] = offset;
 
     for (i = 0; i < shapeCount - 1; i++) {
-      var firstOffset = shapeLength * i;
-      var secondOffset = firstOffset + shapeLength;
+      const firstOffset = shapeLength * i;
+      const secondOffset = firstOffset + shapeLength;
       for (j = 0; j < shapeLength; j++) {
         indices[index++] = j + firstOffset;
         indices[index++] = j + secondOffset;
       }
     }
 
-    var geometry = new GeometryAttribute.Geometry({
+    const geometry = new GeometryAttribute.Geometry({
       attributes: attributes,
       indices: IndexDatatype.IndexDatatype.createTypedArray(vertexCount, indices),
       boundingSphere: Transforms.BoundingSphere.fromVertices(positions),
@@ -95,15 +97,15 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
    *
    * @example
    * function computeCircle(radius) {
-   *   var positions = [];
-   *   for (var i = 0; i < 360; i++) {
-   *     var radians = Cesium.Math.toRadians(i);
+   *   const positions = [];
+   *   for (let i = 0; i < 360; i++) {
+   *     const radians = Cesium.Math.toRadians(i);
    *     positions.push(new Cesium.Cartesian2(radius * Math.cos(radians), radius * Math.sin(radians)));
    *   }
    *   return positions;
    * }
    *
-   * var volumeOutline = new Cesium.PolylineVolumeOutlineGeometry({
+   * const volumeOutline = new Cesium.PolylineVolumeOutlineGeometry({
    *   polylinePositions : Cesium.Cartesian3.fromDegreesArray([
    *     -72.0, 40.0,
    *     -70.0, 35.0
@@ -112,39 +114,39 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
    * });
    */
   function PolylineVolumeOutlineGeometry(options) {
-    options = when.defaultValue(options, when.defaultValue.EMPTY_OBJECT);
-    var positions = options.polylinePositions;
-    var shape = options.shapePositions;
+    options = defaultValue.defaultValue(options, defaultValue.defaultValue.EMPTY_OBJECT);
+    const positions = options.polylinePositions;
+    const shape = options.shapePositions;
 
     //>>includeStart('debug', pragmas.debug);
-    if (!when.defined(positions)) {
-      throw new RuntimeError.DeveloperError("options.polylinePositions is required.");
+    if (!defaultValue.defined(positions)) {
+      throw new Check.DeveloperError("options.polylinePositions is required.");
     }
-    if (!when.defined(shape)) {
-      throw new RuntimeError.DeveloperError("options.shapePositions is required.");
+    if (!defaultValue.defined(shape)) {
+      throw new Check.DeveloperError("options.shapePositions is required.");
     }
     //>>includeEnd('debug');
 
     this._positions = positions;
     this._shape = shape;
-    this._ellipsoid = Matrix2.Ellipsoid.clone(
-      when.defaultValue(options.ellipsoid, Matrix2.Ellipsoid.WGS84)
+    this._ellipsoid = Matrix3.Ellipsoid.clone(
+      defaultValue.defaultValue(options.ellipsoid, Matrix3.Ellipsoid.WGS84)
     );
-    this._cornerType = when.defaultValue(options.cornerType, PolylineVolumeGeometryLibrary.CornerType.ROUNDED);
-    this._granularity = when.defaultValue(
+    this._cornerType = defaultValue.defaultValue(options.cornerType, PolylineVolumeGeometryLibrary.CornerType.ROUNDED);
+    this._granularity = defaultValue.defaultValue(
       options.granularity,
-      ComponentDatatype.CesiumMath.RADIANS_PER_DEGREE
+      Math.CesiumMath.RADIANS_PER_DEGREE
     );
     this._workerName = "createPolylineVolumeOutlineGeometry";
 
-    var numComponents = 1 + positions.length * Matrix2.Cartesian3.packedLength;
+    let numComponents = 1 + positions.length * Matrix3.Cartesian3.packedLength;
     numComponents += 1 + shape.length * Matrix2.Cartesian2.packedLength;
 
     /**
      * The number of elements used to pack the object into an array.
      * @type {Number}
      */
-    this.packedLength = numComponents + Matrix2.Ellipsoid.packedLength + 2;
+    this.packedLength = numComponents + Matrix3.Ellipsoid.packedLength + 2;
   }
 
   /**
@@ -158,27 +160,27 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
    */
   PolylineVolumeOutlineGeometry.pack = function (value, array, startingIndex) {
     //>>includeStart('debug', pragmas.debug);
-    if (!when.defined(value)) {
-      throw new RuntimeError.DeveloperError("value is required");
+    if (!defaultValue.defined(value)) {
+      throw new Check.DeveloperError("value is required");
     }
-    if (!when.defined(array)) {
-      throw new RuntimeError.DeveloperError("array is required");
+    if (!defaultValue.defined(array)) {
+      throw new Check.DeveloperError("array is required");
     }
     //>>includeEnd('debug');
 
-    startingIndex = when.defaultValue(startingIndex, 0);
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
 
-    var i;
+    let i;
 
-    var positions = value._positions;
-    var length = positions.length;
+    const positions = value._positions;
+    let length = positions.length;
     array[startingIndex++] = length;
 
-    for (i = 0; i < length; ++i, startingIndex += Matrix2.Cartesian3.packedLength) {
-      Matrix2.Cartesian3.pack(positions[i], array, startingIndex);
+    for (i = 0; i < length; ++i, startingIndex += Matrix3.Cartesian3.packedLength) {
+      Matrix3.Cartesian3.pack(positions[i], array, startingIndex);
     }
 
-    var shape = value._shape;
+    const shape = value._shape;
     length = shape.length;
     array[startingIndex++] = length;
 
@@ -186,8 +188,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
       Matrix2.Cartesian2.pack(shape[i], array, startingIndex);
     }
 
-    Matrix2.Ellipsoid.pack(value._ellipsoid, array, startingIndex);
-    startingIndex += Matrix2.Ellipsoid.packedLength;
+    Matrix3.Ellipsoid.pack(value._ellipsoid, array, startingIndex);
+    startingIndex += Matrix3.Ellipsoid.packedLength;
 
     array[startingIndex++] = value._cornerType;
     array[startingIndex] = value._granularity;
@@ -195,8 +197,8 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
     return array;
   };
 
-  var scratchEllipsoid = Matrix2.Ellipsoid.clone(Matrix2.Ellipsoid.UNIT_SPHERE);
-  var scratchOptions = {
+  const scratchEllipsoid = Matrix3.Ellipsoid.clone(Matrix3.Ellipsoid.UNIT_SPHERE);
+  const scratchOptions = {
     polylinePositions: undefined,
     shapePositions: undefined,
     ellipsoid: scratchEllipsoid,
@@ -215,36 +217,36 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
    */
   PolylineVolumeOutlineGeometry.unpack = function (array, startingIndex, result) {
     //>>includeStart('debug', pragmas.debug);
-    if (!when.defined(array)) {
-      throw new RuntimeError.DeveloperError("array is required");
+    if (!defaultValue.defined(array)) {
+      throw new Check.DeveloperError("array is required");
     }
     //>>includeEnd('debug');
 
-    startingIndex = when.defaultValue(startingIndex, 0);
+    startingIndex = defaultValue.defaultValue(startingIndex, 0);
 
-    var i;
+    let i;
 
-    var length = array[startingIndex++];
-    var positions = new Array(length);
+    let length = array[startingIndex++];
+    const positions = new Array(length);
 
-    for (i = 0; i < length; ++i, startingIndex += Matrix2.Cartesian3.packedLength) {
-      positions[i] = Matrix2.Cartesian3.unpack(array, startingIndex);
+    for (i = 0; i < length; ++i, startingIndex += Matrix3.Cartesian3.packedLength) {
+      positions[i] = Matrix3.Cartesian3.unpack(array, startingIndex);
     }
 
     length = array[startingIndex++];
-    var shape = new Array(length);
+    const shape = new Array(length);
 
     for (i = 0; i < length; ++i, startingIndex += Matrix2.Cartesian2.packedLength) {
       shape[i] = Matrix2.Cartesian2.unpack(array, startingIndex);
     }
 
-    var ellipsoid = Matrix2.Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
-    startingIndex += Matrix2.Ellipsoid.packedLength;
+    const ellipsoid = Matrix3.Ellipsoid.unpack(array, startingIndex, scratchEllipsoid);
+    startingIndex += Matrix3.Ellipsoid.packedLength;
 
-    var cornerType = array[startingIndex++];
-    var granularity = array[startingIndex];
+    const cornerType = array[startingIndex++];
+    const granularity = array[startingIndex];
 
-    if (!when.defined(result)) {
+    if (!defaultValue.defined(result)) {
       scratchOptions.polylinePositions = positions;
       scratchOptions.shapePositions = shape;
       scratchOptions.cornerType = cornerType;
@@ -254,14 +256,14 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
 
     result._positions = positions;
     result._shape = shape;
-    result._ellipsoid = Matrix2.Ellipsoid.clone(ellipsoid, result._ellipsoid);
+    result._ellipsoid = Matrix3.Ellipsoid.clone(ellipsoid, result._ellipsoid);
     result._cornerType = cornerType;
     result._granularity = granularity;
 
     return result;
   };
 
-  var brScratch = new BoundingRectangle.BoundingRectangle();
+  const brScratch = new BoundingRectangle.BoundingRectangle();
 
   /**
    * Computes the geometric representation of the outline of a polyline with a volume, including its vertices, indices, and a bounding sphere.
@@ -272,12 +274,12 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
   PolylineVolumeOutlineGeometry.createGeometry = function (
     polylineVolumeOutlineGeometry
   ) {
-    var positions = polylineVolumeOutlineGeometry._positions;
-    var cleanPositions = arrayRemoveDuplicates.arrayRemoveDuplicates(
+    const positions = polylineVolumeOutlineGeometry._positions;
+    const cleanPositions = arrayRemoveDuplicates.arrayRemoveDuplicates(
       positions,
-      Matrix2.Cartesian3.equalsEpsilon
+      Matrix3.Cartesian3.equalsEpsilon
     );
-    var shape2D = polylineVolumeOutlineGeometry._shape;
+    let shape2D = polylineVolumeOutlineGeometry._shape;
     shape2D = PolylineVolumeGeometryLibrary.PolylineVolumeGeometryLibrary.removeDuplicatesFromShape(shape2D);
 
     if (cleanPositions.length < 2 || shape2D.length < 3) {
@@ -289,9 +291,9 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
     ) {
       shape2D.reverse();
     }
-    var boundingRectangle = BoundingRectangle.BoundingRectangle.fromPoints(shape2D, brScratch);
+    const boundingRectangle = BoundingRectangle.BoundingRectangle.fromPoints(shape2D, brScratch);
 
-    var computedPositions = PolylineVolumeGeometryLibrary.PolylineVolumeGeometryLibrary.computePositions(
+    const computedPositions = PolylineVolumeGeometryLibrary.PolylineVolumeGeometryLibrary.computePositions(
       cleanPositions,
       shape2D,
       boundingRectangle,
@@ -305,13 +307,13 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
     polylineVolumeOutlineGeometry,
     offset
   ) {
-    if (when.defined(offset)) {
+    if (defaultValue.defined(offset)) {
       polylineVolumeOutlineGeometry = PolylineVolumeOutlineGeometry.unpack(
         polylineVolumeOutlineGeometry,
         offset
       );
     }
-    polylineVolumeOutlineGeometry._ellipsoid = Matrix2.Ellipsoid.clone(
+    polylineVolumeOutlineGeometry._ellipsoid = Matrix3.Ellipsoid.clone(
       polylineVolumeOutlineGeometry._ellipsoid
     );
     return PolylineVolumeOutlineGeometry.createGeometry(
@@ -322,4 +324,3 @@ define(['./when-4bbc8319', './Matrix2-91d5b6af', './arrayRemoveDuplicates-cf5c32
   return createPolylineVolumeOutlineGeometry;
 
 }));
-//# sourceMappingURL=createPolylineVolumeOutlineGeometry.js.map

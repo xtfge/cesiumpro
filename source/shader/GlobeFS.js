@@ -1,4 +1,5 @@
 //This file is automatically rebuilt by the Cesium build process.
+// 添加上下对比
 export default "uniform vec4 u_initialColor;\n\
 \n\
 #if TEXTURE_UNITS > 0\n\

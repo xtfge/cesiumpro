@@ -205,6 +205,11 @@
             "label": "点",
             "value": "5.2.1point",
             "thumb": "./assets/images/5.2.1point.gif"
+          },
+          {
+            "label": "线",
+            "value": "5.2.2-polyline",
+            "thumb": "./assets/images/5.2.1point.gif"
           }
         ]
       },
@@ -308,9 +313,9 @@
         "icon": "",
         "children": [
           {
-            "label": "阴影",
-            "value": "1.1.1tianditu",
-            "thumb": "./images/tdt.gif"
+            "label": "标绘",
+            "value": "3.2.1-plot",
+            "thumb": "./images/3.2.1-plot.png"
           },
           {
             "label": "漫游",
@@ -365,6 +370,10 @@
           {
             "label": "无球模式",
             "value": "3.2.2noglobe",
+            "thumb": "./images/noglobe.gif"
+          }, {
+            "label": "模型压平",
+            "value": "3.2.3flatten-model",
             "thumb": "./images/noglobe.gif"
           }
         ]
