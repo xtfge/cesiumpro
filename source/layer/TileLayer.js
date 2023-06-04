@@ -3,7 +3,6 @@ import defined from "../core/defined.js";
 import Event from '../core/Event.js';
 import proj from '../core/proj.js';
 const {
-    when,
     Rectangle
 } = Cesium;
 class TileLayer {
@@ -28,8 +27,7 @@ class TileLayer {
      */
     constructor(options = {}) {
         this._errorEvent = new Event();
-        this._tilingScheme = proj.get('EPSG:4326');
-        this._readyPromise = when.defer();
+        this._tilingScheme = proj.get('EPSG:4326');        
         this._ready = false;
         this._ready = true;
         this._minimumLevel = defaultValue(options.minimumLevel, 0);
@@ -37,10 +35,13 @@ class TileLayer {
         this._tileWidth = defaultValue(options.tileWidth, 256);
         this._tileHeight = defaultValue(options.tileHeight, 256);
         this._rectangle = defaultValue(options.rectangle, Rectangle.MAX_VALUE);
-        this._readyPromise.resolve(true);
+        this._readyPromise = Promise.resolve(true);
         this._errorEvent.addEventListener((x, y, z) => {
             // 主要是为了不让TileProviderError.handleError打印错误
         })
+    }
+    get errorEvent() {
+        return this._errorEvent;
     }
     /**
      * 可以请求的最小瓦片级别

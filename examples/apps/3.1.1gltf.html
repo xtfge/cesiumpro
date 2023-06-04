@@ -6,8 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Cesium Pro</title>
-    <script src='./editor/Sandcastle.js'></script>
-    <link href='./editor/Sandcastle.css' rel='stylesheet' />
+    <script src='./editor/lil-gui.module.min.js'></script>
     <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
     <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
     <script src='/build/CesiumPro.js'></script>
@@ -30,61 +29,64 @@
 
 <body>
     <div id='map'></div>
-    <div id='toolbar'></div>
     <script>
-        const viewer = new CesiumPro.Viewer('map', {
+        var viewer = new CesiumPro.Viewer('map', {
             shadows: true,
             shouldAnimate: true
         });
-        const p = new CesiumPro.LonLat(110, 30, 10).toCartesian();
-        const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(p);
-        const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2)
+        var position = new CesiumPro.LonLat(110, 30, 10).toCartesian();
+        var matrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+        var rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2)
         // Cesium.Matrix4.multiplyByMatrix3(matrix, rotation, matrix)
         let model = new CesiumPro.Model({
             url: '../data/models/Cesium_Air.glb',
             minimumPixelSize: 16,
             modelMatrix: matrix,
+            enableDebugWireframe: true,
+            colorBlendMode: Cesium.ColorBlendMode.Highlight,
+            color: Cesium.Color.RED
             // position: p
             // upAxis: 2,
-            uniformMapLoaded: function(uniformMap, programId, runtimeNode) {
-                const u_projectionMatrix = uniformMap.u_projectionMatrix;
-                // uniformMap.u_projectionMatrix = function() {
-                //     const matrix = Cesium.Matrix4.fromArray([1,0,0,0,0,5,0,0,0,0,1,0,0,0,0,1]);
-                //     const projectMatrix = u_projectionMatrix();
-                //     Cesium.Matrix4.multiply(projectMatrix, matrix, matrix);
-                //     // console.log(matrix)
-                //     return matrix;
-                // }
-                return uniformMap
-            }
+            // uniformMapLoaded: function(uniformMap, programId, runtimeNode) {
+            //     const u_projectionMatrix = uniformMap.u_projectionMatrix;
+            //     return uniformMap
+            // }
         })
         viewer.addLayer(new CesiumPro.TileLayer({
             maximumLevel: 10
         }))
         viewer.addModel(model)
         viewer.flyTo(model, {
-            offset: new Cesium.HeadingPitchRange(Math.PI / 2, -Cesium.Math.toRadians(80),0)
+            offset: new Cesium.HeadingPitchRange(Math.PI / 2, -Cesium.Math.toRadians(80), 0)
         })
-        parent.viewer = viewer;
-        parent.model = model;
-
-        tools.addCheckbox('阴影', true, function (val) {
+    </script>
+    <script>
+        const gui = new GUI();
+        const object = {
+            '阴影': true,
+            '轮廓': false,
+            '线框模式': false,
+            '动画': false,
+            'mode': 'Highlight',
+            '混合度': 0.5,
+            '颜色': '#FF0000'
+        }
+        gui.add(object, '阴影').onChange(function (val) {
             const shadows = val ? Cesium.ShadowMode.ENABLED : Cesium.ShadowMode.DISABLED;
-            console.log(shadows)
             model.shadows = shadows;
         })
-        tools.addCheckbox('轮廓', false, function (val) {
+        gui.add(object, '轮廓').onChange(function (val) {
             if (val) {
                 model.silhouetteColor = Cesium.Color.GREEN;
-                model.silhouetteSize = 3;
+                model.silhouetteSize = 5;
             } else {
                 model.silhouetteSize = 0;
             }
         })
-        tools.addCheckbox('线框模式', false, function (val) {
+        gui.add(object, '线框模式').onChange(function (val) {
             model.debugWireframe = val;
         })
-        tools.addCheckbox('动画', false, function (val) {
+        gui.add(object, '动画').onChange(function (val) {
             if (val) {
                 model.readyPromise.then(() => {
                     model.activeAnimations.addAll({
@@ -98,7 +100,23 @@
                 })
             }
         })
-
+        const folder = gui.addFolder('颜色叠加');
+        folder.addColor(object, '颜色').onChange(function(val) {
+            model.color = Cesium.Color.fromCssColorString(val)
+        }) 
+        let mix        
+        folder.add(object, 'mode', ["HIGHLIGHT", "REPLACE", "MIX"]).name('叠加模式').onChange(function(val) {
+            model.colorBlendMode = Cesium.ColorBlendMode[val];
+            if (val === 'MIX') {
+                mix.disable(false);
+            } else {
+                mix.disable(true);
+            }
+        })
+        mix = folder.add(object, '混合度', 0, 1, 0.1).disable();   
+        mix.onChange(function(val) {
+            model.colorBlendAmount = val;
+        })    
     </script>
 </body>
 

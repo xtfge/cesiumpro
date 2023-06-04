@@ -7,7 +7,7 @@
   background: #303333;
   border-radius: 4px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 span{
   display: flex;

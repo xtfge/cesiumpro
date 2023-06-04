@@ -94,13 +94,16 @@ class LonLat {
      * @returns {Boolean} 可见性
      */
     static isVisible(point, viewer) {
-        if (viewer instanceof Cesium.Viewer) {
+        if (viewer instanceof Cesium.Viewer === false) {
             throw new CesiumProError('viewer不是一个有效的Cesium.Viewer对象')
         }
         if (!defined(point)) {
-            throw new CesiumProError('point is not defined.')
+            return false;
         }
         const position = LonLat.toCartesian(point)
+        if (!position) {
+            return false;
+        }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
                 .isPointVisible(position);
@@ -137,11 +140,11 @@ class LonLat {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(scene)) {
             throw new CesiumProError('scene未定义。')
-        }
-        if (!defined(point)) {
-            throw new CesiumProError('point is not defined.')
-        }
+        }        
         //>>includeEnd('debug', pragmas.debug);
+        if (!defined(point)) {
+            return undefined
+        }
         const cartesian = LonLat.toCartesian(point)
         if (!defined(cartesian)) {
             return undefined;
@@ -156,13 +159,22 @@ class LonLat {
      * @param {LonLat} point 
      * @returns 用弧度表示的坐标点
      */
-    static toCartographic(point) {
+    static toCartographic(point, viewer) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(point)) {
             throw new CesiumProError('point is not defined.')
         }
         //>>includeEnd('debug', pragmas.debug);
-        return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
+        if (point instanceof LonLat) {
+            return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
+        } else if (point instanceof Cesium.Cartesian3) {
+            return Cesium.Cartographic.fromCartesian(point);
+        } else if (point instanceof Cesium.Cartographic) {
+            return point;
+        } else if (point instanceof Cesium.Cartesian2) {
+            const cartesian = LonLat.toCartesian(point, viewer);
+            return LonLat.toCartographic(cartesian)
+        }
     }
     /**
      * 转笛卡尔坐标
@@ -173,7 +185,7 @@ class LonLat {
     static toCartesian(point, viewer) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(point)) {
-            throw new CesiumProError('point is not defined.')
+            return undefined;
         }
         //>>includeEnd('debug', pragmas.debug);
         if (point instanceof Cesium.Cartesian3) {
@@ -202,7 +214,7 @@ class LonLat {
     static fromCartesian(cartesian) {
         //>>includeStart('debug', pragmas.debug);
         if (!defined(cartesian)) {
-            throw new CesiumProError('cartesian is not defined.')
+            return undefined
         }
         //>>includeEnd('debug', pragmas.debug);
         const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
@@ -311,19 +323,31 @@ class LonLat {
      * @param {any} v 
      */
     static isValid(v) {
-        if (v instanceof LonLat === false) {
-            return false;
+        if (v instanceof LonLat) {
+            if (!defined(v.lon)) {
+                return false;
+            }
+            if (!defined(v.lat)) {
+                return false;
+            }
+            if (!defined(v.alt)) {
+                return false;
+            }
+            return true
         }
-        if (!defined(v.lon)) {
-            return false;
+        if (v instanceof Cesium.Cartesian3) {
+            if (!defined(v.x)) {
+                return false;
+            }
+            if (!defined(v.y)) {
+                return false;
+            }
+            if (!defined(v.z)) {
+                return false;
+            }
+            return true;
         }
-        if (!defined(v.lat)) {
-            return false;
-        }
-        if (!defined(v.alt)) {
-            return false;
-        }
-        return true;
+        return false;
     }
 }
 /**

@@ -26,7 +26,6 @@ const {
     Color,
     EntityCollection,
     HeightReference,
-    when,
     Resource,
     describe,
     Event
@@ -376,26 +375,26 @@ function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
     polygon.arcType = ArcType.RHUMB;
 
     const extrudedHeight = options.extrudedHeight;
-    if(extrudedHeight) {
-        if(typeof extrudedHeight === 'number') {
+    if (extrudedHeight) {
+        if (typeof extrudedHeight === 'number') {
             polygon.extrudedHeight = extrudedHeight;
-        } else if(typeof extrudedHeight === 'string') {
+        } else if (typeof extrudedHeight === 'string') {
             const conditions = extrudedHeight.match(/\$\{\s*.*?\s*\}/ig);
-            if(conditions) {
+            if (conditions) {
                 let extrudeValue = extrudedHeight;
-                for(let con of conditions) {
+                for (let con of conditions) {
                     const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                    if(!(defined(value) && defined(value[1]))) {
+                    if (!(defined(value) && defined(value[1]))) {
                         continue;
                     }
                     extrudeValue = extrudeValue.replace(con, properties[value[1]]);
                 }
                 try {
                     const height = window.eval(extrudeValue);
-                    if(typeof height === 'number') {
+                    if (typeof height === 'number') {
                         polygon.extrudedHeight = height
                     }
-                }catch(e) {
+                } catch (e) {
 
                 }
             }
@@ -496,8 +495,7 @@ function load(that, geoJson, options, sourceUri) {
             throw new CesiumProError('Unknown crs type: ' + crs.type);
         }
     }
-
-    return Cesium.when(crsFunction, function (crsFunction) {
+    return Promise.resolve(crsFunction).then(function (crsFunction) {
         that._entityCollection.removeAll();
 
         // null is a valid value for the crs, but means the entire load process becomes a no-op
@@ -506,7 +504,7 @@ function load(that, geoJson, options, sourceUri) {
             typeHandler(that, geoJson, geoJson, crsFunction, options);
         }
 
-        return Cesium.when.all(that._promises, function () {
+        return Promise.all(that._promises).then(function () {
             that._promises.length = 0;
             DataSource.setLoading(that, false);
             return that;
@@ -779,14 +777,15 @@ class GeoJsonDataSource {
         };
 
         const that = this;
-        return when(promise, function (geoJson) {
-            return load(that, geoJson, options, sourceUri);
-        }).otherwise(function (error) {
-            DataSource.setLoading(that, false);
-            that._error.raiseEvent(that, error);
-            console.log(error);
-            return when.reject(error);
-        });
+        return Promise.resolve(promise)
+            .then(function (geoJson) {
+                return load(that, geoJson, options, sourceUri);
+            })
+            .catch(function (error) {
+                DataSource.setLoading(that, false);
+                that._error.raiseEvent(that, error);
+                throw error;
+            });
     };
     update() {
         return true;

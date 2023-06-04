@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map', {
+            imageryProvider: false
+        });
+        const wind = new CesiumPro.WindField(viewer, {
+            maxParticles: 64 * 64,
+            particleHeight: 100.0,
+            fadeOpacity: 0.996,
+            // dropRate: 0.003,
+            // dropRateBump: 0.01,
+            speedFactor: 1.0,
+            lineWidth: 1.0,
+        });
+        wind.loadDataFromNC('../data/wind.nc');
+
+        viewer.imageryLayers.addImageryProvider(new Cesium.WebMapServiceImageryProvider({
+            url: 'https://www.ncei.noaa.gov/thredds/wms/model-gfs-g4-anl-files-old/201809/20180916/gfsanl_4_20180916_0000_000.grb2',
+            layers: 'Wind_speed_gust_surface',
+            parameters: {
+                ColorScaleRange: '0.1095,35.31'
+            }
+        }));
+    </script>
+    <script>
+        const gui = new GUI();
+        const object = {
+            speedFactor: 1.0,
+            lineWidth: 4.0,
+            fadeOpacity: 0.996,
+            maxParticles: 64 * 64,
+            particleHeight: 100,
+            color: '#FFFFFF',
+            show: true
+        }
+        gui.add(object, 'speedFactor', 0.1, 2.0, 0.1).onChange(function (val) {
+            wind.speedFactor = val;
+        })
+        gui.addColor(object, 'color').onChange(function (val) {
+            wind.color = Cesium.Color.fromCssColorString(val);
+        })
+        gui.add(object, 'lineWidth', 1, 5, 1).onChange(function (val) {
+            wind.lineWidth = val;
+        })
+        gui.add(object, 'maxParticles', 64 * 64, 128 * 128, 10).onChange(function (val) {
+            wind.maxParticles = val;
+        })
+        gui.add(object, 'fadeOpacity', 0.9, 1.0, 0.001).onChange(function (val) {
+            wind.fadeOpacity = val;
+        })
+        gui.add(object, 'particleHeight', 50, 200, 10).onChange(function (val) {
+            wind.particleHeight = val;
+        })
+        gui.add(object, 'show').onChange(function (val) {
+            wind.show = val;
+        })
+    </script>
+</body>
+
+</html>

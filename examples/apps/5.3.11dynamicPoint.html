@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .point {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid hsla(0, 0%, 100%, 0.5);
+            cursor: pointer;
+            color: #0ff;
+            background: currentColor;
+            z-index: 3;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 2em currentColor, 0 0 0.5em currentColor;
+            position: absolute;
+        }
+
+        .point::before {
+            border: 1px solid;
+            animation: wave-point 1s ease infinite;
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 50%;
+            top: 50%;
+            border-radius: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes wave-point {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+                filter: alpha(opacity=1);
+            }
+
+            25% {
+                width: 120%;
+                height: 120%;
+                opacity: 0.7;
+                filter: alpha(opacity=70);
+            }
+
+            50% {
+                width: 200%;
+                height: 200%;
+                opacity: 0.5;
+                filter: alpha(opacity=50);
+            }
+
+            75% {
+                width: 300%;
+                height: 300%;
+                opacity: 0.2;
+                filter: alpha(opacity=20);
+            }
+
+            to {
+                width: 400%;
+                height: 400%;
+                opacity: 0;
+                filter: alpha(opacity=0);
+            }
+        }
+
+        .pop-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 88;
+            background-color: rgba(63, 72, 84, 0.8);
+            color: #FFFFFF;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 20px;
+            transform: translate(-50%, -100%);
+            margin-bottom: 10px;
+        }
+
+        .arrow {
+            width: 10px;
+            height: 10px;
+            margin: 0 auto;
+            border: 10px solid;
+            border-color: rgba(63, 72, 84, 1) transparent transparent transparent;
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            transform: translate(-50%, 50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <div class="pop-window" id="info">
+        <div>id</div>
+        <div>name</div>
+        <div>desc</div>
+        <div class="arrow"></div>
+    </div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const rectangle = Cesium.Rectangle.fromDegrees(110, 30, 110.01, 30.01);
+        const positions = CesiumPro.randomPosition(rectangle, 50);
+        const entities = []
+        const Color = Cesium.Color;
+        const colorList = ['rgba(77, 201, 1, 0.9)',
+            'rgba(1, 201, 38, 0.9)',
+            'rgba(200, 10, 20, 0.9)',
+            'rgba(100, 201, 38, 0.7)',
+            'rgba(221, 221, 0, 0.9)'
+        ]
+        const material1 = new CesiumPro.DynamicWaveMaterialProperty({
+            color: colorList[1],
+            duration: 2000
+        })
+        const material2 = new CesiumPro.DynamicSpreadMaterialProperty({
+            color: colorList[2],
+            gradient: 1,
+            duration: 2000
+        })
+        const group = new CesiumPro.HtmlGraphicGroup(viewer);
+        for (let i = 0, length = positions.length; i < length; i++) {
+            const colorIndex = i % 5;
+            const materialIndex = i % 2;
+            const color = colorList[colorIndex];
+            const htmlPoint = new CesiumPro.HtmlPointGraphic({
+                position: positions[i],
+                el: document.createElement('div'),
+                allowPicking: true,
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+                property: {
+                    id: "point" + i,
+                    name: "name" + i,
+                    desc: "This is a html point."
+                }
+            })
+            htmlPoint.addClass('point');
+            htmlPoint.updateStyle('backgroundColor', color)
+            group.add(htmlPoint);
+        }
+        const infoGraphic = new CesiumPro.HtmlPointGraphic({
+            el: document.getElementById('info'),
+            id: 'info'
+        })
+        group.add(infoGraphic)
+        group.selectedEvent.addEventListener(e => {
+            if (e) {
+                infoGraphic.position = e.position
+                infoGraphic.show = true;
+                const property = e.property;
+                infoGraphic.el.children[0].innerText = 'id: ' + property.id
+                infoGraphic.el.children[1].innerText = 'name: ' + property.name
+                infoGraphic.el.children[2].innerText = 'desc: ' + property.desc
+            } else {
+                infoGraphic.show = false;
+            }
+        })
+        viewer.flyTo(group);
+        window.aa = 0;
+
+    </script>
+</body>
+
+</html>

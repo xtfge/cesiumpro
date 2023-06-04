@@ -355,13 +355,20 @@ class Model{
     getNode(name) {
         return this.delegate.getNode(name);
     }
+    get sceneGraph() {
+        return this.delegate.sceneGraph;
+    }
     /**
      * 模型根节点
      * @readonly
      * @type {Array}
      */
     get rootNodes() {
-        return this.delegate._runtime.rootNodes;
+        if (this.delegate._runtime) {
+            return this.delegate._runtime.rootNodes;
+        }
+        const rootNodeIds = this.sceneGraph._rootNodes;
+        return rootNodeIds.map(_ => this.nodes[_]);         
     }
     /**
      * 模型的所有节点
@@ -369,7 +376,7 @@ class Model{
      * @type {Array}
      */
     get nodes() {
-        return this.delegate._runtime.nodesByName;
+        return this.nodesByName;
     }
     /**
      * 模型的所有材质
@@ -377,7 +384,11 @@ class Model{
      * @type {Array}
      */
     get materials() {
-        return this.delegate._runtime.materialsByName;
+        // 高版本的cesium已经没有该属性了
+        if (this.delegate._runtime) {
+            return this.delegate._runtime.materialsByName;
+        }
+        return [];
     }
     /**
      * 模型的所有网格
@@ -385,7 +396,14 @@ class Model{
      * @type {Array}
      */
     get meshs() {
-        return this.delegate._runtime.meshesByName;
+        // 高版本的cesium已经没有该属性了
+        if (this.delegate._runtime) {
+            return this.delegate._runtime.meshesByName;
+        }
+        return []
+    }
+    get nodesByName() {
+        return this.delegate._nodesByName || this.delegate_runtime
     }
 }
 /**

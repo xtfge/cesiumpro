@@ -1,7 +1,7 @@
-// import GlobeFS from '../shader/GlobeFS.js'
+import GlobeFS from '../shader/GlobeFS.js'
 const { BoundingSphere, buildModuleUrl, Cartesian3, Cartographic, Color, defaultValue, defined, destroyObject, DeveloperError, Ellipsoid, EllipsoidTerrainProvider, Event, IntersectionTests, NearFarScalar, Ray, Rectangle, Resource, ShaderSource, Texture, when, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode, ShadowMode } = Cesium;
 const GlobeVS = Cesium._shadersGlobeVS;
-const GlobeFS = Cesium._shadersGlobeFS;
+// const GlobeFS = Cesium._shadersGlobeFS;
 const AtmosphereCommon = Cesium._shadersAtmosphereCommon;
 const GroundAtmosphere = Cesium._shadersGroundAtmosphere
 

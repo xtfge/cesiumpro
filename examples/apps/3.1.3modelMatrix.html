@@ -75,16 +75,16 @@
          */
         function computeModelPosition(name) {
             const node = model.nodes[name];
-            function fn(node, matrix) {
-                Matrix4.multiply(node.publicNode.matrix, matrix, matrix);
-                if (node.parents && node.parents.length) {
-                    return fn(node.parents[0], matrix)
-                }
-                Matrix4.multiply(node.computedMatrix, matrix, matrix);
+            // function fn(node, matrix) {
+            //     Matrix4.multiply(node.matrix, matrix, matrix);
+            //     if (node.parents && node.parents.length) {
+            //         return fn(node.parents[0], matrix)
+            //     }
+            //     Matrix4.multiply(node.publicNode, matrix, matrix);
 
-            }
+            // }
             const m = Matrix4.clone(Matrix4.IDENTITY);
-            fn(node, m);
+            Matrix4.multiply(node.matrix, node._runtimeNode.transformToRoot, m);
             const position = Matrix4.getTranslation(m, new Cartesian3);
             return position;
         }

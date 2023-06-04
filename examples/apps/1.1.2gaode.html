@@ -36,16 +36,35 @@
         const viewer = new CesiumPro.Viewer('map', {
             imageryProvider: image
         });
+        let vec, road;
+        function removeVec() {
+            if (vec) {
+                viewer.removeLayer(vec);
+                vec = undefined;
+            }
+        }
+        function removeRoad() {
+            if (road) {
+                viewer.removeLayer(road);
+                road = undefined;
+            }
+        }
         tools.addButton('添加矢量图层', function() {
-            viewer.addLayer(new CesiumPro.GaoDeLayer({
+            removeVec();
+            vec = viewer.addLayer(new CesiumPro.GaoDeLayer({
                 layer: 'vec'
             }))
         })
         
         tools.addButton('添加路网', function() {
-            viewer.addLayer(new CesiumPro.GaoDeLayer({
+            removeRoad();
+            road = viewer.addLayer(new CesiumPro.GaoDeLayer({
                 layer: 'roi',
             }))
+        })
+        tools.addButton('移除', function() {
+            removeVec();
+            removeRoad();
         })
         
         parent.viewer = viewer;

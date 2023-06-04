@@ -16,14 +16,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     float t = time;
     float s = 0.3;
     float radius1 = smoothstep(.0, s, t) * 0.5;
-    float alpha1 = circle(st, radius1, 0.01) * circle(st, radius1, -0.01);
-    float alpha2 = circle(st, radius1, 0.01 - radius1) * circle(st, radius1, 0.01);
+    float blurRadius = 0.015;
+    float alpha1 = circle(st, radius1, blurRadius) * circle(st, radius1, -blurRadius);
+    float alpha2 = circle(st, radius1, blurRadius - radius1) * circle(st, radius1, blurRadius);
     float radius2 = 0.5 + smoothstep(s, 1.0, t) * 0.5;
-    float alpha3 = circle(st, radius1, radius2 + 0.01 - radius1) * circle(st, radius1, -0.01);
-
-    material.alpha = smoothstep(1.0, s, t) * (alpha1 + alpha2*0.1 + alpha3*0.1);
+    float alpha3 = circle(st, radius1, radius2 + blurRadius - radius1) * circle(st, radius1, -blurRadius);
+    material.alpha = smoothstep(1.0, s, t) * (alpha1 + alpha2 * 0.1 + alpha3 * 0.1);
     material.alpha *= color.a;
-
     return material;
 }
 `

@@ -13,47 +13,47 @@
           {
             "label": "天地图",
             "value": "1.1.1tianditu",
-            "thumb": "./images/tdt.gif"
+            "thumb": "./images/1.1.1tianditu.png"
           },
           {
             "label": "高德地图",
             "value": "1.1.2gaode",
-            "thumb": "./images/gaode.gif"
+            "thumb": "./images/1.1.2gaode.png"
           },
           {
             "label": "百度地图",
             "value": "1.1.3baidu",
-            "thumb": "./images/baidu.gif"
+            "thumb": "./images/1.1.3baidu.png"
           },
           {
             "label": "腾讯地图",
             "value": "1.1.4tecent",
-            "thumb": "./images/tecent.gif"
+            "thumb": "./images/1.1.4tecent.png"
           },
           {
             "label": "ArcGIS Online",
             "value": "1.1.5arcgis",
-            "thumb": "./images/arcgis.gif"
+            "thumb": "./images/1.1.5arcgis.png"
           },
           {
             "label": "mapBox地图",
             "value": "1.1.6mapbox",
-            "thumb": "./images/mapbox.gif"
+            "thumb": "./images/1.1.6mapbox.png"
           },
           {
             "label": "OpenStreetMap(OSM)",
             "value": "1.1.7osm",
-            "thumb": "./images/osm.gif"
+            "thumb": "./images/1.1.7osm.png"
           },
           {
             "label": "本地图片",
             "value": "1.1.8offline",
-            "thumb": "./images/offline.gif"
+            "thumb": "./images/1.1.8offline.png"
           },
           {
             "label": "Bing Maps",
             "value": "1.1.9bing",
-            "thumb": "./images/bing.gif"
+            "thumb": "./images/1.1.9bing.png"
           }
         ]
       },
@@ -65,17 +65,17 @@
           {
             "label": "WMS",
             "value": "1.2.1wms",
-            "thumb": "./images/wms.gif"
+            "thumb": "./images/1.2.1wms.png"
           },
           {
             "label": "WMTS",
             "value": "1.2.2wmts",
-            "thumb": "./images/wmts.gif"
+            "thumb": "./images/1.2.2wmts.png"
           },
           {
             "label": "TMS",
             "value": "1.2.3tms",
-            "thumb": "./images/tms.gif"
+            "thumb": "./images/1.2.3tms.png"
           }
         ]
       },
@@ -87,37 +87,37 @@
           {
             "label": "TMS标准瓦片",
             "value": "1.3.1tms-tile",
-            "thumb": "./images/tms-tile.gif"
+            "thumb": "./images/1.3.1tms-tile.png"
           },
           {
             "label": "Google标准瓦片",
             "value": "1.3.2google-tile",
-            "thumb": "./images/google-tile.gif"
+            "thumb": "./images/1.3.2google-tile.png"
           },
           {
             "label": "ArcGIS标准瓦片",
             "value": "1.3.3arcgis-tile",
-            "thumb": "./images/arcgis-tile.gif"
+            "thumb": "./images/1.3.3arcgis-tile.png"
           },
           {
             "label": "瓦片调试",
             "value": "1.3.4tile-debug",
-            "thumb": "./images/tile-debug.gif"
+            "thumb": "./images/1.3.4tile-debug.png"
           },
           {
             "label": "经纬网",
             "value": "1.3.5lonlat",
-            "thumb": "./images/lonlat.gif"
+            "thumb": "./images/1.3.5lonlat.png"
           },
           {
             "label": "图层调整",
             "value": "1.3.6layerparameter",
-            "thumb": "./images/layerparameter.gif"
+            "thumb": "./images/1.3.6layerparameter.png"
           },
           {
             "label": "限制地球范围",
             "value": "1.3.7globe-extent",
-            "thumb": "./images/globe-extent.gif"
+            "thumb": "./images/1.3.7globe-extent.png"
           }
         ]
       },
@@ -128,17 +128,17 @@
           {
             "label": "GeoJson",
             "value": "1.4.1geojson",
-            "thumb": "./images/geojson.gif"
+            "thumb": "./images/1.4.1geojson.png"
           },
           {
             "label": "KML/KMZ",
             "value": "1.4.2kml",
-            "thumb": "./images/kml.gif"
+            "thumb": "./images/1.4.2kml.png"
           },
           {
             "label": "Shapefile",
             "value": "1.4.3shp",
-            "thumb": "./images/shp.gif"
+            "thumb": "./images/1.4.3shp.png"
           },
           {
             "label": "PBF",
@@ -148,12 +148,12 @@
           {
             "label": "WFS服务",
             "value": "1.4.5wfs",
-            "thumb": "./images/wfs.gif"
+            "thumb": "./images/1.4.5wfs.png"
           },
           {
             "label": "多边形拉伸(建筑矢量拉伸)",
             "value": "1.4.6polygonExa",
-            "thumb": "./images/polygonExa.gif"
+            "thumb": "./images/1.4.6.polygonExt.png"
           }
         ]
       },
@@ -165,22 +165,17 @@
           {
             "label": "地形",
             "value": "1.5.1terrain",
-            "thumb": "./images/terrain.gif"
+            "thumb": "./images/1.5.1terrain.png"
           },
           {
             "label": "自定义高度图",
-            "value": "1.5.4customterrain",
-            "thumb": "./images/customterrain.gif"
-          },
-          {
-            "label": "多地形",
-            "value": "1.5.2mutilterrain",
-            "thumb": "./images/mutipleterrain.gif"
+            "value": "1.5.2customterrain",
+            "thumb": "./images/1.5.2customterrain.png"
           },
           {
             "label": "地形夸张",
             "value": "1.5.3terrainExa",
-            "thumb": "./images/terrainExa.gif"
+            "thumb": "./images/1.5.3terrainExa.png"
           }
         ]
       }
@@ -220,22 +215,67 @@
           {
             "label": "圆形扫描",
             "value": "5.3.1-circlescan",
-            "thumb": "5.3.1-circlescan.gif"
+            "thumb": "./images/5.3.1-circlescan.png"
           },
           {
             "label": "圆形扩散",
             "value": "5.3.2-circleSpread",
-            "thumb": "5.3.2-circleSpread.gif"
+            "thumb": "./images/5.3.2-circleSpread.png"
           },
           {
             "label": "雷达扫描",
             "value": "5.3.3-radarScan",
-            "thumb": "5.3.3-circleSpread.gif"
+            "thumb": "./images/5.3.3-radarScan.png"
           },
           {
             "label": "动态光锥",
             "value": "5.3.4-dynamicCone",
-            "thumb": "5.3.4-dynamicCone.gif"
+            "thumb": "./images/5.3.4-dynamicCone.png"
+          },
+          {
+            "label": "相控阵雷达",
+            "value": "5.3.5rectangularSensor",
+            "thumb": "./images/5.3.5rectangularSensor.png"
+          },
+          {
+            "label": "流动墙",
+            "value": "5.3.6flowWall",
+            "thumb": "./images/5.3.6flowWall.png"
+          },
+          {
+            "label": "动态线",
+            "value": "5.3.7dynamicpl",
+            "thumb" : "./images/5.3.7dynamicpl.png"
+          }, 
+          {
+            "label": "扩散波",
+            "value": "5.3.8spreedpoint",
+            "thumb" : "./images/5.3.8spreedpoint.png"
+          }, 
+          {
+            "label": "扇形",
+            "value": "5.3.9sector",
+            "thumb" : "./images/5.3.9sector.png"
+          }, 
+          {
+            "label": "卫星扫描",
+            "value": "5.3.10satelliteScan",
+            "thumb" : "./images/5.3.10satelliteScan.png"
+          }, 
+          {
+            "label": "动态点",
+            "value": "5.3.11dynamicPoint",
+            "thumb" : "./images/5.3.11dynamicPoint.png"
+          }, 
+          {
+            "label": "OD线",
+            "value": "5.3.12ODline",
+            "thumb" : "./images/5.3.12ODline.png"
+          }, 
+          {
+            "label": "HTML要素",
+            "value": "5.3.12htmlGraphic",
+            "thumb" : "./images/5.3.12htmlGraphic.png"
           }
         ]
       },
@@ -245,16 +285,16 @@
         "children": [{
           "label": "大量点加载(100万点数据)",
           "value": "5.4.1mag-point",
-          "thumb": "./images/mag-point.gif"
+          "thumb": "./images/5.4.1mag-point.png"
         },
         {
           "label": "模型批量加载(50万模型)",
           "value": "5.4.2massiveModel",
-          "thumb": "./images/massivemodel.gif"
+          "thumb": "./images/5.4.2massiveModel.png"
         }, {
           "label": "自定义点要素",
           "value": "5.4.3customPoint",
-          "thumb": ""
+          "thumb": "./images/5.4.3customPoint.png"
         }]
       }
     ]
@@ -273,37 +313,42 @@
           {
             "label": "自转模拟",
             "value": "2.1.1rotation",
-            "thumb": "./images/selfrotation.gif"
+            "thumb": "./images/2.1.1selfrotation.gif"
           },
           {
             "label": "双球同步",
             "value": "2.1.2viewlink",
-            "thumb": "./images/viewlink.gif"
+            "thumb": "./images/2.1.2viewlink.gif"
           },
           {
             "label": "绕点观察",
             "value": "2.1.3rotatebypoint",
-            "thumb": "./images/rotatebypoint.gif"
+            "thumb": "./images/2.1.3rotatebypoint.gif"
           },
           {
             "label": "开场动画",
             "value": "2.1.4stepfly",
-            "thumb": "./images/stepfly.gif"
+            "thumb": "./images/2.1.4stepfly.png"
           },
           {
             "label": "近地天空盒",
             "value": "2.1.5groundskybox",
-            "thumb": "./images/groundskybox.gif"
+            "thumb": "./images/2.1.5groundskybox.png"
           },
           {
             "label": "巻帘",
-            "value": "1.1.6imagerySplit",
-            "thumb": "./images/imagerySplit.gif"
+            "value": "2.1.6imagerySplit",
+            "thumb": "./images/2.1.6imagerySplit.png"
           },
           {
             "label": "kml漫游",
-            "value": "2.1.10kmltour",
-            "thumb": "./images/kmltour.gif"
+            "value": "2.1.7kmltour",
+            "thumb": "./images/2.1.7kmltour.png"
+          },
+          {
+            "label": "判断点是否在球的正面",
+            "value": "2.1.8pointVisible",
+            "thumb": "./images/2.1.8pointVisible.png"
           }
         ]
       },
@@ -312,11 +357,6 @@
         "value": "widgets",
         "icon": "",
         "children": [
-          {
-            "label": "标绘",
-            "value": "3.2.1-plot",
-            "thumb": "./images/3.2.1-plot.png"
-          },
           {
             "label": "漫游",
             "value": "1.1.1tianditu",
@@ -344,17 +384,17 @@
           {
             "label": "gltf/glb模型加载",
             "value": "3.1.1gltf",
-            "thumb": "./images/gltf.gif"
+            "thumb": "./images/3.1.1gltf.png"
           },
           {
             "label": "模型（矩阵）变换",
             "value": "3.1.3modelMatrix",
-            "thumb": "./images/modelMatrix.gif"
+            "thumb": "./images/3.1.3modelMatrix.png"
           },
           {
             "label": "模型剖切",
             "value": "3.1.4modelclip",
-            "thumb": "./images/modelclip.gif"
+            "thumb": "./images/3.1.4modelclip.png"
           }
         ]
       },
@@ -365,16 +405,16 @@
           {
             "label": "gltf/倾斜摄影(3DTileset)",
             "value": "3.2.1tileset",
-            "thumb": "./images/tileset.gif"
+            "thumb": "./images/3.2.1tileset.png"
           },
           {
             "label": "无球模式",
             "value": "3.2.2noglobe",
-            "thumb": "./images/noglobe.gif"
+            "thumb": "./images/3.2.2noglobe.png"
           }, {
             "label": "模型压平",
             "value": "3.2.3flatten-model",
-            "thumb": "./images/noglobe.gif"
+            "thumb": "./images/3.2.3flatten-model.png"
           }
         ]
       }
@@ -389,7 +429,11 @@
         "label": "大数据可视化",
         "value": "mag",
         "children": [
-          
+          {
+            "label": "风场",
+            "value": "5.3.6windField",
+            "thumb": "./images/5.3.6windField.png"
+          }
         ]
       },
       {
@@ -397,16 +441,26 @@
         "value": "effect",
         "children": [
           {
-            "label": "多边形拉伸",
-            "value": "4.2.1polygonEffect",
-            "thumb": "./images/polygonEffect.gif"
+            "label": "雨",
+            "value": "4.2.1rain",
+            "thumb": "./images/4.2.1rain.png"
+          },
+          {
+            "label": "雪",
+            "value": "4.2.2snow",
+            "thumb": "./images/4.2.2snow.png"
+          },
+          {
+            "label": "雾",
+            "value": "4.2.3fog",
+            "thumb": "./images/4.2.3fog.png"
           }
         ]
       }
     ]
   },
   {
-    "label": "分析",
+    "label": "分析工具",
     "value": "analysis",
     "icon": "glyphicon glyphicon-asterisk",
     "children": [
@@ -429,6 +483,17 @@
       {
         "label": "卫星过境分析",
         "value": "satelliate"
+      },
+      {
+        "label": "常用工具",
+        "value": "tools",
+        "children": [
+          {
+            "label": "标绘",
+            "value": "6.3.1plot",
+            "thumb": "./images/6.3.1plot.png"
+          }
+        ]
       }
     ]
   }

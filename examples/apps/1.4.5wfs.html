@@ -6,6 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Cesium Pro</title>
+    <script src="./config.js"></script>
     <script src='./editor/Sandcastle.js'></script>
     <link href='./editor/Sandcastle.css' rel='stylesheet' />
     <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
@@ -30,26 +31,23 @@
 
 <body>
     <div id='map'></div>
+    <div id="toolbar"></div>
     <script>
+        const geoserver = window.parent.EDITOR_CONFIG.GEOSERVER;
         const viewer = new CesiumPro.Viewer('map', {
             infoBox: true,
             // selectionIndicator: true
         });
         const wfs = new CesiumPro.WFSLayer({
-            url: "http://localhost:8080/geoserver/tiger/ows",
+            url: getGeoserverURL("/tiger/ows"),
             typeName: "tiger:poi",
             style: {
-                pointColor: Cesium.Color.GOLD
+                pointColor: Cesium.Color.GOLD,
+                pointSize: 10
             }
         })
-        viewer.addLayer(wfs)
-        viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(110, 30),
-            point:{
-                pixelSize:5
-            }
-        })
-        // viewer.flyTo(wfs)
+        const layer = viewer.addLayer(wfs)
+        viewer.flyTo(layer)
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         handler.setInputAction((e)=> {
             const feat = viewer.scene.pick(e.position);
@@ -58,12 +56,9 @@
             }
             console.log(feat)
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
-        
-        // const kml = CesiumPro.GeoJsonDataSource.load(resource);
-        // console.log(kml)
-        // viewer.addLayer(kml)
-        parent.viewer = viewer;
-        parent.Resource = Cesium.Resource;
+    </script>
+    <script>
+        tools.addLabel('点击要素查询属性')
     </script>
 </body>
 

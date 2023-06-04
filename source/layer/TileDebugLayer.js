@@ -13,6 +13,9 @@ function buildText(imageryProvider, x, y, level) {
     }
     return text;
 }
+function toCssColorString(color) {
+    return `rgba(${color.red * 255}, ${color.green * 255}, ${color.blue * 255}, ${color.alpha})`
+}
 class TileDebugLayer {
     /**
      * 根据给定参数显示瓦片行列号，仅用于调试。
@@ -33,7 +36,7 @@ class TileDebugLayer {
         this._errorEvent = new Event();
         this._tileWidth = defaultValue(options.tileWidth, 256);
         this._tileHeight = defaultValue(options.tileHeight, 256);
-        this._readyPromise = Cesium.when.resolve(true);
+        this._readyPromise = Promise.resolve(true);
 
         this._font = defaultValue(options.font, 'bold 24px sans-serif');
         this._color = defaultValue(options.color, new Cesium.Color(1,1,1,1));
@@ -152,8 +155,8 @@ class TileDebugLayer {
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
         ctx.font = this.font;
-        ctx.fillStyle = this.color.toCssColorString();
-        ctx.strokeStyle = this.borderColor.toCssColorString();
+        ctx.fillStyle = toCssColorString(this.color);
+        ctx.strokeStyle = toCssColorString(this.color);
         ctx.lineWidth = this.borderWidth
         return {canvas, ctx}
     }
@@ -172,7 +175,7 @@ class TileDebugLayer {
         ctx.fillText(value[1], canvas.width / 2, canvas.height / 4 * 2);
         ctx.fillText(value[2], canvas.width / 2, canvas.height / 4 * 3);
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        return canvas;
+        return Promise.resolve(canvas);
     }
 
 }

@@ -64,9 +64,9 @@
                 }
                 window.graphic = new CesiumPro.CircleSpreadGraphic({
                     position: new CesiumPro.LonLat(107.766, 34.548),
-                    radius: 1000,
+                    radius: 6000,
                     color: '#FF0000',
-                    speed: 5000
+                    speed: 1
                 });
                 viewer.graphicGroup.add(graphic)
                 // graphic.addTo(viewer);
@@ -76,8 +76,9 @@
                 window.graphic = null;
             },
             '颜色': '#FF0000',
-            '速度': 5000,
-            "贴地": false
+            '速度': 1,
+            "贴地": false,
+            "半径": 6000
 
         }
         gui.add(parameters, '添加')
@@ -88,9 +89,14 @@
                 window.graphic.color = parameters['颜色'];
             }
         });
-        gui.add(parameters, '速度', 1000, 10000, 1000).onChange(() => {
+        gui.add(parameters, '速度', 0, 1, 0.1).onChange(() => {
             if(window.graphic) {
                 window.graphic.speed = parameters['速度']
+            }
+        })
+        gui.add(parameters, '半径', 1000, 10000, 1000).onChange(() => {
+            if(window.graphic) {
+                window.graphic.radius = parameters['半径']
             }
         })
         gui.add(parameters, '贴地').onChange(() => {

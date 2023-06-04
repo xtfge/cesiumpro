@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang=></html>
+<html lang=>
+
+</html>
 
 <head>
     <meta charset='UTF-8'>
@@ -41,7 +43,7 @@
         const linstring = CesiumPro.GeoJsonDataSource.load('../data/geojson/railway.geojson')
         // 修改该多边形的样式
         const polygon = CesiumPro.GeoJsonDataSource.load('../data/geojson/province.geojson', {
-            fill: Cesium.Color.GOLD,
+            fill: Cesium.Color.GOLD.withAlpha(0.5),
             outline: false
         })
         // 使用全局方法修改点的颜色
@@ -50,8 +52,8 @@
         const point = CesiumPro.GeoJsonDataSource.load('../data/geojson/city.geojson', {
             pointSize: 6
         })
-
         Promise.all([polygon, linstring, point]).then(json => {
+            console.log(json)
             parent.json = json
             viewer.addLayer(json[0]);
             viewer.addLayer(json[1]);

@@ -35,7 +35,9 @@
             url: '../data/terrain/terrain1'
         })
         viewer.terrain = terrain;
-        viewer.flyTo(new CesiumPro.LonLat(108.5, 33.3, 10000))
+        viewer.flyTo(new CesiumPro.LonLat(108.5, 33.3, 10000)).then((v) => {
+            console.log('fly complete',v)
+        })
         parent.viewer = viewer;
     </script>
 </body>

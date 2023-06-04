@@ -40,6 +40,8 @@
             rectangle: Cesium.Rectangle.fromDegrees(-74.047185, 40.679648, -73.90782, 40.882078),
             url: 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/tiger-ny@EPSG%3A900913@png/{z}/{x}/{reverseY}.png'
         })
+        const layer = viewer.addLayer(tms)
+        viewer.flyTo(layer)
         const layer2 = new CesiumPro.XYZLayer({
             tilingScheme: new Cesium.GeographicTilingScheme(),
             url: ' http://192.168.0.105:7777/tiger_giant_polygon/EPSG_4326_{z}/{sx}/{mx}_{my}.png',
@@ -67,8 +69,7 @@
             },
             maximumLevel: 10
         })
-        const layer = viewer.addLayer(tms)
-        // viewer.flyTo(layer)
+        
         parent.viewer = viewer;
 
         const layer1 = new Cesium.ImageryLayer(new Cesium.UrlTemplateImageryProvider({
@@ -97,7 +98,7 @@
                 '{z}': '00',
             },
         }))
-        viewer.imageryLayers.add(layer1)
+        // viewer.imageryLayers.add(layer1)
     </script>
 </body>
 

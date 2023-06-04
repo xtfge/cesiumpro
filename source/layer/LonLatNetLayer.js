@@ -21,8 +21,8 @@ class LonLatNetLayer {
      * @param {Object} [options] 具有以下属性。
      * @param {String} [options.font='bold 24px sans-serif'] 字体
      * @param {String} [options.color = 'white'] 文字颜色
-     * @param {String} [options.borderColor = 'gold'] 边框颜色
-     * @param {String} [options.borderWidth = 2] 边框宽度
+     * @param {String} [options.lineColor = 'gold'] 边框颜色
+     * @param {String} [options.lineWidth = 2] 边框宽度
      * @param {Number} [options.intervalOfZeorLevel=16] 0级两条线之间的度数
      * @param {Boolean} [options.hasAlphaChannel=true] 是否有alpha通道
      */
@@ -39,18 +39,12 @@ class LonLatNetLayer {
         this._errorEvent = new Event();
 
         this._ready = true;
-        this._readyPromise = Cesium.when.defer();
-        this._readyPromise.resolve(true);
+        this._readyPromise = Promise.resolve(true);
 
         this._font = defaultValue(options.font, 'bold 24px sans-serif');
         this._color = defaultValue(options.color, 'white');
-        this._borderColor = defaultValue(options.borderColor, 'gold')
-        this._borderWidth = defaultValue(options.borderWidth, 2)
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.canvas.width = 256;
-        this.canvas.height = 256;
-        this.ctx.textBaseline = 'middle';
+        this._lineColor = defaultValue(options.lineColor, 'gold')
+        this._lineWidth = defaultValue(options.lineWidth, 2)
     }
     get hasAlphaChannel() {
         return this._hasAlphaChannel;
@@ -105,7 +99,7 @@ class LonLatNetLayer {
      * @type {String}
      */
     get color() {
-        return this._color;
+        return `rgba(${this._color.red * 255}, ${this._color.green * 255}, ${this._color.blue * 255}, ${this._color.alpha})`;
     }
     set color(val) {
         this._color = val;
@@ -114,28 +108,35 @@ class LonLatNetLayer {
      * 获得或设置边框颜色
      * @type {String}
      */
-    get borderColor() {
-        return this._borderColor;
+    get lineColor() {
+        const c = this._lineColor;
+        return `rgba(${c.red * 255}, ${c.green * 255}, ${c.blue * 255}, ${c.alpha})`;
     }
-    set borderColor(val) {
-        this._borderColor = val;
+    set lineColor(val) {
+        this._lineColor = val;
     }
     /**
      * 获得或设置边框宽度
      * @type {Number}
      */
-    get borderWidth() {
-        return this._borderWidth
+    get lineWidth() {
+        return this._lineWidth
     }
-    _resetStyle() {
-        // this.ctx.textAlign = 'left';
-        this.ctx.font = this.font;
-        this.ctx.fillStyle = this.color;
-        this.ctx.strokeStyle = this.borderColor;
-        this.ctx.lineWidth = this.borderWidth
-    }
-    _clearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    /**
+     * @private
+     */
+     createCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.tileWidth;
+        canvas.height = this.tileHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
+        ctx.font = this.font;
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = this.lineColor;
+        ctx.lineWidth = this.lineWidth
+        return {canvas, ctx}
     }
     getOffset(left, top, level) {
         const delta = this.tilingScheme.getDelatXY(level);
@@ -156,17 +157,14 @@ class LonLatNetLayer {
         return [x, y, validValueX, validValueY]
     }
     requestImage(x, y, level, request) {
-        this._clearCanvas()
-        this._resetStyle();
-        const { canvas, ctx } = this;
-        const value = this.tilingScheme.getLonLatValuee(level, x, y);
-        const value1 = this.tilingScheme.tileXYToNativeRectangle(x, y, level);
-        this.ctx.textAlign = 'left';
+        const { ctx, canvas } = this.createCanvas();
+        const value = this.tilingScheme.getPosition(level, x, y);
+        ctx.textAlign = 'left';
         ctx.fillText(value.lon, 10, canvas.height / 2);
-        this.ctx.textAlign = 'center';
+        ctx.textAlign = 'center';
         ctx.fillText(value.lat, canvas.width / 2, 20);
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        return canvas;
+        return Promise.resolve(canvas);
     }
 
 }

@@ -492,7 +492,7 @@ function load(that, geoJson, options, sourceUri) {
         }
     }
 
-    return Cesium.when(crsFunction, function (crsFunction) {
+    return Promise.resolve(crsFunction).then(function (crsFunction) {
         that._entityCollection.removeAll();
 
         // null is a valid value for the crs, but means the entire load process becomes a no-op
@@ -501,7 +501,7 @@ function load(that, geoJson, options, sourceUri) {
             typeHandler(that, geoJson, geoJson, crsFunction, options);
         }
 
-        return Cesium.when.all(that._promises, function () {
+        return Promise.all(that._promises).then(function () {
             that._promises.length = 0;
             DataSource.setLoading(that, false);
             return that;
@@ -678,15 +678,14 @@ class ShapefileDataSource extends GeoJsonDataSource {
             clampToGround: defaultValue(options.clampToGround, ShapefileDataSource.clampToGround),
             extrudedHeight: options.extrudedHeight
         };
-
-
-        return Cesium.when(promise, function (geoJson) {
+        return Promise.resolve(promise)
+        .then(function (geoJson) {
             return load(that, geoJson, options, sourceUri);
-        }).otherwise(function (error) {
-            Cesium.DataSource.setLoading(that, false);
+        })
+        .catch(function (error) {
+            DataSource.setLoading(that, false);
             that._error.raiseEvent(that, error);
-            console.log(error);
-            return Cesium.when.reject(error);
+            throw error;
         });
     }
 

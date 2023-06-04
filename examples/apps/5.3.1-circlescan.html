@@ -26,8 +26,8 @@
 <body>
     <div id='map'></div>
     <script>
-        const lat = 34.548;
-        const lon =  107.766
+        var lat = 34.548;
+        var lon =  107.766
         const viewer = new CesiumPro.Viewer('map', {
             terrainProvider: new Cesium.CesiumTerrainProvider({
                 url: '../data/terrain'
@@ -54,8 +54,8 @@
         const parameters = {
             color: '#FF0000',
             '修改位置': function() {
-                const lon = Math.random() * 0.1 + lon;
-                const lat = Math.random() * 0.1 + lat;
+                lon = Math.random() * 0.1 + lon;
+                lat = Math.random() * 0.1 + lat;
                 const p = new CesiumPro.LonLat(lon, lat);
                 graphic.position = p;
             },
@@ -65,7 +65,7 @@
                     position: new CesiumPro.LonLat(lon , lat + 0.05),
                     radius: 1000,
                     color: '#FF0000',
-                    speed: 10,
+                    speed: 0.5,
                     clampToGround: parameters['贴地'],
                     property: {
                         name: "贴地圆",
@@ -79,7 +79,7 @@
                 graphic.remove();
             },
             '颜色': '#FF0000',
-            '速度': 10,
+            '速度': 0.5,
             "贴地": false,
             "允许鼠标拾取": false
         }
@@ -91,7 +91,7 @@
                 window.graphic.color = parameters['颜色'];
             }
         });
-        gui.add(parameters, '速度', 1, 100, 10).onChange(() => {
+        gui.add(parameters, '速度', 0, 1, 0.1).onChange(() => {
             if(window.graphic) {
                 window.graphic.speed = parameters['速度']
             }

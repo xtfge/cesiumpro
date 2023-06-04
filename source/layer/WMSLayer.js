@@ -3,6 +3,7 @@ import defined from "../core/defined.js";
 class WMSLayer extends Cesium.WebMapServiceImageryProvider {
     /**
      * 创建一个从WMS服务请求数据的图层。
+     * TODO： 从capability 创建图层
      * @extends Cesium.WebMapServiceImageryProvider
      * @param {*} options 具有以下属性
      * @param {Resource|String} options.url 一个WMS服务的URL. 这个url支持和 {@link XYZLayer}一样的关键字。

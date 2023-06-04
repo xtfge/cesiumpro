@@ -88,11 +88,39 @@ LonlatTilingScheme.prototype.getDelatXY = function(level) {
   let dy = intervalOfZeorLevel / 2 ** level;
   return {dx, dy}  
 }
-LonlatTilingScheme.prototype.getLonLatValuee = function(level, x, y) {
+LonlatTilingScheme.prototype.getLonLatValue = function(level, x, y) {
   const value = this.getDelatXY(level);
   const lon = value.dx * x - 180;
   const lat = 90 - value.dy * y;
   return {lon, lat}
+}
+LonlatTilingScheme.prototype.getPosition = function(level, x, y) {
+  const rectangle = this._rectangle;
+
+  const xTiles = this.getNumberOfXTilesAtLevel(level);
+  const yTiles = this.getNumberOfYTilesAtLevel(level);
+
+  const xTileWidth = rectangle.width / xTiles;
+  const west = x * xTileWidth + rectangle.west;
+  const east = (x + 1) * xTileWidth + rectangle.west;
+
+  const yTileHeight = rectangle.height / yTiles;
+  const north = rectangle.north - y * yTileHeight;
+  const south = rectangle.north - (y + 1) * yTileHeight;
+
+  // if (!defined(result)) {
+  //   result = new Rectangle(west, south, east, north);
+  // }
+
+  // result.west = west;
+  // result.south = south;
+  // result.east = east;
+  // result.north = north;
+  // return result;
+  return {
+    lon: +CesiumMath.toDegrees(west).toFixed(5),
+    lat: +CesiumMath.toDegrees(north).toFixed(5)
+  }
 }
 
 /**

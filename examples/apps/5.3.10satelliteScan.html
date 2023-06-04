@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        function computeCirclularFlight(lon, lat, radius) {
+        var property = new Cesium.SampledPositionProperty();
+        for (var i = 0; i <= 360; i += 45) {
+          var radians = Cesium.Math.toRadians(i);
+          var time = Cesium.JulianDate.addSeconds(
+            viewer.clock.currentTime,
+            i,
+            new Cesium.JulianDate()
+          );
+          var position = Cesium.Cartesian3.fromDegrees(
+            lon + radius * 1.5 * Math.cos(radians),
+            lat + radius * Math.sin(radians),
+            Cesium.Math.nextRandomNumber() * 500 + 1750
+          );
+          property.addSample(time, position);
+
+          //Also create a point for each sample we generate.
+          viewer.entities.add({
+            position: position,
+            point: {
+              pixelSize: 8,
+              color: Cesium.Color.TRANSPARENT,
+              outlineColor: Cesium.Color.YELLOW,
+              outlineWidth: 3,
+            },
+          });
+        }
+        return property;
+      }
+    </script>
+    <script>
+        const viewer = new CesiumPro.Viewer('map', {
+            animation: true,
+            timeline: true
+        });
+        const path = viewer.entities.add({
+            availability: new Cesium.TimeIntervalCollection([
+                new Cesium.TimeInterval({
+                    start: viewer.clock.currentTime,
+                    stop: Cesium.JulianDate.addSeconds(viewer.clock.currentTime, 360, new Cesium.JulianDate),
+                }),
+            ]),
+            position: computeCirclularFlight(110, 30, 0.1),
+            point: {},
+            path: {
+                resolution: 1,
+                material: new Cesium.PolylineGlowMaterialProperty({
+                    glowPower: 0.1,
+                    color: Cesium.Color.YELLOW,
+                }),
+                width: 10,
+            },
+        })
+        const graphic = new CesiumPro.SatelliteScanGraphic({
+            position: new CesiumPro.LonLat(110, 30, 1000),
+            radius: 600,
+            image: CesiumPro.Url.buildModuleUrl('./assets/images/satellite.png'),
+            color: Cesium.Color.AQUA,
+            path: path
+        })
+        graphic.addTo(viewer);
+        graphic.zoomTo();
+    </script>
+    <script>
+        const object = {
+            show: true,
+            color: '#00FFFF',
+            scan: true,
+            speed: 0.5,
+            thickness: 0.3,
+            inverse: false,
+            slices: 20,
+            rx: 0,
+            ry: 0,
+            tracked: false
+        }
+        const gui = new GUI();
+        gui.add(object, 'show').name('显示').onChange(function (val) {
+            graphic.show = val;
+        })
+        gui.addColor(object, 'color').name('颜色').onChange(function (val) {
+            graphic.color = Cesium.Color.fromCssColorString(val);
+        })
+        gui.add(object, 'scan').name('扫描').onChange(function (val) {
+            graphic.animation = val;
+        })
+        gui.add(object, 'speed', 0.0, 1, 0.1).name('扫描速度').onChange(function (val) {
+            graphic.speed = val
+        })
+        gui.add(object, 'slices', 10, 30, 1).name('分片数').onChange(function (val) {
+            graphic.slices = val;
+        })
+        gui.add(object, 'inverse').name('反转').onChange(function (val) {
+            graphic.inverse = val;
+        })
+        gui.add(object, 'tracked').name('跟踪').onChange(function(val) {
+            graphic.tracked = val;
+        })
+        let rx = 0, ry = 0;
+        gui.add(object, 'rx', -90, 90, 1).name('绕X轴旋转').onChange(function (val) {
+
+            const rotation = new Cesium.Cartesian3(object.rx - rx, object.ry - ry, 0);
+            graphic.rotation = rotation;
+            rx = val
+        })
+        gui.add(object, 'ry', -90, 90, 1).name('绕Y轴旋转').onChange(function (val) {
+
+            const rotation = new Cesium.Cartesian3(object.rx - rx, object.ry - ry, 0);
+            graphic.rotation = rotation;
+            ry = val
+        })
+
+    </script>
+</body>
+
+</html>

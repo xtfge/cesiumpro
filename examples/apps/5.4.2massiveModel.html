@@ -71,7 +71,7 @@
         })
         
         viewer.flyTo(new CesiumPro.LonLat(101,31,2000)).then(() => {
-            viewer.massiveGraphicLayers.add(massiveModel)
+            viewer.vectorTileCollection.add(massiveModel)
         })
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         handler.setInputAction((e) => {

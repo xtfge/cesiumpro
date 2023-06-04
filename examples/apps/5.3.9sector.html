@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const appearance = function(color) {
+           return new Cesium.MaterialAppearance({
+            material: new Cesium.Material({
+                fabric: {
+                    type: 'custom',
+                    source: `
+              czm_material czm_getMaterial(czm_materialInput materialInput){
+                czm_material material=czm_getDefaultMaterial(materialInput);
+                vec2 st = materialInput.st;
+                float dis = distance(st,vec2(0.5));
+                material.diffuse = color.rgb;
+                material.alpha = color.a*dis;
+                return material;
+              }
+              `,
+                    uniforms: {
+                        color
+                    }
+                }
+            })
+        })
+        }
+        function addSector(geometry, color) {
+            const primitive = new Cesium.Primitive({
+                geometryInstances: new Cesium.GeometryInstance({
+                    geometry: geometry,
+                    attributes: {
+                        color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(1.0, 1.0, 1.0, 1.0))
+                    }
+                }),
+                appearance: appearance(color),
+                asynchronous: false,
+                // modelMatrix
+            })
+            viewer.scene.primitives.add(primitive);
+            return primitive
+        }
+        const coords = [
+            [110, 30],
+            [110.02, 30.01],
+            [110.05, 30.03],
+            [110.06, 30.04],
+            [110.03, 30.02]
+        ]
+        for (let i = 0; i < coords.length; i++) {
+            const c = coords[i]
+            const center = Cesium.Cartesian3.fromDegrees(...c)
+            const sector = new CesiumPro.SectorGeometry({
+                center,
+                radius: 1000 + 1000 * Math.random(),
+                fov: 90 + 90 * Math.random(),
+                height: 100,
+                rotation: Math.random() * 180,
+                vertexFormat: Cesium.VertexFormat.POSITION_NORMAL_AND_ST
+            })
+            addSector(sector, Cesium.Color.fromRandom({alpha: 1.0}))
+        }
+        viewer.flyTo(new CesiumPro.LonLat(110, 29.9, 10000))
+    </script>
+</body>
+
+</html>

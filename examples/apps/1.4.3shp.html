@@ -33,7 +33,9 @@
             fill:Cesium.Color.WHITE.withAlpha(0)
         })
         const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp', {
-            clampToGround:true
+            clampToGround:true,
+            pointSize: 6,
+            pointColor: Cesium.Color.WHITE
         })
         viewer.addLayer(province)
         viewer.addLayer(city)

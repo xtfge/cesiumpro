@@ -60,17 +60,19 @@
                 position: _,
             }
         })
+        // 自定义几何要点
         function createGeometry(object, tile, framestate) {
             return new Cesium.Entity({
                 position: object.position,
                 point: {
-                    pixelSize: 5,
+                    pixelSize: 8,
                     color: Cesium.Color.fromRandom({alpha: 1})
                 },
                 label: {
                     text: object.property.name,
                     font: "14px sans-serif",
-                    eyeOffset: new Cesium.Cartesian2(0, 30)
+                    eyeOffset: new Cesium.Cartesian2(0, 30),
+                    fillColor: Cesium.Color.GOLD
                 }
             })
         }
@@ -79,7 +81,7 @@
             createGeometryFunction: createGeometry
         });
         viewer.flyTo(new CesiumPro.LonLat(100,30,8000)).then(() => {
-            viewer.massiveGraphicLayers.add(layer)
+            viewer.vectorTileCollection.add(layer)
         })
         
     </script>

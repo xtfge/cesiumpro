@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang=
->
+<html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -32,9 +31,19 @@
         const viewer = new CesiumPro.Viewer('map');
         const lonlat = new CesiumPro.LonLatNetLayer({
             color: Cesium.Color.RED,
-            intervalOfZeorLevel: 16
+            lineColor: Cesium.Color.WHITE,
+            intervalOfZeorLevel: 16,
+            font: 'bold 32px sans-serif',
+            lineWidth: 10
             // hasAlphaChannel: false
         });
+        viewer.entities.add({
+            position: new CesiumPro.LonLat(120, 30).toCartesian(),
+            point: {
+                pixelSize: 20,
+                color: Cesium.Color.GOLD
+            }
+        })
         viewer.addLayer(lonlat)
         parent.viewer = viewer;
     </script>

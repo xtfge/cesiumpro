@@ -43,7 +43,7 @@ class WFSLayer {
                 outputFormat: 'application/json'
             }
         })
-        return GeoJsonDataSource.load(resource, this._style);
+        this._dataSource = GeoJsonDataSource.load(resource, this._style);
     }
     get rectangle() {
         return this._rectangle || this.tilingScheme.rectangle;

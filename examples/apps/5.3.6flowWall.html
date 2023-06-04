@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+
+        const wall1 = viewer.entities.add({
+            name: "yellow wall ",
+            wall: {
+                positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                    106.0,
+                    46.0,
+                    100000.0,
+
+                    106.0,
+                    47.0,
+                    100000.0,
+
+                    108.0,
+                    44.0,
+                    100000.0,
+
+                    108.0,
+                    45.0,
+                    100000.0,
+
+                    110.0,
+                    46.,
+                    100000.0,
+                ]),
+                material: new CesiumPro.DynamicFlowWallMaterialProperty({
+                    gradient: 3,
+                    duration: 3000,
+                    color: Cesium.Color.YELLOW,
+                    wrapX: true,
+                    image: "../data/img/wall.png"
+                })
+            }
+        })
+        const wall2 = viewer.entities.add({
+            name: "arrow wall",
+            wall: {
+                positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                    107.0,
+                    45.0,
+                    100000.0,
+
+                    105.0,
+                    45.0,
+                    100000.0,
+
+                    105.0,
+                    41.0,
+                    100000.0,
+
+                    107.0,
+                    41.0,
+                    100000.0,
+
+                    107.0,
+                    45.,
+                    100001.0,
+                ]),
+                material: new CesiumPro.DynamicFlowWallMaterialProperty({
+                    gradient: 3,
+                    duration: 3000,
+                    color: Cesium.Color.YELLOW,
+                    wrapX: false,
+                    image: "../data/img/arrow.png",
+                    repeat: new Cesium.Cartesian2(12, 1)
+                })
+            }
+        })
+        const center = Cesium.Cartesian3.fromDegrees(102.5, 42, 100000);
+        const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+        const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4)
+        const positions = []
+        for (let i = 0; i <= 360; i++) {
+            const x = 100000 * Math.cos(Cesium.Math.toRadians(i));
+            const y = 100000 * Math.sin(Cesium.Math.toRadians(i));
+            const local = new Cesium.Cartesian3(x, y, 0);
+            const wp = Cesium.Matrix4.multiplyByPoint(matrix, local, new Cesium.Cartesian3);
+            positions.push(wp)
+        }
+        const wall3 = viewer.entities.add({
+            name: "aqua wall",
+            wall: {
+                positions,
+                material: new CesiumPro.DynamicFlowWallMaterialProperty({
+                    gradient: 3,
+                    duration: 3000,
+                    color: Cesium.Color.AQUA,
+                    wrapX: true,
+                    image: "../data/img/wall.png"
+                })
+            }
+        })
+        viewer.flyTo([wall1, wall2, wall3])
+    </script>
+</body>
+
+</html>

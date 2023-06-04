@@ -189,11 +189,11 @@ function render(scene) {
     if (defined(scene.globe)) {
         scene.globe.beginFrame(frameState);
         // override
-        scene._LodGraphic.beginFrame(frameState)
+        scene._vectorTileQuadtree.beginFrame(frameState)
     }
     scene.updateEnvironment();
     scene.updateAndExecuteCommands(passState, backgroundColor);
-    scene.globe && scene._LodGraphic.render(frameState);
+    scene.globe && scene._vectorTileQuadtree.render(frameState);
     scene.resolveFramebuffers(passState);
 
     passState.framebuffer = undefined;
@@ -201,7 +201,7 @@ function render(scene) {
 
     if (defined(scene.globe)) {
         scene.globe.endFrame(frameState);
-        scene._LodGraphic.endFrame(frameState)
+        scene._vectorTileQuadtree.endFrame(frameState)
 
         if (!scene.globe.tilesLoaded) {
             scene._renderRequested = true;

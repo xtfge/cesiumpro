@@ -31,9 +31,10 @@
     <script>
         const viewer = new CesiumPro.Viewer('map');
         // 由于google被Q，使用openstreetmap瓦片服务代替
-        // openstreetmap的切片规则符合google标准
+        // mapbox的切片规则符合google标准
         const tms = new CesiumPro.XYZLayer({
-            url: 'http://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            // url: 'http://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            url: "https://b.tiles.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiYmFvcmxlaSIsImEiOiJja2p4eWdhcDAwd3VqMm5sc3JveDVidjZhIn0.d2t9yfYG2rLAKqbA4YRtXA"
         })
         viewer.addLayer(tms)
         parent.viewer = viewer;

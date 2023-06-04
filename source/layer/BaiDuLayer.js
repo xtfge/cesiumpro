@@ -38,7 +38,9 @@ class BaiDuLayer extends XYZLayer {
         });
         options.subdomains = '123'
         super(options);
-        this._rectangle = this._tilingScheme.rectangle;
+    }
+    get rectangle() {
+        return this.tilingScheme.rectangle;
     }
     /**
      * 请求指定瓦片

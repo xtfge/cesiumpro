@@ -5,7 +5,6 @@ import Event from './Event.js'
 import CesiumProTerrainProvider from './CesiumProTerrainProvider.js'
 const {
     CesiumTerrainProvider,
-    when,
     TerrainProvider,
     Resource,
     CustomDataSource,
@@ -43,13 +42,10 @@ function bindBounding(provider, url) {
     const layerJsonResource = resource.getDerivedResource({
         url: "layer.json",
     });
-    return new Promise((resolve, reject) => {
-        when(layerJsonResource.fetchJson())
-        .then((data) => {
-            provider.projection = data.projection;
-            provider.bounds = Rectangle.fromDegrees(...data.valid_bounds);
-            resolve(true);
-        })
+    return layerJsonResource.fetchJson()
+    .then((data) => {
+        provider.projection = data.projection;
+        provider.bounds = Rectangle.fromDegrees(...data.valid_bounds);
     })
 }
 class MultipleTerrainProvider {
@@ -104,21 +100,26 @@ class MultipleTerrainProvider {
             boundPromise.push(bindBounding(provider, terrain.url));
         }
         this._ready = false;
-        this._readyPromise = when.defer()
+        this._readyPromise = new Promise((resolve) => {
+            Promise.all([...this._terrainProviders.map(_ => _.readyPromise), ...boundPromise]).then((pv) => {
+                this._ready = true;
+                resolve(true);
+                this._tilingScheme = this._terrainProviders[0]._tilingScheme;
+                this._levelZeroMaximumGeometricError = TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
+                    this._tilingScheme.ellipsoid,
+                    this._heightmapWidth,
+                    this._tilingScheme.getNumberOfXTilesAtLevel(0)
+                );
+            })
+        })
         this._terrainList = terrainList;
 
         // 所有地形准备完成就准备完成
-        Promise.all([...this._terrainProviders.map(_ => _.readyPromise), ...boundPromise]).then((pv) => {
-            this._ready = true;
-            this._readyPromise.resolve(true);
-            this._tilingScheme = this._terrainProviders[0]._tilingScheme;
-            this._levelZeroMaximumGeometricError = TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
-                this._tilingScheme.ellipsoid,
-                this._heightmapWidth,
-                this._tilingScheme.getNumberOfXTilesAtLevel(0)
-            );
-        })
+
         this._validProvider = undefined;
+    }
+    get errorEvent() {
+        return this._errorEvent;
     }
     get tilingScheme() {
         return this._tilingScheme;
@@ -169,7 +170,7 @@ class MultipleTerrainProvider {
             // const rect = _.tilingScheme.tileXYToRectangle(x, y, level);
             // const intersection = Rectangle.intersection(rect, _.bounds);
             // return !!intersection;
-        });       
+        });
         const sorted = providers.sort((a, b) => b.zIndex - a.zIndex);
         this._validProvider = sorted[0];
         if (this._validProvider) {
@@ -186,9 +187,9 @@ class MultipleTerrainProvider {
      * @returns {Promise}
      */
     requestTileGeometry(x, y, level, request) {
-        for(let provider of this._terrainProviders) {
-            if(provider !== this._validProvider) {
-                if(provider.getTileDataAvailable(x, y, level)) {
+        for (let provider of this._terrainProviders) {
+            if (provider !== this._validProvider) {
+                if (provider.getTileDataAvailable(x, y, level)) {
                     provider.requestTileGeometry(x, y, level);
                 }
             }

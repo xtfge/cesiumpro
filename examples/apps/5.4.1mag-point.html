@@ -90,7 +90,7 @@
         })
         parent.viewer = viewer;
         viewer.flyTo(new CesiumPro.LonLat(100,30,8000)).then(() => {
-            viewer.massiveGraphicLayers.add(pointlayer)
+            viewer.vectorTileCollection.add(pointlayer)
         })
         
 

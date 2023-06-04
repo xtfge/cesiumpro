@@ -20,21 +20,21 @@ const AutomaticUniforms = {
         size: 1,
         datatype: WebGLConstants.FLOAT,
         getValue: function (uniformState) {
-            return uniformState._frameState.context.drawingBufferWidth;
+            return uniformState.frameState.context.drawingBufferWidth;
         },
     }),
     czm_p_drawingBufferHeight: new AutomaticUniform({
         size: 1,
         datatype: WebGLConstants.FLOAT,
         getValue: function (uniformState) {
-            return uniformState._frameState.context.drawingBufferHeight;
+            return uniformState.frameState.context.drawingBufferHeight;
         },
     }),
-    czm_p_imagerySplitPosition: new AutomaticUniform({
+    czm_p_splitPosition: new AutomaticUniform({
         size: 1,
         datatype: WebGLConstants.FLOAT,
         getValue: function (uniformState) {
-            return uniformState._frameState.imagerySplitPosition;
+            return uniformState.frameState.splitPosition;
         },
     }),
 }

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .arrow {
+            width: 10px;
+            height: 10px;
+            margin: 0 auto;
+            border: 10px solid;
+            border-color: #000000AA transparent transparent transparent;
+            box-sizing: border-box;
+            position: absolute;
+            left: 50%;
+            top: 63px;
+            transform: translate(-50%, 50%);
+        }
+
+        .text-info {
+            width: 673px;
+            background-color: #00000099;
+            color: #FFFFFF;
+            padding: 20px 10px;
+            border-radius: 10px;
+            transform: translate(-50%, -50%);
+            text-shadow: 1px 0px 3px orange, 2px 1px 3px red, -2px 0px 7px yellow;
+            font-size: 1.5em;
+        }
+
+        .info-border {
+            width: 300px;
+            height: 32px;
+            margin: auto;
+            color: #15d1f2;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 0 1px rgba(21, 209, 242, 0.5);
+        }
+
+        .info-border::after {
+            content: "";
+            margin: -5%;
+            box-shadow: inset 0 0 0 4px;
+            animation: info-border-animation 8s linear infinite; 
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .info-border::before {
+            content: "";
+            margin: -5%;
+            box-shadow: inset 0 0 0 4px;
+            /* clip: rect(0px, 330px, 4px, 0px); */
+            animation: info-border-animation 8s linear infinite -4s;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        @keyframes info-border-animation {
+
+            0%,
+            100% {
+                clip: rect(0px, 330px, 4px, 0px);
+            }
+
+            25% {
+                clip: rect(0px, 4px, 64px, 0px);
+            }
+
+            50% {
+                clip: rect(60px, 330px, 330px, 0px);
+            }
+
+            75% {
+                clip: rect(0px, 330px, 64px, 326px);
+            }
+        }
+
+        .info-border div {
+            color: #FFFFFF;
+            font-size: 26px;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            font-weight: bolder;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <div class="text-info" id="div1">
+        This is a HTML feature, <b>any HTML element can be used.</b>
+        <div class="arrow"></div>
+    </div>
+    <div class="info-border" id="div2">
+        <div>您正在使用Cesium Pro</div>
+    </div>
+    <div id="div3" style="transform: translate(0px, -100%);">
+        <div style="margin: 0 20px;background-color: #00000088;color:#fff;font-size:32px">中国.西安</div>
+        <img src="../data/img/popup.png" style="width: 200px"/>
+    </div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const group = new CesiumPro.HtmlGraphicGroup(viewer);
+        const htmlGraphic = new CesiumPro.HtmlPointGraphic({
+            position: Cesium.Cartesian3.fromDegrees(110, 30),
+            el: document.getElementById('div1'),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+        })
+        const htmlGraphic1 = new CesiumPro.HtmlPointGraphic({
+            position: Cesium.Cartesian3.fromDegrees(110.001, 30),
+            el: document.getElementById('div2'),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+        })
+        const htmlGraphic2 = new CesiumPro.HtmlPointGraphic({
+            position: Cesium.Cartesian3.fromDegrees(110.001, 30.001),
+            el: document.getElementById('div3'),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+        })
+        setInterval(() => {
+            htmlGraphic2.position = Cesium.Cartesian3.fromDegrees(110.001 - Math.random() * 0.001, 30.001 - Math.random() * 0.001)
+        }, 1000);
+        group.add(htmlGraphic);
+        group.add(htmlGraphic1)
+        group.add(htmlGraphic2)
+        viewer.flyTo(group);
+
+    </script>
+</body>
+
+</html>

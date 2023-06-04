@@ -143,5 +143,8 @@ class Event {
 
     this._insideRaiseEvent = false;
   }
+  raiseEvent() {
+    this.raise(...arguments)
+  }
 }
 export default Event;

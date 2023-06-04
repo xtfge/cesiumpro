@@ -1,4 +1,4 @@
-//This file is automatically rebuilt by the Cesium build process.
+// 添加上下对比
 export default "uniform vec4 u_initialColor;\n\
 \n\
 #if TEXTURE_UNITS > 0\n\
@@ -103,29 +103,28 @@ uniform vec4 u_undergroundColorAlphaByDistance;\n\
 \n\
 #ifdef ENABLE_VERTEX_LIGHTING\n\
 uniform float u_lambertDiffuseMultiplier;\n\
-uniform float u_vertexShadowDarkness;\n\
 #endif\n\
 \n\
-in vec3 v_positionMC;\n\
-in vec3 v_positionEC;\n\
-in vec3 v_textureCoordinates;\n\
-in vec3 v_normalMC;\n\
-in vec3 v_normalEC;\n\
+varying vec3 v_positionMC;\n\
+varying vec3 v_positionEC;\n\
+varying vec3 v_textureCoordinates;\n\
+varying vec3 v_normalMC;\n\
+varying vec3 v_normalEC;\n\
 \n\
 #ifdef APPLY_MATERIAL\n\
-in float v_height;\n\
-in float v_slope;\n\
-in float v_aspect;\n\
+varying float v_height;\n\
+varying float v_slope;\n\
+varying float v_aspect;\n\
 #endif\n\
 \n\
 #if defined(FOG) || defined(GROUND_ATMOSPHERE) || defined(UNDERGROUND_COLOR) || defined(TRANSLUCENT)\n\
-in float v_distance;\n\
+varying float v_distance;\n\
 #endif\n\
 \n\
 #if defined(GROUND_ATMOSPHERE) || defined(FOG)\n\
-in vec3 v_atmosphereRayleighColor;\n\
-in vec3 v_atmosphereMieColor;\n\
-in float v_atmosphereOpacity;\n\
+varying vec3 v_atmosphereRayleighColor;\n\
+varying vec3 v_atmosphereMieColor;\n\
+varying float v_atmosphereOpacity;\n\
 #endif\n\
 \n\
 #if defined(UNDERGROUND_COLOR) || defined(TRANSLUCENT)\n\
@@ -196,7 +195,7 @@ vec4 sampleAndBlend(\n\
     vec2 translation = textureCoordinateTranslationAndScale.xy;\n\
     vec2 scale = textureCoordinateTranslationAndScale.zw;\n\
     vec2 textureCoordinates = tileTextureCoordinates * scale + translation;\n\
-    vec4 value = texture(textureToSample, textureCoordinates);\n\
+    vec4 value = texture2D(textureToSample, textureCoordinates);\n\
     vec3 color = value.rgb;\n\
     float alpha = value.a;\n\
 \n\
@@ -377,7 +376,7 @@ void main()\n\
     vec2 waterMaskTextureCoordinates = v_textureCoordinates.xy * waterMaskScale + waterMaskTranslation;\n\
     waterMaskTextureCoordinates.y = 1.0 - waterMaskTextureCoordinates.y;\n\
 \n\
-    float mask = texture(u_waterMask, waterMaskTextureCoordinates).r;\n\
+    float mask = texture2D(u_waterMask, waterMaskTextureCoordinates).r;\n\
 \n\
     if (mask > 0.0)\n\
     {\n\
@@ -407,7 +406,7 @@ void main()\n\
 #endif\n\
 \n\
 #ifdef ENABLE_VERTEX_LIGHTING\n\
-    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * u_lambertDiffuseMultiplier + u_vertexShadowDarkness, 0.0, 1.0);\n\
+    float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalize(v_normalEC)) * u_lambertDiffuseMultiplier + 0.3, 0.0, 1.0);\n\
     vec4 finalColor = vec4(color.rgb * czm_lightColor * diffuseIntensity, color.a);\n\
 #elif defined(ENABLE_DAYNIGHT_SHADING)\n\
     float diffuseIntensity = clamp(czm_getLambertDiffuse(czm_lightDirectionEC, normalEC) * 5.0 + 0.3, 0.0, 1.0);\n\
@@ -546,7 +545,7 @@ void main()\n\
     }\n\
 #endif\n\
     \n\
-    out_FragColor =  finalColor;\n\
+    gl_FragColor =  finalColor;\n\
 }\n\
 \n\
 \n\

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const polylines = new Cesium.PolylineCollection();
+        const pc = viewer.scene.primitives.add(polylines)
+        function createLine(positions, color) {
+            polylines.add({
+                positions: positions,
+                width: 4,
+                material: CesiumPro.Material.fromType('ODLine', {
+                    speed: 2 + Math.random(),
+                    baseColor: Cesium.Color.YELLOW.withAlpha(0.3),
+                    color: color
+                })
+            });
+        }
+        fetch('../data/bjgj.json').then(res => {
+            return res.json();
+        }).then(json => {
+            const busLines = []
+            json.forEach(function (busLine, idx) {
+                let prevPt
+                const points = []
+                for (let i = 0; i < busLine.length; i += 2) {
+                    let pt = [busLine[i], busLine[i + 1]]
+                    if (i > 0) {
+                        pt = [prevPt[0] + pt[0], prevPt[1] + pt[1]]
+                    }
+                    prevPt = pt
+
+                    const longitude = pt[0] / 1e4
+                    const latitude = pt[1] / 1e4
+                    const cart = Cesium.Cartesian3.fromDegrees(longitude, latitude, 100.0)
+                    points.push(cart)
+                }
+                createLine(points, new Cesium.Color(Math.random() * 0.5 + 0.5, Math.random() * 0.8 + 0.2, 0.0, 1.0))
+            })
+        })
+        viewer.flyTo(new CesiumPro.LonLat(116.394, 39.364, 55751))
+    </script>
+</body>
+
+</html>

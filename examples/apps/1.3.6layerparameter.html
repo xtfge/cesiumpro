@@ -6,8 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Cesium Pro</title>
-   <script src='./editor/Sandcastle.js'></script>
-   <link href='./editor/Sandcastle.css' rel='stylesheet'/>
+    <script src="./editor/dat.gui.js"></script>
     <script src='/thirdParty/cesium/Cesium/Cesium.js'></script>
     <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
     <script src='/build/CesiumPro.js'></script>
@@ -34,23 +33,31 @@
         });
         const gaode = new CesiumPro.GaoDeLayer();
         const layer = viewer.addLayer(gaode)
-
-        tools.addSlider('亮度', 1, 0, 3, 0.1, function(val) {
+    </script>
+    <script>
+        const object = {
+            brightness: 1,
+            contrast: 1,
+            hue: 1,
+            saturation: 1,
+            gamma: 1
+        }
+        const gui = new GUI();
+        gui.add(object, 'brightness', 0, 3).onChange((val) => {
             layer.brightness = val;
         })
-        tools.addSlider('对比度', 1, 0, 3, 0.1, function(val) {
+        gui.add(object, 'contrast', 0, 3).onChange(function(val) {
             layer.contrast = val;
         })
-        tools.addSlider('色彩', 1, 0, 3, 0.1, function(val) {
+        gui.add(object, 'hue', 0, 3).onChange(function(val) {
             layer.hue = val;            
         })
-        tools.addSlider('饱合度', 1, 0, 3, 0.1, function(val) {
+        gui.add(object, 'saturation', 0, 3).onChange(function(val) {
             layer.saturation = val
         })
-        tools.addSlider('gamma校正', 1, 0, 3, 0.1, function(val) {
+        gui.add(object, 'gamma', 0, 3).onChange(function(val) {
             layer.gamma = val;
         })
-        parent.viewer = viewer;
     </script>
 </body>
 </html>

@@ -2,7 +2,7 @@ import Event from './Event';
 import defined from './defined'
 import defaultValue from './defaultValue';
 import createGuid from './createGuid';
-class Graphic{
+class Graphic {
     /**
      * 所有CesiumPro自定义图形基类
     */
@@ -12,11 +12,12 @@ class Graphic{
         this._primitive = null;
         this._oldPrimitive = null;
         this._definedChanged = new Event();
+        this._loadEvent = new Event();
         this._clampToGround = defaultValue(!!options.clampToGround, false);
-        this._show = defaultValue(!!options.show, true);
+        this._show = defaultValue(options.show, true);
         this._removed = false;
         this._allowPicking = defaultValue(options.allowPicking, true);
-        this._property = defaultValue(options, options.property);
+        this._property = options.property;
     }
     /**
      * 图形id，可以使用它获取图形
@@ -57,6 +58,7 @@ class Graphic{
     }
     set allowPicking(v) {
         if ((!!v) !== this._allowPicking) {
+            this.definedChanged.raise('allowPicking', v, this._allowPicking)
             this._allowPicking = v;
             this.updatePrimitive && this.updatePrimitive();
         }
@@ -69,12 +71,16 @@ class Graphic{
         return this._clampToGround;
     }
     set clampToGround(val) {
-        if (val !== this._clampToGround) {
-            this.oldPrimitive = this.primitive;
-            const options = Object.assign({}, this._options, {clampToGround: val, asynchronous: false})
-            this._primitive = (new this.constructor(options)).primitive;
+        if (val === this._clampToGround) {
+            return
+            
         }
+        // this.oldPrimitive = this.primitive;
+        // const options = Object.assign({}, this._options, { clampToGround: val, asynchronous: false });
+        // this._primitive = (new this.constructor(options)).primitive;
+        this.definedChanged.raise('clampToGround', val, this._clampToGround);        
         this._clampToGround = val;
+        this.updatePrimitive();
     }
     /**
      * 显示或隐藏图形
@@ -83,11 +89,11 @@ class Graphic{
     get show() {
         return this._show;
     }
-    set show(val){
+    set show(val) {
         if (val === this._show) {
             return
         }
-        this.definedChanged.raise('show', v, this._show)
+        this.definedChanged.raise('show', val, this._show)
         this._show = val;
         this.primitive && (this.primitive.show = val);
     }
@@ -125,14 +131,15 @@ class Graphic{
         }
     }
     toJson() {
-        if(!defined(this.primitive)) {
+        if (!defined(this.primitive)) {
             return;
         }
+        return JSON.parse(JSON.stringify(this._options))
     }
     /**
      * @private
      */
-    update() {}
+    update() { }
     /**
      * 更新要素外观材质相关的属性
      * @private
@@ -165,10 +172,9 @@ class Graphic{
         if (!defined(this.primitive)) {
             return;
         }
-        this._viewer = viewer;
         viewer.graphicGroup.add(this);
     }
-    zoomTo() {}
+    zoomTo() { }
     /**
      * 将当前要素从场景中移除
      * @returns 被移除的要素
@@ -177,7 +183,7 @@ class Graphic{
         if (!defined(this.primitive)) {
             return;
         }
-        if (this._viewer) {
+        if (this.group) {
             this.group.remove(this);
             return this;
         }
@@ -185,8 +191,9 @@ class Graphic{
     isDestroyed() {
         return false;
     }
-    destroy() {
-        if (this.primitive && !this.primitive.isDestroyed()) {
+    destroy() { 
+        this.remove()       
+        if (this.primitive && !this.primitive.isDestroyed()) {            
             this.primitive.destroy();
             this.primitive = undefined;
         }

@@ -32,7 +32,7 @@
         const viewer = new CesiumPro.Viewer('map');
         const geoLayer = new CesiumPro.TileDebugLayer()
         const projLayer = new CesiumPro.TileDebugLayer({
-            color: 'red',
+            color: Cesium.Color.RED,
             tilingScheme: CesiumPro.proj.get('EPSG:3857')
         })
         let layer = viewer.addLayer(geoLayer)

@@ -2,7 +2,7 @@ const {WebMapTileServiceImageryProvider} = Cesium;
 class WMTSLayer extends WebMapTileServiceImageryProvider {
     /**
      * 创建一个从WMTS服务请求数据的图层。
-     *
+     * TODO： 从capability 创建图层
      * 
      * @param {Object} options 具有以下属性
      * @param {Resource|String} options.url WMTS服务GetTile需要的URL或着tile-URL模板. 如果是tile-URL模板m该URL应该包含以下关键字：

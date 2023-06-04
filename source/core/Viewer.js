@@ -12,10 +12,12 @@ import InfoBox from '../widgets/InfoBox.js'
 import CesiumProError from "./CesiumProError.js";
 import Model from "../scene/Model.js";
 import Tileset from "../scene/Tileset.js";
-import QuadTreeProvider from "../scene/QuadTreeProvider.js";
+import VectorTileProvider from "../scene/VectorTileProvider.js";
 import Globe from '../scene/Globe.js'
 import overrideCesium from '../override/index.js'
 import GraphicGroup from "./GraphicGroup.js";
+import WFSLayer from "../layer/WFSLayer.js";
+import DefaultDataSource from "../scene/DefaultDataSource.js";
 const {
     Matrix4,
     BoundingSphere,
@@ -29,10 +31,10 @@ function flyTo(viewer, target, options) {
         endTransform: options.endTransform,
         offset: options.offset,
         complete: function () {
-            viewer._zoomPromise.resolve(true);
+            viewer._completeZoom(true);
         },
         cancel: function () {
-            viewer._zoomPromise.resolve(false);
+            viewer._completeZoom(true);
         },
         offset: options.offset,
     });
@@ -53,19 +55,19 @@ function getDefaultOptions() {
         sceneModePicker: false,
         shadows: false,
         imageryProvider: createDefaultLayer(),
-        contextOptions: {
-            // cesium状态下允许canvas转图片convertToImage
-            webgl: {
-                alpha: true,
-                depth: false,
-                stencil: true,
-                antialias: true,
-                premultipliedAlpha: true,
-                preserveDrawingBuffer: true, // 截图时需要打开
-                failIfMajorPerformanceCaveat: true,
-            },
-            allowTextureFilterAnisotropic: true,
-        },
+        // contextOptions: {
+        //     // cesium状态下允许canvas转图片convertToImage
+        //     webgl: {
+        //         alpha: true,
+        //         depth: false,
+        //         stencil: true,
+        //         antialias: true,
+        //         premultipliedAlpha: true,
+        //         preserveDrawingBuffer: true, // 截图时需要打开
+        //         failIfMajorPerformanceCaveat: true,
+        //     },
+        //     allowTextureFilterAnisotropic: true,
+        // },
     }
 }
 let lastFpsTime, lastMsTime;
@@ -285,16 +287,20 @@ function createWidgets(options, viewer) {
     }
 }
 function flyToPrimitive(viewer, target, options) {
-    const zoomPromise = viewer._zoomPromise = Cesium.when.defer();
+    const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
+      viewer._completeZoom = function (value) {
+        resolve(value);
+      };
+    });
     target.readyPromise.then(() => {
         if (target._boundingSpheres) {
             flyTo(viewer, BoundingSphere.fromBoundingSpheres(target._boundingSpheres), options)
         } else if (target.boundingSphere) {
             let boundingSphere = target.boundingSphere;
             boundingSphere = BoundingSphere.clone(boundingSphere);
-            if (target.modelMatrix) {
-                Matrix4.multiplyByPoint(target.modelMatrix, boundingSphere.center, boundingSphere.center)
-            }
+            // if (target.modelMatrix) {
+            //     Matrix4.multiplyByPoint(target.modelMatrix, boundingSphere.center, boundingSphere.center)
+            // }
             flyTo(viewer, boundingSphere, options)
         }
     })
@@ -377,18 +383,23 @@ class Viewer extends Cesium.Viewer {
 
         this.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
         if (this.scene.globe) {
-            const quadtreeProvider = new QuadTreeProvider({
+            const quadtreeProvider = new VectorTileProvider({
                 terrainProvider: this.terrainProvider,
                 scene: this.scene
             })
             const quadtree = new Cesium.QuadtreePrimitive({
                 tileProvider: quadtreeProvider
             })
-            this.scene._LodGraphic = quadtree;
+            this.scene._vectorTileQuadtree = quadtree;
         }
         this.scene.dataSources = this.dataSources;
 
         this._graphicGroup = new GraphicGroup(this);
+        /**
+         * 一个具有默认样式的数据源（defaultDatasource）
+         * @type {DefaultDataSource}
+         */
+        this.dds = new DefaultDataSource(this);
     }
     /**
      * 自定义图形集合
@@ -399,12 +410,12 @@ class Viewer extends Cesium.Viewer {
         return this._graphicGroup;
     }
     /**
-     * 大数据图层集合
+     * 调度矢量瓦片的四叉树
      * @readonly
      * @type {MassiveEntityLayerCollection}
      */
-    get massiveGraphicLayers() {
-        return this.scene._LodGraphic.tileProvider._layers;
+    get vectorTileCollection() {
+        return this.scene._vectorTileQuadtree.tileProvider._layers;
     }
     /**
      * 获取未绑定到特定数据源的实体集合。
@@ -731,12 +742,20 @@ class Viewer extends Cesium.Viewer {
      * });
      */
     flyTo(target, options = {}) {
+        if (!target) {
+            return;
+        }
         if (target instanceof LonLat) {
             const catresian = target.toCartesian();
             return this.flyTo(catresian, options)
         }
+        const that = this;
         if (target instanceof Cesium.Cartesian3) {
-            const zoomPromise = viewer._zoomPromise = Cesium.when.defer();
+            const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
+              that._completeZoom = function (value) {
+                resolve(value);
+              };
+            });
             const radius = defaultValue(options.radius, 1000);
             delete options.radius;
             const boundingSphere = new Cesium.BoundingSphere(target, radius);
@@ -750,8 +769,13 @@ class Viewer extends Cesium.Viewer {
             return flyToPrimitive(this, target.delegate, options)
         } else if(target instanceof Tileset) {
             return super.flyTo(target.delegate, options)
+        } else if (target instanceof Cesium.Cesium3DTileset) {
+            super.flyTo(target, options)
         } else if(target.boundingSphere) {
-            return this.camera.flyToBoundingSphere(target.boundingSphere);
+            const modelMatrix = target.modelMatrix || Matrix4.IDENTITY;
+            const center = Matrix4.multiplyByPoint(modelMatrix, target.boundingSphere.center, {})
+            const bounding = new BoundingSphere(center, target.boundingSphere.radius)
+            return this.camera.flyToBoundingSphere(bounding);
         }
         return super.flyTo(target, options);
     }
@@ -825,6 +849,9 @@ class Viewer extends Cesium.Viewer {
             layerProvider instanceof ShapefileDataSource ||
             isPromise(layerProvider)) {
             return this.dataSources.add(layerProvider)
+        }
+        if (layerProvider instanceof WFSLayer) {
+            return this.dataSources.add(layerProvider._dataSource)
         }
         // if not DataSource, handle it as ImageryLayer
         return this.layers.addImageryProvider(layerProvider);
@@ -941,6 +968,10 @@ class Viewer extends Cesium.Viewer {
             handler.destroy();
         }
     }
+    addPoint(lon, lat, height) {
+        this.dds.addPoint(lon, lat, height)
+    }
+
 }
 // 生写Cesium中的部分函数
 overrideCesium();
