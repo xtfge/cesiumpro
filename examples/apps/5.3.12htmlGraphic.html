@@ -62,7 +62,7 @@
             content: "";
             margin: -5%;
             box-shadow: inset 0 0 0 4px;
-            animation: info-border-animation 8s linear infinite; 
+            animation: info-border-animation 8s linear infinite;
             position: absolute;
             top: 0;
             bottom: 0;
@@ -82,6 +82,7 @@
             left: 0;
             right: 0;
         }
+
         @keyframes info-border-animation {
 
             0%,
@@ -114,6 +115,27 @@
             user-select: none;
             cursor: pointer;
         }
+
+        .info-line {
+            background: url('../data/img/link-line.png') no-repeat;
+            width: 50px;
+            height: 100px;
+            margin-left: -50px;
+        }
+
+        .info-bg {
+            width: 220px;
+            height: 127px;
+            background: url('../data/img//layer_border.png') no-repeat;
+            display: flex;
+            flex-wrap: wrap;
+            /* justify-content: space-around; */
+            color:#FFF;
+            padding: 5px 20px;
+        }
+        .info-text4 {
+            transform: translate(-310px, -237px);
+        }
     </style>
 </head>
 
@@ -124,37 +146,54 @@
         This is a HTML feature, <b>any HTML element can be used.</b>
         <div class="arrow"></div>
     </div>
-    <div class="info-border" id="div2">
-        <div>您正在使用Cesium Pro</div>
-    </div>
+
     <div id="div3" style="transform: translate(0px, -100%);">
         <div style="margin: 0 20px;background-color: #00000088;color:#fff;font-size:32px">中国.西安</div>
-        <img src="../data/img/popup.png" style="width: 200px"/>
+        <img src="../data/img/popup.png" style="width: 200px" />
+    </div>
+    <div id="div4" class="info-text4">
+        <div class="info-bg">
+            <span>设备ID: 20230012</span>
+            <span>设备厂家: xxxx公司</span>
+            <span>生产日期: 2022.10.10</span>
+        </div>
+        <div class="info-line"></div>
     </div>
     <script>
         const viewer = new CesiumPro.Viewer('map');
         const group = new CesiumPro.HtmlGraphicGroup(viewer);
         const htmlGraphic = new CesiumPro.HtmlPointGraphic({
-            position: Cesium.Cartesian3.fromDegrees(110, 30),
+            position: Cesium.Cartesian3.fromDegrees(110.001, 30.0002),
             el: document.getElementById('div1'),
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
         })
+        const div = document.createElement('div');
+        div.className = 'info-border';
+        const innerDiv = document.createElement('div');
+        innerDiv.innerText = "您正在使用Cesium Pro"
+        div.appendChild(innerDiv)
         const htmlGraphic1 = new CesiumPro.HtmlPointGraphic({
-            position: Cesium.Cartesian3.fromDegrees(110.001, 30),
-            el: document.getElementById('div2'),
+            position: Cesium.Cartesian3.fromDegrees(110, 30),
+            el: div,
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
         })
         const htmlGraphic2 = new CesiumPro.HtmlPointGraphic({
-            position: Cesium.Cartesian3.fromDegrees(110.001, 30.001),
+            position: Cesium.Cartesian3.fromDegrees(110.002, 30.001),
             el: document.getElementById('div3'),
             distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
         })
         setInterval(() => {
-            htmlGraphic2.position = Cesium.Cartesian3.fromDegrees(110.001 - Math.random() * 0.001, 30.001 - Math.random() * 0.001)
+            htmlGraphic2.position = Cesium.Cartesian3.fromDegrees(110.002 - Math.random() * 0.001, 30.001 - Math.random() * 0.001)
         }, 1000);
+        const htmlGraphic3 = new CesiumPro.HtmlPointGraphic({
+            position: Cesium.Cartesian3.fromDegrees(110, 30.001),
+            el: document.getElementById('div4'),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 2000),
+        })
         group.add(htmlGraphic);
-        group.add(htmlGraphic1)
-        group.add(htmlGraphic2)
+        group.add(htmlGraphic1);
+        group.add(htmlGraphic2);
+        group.add(htmlGraphic3);
         viewer.flyTo(group);
 
     </script>
