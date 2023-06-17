@@ -16,6 +16,9 @@ const childProcess = require('child_process');
 const minifyCss = require('gulp-clean-css');
 const rollupPluginTerser = require("rollup-plugin-terser");
 const package = require('./package.json');
+const resolve = require("@rollup/plugin-node-resolve");
+const commonjs = require("@rollup/plugin-commonjs");
+const format = require('date-fns').format;
 
 exports.build = build;
 
@@ -37,6 +40,8 @@ const config = {
     outputName: 'CesiumPro'
 }
 const copyrightHeader = fs.readFileSync(path.join(config.src, 'copyright.js'), 'utf-8');
+const datestr = format(new Date(), 'yyyy-MM-dd');
+const copyrightHeaderFromat = copyrightHeader.replace('{{version}}', config.version).replace('{{datetime}}', datestr);
 function filePathToModuleId(moduleId) {
     return moduleId.replace(/\\/g, '/');
 }
@@ -62,7 +67,7 @@ function createCesiumProJs() {
     fs.writeFileSync(path.join(config.src, `${config.outputName}.js`), contents)
 }
 function buildCesiumPro(debug = true) {
-    const plugins = [];
+    const plugins = [resolve(), commonjs()];
     let libaryName = `${config.outputName}.js`
     if (!debug) {
         plugins.push(rollupPluginStripPragma({
@@ -80,7 +85,7 @@ function buildCesiumPro(debug = true) {
             format: 'umd',
             name: config.outputName,
             sourcemap: debug,
-            banner: copyrightHeader,
+            banner: copyrightHeaderFromat,
             file: path.join(config.publicPath, config.dist, libaryName)
         })
     })

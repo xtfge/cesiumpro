@@ -50,7 +50,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L15">scene/Globe.js 15</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L18">scene/Globe.js 18</a>
 </div>
 
 
@@ -207,7 +207,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L257">scene/Globe.js 257</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L317">scene/Globe.js 317</a>
 </div>
 
 
@@ -269,7 +269,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L241">scene/Globe.js 241</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L301">scene/Globe.js 301</a>
 </div>
 
 
@@ -325,13 +325,385 @@
     
     
 <div class="nameContainer">
+  <h4 class="name" id="atmosphereLightIntensity">
+    <a href="#atmosphereLightIntensity" class="doc-link"></a>
+    atmosphereLightIntensity<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L180">scene/Globe.js 180</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The intensity of the light that is used for computing the ground atmosphere color.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">10.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereMieAnisotropy">
+    <a href="#atmosphereMieAnisotropy" class="doc-link"></a>
+    atmosphereMieAnisotropy<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L222">scene/Globe.js 222</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The anisotropy of the medium to consider for Mie scattering.<p>Valid values are between -1.0 and 1.0.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.9</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereMieCoefficient">
+    <a href="#atmosphereMieCoefficient" class="doc-link"></a>
+    atmosphereMieCoefficient<span class="type-signature"> : Cartesian3</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L196">scene/Globe.js 196</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The Mie scattering coefficient used in the atmospheric scattering equations for the ground atmosphere.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cartesian3(21e-6, 21e-6, 21e-6)</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereMieScaleHeight">
+    <a href="#atmosphereMieScaleHeight" class="doc-link"></a>
+    atmosphereMieScaleHeight<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L212">scene/Globe.js 212</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The Mie scale height used in the atmospheric scattering equations for the ground atmosphere, in meters.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">3200.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereRayleighCoefficient">
+    <a href="#atmosphereRayleighCoefficient" class="doc-link"></a>
+    atmosphereRayleighCoefficient<span class="type-signature"> : Cartesian3</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L188">scene/Globe.js 188</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The Rayleigh scattering coefficient used in the atmospheric scattering equations for the ground atmosphere.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">Cartesian3(5.5e-6, 13.0e-6, 28.4e-6)</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="atmosphereRayleighScaleHeight">
+    <a href="#atmosphereRayleighScaleHeight" class="doc-link"></a>
+    atmosphereRayleighScaleHeight<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L204">scene/Globe.js 204</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The Rayleigh scale height used in the atmospheric scattering equations for the ground atmosphere, in meters.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">10000.0</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
   <h4 class="name" id="atmosphereSaturationShift">
     <a href="#atmosphereSaturationShift" class="doc-link"></a>
     atmosphereSaturationShift<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L249">scene/Globe.js 249</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L309">scene/Globe.js 309</a>
 </div>
 
 
@@ -393,7 +765,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L294">scene/Globe.js 294</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L354">scene/Globe.js 354</a>
 </div>
 
 
@@ -455,7 +827,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L358">scene/Globe.js 358</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L418">scene/Globe.js 418</a>
 </div>
 
 
@@ -514,7 +886,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L388">scene/Globe.js 388</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L448">scene/Globe.js 448</a>
 </div>
 
 
@@ -576,7 +948,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L372">scene/Globe.js 372</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L432">scene/Globe.js 432</a>
 </div>
 
 
@@ -635,7 +1007,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L223">scene/Globe.js 223</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L283">scene/Globe.js 283</a>
 </div>
 
 
@@ -697,7 +1069,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L142">scene/Globe.js 142</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L154">scene/Globe.js 154</a>
 </div>
 
 
@@ -759,7 +1131,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L152">scene/Globe.js 152</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L164">scene/Globe.js 164</a>
 </div>
 
 
@@ -821,7 +1193,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L306">scene/Globe.js 306</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L366">scene/Globe.js 366</a>
 </div>
 
 
@@ -880,7 +1252,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L133">scene/Globe.js 133</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L135">scene/Globe.js 135</a>
 </div>
 
 
@@ -942,7 +1314,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L125">scene/Globe.js 125</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L127">scene/Globe.js 127</a>
 </div>
 
 
@@ -1004,7 +1376,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L316">scene/Globe.js 316</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L376">scene/Globe.js 376</a>
 </div>
 
 
@@ -1063,7 +1435,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L328">scene/Globe.js 328</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L388">scene/Globe.js 388</a>
 </div>
 
 
@@ -1116,13 +1488,75 @@
     
     
 <div class="nameContainer">
+  <h4 class="name" id="lambertDiffuseMultiplier">
+    <a href="#lambertDiffuseMultiplier" class="doc-link"></a>
+    lambertDiffuseMultiplier<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L145">scene/Globe.js 145</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  A multiplier to adjust terrain lambert lighting.This number is multiplied by the result of <code>czm_getLambertDiffuse</code> in GlobeFS.glsl.This only takes effect when <code>enableLighting</code> is <code>true</code>.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">0.9</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
   <h4 class="name" id="lightingFadeInDistance">
     <a href="#lightingFadeInDistance" class="doc-link"></a>
     lightingFadeInDistance<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L180">scene/Globe.js 180</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L240">scene/Globe.js 240</a>
 </div>
 
 
@@ -1184,7 +1618,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L171">scene/Globe.js 171</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L231">scene/Globe.js 231</a>
 </div>
 
 
@@ -1246,7 +1680,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L96">scene/Globe.js 96</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L98">scene/Globe.js 98</a>
 </div>
 
 
@@ -1304,11 +1738,11 @@
 <div class="nameContainer">
   <h4 class="name" id="material">
     <a href="#material" class="doc-link"></a>
-    material<span class="type-signature"> : Material</span>
+    material<span class="type-signature"> : Material|undefined</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L468">scene/Globe.js 468</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L528">scene/Globe.js 528</a>
 </div>
 
 
@@ -1367,7 +1801,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L72">scene/Globe.js 72</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L74">scene/Globe.js 74</a>
 </div>
 
 
@@ -1429,7 +1863,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L200">scene/Globe.js 200</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L260">scene/Globe.js 260</a>
 </div>
 
 
@@ -1491,7 +1925,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L190">scene/Globe.js 190</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L250">scene/Globe.js 250</a>
 </div>
 
 
@@ -1553,7 +1987,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L406">scene/Globe.js 406</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L466">scene/Globe.js 466</a>
 </div>
 
 
@@ -1615,7 +2049,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L105">scene/Globe.js 105</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L107">scene/Globe.js 107</a>
 </div>
 
 
@@ -1677,7 +2111,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L115">scene/Globe.js 115</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L117">scene/Globe.js 117</a>
 </div>
 
 
@@ -1739,7 +2173,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L233">scene/Globe.js 233</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L293">scene/Globe.js 293</a>
 </div>
 
 
@@ -1801,7 +2235,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L58">scene/Globe.js 58</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L60">scene/Globe.js 60</a>
 </div>
 
 
@@ -1863,7 +2297,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L162">scene/Globe.js 162</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L172">scene/Globe.js 172</a>
 </div>
 
 
@@ -1908,11 +2342,6 @@
     
 
     
-    <h5>Demo:</h5>
-    <ul class="see-list">
-        <li><a href="https://sandcastle.cesium.com/index.html?src=Ground%2520Atmosphere.html">Ground atmosphere demo in Sandcastle</a></li>
-    </ul>
-    
 
     
 
@@ -1930,7 +2359,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L286">scene/Globe.js 286</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L346">scene/Globe.js 346</a>
 </div>
 
 
@@ -1992,7 +2421,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L210">scene/Globe.js 210</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L270">scene/Globe.js 270</a>
 </div>
 
 
@@ -2054,7 +2483,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L267">scene/Globe.js 267</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L327">scene/Globe.js 327</a>
 </div>
 
 
@@ -2116,7 +2545,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L277">scene/Globe.js 277</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L337">scene/Globe.js 337</a>
 </div>
 
 
@@ -2178,7 +2607,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L423">scene/Globe.js 423</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L483">scene/Globe.js 483</a>
 </div>
 
 
@@ -2237,7 +2666,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L444">scene/Globe.js 444</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L504">scene/Globe.js 504</a>
 </div>
 
 
@@ -2296,7 +2725,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L83">scene/Globe.js 83</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L85">scene/Globe.js 85</a>
 </div>
 
 
@@ -2358,7 +2787,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L456">scene/Globe.js 456</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L516">scene/Globe.js 516</a>
 </div>
 
 
@@ -2417,7 +2846,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L340">scene/Globe.js 340</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L400">scene/Globe.js 400</a>
 </div>
 
 
@@ -2476,7 +2905,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L543">scene/Globe.js 543</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L603">scene/Globe.js 603</a>
 </div>
 
 
@@ -2535,7 +2964,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L492">scene/Globe.js 492</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L552">scene/Globe.js 552</a>
 </div>
 
 
@@ -2602,7 +3031,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L518">scene/Globe.js 518</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L578">scene/Globe.js 578</a>
 </div>
 
 
@@ -2672,7 +3101,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1020">scene/Globe.js 1020</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1090">scene/Globe.js 1090</a>
 </div>
 
 
@@ -2781,7 +3210,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L749">scene/Globe.js 749</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L809">scene/Globe.js 809</a>
 </div>
 
 
@@ -2916,7 +3345,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1000">scene/Globe.js 1000</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L1070">scene/Globe.js 1070</a>
 </div>
 
 
@@ -3010,7 +3439,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L721">scene/Globe.js 721</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Globe.js#L781">scene/Globe.js 781</a>
 </div>
 
 
@@ -3191,7 +3620,7 @@
     
         <h5>Example:</h5>
         
-    <pre><code class="language-javascript">// find intersection of ray through a pixel and the globevar ray = viewer.camera.getPickRay(windowCoordinates);var intersection = globe.pick(ray, scene);</code></pre>
+    <pre><code class="language-javascript">// find intersection of ray through a pixel and the globeconst ray = viewer.camera.getPickRay(windowCoordinates);const intersection = globe.pick(ray, scene);</code></pre>
 
     
 
@@ -3228,7 +3657,7 @@
     <div class="nav">
       <div class="menu">
         <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
-        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="buildUniforms"><a href="global.html#buildUniforms">buildUniforms</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="CircleScanGraphic"><a href="CircleScanGraphic.html">CircleScanGraphic</a></li><li data-name="CircleSpreadGraphic"><a href="CircleSpreadGraphic.html">CircleSpreadGraphic</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="CylinderGeometry"><a href="CylinderGeometry.html">CylinderGeometry</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="DynamicConeGraphic"><a href="DynamicConeGraphic.html">DynamicConeGraphic</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="ImagerySplitDirection"><a href="global.html#ImagerySplitDirection">ImagerySplitDirection</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="RadarScanGraphic"><a href="RadarScanGraphic.html">RadarScanGraphic</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BasePlot"><a href="BasePlot.html">BasePlot</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="Cartometry"><a href="Cartometry.html">Cartometry</a></li><li data-name="CartometryManager"><a href="CartometryManager.html">CartometryManager</a></li><li data-name="CartometryType"><a href="CartometryType.html">CartometryType</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="CesiumTerrainProvider"><a href="CesiumTerrainProvider.html">CesiumTerrainProvider</a></li><li data-name="checkViewer"><a href="checkViewer.html">checkViewer</a></li><li data-name="CircleScanGraphic"><a href="CircleScanGraphic.html">CircleScanGraphic</a></li><li data-name="CircleSpreadGraphic"><a href="CircleSpreadGraphic.html">CircleSpreadGraphic</a></li><li data-name="clone"><a href="clone.html">clone</a></li><li data-name="ContextMenu"><a href="ContextMenu.html">ContextMenu</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createDomeLineVertexArray"><a href="global.html#createDomeLineVertexArray">createDomeLineVertexArray</a></li><li data-name="createDomeVertexArray"><a href="global.html#createDomeVertexArray">createDomeVertexArray</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="createScanPlaneVertexArray"><a href="global.html#createScanPlaneVertexArray">createScanPlaneVertexArray</a></li><li data-name="createSectorLineVertexArray"><a href="global.html#createSectorLineVertexArray">createSectorLineVertexArray</a></li><li data-name="CursorTip"><a href="CursorTip.html">CursorTip</a></li><li data-name="CylinderGeometry"><a href="CylinderGeometry.html">CylinderGeometry</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="destroyObject"><a href="destroyObject.html">destroyObject</a></li><li data-name="DivGraphic"><a href="DivGraphic.html">DivGraphic</a></li><li data-name="DynamicConeGraphic"><a href="DynamicConeGraphic.html">DynamicConeGraphic</a></li><li data-name="DynamicFadeMaterialProperty"><a href="DynamicFadeMaterialProperty.html">DynamicFadeMaterialProperty</a></li><li data-name="DynamicFlowWallMaterialProperty"><a href="DynamicFlowWallMaterialProperty.html">DynamicFlowWallMaterialProperty</a></li><li data-name="DynamicSpreadMaterialProperty"><a href="DynamicSpreadMaterialProperty.html">DynamicSpreadMaterialProperty</a></li><li data-name="DynamicWaveMaterialProperty"><a href="DynamicWaveMaterialProperty.html">DynamicWaveMaterialProperty</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="FlattenPolygonCollection"><a href="FlattenPolygonCollection.html">FlattenPolygonCollection</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="getParabolaPoints"><a href="global.html#getParabolaPoints">getParabolaPoints</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GraphicGroup"><a href="GraphicGroup.html">GraphicGroup</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="guid"><a href="guid.html">guid</a></li><li data-name="HtmlGraphicGroup"><a href="HtmlGraphicGroup.html">HtmlGraphicGroup</a></li><li data-name="HtmlPointGraphic"><a href="HtmlPointGraphic.html">HtmlPointGraphic</a></li><li data-name="ImageGraphic"><a href="ImageGraphic.html">ImageGraphic</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NodePlot"><a href="NodePlot.html">NodePlot</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="pickPosition"><a href="pickPosition.html">pickPosition</a></li><li data-name="PlotManager"><a href="PlotManager.html">PlotManager</a></li><li data-name="PlotType"><a href="PlotType.html">PlotType</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="PointPlot"><a href="PointPlot.html">PointPlot</a></li><li data-name="PolygonPlot"><a href="PolygonPlot.html">PolygonPlot</a></li><li data-name="PolylineFlowMaterialProperty"><a href="PolylineFlowMaterialProperty.html">PolylineFlowMaterialProperty</a></li><li data-name="PolylineODMaterialProperty"><a href="PolylineODMaterialProperty.html">PolylineODMaterialProperty</a></li><li data-name="PolylinePlot"><a href="PolylinePlot.html">PolylinePlot</a></li><li data-name="PolylineTrailLinkMaterialProperty"><a href="PolylineTrailLinkMaterialProperty.html">PolylineTrailLinkMaterialProperty</a></li><li data-name="PostProcessing"><a href="PostProcessing.html">PostProcessing</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Properties"><a href="Properties.html">Properties</a></li><li data-name="RadarScanGraphic"><a href="RadarScanGraphic.html">RadarScanGraphic</a></li><li data-name="RectangularSensorPrimitive"><a href="RectangularSensorPrimitive.html">RectangularSensorPrimitive</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="rotateEnabled"><a href="rotateEnabled.html">rotateEnabled</a></li><li data-name="SatelliteScan"><a href="SatelliteScan.html">SatelliteScan</a></li><li data-name="SectorGeometry"><a href="SectorGeometry.html">SectorGeometry</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="SnowEffect"><a href="SnowEffect.html">SnowEffect</a></li><li data-name="SplitDirection"><a href="global.html#SplitDirection">SplitDirection</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="TransformHelper"><a href="TransformHelper.html">TransformHelper</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WindField"><a href="WindField.html">WindField</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
       </div>
     </div>
 

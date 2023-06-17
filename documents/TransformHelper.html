@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      TransformHelper - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        TransformHelper
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="TransformHelper">
+    <a href="#TransformHelper" class="doc-link"></a>
+    new CesiumPro.TransformHelper<span class="signature">(<span class="optional">options</span>)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L142">core/TransformHelper.js 142</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  模型编辑控制器，虽然它也适用于点元素
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                具有以下属性
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>lineWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">15</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                线宽</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>xAxisColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.RED</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                X轴的颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>yAxisColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.GREEN</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Y轴颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>zAxisColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.BLUE</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Z轴颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scaleAxisColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.WHITE</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                缩放轴的颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>activeAxisColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.YELLOW</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                被激活的坐标标轴颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>translateEnabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建平移控制器</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rotateEnabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建旋转控制器，仅对模型可用</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scaleEnabled</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否创建缩放控制器，仅对模型有效</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>xAxisLength</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                X轴的长度, 如果未定义将自动计算</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>yAxisLength</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Y轴的长度，如果未定义将自动计算</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>zAxisLength</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                Z轴长度，如果未定义将自动计算</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scaleAxisLength</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                缩放轴的长度，如果未定义将自动计算</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rotatePlaneRadius</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                旋转轴的半径，如果未定义将自动计算</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sizeInPixel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                控制器的大小是否以像素为单位</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>originOffset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Cartesian3.ZERO</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                默认原点在点或模型的中心位置，该值设置相对于默认位置的偏移</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const helper = new CesiumPro.TransformHelper({                rotateEnabled: true,    translateEnabled: true,    scaleEnabled: true,    xAxisLength: 10,    yAxisLength: 10,    zAxisLength: 10,    scaleAxisLength: 10,    rotatePlaneRadius: 8});helper.addTo(viewer);helper.bind(model);</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="center">
+    <a href="#center" class="doc-link"></a>
+    center<span class="type-signature"> : Ceium.Cartesian3</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L240">core/TransformHelper.js 240</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  中心位置的坐标
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="modelMatrix">
+    <a href="#modelMatrix" class="doc-link"></a>
+    modelMatrix<span class="type-signature"> : <a href="../cesiumDocumentation/Matrix4.html" target = '_blank'>Cesium.Matrix4</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L247">core/TransformHelper.js 247</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  模型矩阵
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="postTransformEvent">
+    <a href="#postTransformEvent" class="doc-link"></a>
+    postTransformEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L177">core/TransformHelper.js 177</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  位置或姿态发生变化后触发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="preTranformEvent">
+    <a href="#preTranformEvent" class="doc-link"></a>
+    preTranformEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L172">core/TransformHelper.js 172</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  位置或姿态发生变化前解发的事件
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="rotateEnabled">
+    <a href="#rotateEnabled" class="doc-link"></a>
+    rotateEnabled<span class="type-signature"> : boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L202">core/TransformHelper.js 202</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得或设置旋转控件是否显示
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="scaleEnabled">
+    <a href="#scaleEnabled" class="doc-link"></a>
+    scaleEnabled<span class="type-signature"> : boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L221">core/TransformHelper.js 221</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得或设置缩放控件是否显示
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="translateEnabled">
+    <a href="#translateEnabled" class="doc-link"></a>
+    translateEnabled<span class="type-signature"> : boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L183">core/TransformHelper.js 183</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  获得或设置平移控件是否显示
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="addTo">
+    <a href="#addTo" class="doc-link"></a>
+    addTo<span class="signature">(viewer)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L587">core/TransformHelper.js 587</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  添加到场景
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>viewer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="../cesiumDocumentation/Viewer.html" target = '_blank'>Cesium.Viewer</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="bind">
+    <a href="#bind" class="doc-link"></a>
+    bind<span class="signature">(object)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L516">core/TransformHelper.js 516</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  绑定一个对象
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>object</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  <a href="Model.html">Model</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Model.html" target = '_blank'>Cesium.Model</a></span>
+|
+
+
+<span class="param-type">
+  <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="createScaleAxis">
+    <a href="#createScaleAxis" class="doc-link"></a>
+    createScaleAxis<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L496">core/TransformHelper.js 496</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  创建缩放轴
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="remove">
+    <a href="#remove" class="doc-link"></a>
+    remove<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L681">core/TransformHelper.js 681</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  从场景中删除
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="translate">
+    <a href="#translate" class="doc-link"></a>
+    translate<span class="signature">(offset)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L744">core/TransformHelper.js 744</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  平移
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  *</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="unbind">
+    <a href="#unbind" class="doc-link"></a>
+    unbind<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/TransformHelper.js#L574">core/TransformHelper.js 574</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  解绑当前绑定对象
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BasePlot"><a href="BasePlot.html">BasePlot</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="Cartometry"><a href="Cartometry.html">Cartometry</a></li><li data-name="CartometryManager"><a href="CartometryManager.html">CartometryManager</a></li><li data-name="CartometryType"><a href="CartometryType.html">CartometryType</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="CesiumTerrainProvider"><a href="CesiumTerrainProvider.html">CesiumTerrainProvider</a></li><li data-name="checkViewer"><a href="checkViewer.html">checkViewer</a></li><li data-name="CircleScanGraphic"><a href="CircleScanGraphic.html">CircleScanGraphic</a></li><li data-name="CircleSpreadGraphic"><a href="CircleSpreadGraphic.html">CircleSpreadGraphic</a></li><li data-name="clone"><a href="clone.html">clone</a></li><li data-name="ContextMenu"><a href="ContextMenu.html">ContextMenu</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createDomeLineVertexArray"><a href="global.html#createDomeLineVertexArray">createDomeLineVertexArray</a></li><li data-name="createDomeVertexArray"><a href="global.html#createDomeVertexArray">createDomeVertexArray</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="createScanPlaneVertexArray"><a href="global.html#createScanPlaneVertexArray">createScanPlaneVertexArray</a></li><li data-name="createSectorLineVertexArray"><a href="global.html#createSectorLineVertexArray">createSectorLineVertexArray</a></li><li data-name="CursorTip"><a href="CursorTip.html">CursorTip</a></li><li data-name="CylinderGeometry"><a href="CylinderGeometry.html">CylinderGeometry</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="destroyObject"><a href="destroyObject.html">destroyObject</a></li><li data-name="DivGraphic"><a href="DivGraphic.html">DivGraphic</a></li><li data-name="DynamicConeGraphic"><a href="DynamicConeGraphic.html">DynamicConeGraphic</a></li><li data-name="DynamicFadeMaterialProperty"><a href="DynamicFadeMaterialProperty.html">DynamicFadeMaterialProperty</a></li><li data-name="DynamicFlowWallMaterialProperty"><a href="DynamicFlowWallMaterialProperty.html">DynamicFlowWallMaterialProperty</a></li><li data-name="DynamicSpreadMaterialProperty"><a href="DynamicSpreadMaterialProperty.html">DynamicSpreadMaterialProperty</a></li><li data-name="DynamicWaveMaterialProperty"><a href="DynamicWaveMaterialProperty.html">DynamicWaveMaterialProperty</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="FlattenPolygonCollection"><a href="FlattenPolygonCollection.html">FlattenPolygonCollection</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="getParabolaPoints"><a href="global.html#getParabolaPoints">getParabolaPoints</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GraphicGroup"><a href="GraphicGroup.html">GraphicGroup</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="guid"><a href="guid.html">guid</a></li><li data-name="HtmlGraphicGroup"><a href="HtmlGraphicGroup.html">HtmlGraphicGroup</a></li><li data-name="HtmlPointGraphic"><a href="HtmlPointGraphic.html">HtmlPointGraphic</a></li><li data-name="ImageGraphic"><a href="ImageGraphic.html">ImageGraphic</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NodePlot"><a href="NodePlot.html">NodePlot</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="pickPosition"><a href="pickPosition.html">pickPosition</a></li><li data-name="PlotManager"><a href="PlotManager.html">PlotManager</a></li><li data-name="PlotType"><a href="PlotType.html">PlotType</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="PointPlot"><a href="PointPlot.html">PointPlot</a></li><li data-name="PolygonPlot"><a href="PolygonPlot.html">PolygonPlot</a></li><li data-name="PolylineFlowMaterialProperty"><a href="PolylineFlowMaterialProperty.html">PolylineFlowMaterialProperty</a></li><li data-name="PolylineODMaterialProperty"><a href="PolylineODMaterialProperty.html">PolylineODMaterialProperty</a></li><li data-name="PolylinePlot"><a href="PolylinePlot.html">PolylinePlot</a></li><li data-name="PolylineTrailLinkMaterialProperty"><a href="PolylineTrailLinkMaterialProperty.html">PolylineTrailLinkMaterialProperty</a></li><li data-name="PostProcessing"><a href="PostProcessing.html">PostProcessing</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Properties"><a href="Properties.html">Properties</a></li><li data-name="RadarScanGraphic"><a href="RadarScanGraphic.html">RadarScanGraphic</a></li><li data-name="RectangularSensorPrimitive"><a href="RectangularSensorPrimitive.html">RectangularSensorPrimitive</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="rotateEnabled"><a href="rotateEnabled.html">rotateEnabled</a></li><li data-name="SatelliteScan"><a href="SatelliteScan.html">SatelliteScan</a></li><li data-name="SectorGeometry"><a href="SectorGeometry.html">SectorGeometry</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="SnowEffect"><a href="SnowEffect.html">SnowEffect</a></li><li data-name="SplitDirection"><a href="global.html#SplitDirection">SplitDirection</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="TransformHelper"><a href="TransformHelper.html">TransformHelper</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WindField"><a href="WindField.html">WindField</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

@@ -1,7 +1,8 @@
 /**
- * CesiumPro
- * @version {{version}}
- * @datetime {{datetime}}
+ * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
+ * including data loading, visualization, Spatial analysis, etc
+ * @version 1.1.1
+ * @datetime 2023-06-17
  */
 
 (function (global, factory) {
@@ -10,7 +11,7 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.CesiumPro = {}));
 })(this, (function (exports) { 'use strict';
 
-    class CesiumProError$1 extends Error {
+    let CesiumProError$1 = class CesiumProError extends Error {
         /**
          * 定义CesiumPro抛出的错误
          * @extends Error
@@ -28,7 +29,7 @@
             super(message);
             this.name = 'CesiumProError';
         }
-    }
+    };
     CesiumProError$1.throwInstantiationError = function () {
         throw new DeveloperError(
             "This function defines an interface and should not be called directly."
@@ -42,12 +43,1211 @@
       throw new CesiumProError$1('抽象方法无法被调用。');
     }
 
+    const {
+      Cartesian3: Cartesian3$h,
+      Primitive: Primitive$6,
+      Material: Material$h,
+      Geometry: Geometry$1,
+      MaterialAppearance: MaterialAppearance$6,
+      GeometryAttribute: GeometryAttribute$1,
+      ComponentDatatype: ComponentDatatype$2,
+      PrimitiveType: PrimitiveType$3,
+      BoundingSphere: BoundingSphere$8,
+      VertexFormat: VertexFormat$4,
+      defaultValue: defaultValue$a,
+      GeometryAttributes: GeometryAttributes$1,
+      Check,
+    } = Cesium;
+    const scratchVertexFormat$1 = new VertexFormat$4();
+    const scratchNormal = new Cartesian3$h();
+    class AxisPlaneGeometry {
+      constructor(options = {}) {
+        this._normal = options.normal;
+        this._radius = options.radius;
+        this._center = options.center;
+        const vertexFormat = defaultValue$a(
+          options.vertexFormat,
+          VertexFormat$4.DEFAULT
+        );
+        this._vertexFormat = vertexFormat;
+      }
+      static packedLength = VertexFormat$4.packedLength + Cartesian3$h.packedLength + 1;
+      static pack(value, array, startingIndex) {
+        //>>includeStart('debug', pragmas.debug);
+        Check.typeOf.object("value", value);
+        Check.defined("array", array);
+        //>>includeEnd('debug');
+
+        startingIndex = defaultValue$a(startingIndex, 0);
+
+        VertexFormat$4.pack(value._vertexFormat, array, startingIndex);
+        startingIndex += VertexFormat$4.packedLength;
+        Cartesian3$h.pack(value._normal, array, startingIndex);
+        startingIndex += Cartesian3$h.packedLength;
+        array[startingIndex++] = value._radius;
+        return array;
+      }
+      static unpack(array, startingIndex, result) {
+        //>>includeStart('debug', pragmas.debug);
+        Check.defined("array", array);
+        //>>includeEnd('debug');
+
+        startingIndex = defaultValue$a(startingIndex, 0);
+
+        const vertexFormat = VertexFormat$4.unpack(
+          array,
+          startingIndex,
+          scratchVertexFormat$1
+        );
+        startingIndex += VertexFormat$4.packedLength;
+        const normal = Cartesian3$h.unpack(array, startingIndex, scratchNormal);
+        startingIndex += Cartesian3$h.packedLength;
+        const radius = array[startingIndex];
+
+        if (!defined(result)) {
+          return new PlaneGeometry({
+            vertexFormat,
+            normal,
+            radius,
+          });
+        }
+
+        result._vertexFormat = VertexFormat$4.clone(
+          vertexFormat,
+          result._vertexFormat
+        );
+        result._normal = Cartesian3$h.clone(normal, result._normal);
+        result._radius = radius;
+
+        return result;
+      }
+      static createGeometry(planeGeometry) {
+        const v1 = Math.max(1, planeGeometry._radius * 0.02);
+        const v2 = Math.max(planeGeometry._radius * 0.2, v1 * 2);
+        let positions = [];
+        let normal = [];
+        const { x, y, z } = planeGeometry._center;
+        let center;
+        if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_X)) {
+          positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
+          center = new Cartesian3$h(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
+          normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
+        } else if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_Y)) {
+          positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
+          center = new Cartesian3$h((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
+          normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
+        } else if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_Z)) {
+          positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
+          center = new Cartesian3$h((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
+          normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
+        }
+        positions = new Float32Array([...positions]);
+        const sts = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]);
+        const indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
+        return new Geometry$1({
+          attributes: new GeometryAttributes$1({
+            position: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.DOUBLE,
+              componentsPerAttribute: 3,
+              values: positions,
+            }),
+            normal: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentsPerAttribute: 3,
+              values: normal,
+            }),
+            st: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentsPerAttribute: 2,
+              values: sts,
+            }),
+          }),
+          indices: indices,
+          primitiveType: PrimitiveType$3.TRIANGLES,
+          boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
+        });
+      }
+    }
+    class AxisPlane {
+      /**
+       * 坐标轴平面
+       * @private
+       * @param {*} options
+       */
+      constructor(options = {}) {
+        this._center = options.center;
+        this._modelMatrix = options.modelMatrix;
+        this._color = options.color;
+        const radius = options.radius;    this._normal = options.normal;
+        const planeGeometry = new AxisPlaneGeometry({
+          normal: this._normal,
+          radius: radius,
+          vertexFormat: VertexFormat$4.DEFAULT,
+          center: this._center,
+        });
+        const instance = new Cesium.GeometryInstance({
+          geometry: AxisPlaneGeometry.createGeometry(planeGeometry),
+        });
+        const primitive = new Primitive$6({
+          asynchronous: false,
+          geometryInstances: instance,
+          modelMatrix: this._modelMatrix,
+          appearance: new MaterialAppearance$6({
+            material: Material$h.fromType("Color", {
+              color: this._color,
+            }),
+          }),
+        });
+        primitive.isAxisPlane = true;
+        primitive.normal = this._normal;
+        primitive.axis = options.axis;
+        primitive.color = this._color;
+        return primitive;
+      }
+    }
+
+    /**
+     * 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
+     *
+     * @exports defaultValue
+     *
+     * @param {*} a
+     * @param {*} b
+     * @returns {*} 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
+     *
+     * @example
+     * param = CesiumPro.defaultValue(param, 'default');
+     */
+    function defaultValue$9(a, b) {
+        if (a !== undefined && a !== null) {
+            return a;
+        }
+        return b;
+    }
+
+    /**
+     * 判断一个变量是否被定义
+     * @param value
+     * @exports defined
+     * @returns {Boolean} value是否被定义
+     */
+     function defined$b(value) {
+        return value !== undefined && value !== null;
+      }
+
+    class LonLat {
+        /**
+         * 用经纬度（度）和海拔（米）描述一个地理位置。
+         * @param {Number} lon 经度，单位：度
+         * @param {Number} lat 经度，单位：度
+         * @param {Number} alt 海拔，单位：米
+         */
+        constructor(lon, lat, alt) {
+            if (!defined$b(lon)) {
+                throw new CesiumProError$1('longitude is required.')
+            }
+            if (!defined$b(lat)) {
+                throw new CesiumProError$1('latitude is required.')
+            }
+            this.lon = lon;
+            this.lat = lat;
+            this.alt = defaultValue$9(alt, 0);
+        }
+        get height() {
+            return this.alt;
+        }
+        /**
+         * 转为屏幕坐标
+         * @param {Cesium.Scene} scene 
+         * @returns {Cesium.Cartesian2} 屏幕坐标
+         */
+        toPixel(scene) {
+            return LonLat.toPixel(this, scene);
+        }
+        /**
+         * 转为笛卡尔坐标
+         * @returns {Cesium.Cartesian3} 笛卡尔坐标
+         */
+        toCartesian() {
+            return LonLat.toCartesian(this);
+        }
+        /**
+         * 转为地理坐标
+         * @returns {Cesium.Cartographic} 地理坐标
+         */
+        toCartographic() {
+            return LonLat.toCartographic(this)
+        }
+        /**
+         * 获得该点的弧度形式
+         * @returns 弧度表示的点
+         */
+        getRadias() {
+            return {
+                lon: Cesium.Math.toRadians(this.lon),
+                lat: Cesium.Math.toRadians(this.lat),
+                alt
+            }
+        }
+        /**
+         * 判断该点是否在场景内，且在球的正面
+         * @returns {Boolean} 可见性
+         */
+        isVisible(viewer) {
+            return LonLat.isVisible(this, viewer)
+        }
+        /**
+         * 转为字符串
+         * @returns 表示该点位置的字符串
+         */
+        toString() {
+            return `{lon: ${this.lon}, lat: ${this.lat}, alt: ${this.alt}}`
+        }
+        /**
+         * 转为JSON对象
+         * @returns 表示该点位置的对象
+         */
+        toJson() {
+            return {
+                lon: this.lon,
+                lat: this.lat,
+                alt: this.alt
+            }
+        }
+        /**
+         * 从地理点坐标转换成数组
+         * @returns 表示该点位置的数组
+         */
+        toArray() {
+            return [this.lon, this.lat, this.alt];
+        }
+        /**
+         * 判断一个点在当前场景是否可见。这里的可见指的是是否在屏幕范围内且在球的正面。
+         * @param {LonLat} point 点
+         * @param {Cesium.Viewer} viewer Viewer对象
+         * @returns {Boolean} 可见性
+         */
+        static isVisible(point, viewer) {
+            if (viewer instanceof Cesium.Viewer === false) {
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
+            }
+            if (!defined$b(point)) {
+                return false;
+            }
+            const position = LonLat.toCartesian(point);
+            if (!position) {
+                return false;
+            }
+            if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
+                const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
+                    .isPointVisible(position);
+                if (!visibility) {
+                    return false;
+                }
+                const windowPosition = LonLat.toPixel(point, viewer.scene);
+                if (!defined$b(windowPosition)) {
+                    return false;
+                }
+                const width = viewer.canvas.width || viewer.canvas.clientWidth;
+                const height = viewer.canvas.height || viewer.canvas.clientHeight;
+                return (windowPosition.x > 0 && windowPosition.x < width) && (windowPosition.y > 0 && windowPosition.y < height);
+            } else if (viewer.scene.mode === Cesium.SceneMode.SCENE2D) {
+                const frustum = viewer.scene.camera.frustum;
+                const {
+                    positionWC,
+                    directionWC,
+                    upWC
+                } = viewer.scene.camera;
+                const cullingVolume = frustum.computeCullingVolume(positionWC, directionWC, upWC);
+                const bounding = Cesium.BoundingSphere.projectTo2D(new BoundingSphere(position, 1));
+                const visibility = cullingVolume.computeVisibility(bounding);
+                return visibility === Cesium.Intersect.INSIDE || visibility === Cesium.Intersect.INERSECTING
+            }
+        }
+        /**
+         * 转屏幕坐标
+         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic} point 
+         * @param {Cesium.Scene} scene 
+         * @returns 对应的屏幕坐标
+         */
+        static toPixel(point, scene) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(scene)) {
+                throw new CesiumProError$1('scene未定义。')
+            }        
+            //>>includeEnd('debug', pragmas.debug);
+            if (!defined$b(point)) {
+                return undefined
+            }
+            const cartesian = LonLat.toCartesian(point);
+            if (!defined$b(cartesian)) {
+                return undefined;
+            }
+            return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
+                scene,
+                cartesian,
+            );
+        }
+        /**
+         * 转弧度坐标
+         * @param {LonLat} point 
+         * @returns 用弧度表示的坐标点
+         */
+        static toCartographic(point, viewer) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(point)) {
+                throw new CesiumProError$1('point is not defined.')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            if (point instanceof LonLat) {
+                return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
+            } else if (point instanceof Cesium.Cartesian3) {
+                return Cesium.Cartographic.fromCartesian(point);
+            } else if (point instanceof Cesium.Cartographic) {
+                return point;
+            } else if (point instanceof Cesium.Cartesian2) {
+                const cartesian = LonLat.toCartesian(point, viewer);
+                return LonLat.toCartographic(cartesian)
+            }
+        }
+        /**
+         * 转笛卡尔坐标
+         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic|Cesium.Cartesian2} point 
+         * @param {Viewer} [viewer] viewer对象， 如果point是Cesium.Cartesian2类型，该参数需要被提供
+         * @returns 用笛卡尔坐标表示的点
+         */
+        static toCartesian(point, viewer) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(point)) {
+                return undefined;
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            if (point instanceof Cesium.Cartesian3) {
+                return point;
+            }
+            if (point instanceof Cesium.Cartographic) {
+                return Cesium.Cartographic.toCartesian(point)
+            }
+            if (point instanceof LonLat) {
+                return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
+            }
+            if (point instanceof Cesium.Cartesian2) {
+                if(!viewer) {
+                    return;
+                }
+                const ray = viewer.scene.camera.getPickRay(point);
+                return viewer.scene.globe.pick(ray, viewer.scene);
+            }
+
+        }
+        /**
+         * 从一个笛卡尔坐标创建点
+         * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标点
+         * @returns GeoPoint点
+         */
+        static fromCartesian(cartesian) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(cartesian)) {
+                return undefined
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+            if (!defined$b(cartographic)) {
+                return undefined;
+            }
+            return LonLat.fromCartographic(cartographic)
+        }
+        /**
+         * 从一个地理坐标点创建点
+         * @param {Cesium.Cartographic} cartographic 地理坐标点
+         * @returns GeoPoint点
+         */
+        static fromCartographic(cartographic) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(cartographic)) {
+                throw new CesiumProError$1('cartographic is not defined.')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            return new LonLat(
+                Cesium.Math.toDegrees(cartographic.longitude),
+                Cesium.Math.toDegrees(cartographic.latitude),
+                cartographic.height
+            )
+        }
+        /**
+         * 从一个窗口坐标创建点
+         * @param {Cesium.Cartesian2} pixel 窗口坐标
+         * @param {Cesium.Viewer} viewer Viewer对象
+         * @returns {LonLat} GeoPoint点
+         */
+        static fromPixel(pixel, viewer) {
+            if (!viewer.scene.globe) {
+                return undefined;
+            }
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$b(pixel)) {
+                throw new CesiumProError$1('pixel is not defined.')
+            }
+            if (viewer instanceof Cesium.Viewer === false) {
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            const ray = viewer.scene.camera.getPickRay(pixel);
+            const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+            if (!defined$b(cartesian)) {
+                return undefined;
+            }
+            return LonLat.fromCartesian(cartesian);
+        }
+        /**
+         * 从经纬度创建点
+         * @param {Number} lon 经度(度)
+         * @param {Number} lat 纬度(度)
+         * @param {Number} height 海拔(米)
+         * @returns {LonLat}
+         */
+        static fromDegrees(lon, lat, height) {
+            return new LonLat(lon, lat, height);
+        }
+        /**
+         * 从经纬度创建点
+         * @param {Number} lon 经度(弧度)
+         * @param {Number} lat 纬度(弧度)
+         * @param {Number} height 海拔(米)
+         * @returns {LonLat}
+         */
+         static fromRadians(lon, lat, height) {
+            return new LonLat(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
+        }
+        /**
+         * 判断一个点或经纬度是否在中国范围内（粗略）
+         * @param  {LonLat|Number[]} args 
+         * @returns 如果在中国范围内，返回true
+         */
+        static inChina(...args) {
+            if (args.length === 1) {
+                const p = args[0];
+                if (args[0] instanceof LonLat) {
+                    return LonLat.inChina(p.lon, p.lat)
+                }
+            } else {
+                const lon = +args[0];
+                const lat = +args[1];
+                return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat < 53.55
+            }
+        }
+        /**
+         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
+         * @param {Array} lonlat 
+         * @returns {LonLat}
+         */
+        static fromArray(lonlat) {
+            return new LonLat(...lonlat)
+        }
+        /**
+         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
+         * @param {Object} lonlat 
+         * @returns {LonLat}
+         */
+         static fromJson(lonlat) {
+            return new LonLat(lonlat.lon, lonlat.lat, lonlat.alt)
+        }
+        /**
+         * 判断对象是不是一个有效的点
+         * @param {any} v 
+         */
+        static isValid(v) {
+            if (v instanceof LonLat) {
+                if (!defined$b(v.lon)) {
+                    return false;
+                }
+                if (!defined$b(v.lat)) {
+                    return false;
+                }
+                if (!defined$b(v.alt)) {
+                    return false;
+                }
+                return true
+            }
+            if (v instanceof Cesium.Cartesian3) {
+                if (!defined$b(v.x)) {
+                    return false;
+                }
+                if (!defined$b(v.y)) {
+                    return false;
+                }
+                if (!defined$b(v.z)) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * @module helpers
+     */
+    /**
+     * Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
+     *
+     * @memberof helpers
+     * @type {number}
+     */
+    /**
+     * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
+     *
+     * @name feature
+     * @param {Geometry} geometry input geometry
+     * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {Feature} a GeoJSON Feature
+     * @example
+     * var geometry = {
+     *   "type": "Point",
+     *   "coordinates": [110, 50]
+     * };
+     *
+     * var feature = turf.feature(geometry);
+     *
+     * //=feature
+     */
+    function feature(geom, properties, options) {
+        if (options === void 0) { options = {}; }
+        var feat = { type: "Feature" };
+        if (options.id === 0 || options.id) {
+            feat.id = options.id;
+        }
+        if (options.bbox) {
+            feat.bbox = options.bbox;
+        }
+        feat.properties = properties || {};
+        feat.geometry = geom;
+        return feat;
+    }
+    /**
+     * Creates a {@link Polygon} {@link Feature} from an Array of LinearRings.
+     *
+     * @name polygon
+     * @param {Array<Array<Array<number>>>} coordinates an array of LinearRings
+     * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {Feature<Polygon>} Polygon Feature
+     * @example
+     * var polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
+     *
+     * //=polygon
+     */
+    function polygon(coordinates, properties, options) {
+        if (options === void 0) { options = {}; }
+        for (var _i = 0, coordinates_1 = coordinates; _i < coordinates_1.length; _i++) {
+            var ring = coordinates_1[_i];
+            if (ring.length < 4) {
+                throw new Error("Each LinearRing of a Polygon must have 4 or more Positions.");
+            }
+            for (var j = 0; j < ring[ring.length - 1].length; j++) {
+                // Check if first point of Polygon contains two numbers
+                if (ring[ring.length - 1][j] !== ring[0][j]) {
+                    throw new Error("First and last Position are not equivalent.");
+                }
+            }
+        }
+        var geom = {
+            type: "Polygon",
+            coordinates: coordinates,
+        };
+        return feature(geom, properties, options);
+    }
+
+    /**
+     * Callback for geomEach
+     *
+     * @callback geomEachCallback
+     * @param {Geometry} currentGeometry The current Geometry being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {Object} featureProperties The current Feature Properties being processed.
+     * @param {Array<number>} featureBBox The current Feature BBox being processed.
+     * @param {number|string} featureId The current Feature Id being processed.
+     */
+
+    /**
+     * Iterate over each geometry in any GeoJSON object, similar to Array.forEach()
+     *
+     * @name geomEach
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (currentGeometry, featureIndex, featureProperties, featureBBox, featureId)
+     * @returns {void}
+     * @example
+     * var features = turf.featureCollection([
+     *     turf.point([26, 37], {foo: 'bar'}),
+     *     turf.point([36, 53], {hello: 'world'})
+     * ]);
+     *
+     * turf.geomEach(features, function (currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
+     *   //=currentGeometry
+     *   //=featureIndex
+     *   //=featureProperties
+     *   //=featureBBox
+     *   //=featureId
+     * });
+     */
+    function geomEach(geojson, callback) {
+      var i,
+        j,
+        g,
+        geometry,
+        stopG,
+        geometryMaybeCollection,
+        isGeometryCollection,
+        featureProperties,
+        featureBBox,
+        featureId,
+        featureIndex = 0,
+        isFeatureCollection = geojson.type === "FeatureCollection",
+        isFeature = geojson.type === "Feature",
+        stop = isFeatureCollection ? geojson.features.length : 1;
+
+      // This logic may look a little weird. The reason why it is that way
+      // is because it's trying to be fast. GeoJSON supports multiple kinds
+      // of objects at its root: FeatureCollection, Features, Geometries.
+      // This function has the responsibility of handling all of them, and that
+      // means that some of the `for` loops you see below actually just don't apply
+      // to certain inputs. For instance, if you give this just a
+      // Point geometry, then both loops are short-circuited and all we do
+      // is gradually rename the input until it's called 'geometry'.
+      //
+      // This also aims to allocate as few resources as possible: just a
+      // few numbers and booleans, rather than any temporary arrays as would
+      // be required with the normalization approach.
+      for (i = 0; i < stop; i++) {
+        geometryMaybeCollection = isFeatureCollection
+          ? geojson.features[i].geometry
+          : isFeature
+          ? geojson.geometry
+          : geojson;
+        featureProperties = isFeatureCollection
+          ? geojson.features[i].properties
+          : isFeature
+          ? geojson.properties
+          : {};
+        featureBBox = isFeatureCollection
+          ? geojson.features[i].bbox
+          : isFeature
+          ? geojson.bbox
+          : undefined;
+        featureId = isFeatureCollection
+          ? geojson.features[i].id
+          : isFeature
+          ? geojson.id
+          : undefined;
+        isGeometryCollection = geometryMaybeCollection
+          ? geometryMaybeCollection.type === "GeometryCollection"
+          : false;
+        stopG = isGeometryCollection
+          ? geometryMaybeCollection.geometries.length
+          : 1;
+
+        for (g = 0; g < stopG; g++) {
+          geometry = isGeometryCollection
+            ? geometryMaybeCollection.geometries[g]
+            : geometryMaybeCollection;
+
+          // Handle null Geometry
+          if (geometry === null) {
+            if (
+              callback(
+                null,
+                featureIndex,
+                featureProperties,
+                featureBBox,
+                featureId
+              ) === false
+            )
+              return false;
+            continue;
+          }
+          switch (geometry.type) {
+            case "Point":
+            case "LineString":
+            case "MultiPoint":
+            case "Polygon":
+            case "MultiLineString":
+            case "MultiPolygon": {
+              if (
+                callback(
+                  geometry,
+                  featureIndex,
+                  featureProperties,
+                  featureBBox,
+                  featureId
+                ) === false
+              )
+                return false;
+              break;
+            }
+            case "GeometryCollection": {
+              for (j = 0; j < geometry.geometries.length; j++) {
+                if (
+                  callback(
+                    geometry.geometries[j],
+                    featureIndex,
+                    featureProperties,
+                    featureBBox,
+                    featureId
+                  ) === false
+                )
+                  return false;
+              }
+              break;
+            }
+            default:
+              throw new Error("Unknown Geometry Type");
+          }
+        }
+        // Only increase `featureIndex` per each feature
+        featureIndex++;
+      }
+    }
+
+    /**
+     * Callback for geomReduce
+     *
+     * The first time the callback function is called, the values provided as arguments depend
+     * on whether the reduce method has an initialValue argument.
+     *
+     * If an initialValue is provided to the reduce method:
+     *  - The previousValue argument is initialValue.
+     *  - The currentValue argument is the value of the first element present in the array.
+     *
+     * If an initialValue is not provided:
+     *  - The previousValue argument is the value of the first element present in the array.
+     *  - The currentValue argument is the value of the second element present in the array.
+     *
+     * @callback geomReduceCallback
+     * @param {*} previousValue The accumulated value previously returned in the last invocation
+     * of the callback, or initialValue, if supplied.
+     * @param {Geometry} currentGeometry The current Geometry being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {Object} featureProperties The current Feature Properties being processed.
+     * @param {Array<number>} featureBBox The current Feature BBox being processed.
+     * @param {number|string} featureId The current Feature Id being processed.
+     */
+
+    /**
+     * Reduce geometry in any GeoJSON object, similar to Array.reduce().
+     *
+     * @name geomReduce
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId)
+     * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
+     * @returns {*} The value that results from the reduction.
+     * @example
+     * var features = turf.featureCollection([
+     *     turf.point([26, 37], {foo: 'bar'}),
+     *     turf.point([36, 53], {hello: 'world'})
+     * ]);
+     *
+     * turf.geomReduce(features, function (previousValue, currentGeometry, featureIndex, featureProperties, featureBBox, featureId) {
+     *   //=previousValue
+     *   //=currentGeometry
+     *   //=featureIndex
+     *   //=featureProperties
+     *   //=featureBBox
+     *   //=featureId
+     *   return currentGeometry
+     * });
+     */
+    function geomReduce(geojson, callback, initialValue) {
+      var previousValue = initialValue;
+      geomEach(
+        geojson,
+        function (
+          currentGeometry,
+          featureIndex,
+          featureProperties,
+          featureBBox,
+          featureId
+        ) {
+          if (featureIndex === 0 && initialValue === undefined)
+            previousValue = currentGeometry;
+          else
+            previousValue = callback(
+              previousValue,
+              currentGeometry,
+              featureIndex,
+              featureProperties,
+              featureBBox,
+              featureId
+            );
+        }
+      );
+      return previousValue;
+    }
+
+    // Note: change RADIUS => earthRadius
+    var RADIUS$1 = 6378137;
+    /**
+     * Takes one or more features and returns their area in square meters.
+     *
+     * @name area
+     * @param {GeoJSON} geojson input GeoJSON feature(s)
+     * @returns {number} area in square meters
+     * @example
+     * var polygon = turf.polygon([[[125, -15], [113, -22], [154, -27], [144, -15], [125, -15]]]);
+     *
+     * var area = turf.area(polygon);
+     *
+     * //addToMap
+     * var addToMap = [polygon]
+     * polygon.properties.area = area
+     */
+    function area(geojson) {
+        return geomReduce(geojson, function (value, geom) {
+            return value + calculateArea(geom);
+        }, 0);
+    }
+    /**
+     * Calculate Area
+     *
+     * @private
+     * @param {Geometry} geom GeoJSON Geometries
+     * @returns {number} area
+     */
+    function calculateArea(geom) {
+        var total = 0;
+        var i;
+        switch (geom.type) {
+            case "Polygon":
+                return polygonArea(geom.coordinates);
+            case "MultiPolygon":
+                for (i = 0; i < geom.coordinates.length; i++) {
+                    total += polygonArea(geom.coordinates[i]);
+                }
+                return total;
+            case "Point":
+            case "MultiPoint":
+            case "LineString":
+            case "MultiLineString":
+                return 0;
+        }
+        return 0;
+    }
+    function polygonArea(coords) {
+        var total = 0;
+        if (coords && coords.length > 0) {
+            total += Math.abs(ringArea(coords[0]));
+            for (var i = 1; i < coords.length; i++) {
+                total -= Math.abs(ringArea(coords[i]));
+            }
+        }
+        return total;
+    }
+    /**
+     * @private
+     * Calculate the approximate area of the polygon were it projected onto the earth.
+     * Note that this area will be positive if ring is oriented clockwise, otherwise it will be negative.
+     *
+     * Reference:
+     * Robert. G. Chamberlain and William H. Duquette, "Some Algorithms for Polygons on a Sphere",
+     * JPL Publication 07-03, Jet Propulsion
+     * Laboratory, Pasadena, CA, June 2007 https://trs.jpl.nasa.gov/handle/2014/40409
+     *
+     * @param {Array<Array<number>>} coords Ring Coordinates
+     * @returns {number} The approximate signed geodesic area of the polygon in square meters.
+     */
+    function ringArea(coords) {
+        var p1;
+        var p2;
+        var p3;
+        var lowerIndex;
+        var middleIndex;
+        var upperIndex;
+        var i;
+        var total = 0;
+        var coordsLength = coords.length;
+        if (coordsLength > 2) {
+            for (i = 0; i < coordsLength; i++) {
+                if (i === coordsLength - 2) {
+                    // i = N-2
+                    lowerIndex = coordsLength - 2;
+                    middleIndex = coordsLength - 1;
+                    upperIndex = 0;
+                }
+                else if (i === coordsLength - 1) {
+                    // i = N-1
+                    lowerIndex = coordsLength - 1;
+                    middleIndex = 0;
+                    upperIndex = 1;
+                }
+                else {
+                    // i = 0 to N-3
+                    lowerIndex = i;
+                    middleIndex = i + 1;
+                    upperIndex = i + 2;
+                }
+                p1 = coords[lowerIndex];
+                p2 = coords[middleIndex];
+                p3 = coords[upperIndex];
+                total += (rad(p3[0]) - rad(p1[0])) * Math.sin(rad(p2[1]));
+            }
+            total = (total * RADIUS$1 * RADIUS$1) / 2;
+        }
+        return total;
+    }
+    function rad(num) {
+        return (num * Math.PI) / 180;
+    }
+
+    /**
+     * 地图量算工具,包括距离量算、面积量算、角度量算、高度量算
+     * @namespace Cartometry
+     */
+    const Cartometry = {};
+    /**
+     * 贴地距离
+     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
+     * @return {Number} 长度，单位米
+     */
+    Cartometry.surfaceDistance = function(positions) {
+      let distance = 0;
+      for (let i = 0; i < positions.length - 1; i += 1) {
+        const point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
+        const point2cartographic = Cesium.Cartographic.fromCartesian(positions[i + 1]);
+        /** 根据经纬度计算出距离* */
+        const geodesic = new Cesium.EllipsoidGeodesic();
+        geodesic.setEndPoints(point1cartographic, point2cartographic);
+        const s = geodesic.surfaceDistance;
+        distance += s;
+      }
+      return distance;
+    };
+
+    /**
+     * 空间距离
+     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
+     * @return {Number} 长度，单位米
+     */
+    Cartometry.spaceDistance = function(positions) {
+      let dis = 0;
+      for (let i = 1; i < positions.length; i++) {
+        const s = positions[i - 1];
+        const e = positions[i];
+        dis += Cesium.Cartesian3.distance(s, e);
+      }
+      return dis;
+    };
+
+    /**
+     *
+     * 计算两个向量之间的夹角，两个向量必须拥有相同的起点。
+     * @param {Cesium.Cartesian3} p1 向量起点
+     * @param {Cesium.Cartesian3} p2 向量1终点
+     * @param {Cesium.Cartesian3} p3 向量2终点
+     * @return {Number} 返回p1p2和p1p3之间的夹角，单位：度
+     */
+    Cartometry.angle = function(p1, p2, p3) {
+      // 以任意一点为原点建立局部坐标系
+      const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(p1);
+      const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
+      // 将其它两个点坐标转换到局部坐标
+      const localp2 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p2, new Cesium.Cartesian3());
+      const localp3 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p3, new Cesium.Cartesian3());
+      // 归一化
+      const normalizep2 = Cesium.Cartesian3.normalize(localp2, new Cesium.Cartesian3());
+      const normalizep3 = Cesium.Cartesian3.normalize(localp3, new Cesium.Cartesian3());
+      // 计算两点夹角
+      const cos = Cesium.Cartesian3.dot(normalizep2, normalizep3);
+      const angle = Cesium.Math.acosClamped(cos);
+      return Cesium.Math.toDegrees(angle);
+    };
+
+    /**
+     * 计算向量的方位角
+     * @param  {Cesium.Cartesian3} center 向量起点
+     * @param  {Cesium.Cartesian3} point  向量终点
+     * @return {Number}        角度，单位：度
+     * @example
+     *
+     * const start=Cesium.Cartesian3.fromDegrees(110,30);
+     * const end=Cesium.Cartesian3.fromDegrees(110,40)
+     * const angle = CesiumPro.Cartometry.angleBetweenNorth(start,end);
+     */
+    Cartometry.angleBetweenNorth = function(center, point) {
+      const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+      const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
+      const localp = Cesium.Matrix4.multiplyByPoint(inverseMatrix, point, new Cesium.Cartesian3());
+      const normalize = Cesium.Cartesian3.normalize(localp, new Cesium.Cartesian3());
+      const north = new Cesium.Cartesian3(0, 1, 0);
+      const cos = Cesium.Cartesian3.dot(normalize, north);
+      let angle = Cesium.Math.acosClamped(cos);
+      angle = Cesium.Math.toDegrees(angle);
+
+      const east = new Cesium.Cartesian3(1, 0, 0);
+      const arceast = Cesium.Cartesian3.dot(east, normalize);
+      if (arceast < 0) {
+        angle = 360 - angle;
+      }
+
+      return angle;
+    };
+    /**
+     * 贴地面积
+     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
+     * @return {Number} 面积，单位：平方米
+     */
+    Cartometry.surfaceArea = function(positions) {
+      // TODO:计算方法有问题
+      let res = 0;
+      // 拆分三角曲面
+
+      for (let i = 0; i < positions.length - 2; i += 1) {
+        const j = (i + 1) % positions.length;
+        const k = (i + 2) % positions.length;
+        const totalAngle = Cartometry.angle(positions[i], positions[j], positions[k]);
+        const distemp1 = Cartometry.spaceDistance([positions[i], positions[j]]);
+        const distemp2 = Cartometry.spaceDistance([positions[j], positions[k]]);
+        res += distemp1 * distemp2 * Math.abs(Math.sin(Cesium.Math.toRadians(totalAngle)));
+      }
+      return res;
+    };
+
+    /**
+     * 空间面积
+     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
+     * @return {Number} 面积，单位：平方米
+     */
+    Cartometry.spaceArea = function(positions) {
+      const points = [];
+      for (let position of positions) {
+        const coord = LonLat.fromCartesian(position);
+        points.push([coord.lon, coord.lat]);
+      }
+      points.push(points[0]);
+      const polygon$1 = polygon([points]);
+      return area(polygon$1);
+    };
+
+    /**
+     * 计算相邻两个点之间的高度差
+     * @param  {} positions
+     * @return {} 相信两个顶点之间的高度差，单位m
+     */
+    Cartometry.heightFromCartesianArray = function(positions) {
+      if (positions.length < 2) {
+        return 0;
+      }
+      const rst = [];
+      for (let i = 1; i < positions.length; i++) {
+        const startC = Cesium.Cartographic.fromCartesian(positions[i - 1]);
+        const endC = Cesium.Cartographic.fromCartesian(positions[i]);
+        if (startC && endC) {
+          rst.push(endC.height - startC.height);
+        } else {
+          rst.push('NaN');
+        }
+      }
+      return rst;
+    };
+
+    /**
+     * 地图量算类型
+     * @exports CartometryType
+     * @enum {Number}
+     */
+    const CartometryType = {
+      /**
+       * 贴地距离
+       * @type {Number}
+       * @constant
+       */
+      SURFACE_DISTANCE: 1,
+      /**
+       * 空间距离
+       * @type {Number}
+       * @constant
+       */
+      SPACE_DISTANCE: 2,
+      /**
+       * 空间面积
+       * @type {Number}
+       * @constant
+       */
+      SPACE_AREA: 3,
+      /**
+       * 贴地面积
+       * @type {Number}
+       * @constant
+       */
+      SURFACE_AREA: 4,
+      /**
+       * 高度
+       * @type {Number}
+       * @constant
+       */
+      HEIGHT: 5,
+      /**
+       * 方位角
+       * @type {Number}
+       * @constant
+       */
+      ANGLE: 6,
+    };
+
+    /**
+     * 验证是否是合法类型
+     * @param {CartometryType}
+     * @returns {Number}
+     */
+    CartometryType.validate = function (type) {
+      return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE
+        || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE
+        || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
+    };
+
+    /**
+     * 从枚举值获得枚举标签
+     * @param  {CartometryType} value 枚举值
+     * @returns {String}
+     */
+    CartometryType.getKey = function (value) {
+      let key;
+      switch (value) {
+        case 1:
+          key = 'SURFACE_DISTANCE';
+          break;
+        case 2:
+          key = 'SPACE_DISTANCE';
+          break;
+        case 3:
+          key = 'SPACE_AREA';
+          break;
+        case 4:
+          key = 'SURFACE_AREA';
+          break;
+        case 5:
+          key = 'HEIGHT';
+          break;
+        case 6:
+          key = 'ANGLE';
+          break;
+        default:
+          key = undefined;
+      }
+      return key;
+    };
+    var CartometryType$1 = Object.freeze(CartometryType);
+
     /* eslint-disable prefer-rest-params */
+
 
     function compareNumber(a, b) {
       return b - a;
     }
-    class Event$8 {
+    let Event$8 = class Event {
       /**
        * 事件管理器
        * @example
@@ -188,16 +1388,16 @@
       raiseEvent() {
         this.raise(...arguments);
       }
-    }
+    };
 
     const {
         RequestState: RequestState$1,
         AttributeCompression,
         BoundingSphere: BoundingSphere$7,
-        Cartesian3: Cartesian3$f,
+        Cartesian3: Cartesian3$g,
         Credit: Credit$1,
         defaultValue: defaultValue$8,
-        defined: defined$b,
+        defined: defined$a,
         DeveloperError: DeveloperError$3,
         GeographicTilingScheme: GeographicTilingScheme$3,
         WebMercatorTilingScheme,
@@ -264,7 +1464,7 @@
      */
     function CesiumTerrainProvider$1(options) {
       //>>includeStart('debug', pragmas.debug)
-      if (!defined$b(options) || !defined$b(options.url)) {
+      if (!defined$a(options) || !defined$a(options.url)) {
         throw new DeveloperError$3("options.url is required.");
       }
       //>>includeEnd('debug');
@@ -376,7 +1576,7 @@
         let isHeightmap = false;
         if (data.format === "heightmap-1.0") {
           isHeightmap = true;
-          if (!defined$b(that._heightmapStructure)) {
+          if (!defined$a(that._heightmapStructure)) {
             that._heightmapStructure = {
               heightScale: 1.0 / 5.0,
               heightOffset: -1000.0,
@@ -466,25 +1666,25 @@
         // by setting the _littleEndianExtensionSize to false. Always prefer 'octvertexnormals'
         // over 'vertexnormals' if both extensions are supported by the server.
         if (
-          defined$b(data.extensions) &&
+          defined$a(data.extensions) &&
           data.extensions.indexOf("octvertexnormals") !== -1
         ) {
           hasVertexNormals = true;
         } else if (
-          defined$b(data.extensions) &&
+          defined$a(data.extensions) &&
           data.extensions.indexOf("vertexnormals") !== -1
         ) {
           hasVertexNormals = true;
           littleEndianExtensionSize = false;
         }
         if (
-          defined$b(data.extensions) &&
+          defined$a(data.extensions) &&
           data.extensions.indexOf("watermask") !== -1
         ) {
           hasWaterMask = true;
         }
         if (
-          defined$b(data.extensions) &&
+          defined$a(data.extensions) &&
           data.extensions.indexOf("metadata") !== -1
         ) {
           hasMetadata = true;
@@ -493,7 +1693,7 @@
         const availabilityLevels = data.metadataAvailability;
         const availableTiles = data.available;
         let availability;
-        if (defined$b(availableTiles) && !defined$b(availabilityLevels)) {
+        if (defined$a(availableTiles) && !defined$a(availabilityLevels)) {
           availability = new TileAvailability(
             that._tilingScheme,
             availableTiles.length
@@ -501,7 +1701,7 @@
           for (let level = 0; level < availableTiles.length; ++level) {
             const rangesAtLevel = availableTiles[level];
             const yTiles = that._tilingScheme.getNumberOfYTilesAtLevel(level);
-            if (!defined$b(overallAvailability[level])) {
+            if (!defined$a(overallAvailability[level])) {
               overallAvailability[level] = [];
             }
 
@@ -528,7 +1728,7 @@
               );
             }
           }
-        } else if (defined$b(availabilityLevels)) {
+        } else if (defined$a(availabilityLevels)) {
           availabilityTilesLoaded = new TileAvailability(
             that._tilingScheme,
             maxZoom
@@ -541,7 +1741,7 @@
         that._hasWaterMask = that._hasWaterMask || hasWaterMask;
         that._hasVertexNormals = that._hasVertexNormals || hasVertexNormals;
         that._hasMetadata = that._hasMetadata || hasMetadata;
-        if (defined$b(data.attribution)) {
+        if (defined$a(data.attribution)) {
           if (attribution.length > 0) {
             attribution += " ";
           }
@@ -565,8 +1765,8 @@
         );
 
         const parentUrl = data.parentUrl;
-        if (defined$b(parentUrl)) {
-          if (!defined$b(availability)) {
+        if (defined$a(parentUrl)) {
+          if (!defined$a(availability)) {
             console.log(
               "A layer.json can't have a parentUrl if it does't have an available array."
             );
@@ -604,7 +1804,7 @@
 
       function metadataSuccess(data) {
         return parseMetadataSuccess(data).then(function () {
-          if (defined$b(metadataError)) {
+          if (defined$a(metadataError)) {
             return;
           }
 
@@ -632,7 +1832,7 @@
           if (attribution.length > 0) {
             const layerJsonCredit = new Credit$1(attribution);
 
-            if (defined$b(that._tileCredits)) {
+            if (defined$a(that._tileCredits)) {
               that._tileCredits.push(layerJsonCredit);
             } else {
               that._tileCredits = [layerJsonCredit];
@@ -646,7 +1846,7 @@
 
       function metadataFailure(data) {
         // If the metadata is not found, assume this is a pre-metadata heightmap tileset.
-        if (defined$b(data) && data.statusCode === 404) {
+        if (defined$a(data) && data.statusCode === 404) {
           return metadataSuccess({
             tilejson: "2.1.0",
             format: "heightmap-1.0",
@@ -701,7 +1901,7 @@
     };
 
     function getRequestHeader(extensionsList) {
-      if (!defined$b(extensionsList) || extensionsList.length === 0) {
+      if (!defined$a(extensionsList) || extensionsList.length === 0) {
         return {
           Accept:
             "application/vnd.quantized-mesh,application/octet-stream;q=0.9,*/*;q=0.01",
@@ -750,7 +1950,7 @@
       let triangleLength = bytesPerIndex * triangleElements;
 
       const view = new DataView(buffer);
-      const center = new Cartesian3$f(
+      const center = new Cartesian3$g(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -763,7 +1963,7 @@
       pos += Float32Array.BYTES_PER_ELEMENT;
 
       const boundingSphere = new BoundingSphere$7(
-        new Cartesian3$f(
+        new Cartesian3$g(
           view.getFloat64(pos, true),
           view.getFloat64(pos + 8, true),
           view.getFloat64(pos + 16, true)
@@ -772,7 +1972,7 @@
       );
       pos += boundingSphereLength;
 
-      const horizonOcclusionPoint = new Cartesian3$f(
+      const horizonOcclusionPoint = new Cartesian3$g(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -898,7 +2098,7 @@
               stringLength
             );
             const availableTiles = metadata.available;
-            if (defined$b(availableTiles)) {
+            if (defined$a(availableTiles)) {
               for (let offset = 0; offset < availableTiles.length; ++offset) {
                 const availableLevel = level + offset + 1;
                 const rangesAtLevel = availableTiles[offset];
@@ -1018,7 +2218,7 @@
         for (let i = 0; i < layerCount; ++i) {
           const layer = layers[i];
           if (
-            !defined$b(layer.availability) ||
+            !defined$a(layer.availability) ||
             layer.availability.isTileAvailable(level, x, y)
           ) {
             layerToUse = layer;
@@ -1031,7 +2231,7 @@
     };
 
     function requestTileGeometry(provider, x, y, level, layerToUse, request) {
-      if (!defined$b(layerToUse)) {
+      if (!defined$a(layerToUse)) {
         return Promise.reject(new RuntimeError$1("Terrain tile doesn't exist"));
       }
 
@@ -1070,8 +2270,8 @@
 
       const resource = layerToUse.resource;
       if (
-        defined$b(resource._ionEndpoint) &&
-        !defined$b(resource._ionEndpoint.externalType)
+        defined$a(resource._ionEndpoint) &&
+        !defined$a(resource._ionEndpoint.externalType)
       ) {
         // ion uses query paremeters to request extensions
         if (extensionList.length !== 0) {
@@ -1101,15 +2301,15 @@
           resource.request.state === RequestState$1.ACTIVE) {
           return;
         }
-      if (!defined$b(promise)) {
+      if (!defined$a(promise)) {
         return undefined;
       }
 
       return promise.then(function (buffer) {
-        if (!defined$b(buffer)) {
+        if (!defined$a(buffer)) {
           return Promise.reject(new RuntimeError$1("Mesh buffer doesn't exist."));
         }
-        if (defined$b(provider._heightmapStructure)) {
+        if (defined$a(provider._heightmapStructure)) {
           return createHeightmapTerrainData(provider, buffer);
         }
         return createQuantizedMeshTerrainData(
@@ -1363,7 +2563,7 @@
      * @returns {Boolean|undefined} Undefined if not supported or availability is unknown, otherwise true or false.
      */
     CesiumTerrainProvider$1.prototype.getTileDataAvailable = function (x, y, level) {
-      if (!defined$b(this._availability)) {
+      if (!defined$a(this._availability)) {
         return undefined;
       }
       if (level > this._availability._maximumLevel) {
@@ -1406,7 +2606,7 @@
       level
     ) {
       if (
-        !defined$b(this._availability) ||
+        !defined$a(this._availability) ||
         level > this._availability._maximumLevel ||
         this._availability.isTileAvailable(level, x, y) ||
         !this._hasMetadata
@@ -1419,7 +2619,7 @@
       const count = layers.length;
       for (let i = 0; i < count; ++i) {
         const layerResult = checkLayer(this, x, y, level, layers[i], i === 0);
-        if (defined$b(layerResult.promise)) {
+        if (defined$a(layerResult.promise)) {
           return layerResult.promise;
         }
       }
@@ -1447,7 +2647,7 @@
     }
 
     function checkLayer(provider, x, y, level, layer, topLayer) {
-      if (!defined$b(layer.availabilityLevels)) {
+      if (!defined$a(layer.availabilityLevels)) {
         // It's definitely not in this layer
         return {
           result: false,
@@ -1462,7 +2662,7 @@
       const availability = layer.availability;
 
       let tile = getAvailabilityTile(layer, x, y, level);
-      while (defined$b(tile)) {
+      while (defined$a(tile)) {
         if (
           availability.isTileAvailable(tile.level, tile.x, tile.y) &&
           !availabilityTilesLoaded.isTileAvailable(tile.level, tile.x, tile.y)
@@ -1471,7 +2671,7 @@
           if (!topLayer) {
             cacheKey = `${tile.level}-${tile.x}-${tile.y}`;
             requestPromise = layer.availabilityPromiseCache[cacheKey];
-            if (!defined$b(requestPromise)) {
+            if (!defined$a(requestPromise)) {
               // For cutout terrain, if this isn't the top layer the availability tiles
               //  may never get loaded, so request it here.
               const request = new Request$1({
@@ -1487,7 +2687,7 @@
                 layer,
                 request
               );
-              if (defined$b(requestPromise)) {
+              if (defined$a(requestPromise)) {
                 layer.availabilityPromiseCache[cacheKey] = requestPromise;
                 requestPromise.then(deleteFromCache);
               }
@@ -1527,25 +2727,6 @@
     }
 
     /**
-     * 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
-     *
-     * @exports defaultValue
-     *
-     * @param {*} a
-     * @param {*} b
-     * @returns {*} 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
-     *
-     * @example
-     * param = CesiumPro.defaultValue(param, 'default');
-     */
-    function defaultValue$7(a, b) {
-        if (a !== undefined && a !== null) {
-            return a;
-        }
-        return b;
-    }
-
-    /**
      * @exports clone
      * 生成一个对象的副本
      * @param  {Object} object 被克隆的对象
@@ -1557,7 +2738,7 @@
         return object;
       }
 
-      deep = defaultValue$7(deep, false);
+      deep = defaultValue$9(deep, false);
 
       const result = new object.constructor();
       for (const propertyName in object) {
@@ -1573,16 +2754,6 @@
       return result;
     }
 
-    /**
-     * 判断一个变量是否被定义
-     * @param value
-     * @exports defined
-     * @returns {Boolean} value是否被定义
-     */
-     function defined$a(value) {
-        return value !== undefined && value !== null;
-      }
-
     const cesiumScriptRegex = /((?:.*\/)|^)CesiumPro\.js(?:\?|#|$)/;
 
     let a;
@@ -1593,7 +2764,7 @@
         return url;
       }
 
-      if (!defined$a(a)) {
+      if (!defined$b(a)) {
         a = document.createElement('a');
       }
       a.href = url;
@@ -1624,7 +2795,7 @@
     }
 
     function getCesiumProBaseUrl() {
-      if (defined$a(baseResource)) {
+      if (defined$b(baseResource)) {
         return baseResource;
       }
 
@@ -1633,7 +2804,7 @@
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$a(window.define.amd)
+        && defined$b(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -1644,13 +2815,13 @@
         baseUrlString = getBaseUrlFromCesiumScript();
       }
       // >>includeStart('debug');
-      if (!defined$a(baseUrlString)) {
+      if (!defined$b(baseUrlString)) {
         throw new CesiumProError$1(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$a(baseUrlString)) {
+      if(!defined$b(baseUrlString)) {
           baseUrlString = '';
       }
       baseResource = new Cesium.Resource({
@@ -1669,11 +2840,11 @@
     }
 
     function buildModuleUrl$2(relativeUrl) {
-      if (!defined$a(implementation)) {
+      if (!defined$b(implementation)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$a(window.define.amd)
+          && defined$b(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
           implementation = buildModuleUrlFromRequireToUrl;
@@ -1766,14 +2937,14 @@
     }
     let bootstrapperUrlResult;
     function getBootstrapperUrl() {
-        if (!defined$a(bootstrapperUrlResult)) {
+        if (!defined$b(bootstrapperUrlResult)) {
             bootstrapperUrlResult = getWorkerUrl("Workers/cesiumWorkerBootstrapper.js");
         }
         return bootstrapperUrlResult;
     }
     function createWorker(processor) {
         const worker = new Worker(getBootstrapperUrl());
-        worker.postMessage = defaultValue$7(
+        worker.postMessage = defaultValue$9(
             worker.webkitPostMessage,
             worker.postMessage
         );
@@ -1819,7 +2990,7 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$e,
+        Cartesian3: Cartesian3$f,
         Cartographic: Cartographic$5,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$2,
@@ -1865,8 +3036,8 @@
     }
     class Cluster {
         constructor(scene, options = {}) {
-            this._objects = defaultValue$7(options.objects, []);
-            this._getScreenBoundingBox = defaultValue$7(options.getScreenBoundingBox, getScreenBoundingBox);
+            this._objects = defaultValue$9(options.objects, []);
+            this._getScreenBoundingBox = defaultValue$9(options.getScreenBoundingBox, getScreenBoundingBox);
             this._scene = scene;
             this.clusterSize = 3;
             this.pixelRange = 50;
@@ -1898,7 +3069,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$e.clone(object.position);
+                const clusterPosition = Cartesian3$f.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -1910,16 +3081,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$e.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$f.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$2.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$e.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$f.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$e(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$f(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -1945,7 +3116,7 @@
         }
         const now = Cesium.getTimestamp();
         const scene = viewer.scene;
-        if (defined$a(lastUpdateTime) && now - lastUpdateTime < 250) {
+        if (defined$b(lastUpdateTime) && now - lastUpdateTime < 250) {
             return;
         }
         lastUpdateTime = now;
@@ -1956,7 +3127,7 @@
         const endRay = scene.camera.getPickRay(new Cesium.Cartesian2(width / 2 + 1, height / 2));
         const startPosition = scene.globe.pick(startRay, scene);
         const endPosition = scene.globe.pick(endRay, scene);
-        if (!(defined$a(startPosition) && defined$a(endPosition))) {
+        if (!(defined$b(startPosition) && defined$b(endPosition))) {
             return;
         }
         const geodesic = new Cesium.EllipsoidGeodesic(
@@ -1965,356 +3136,6 @@
         );
         const distance = geodesic.surfaceDistance;
         return distance;
-    }
-
-    class LonLat {
-        /**
-         * 用经纬度（度）和海拔（米）描述一个地理位置。
-         * @param {Number} lon 经度，单位：度
-         * @param {Number} lat 经度，单位：度
-         * @param {Number} alt 海拔，单位：米
-         */
-        constructor(lon, lat, alt) {
-            if (!defined$a(lon)) {
-                throw new CesiumProError$1('longitude is required.')
-            }
-            if (!defined$a(lat)) {
-                throw new CesiumProError$1('latitude is required.')
-            }
-            this.lon = lon;
-            this.lat = lat;
-            this.alt = defaultValue$7(alt, 0);
-        }
-        get height() {
-            return this.alt;
-        }
-        /**
-         * 转为屏幕坐标
-         * @param {Cesium.Scene} scene 
-         * @returns {Cesium.Cartesian2} 屏幕坐标
-         */
-        toPixel(scene) {
-            return LonLat.toPixel(this, scene);
-        }
-        /**
-         * 转为笛卡尔坐标
-         * @returns {Cesium.Cartesian3} 笛卡尔坐标
-         */
-        toCartesian() {
-            return LonLat.toCartesian(this);
-        }
-        /**
-         * 转为地理坐标
-         * @returns {Cesium.Cartographic} 地理坐标
-         */
-        toCartographic() {
-            return LonLat.toCartographic(this)
-        }
-        /**
-         * 获得该点的弧度形式
-         * @returns 弧度表示的点
-         */
-        getRadias() {
-            return {
-                lon: Cesium.Math.toRadians(this.lon),
-                lat: Cesium.Math.toRadians(this.lat),
-                alt
-            }
-        }
-        /**
-         * 判断该点是否在场景内，且在球的正面
-         * @returns {Boolean} 可见性
-         */
-        isVisible(viewer) {
-            return LonLat.isVisible(this, viewer)
-        }
-        /**
-         * 转为字符串
-         * @returns 表示该点位置的字符串
-         */
-        toString() {
-            return `{lon: ${this.lon}, lat: ${this.lat}, alt: ${this.alt}}`
-        }
-        /**
-         * 转为JSON对象
-         * @returns 表示该点位置的对象
-         */
-        toJson() {
-            return {
-                lon: this.lon,
-                lat: this.lat,
-                alt: this.alt
-            }
-        }
-        /**
-         * 从地理点坐标转换成数组
-         * @returns 表示该点位置的数组
-         */
-        toArray() {
-            return [this.lon, this.lat, this.alt];
-        }
-        /**
-         * 判断一个点在当前场景是否可见。这里的可见指的是是否在屏幕范围内且在球的正面。
-         * @param {LonLat} point 点
-         * @param {Cesium.Viewer} viewer Viewer对象
-         * @returns {Boolean} 可见性
-         */
-        static isVisible(point, viewer) {
-            if (viewer instanceof Cesium.Viewer === false) {
-                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
-            }
-            if (!defined$a(point)) {
-                return false;
-            }
-            const position = LonLat.toCartesian(point);
-            if (!position) {
-                return false;
-            }
-            if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
-                const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
-                    .isPointVisible(position);
-                if (!visibility) {
-                    return false;
-                }
-                const windowPosition = LonLat.toPixel(point, viewer.scene);
-                if (!defined$a(windowPosition)) {
-                    return false;
-                }
-                const width = viewer.canvas.width || viewer.canvas.clientWidth;
-                const height = viewer.canvas.height || viewer.canvas.clientHeight;
-                return (windowPosition.x > 0 && windowPosition.x < width) && (windowPosition.y > 0 && windowPosition.y < height);
-            } else if (viewer.scene.mode === Cesium.SceneMode.SCENE2D) {
-                const frustum = viewer.scene.camera.frustum;
-                const {
-                    positionWC,
-                    directionWC,
-                    upWC
-                } = viewer.scene.camera;
-                const cullingVolume = frustum.computeCullingVolume(positionWC, directionWC, upWC);
-                const bounding = Cesium.BoundingSphere.projectTo2D(new BoundingSphere(position, 1));
-                const visibility = cullingVolume.computeVisibility(bounding);
-                return visibility === Cesium.Intersect.INSIDE || visibility === Cesium.Intersect.INERSECTING
-            }
-        }
-        /**
-         * 转屏幕坐标
-         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic} point 
-         * @param {Cesium.Scene} scene 
-         * @returns 对应的屏幕坐标
-         */
-        static toPixel(point, scene) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(scene)) {
-                throw new CesiumProError$1('scene未定义。')
-            }        
-            //>>includeEnd('debug', pragmas.debug);
-            if (!defined$a(point)) {
-                return undefined
-            }
-            const cartesian = LonLat.toCartesian(point);
-            if (!defined$a(cartesian)) {
-                return undefined;
-            }
-            return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
-                scene,
-                cartesian,
-            );
-        }
-        /**
-         * 转弧度坐标
-         * @param {LonLat} point 
-         * @returns 用弧度表示的坐标点
-         */
-        static toCartographic(point, viewer) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(point)) {
-                throw new CesiumProError$1('point is not defined.')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            if (point instanceof LonLat) {
-                return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
-            } else if (point instanceof Cesium.Cartesian3) {
-                return Cesium.Cartographic.fromCartesian(point);
-            } else if (point instanceof Cesium.Cartographic) {
-                return point;
-            } else if (point instanceof Cesium.Cartesian2) {
-                const cartesian = LonLat.toCartesian(point, viewer);
-                return LonLat.toCartographic(cartesian)
-            }
-        }
-        /**
-         * 转笛卡尔坐标
-         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic|Cesium.Cartesian2} point 
-         * @param {Viewer} [viewer] viewer对象， 如果point是Cesium.Cartesian2类型，该参数需要被提供
-         * @returns 用笛卡尔坐标表示的点
-         */
-        static toCartesian(point, viewer) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(point)) {
-                return undefined;
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            if (point instanceof Cesium.Cartesian3) {
-                return point;
-            }
-            if (point instanceof Cesium.Cartographic) {
-                return Cesium.Cartographic.toCartesian(point)
-            }
-            if (point instanceof LonLat) {
-                return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
-            }
-            if (point instanceof Cesium.Cartesian2) {
-                if(!viewer) {
-                    return;
-                }
-                const ray = viewer.scene.camera.getPickRay(point);
-                return viewer.scene.globe.pick(ray, viewer.scene);
-            }
-
-        }
-        /**
-         * 从一个笛卡尔坐标创建点
-         * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标点
-         * @returns GeoPoint点
-         */
-        static fromCartesian(cartesian) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(cartesian)) {
-                return undefined
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-            if (!defined$a(cartographic)) {
-                return undefined;
-            }
-            return LonLat.fromCartographic(cartographic)
-        }
-        /**
-         * 从一个地理坐标点创建点
-         * @param {Cesium.Cartographic} cartographic 地理坐标点
-         * @returns GeoPoint点
-         */
-        static fromCartographic(cartographic) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(cartographic)) {
-                throw new CesiumProError$1('cartographic is not defined.')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            return new LonLat(
-                Cesium.Math.toDegrees(cartographic.longitude),
-                Cesium.Math.toDegrees(cartographic.latitude),
-                cartographic.height
-            )
-        }
-        /**
-         * 从一个窗口坐标创建点
-         * @param {Cesium.Cartesian2} pixel 窗口坐标
-         * @param {Cesium.Viewer} viewer Viewer对象
-         * @returns {LonLat} GeoPoint点
-         */
-        static fromPixel(pixel, viewer) {
-            if (!viewer.scene.globe) {
-                return undefined;
-            }
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(pixel)) {
-                throw new CesiumProError$1('pixel is not defined.')
-            }
-            if (viewer instanceof Cesium.Viewer === false) {
-                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            const ray = viewer.scene.camera.getPickRay(pixel);
-            const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-            if (!defined$a(cartesian)) {
-                return undefined;
-            }
-            return LonLat.fromCartesian(cartesian);
-        }
-        /**
-         * 从经纬度创建点
-         * @param {Number} lon 经度(度)
-         * @param {Number} lat 纬度(度)
-         * @param {Number} height 海拔(米)
-         * @returns {LonLat}
-         */
-        static fromDegrees(lon, lat, height) {
-            return new LonLat(lon, lat, height);
-        }
-        /**
-         * 从经纬度创建点
-         * @param {Number} lon 经度(弧度)
-         * @param {Number} lat 纬度(弧度)
-         * @param {Number} height 海拔(米)
-         * @returns {LonLat}
-         */
-         static fromRadians(lon, lat, height) {
-            return new LonLat(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
-        }
-        /**
-         * 判断一个点或经纬度是否在中国范围内（粗略）
-         * @param  {LonLat|Number[]} args 
-         * @returns 如果在中国范围内，返回true
-         */
-        static inChina(...args) {
-            if (args.length === 1) {
-                const p = args[0];
-                if (args[0] instanceof LonLat) {
-                    return LonLat.inChina(p.lon, p.lat)
-                }
-            } else {
-                const lon = +args[0];
-                const lat = +args[1];
-                return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat < 53.55
-            }
-        }
-        /**
-         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
-         * @param {Array} lonlat 
-         * @returns {LonLat}
-         */
-        static fromArray(lonlat) {
-            return new LonLat(...lonlat)
-        }
-        /**
-         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
-         * @param {Object} lonlat 
-         * @returns {LonLat}
-         */
-         static fromJson(lonlat) {
-            return new LonLat(lonlat.lon, lonlat.lat, lonlat.alt)
-        }
-        /**
-         * 判断对象是不是一个有效的点
-         * @param {any} v 
-         */
-        static isValid(v) {
-            if (v instanceof LonLat) {
-                if (!defined$a(v.lon)) {
-                    return false;
-                }
-                if (!defined$a(v.lat)) {
-                    return false;
-                }
-                if (!defined$a(v.alt)) {
-                    return false;
-                }
-                return true
-            }
-            if (v instanceof Cesium.Cartesian3) {
-                if (!defined$a(v.x)) {
-                    return false;
-                }
-                if (!defined$a(v.y)) {
-                    return false;
-                }
-                if (!defined$a(v.z)) {
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        }
     }
 
     /**
@@ -2339,7 +3160,7 @@
         }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const rect = viewer.camera.computeViewRectangle();
-            if(!defined$a(rect)) {
+            if(!defined$b(rect)) {
                 return undefined;
             }
             return {
@@ -2376,12 +3197,12 @@
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$7(options, {});
-        const items = defaultValue$7(options.items, []);
+        options = defaultValue$9(options, {});
+        const items = defaultValue$9(options.items, []);
         this._items = new Cesium.AssociativeArray();
         this._position = options.position;
 
-        this._container = defaultValue$7(options.container, viewer.container);
+        this._container = defaultValue$9(options.container, viewer.container);
         this._root = this.createMenu();
         this.createItems(items);
         this._show = true;
@@ -2645,7 +3466,7 @@
 
     const class2type = {};
 
-    const { toString } = class2type;
+    const { toString: toString$2 } = class2type;
 
     const hasOwn = class2type.hasOwnProperty;
 
@@ -2712,7 +3533,7 @@
 
       // Support: Android <=2.3 only (functionish RegExp)
       return typeof obj === 'object' || typeof obj === 'function'
-        ? class2type[toString.call(obj)] || 'object'
+        ? class2type[toString$2.call(obj)] || 'object'
         : typeof obj;
     }
     /* global Symbol */
@@ -2901,7 +3722,7 @@
 
         // Detect obvious negatives
         // Use toString instead of jQuery.type to catch host objects
-        if (!obj || toString.call(obj) !== '[object Object]') {
+        if (!obj || toString$2.call(obj) !== '[object Object]') {
           return false;
         }
 
@@ -12769,13 +13590,13 @@
           jQuery(`#${id}`).remove();
         }
         const tooltip = document.createElement('div');
-        tooltip.id = defaultValue$7(id, guid());
+        tooltip.id = defaultValue$9(id, guid());
         tooltip.className = 'cursor-tip-class';
         tooltip.innerHTML = text;
         const target = viewer ? viewer.container : document.body;
         target.appendChild(tooltip);
         this.ele = tooltip;
-        this._show = defaultValue$7(options.show, true);
+        this._show = defaultValue$9(options.show, true);
         this._isDestryoed = false;
         this._target = target;
         this._id = tooltip.id;
@@ -12951,7 +13772,7 @@
      * @see CesiumProError
      */
     function destroyObject$6(object, message) {
-      message = defaultValue$7(
+      message = defaultValue$9(
         message,
         "This object was destroyed, i.e., destroy() was called."
       );
@@ -12976,21 +13797,67 @@
       return undefined;
     }
 
+    /**
+     * 根据起来和终点，描述一条抛物线,抛物线方程为方程y=-(4h/L**2)*x**2+h
+     * @param {LonLat} from 抛物线起点
+     * @param {LonLat} to 抛物线终点
+     * @param {number} [height=5000] 最高点高度
+     * @param {number} [count=50] 点集数量
+     * @returns {LonLat[]} 描述抛物线的点集 
+     */
+    function getParabolaPoints(from, to, height = 5000, count = 50) {
+        //方程y=-(4h/L**2)*x**2+h
+        //上为顶点的高
+        //L为横纵间距的较大者
+        const h = height > 5000 ? height : 5000;
+        const max = Math.abs(from.lon - to.lon) > Math.abs(from.lat - to.lat);
+        const L = max
+            ? Math.abs(from.lon - to.lon)
+            : Math.abs(from.lat - to.lat);
+        const num = count > 50 ? count : 50;
+        const result = [];
+        let dlt = L / num;
+        if (max) {
+            const delLat = (to.lat - from.lat) / num;
+            if (from.lon - to.lon > 0) {
+                dlt = -dlt;
+            }
+            for (let i = 0; i < num; i++) {
+                const tmpH = h - Math.pow((-0.5 * L + Math.abs(dlt) * i), 2) * 4 * h / Math.pow(L, 2);
+                const lon = from.lon + dlt * i;
+                const lat = from.lat + delLat * i;
+                result.push([lon, lat, tmpH]);
+            }
+        } else {
+            const delLon = (to.lon - from.lon) / num;
+            if (from.lat - to.lat > 0) {
+                dlt = -dlt;
+            }
+            for (let j = 0; j < num; j++) {
+                const tmpH = h - Math.pow((-0.5 * L + Math.abs(dlt) * j), 2) * 4 * h / Math.pow(L, 2);
+                const lon = from.lon + delLon * j;
+                const lat = from.lat + dlt * j;
+                result.push([lon, lat, tmpH]);
+            }
+        }
+        return result
+    }
+
     class Graphic {
         /**
          * 所有CesiumPro自定义图形基类
         */
         constructor(options) {
-            this._options = options;
-            this._id = defaultValue$7(options.id, createGuid$3());
+            this._options = defaultValue$9(options, {});
+            this._id = defaultValue$9(options.id, createGuid$3());
             this._primitive = null;
             this._oldPrimitive = null;
             this._definedChanged = new Event$8();
             this._loadEvent = new Event$8();
-            this._clampToGround = defaultValue$7(!!options.clampToGround, false);
-            this._show = defaultValue$7(options.show, true);
+            this._clampToGround = defaultValue$9(!!options.clampToGround, false);
+            this._show = defaultValue$9(options.show, true);
             this._removed = false;
-            this._allowPicking = defaultValue$7(options.allowPicking, true);
+            this._allowPicking = defaultValue$9(options.allowPicking, true);
             this._property = options.property;
         }
         /**
@@ -13105,7 +13972,7 @@
             }
         }
         toJson() {
-            if (!defined$a(this.primitive)) {
+            if (!defined$b(this.primitive)) {
                 return;
             }
             return JSON.parse(JSON.stringify(this._options))
@@ -13143,7 +14010,7 @@
          * @param {Viewer} viewer viewer对象
          */
         addTo(viewer) {
-            if (!defined$a(this.primitive)) {
+            if (!defined$b(this.primitive)) {
                 return;
             }
             viewer.graphicGroup.add(this);
@@ -13154,7 +14021,7 @@
          * @returns 被移除的要素
          */
         remove() {
-            if (!defined$a(this.primitive)) {
+            if (!defined$b(this.primitive)) {
                 return;
             }
             if (this.group) {
@@ -13175,7 +14042,7 @@
         }
     }
 
-    const { AssociativeArray: AssociativeArray$3, PrimitiveCollection: PrimitiveCollection$3 } = Cesium;
+    const { AssociativeArray: AssociativeArray$3, PrimitiveCollection: PrimitiveCollection$4 } = Cesium;
     class GraphicGroup {
         /**
          * graphic 集合
@@ -13185,7 +14052,7 @@
             this.values = new AssociativeArray$3();
             this.id = createGuid$3();
             this.viewer = viewer;
-            this.root = new PrimitiveCollection$3();
+            this.root = new PrimitiveCollection$4();
             this.root.name = 'graphicGroup';
             viewer.scene.primitives.add(this.root);
         }
@@ -13214,7 +14081,7 @@
         /**
          * 根据id获得图形对象
          * @param {string} id 
-         * @returns 
+         * @returns {Graphic} id对应的图形对象
          */
         getById(id) {
             return this.get(id);
@@ -13244,7 +14111,7 @@
         /**
          * 判断该集合是否包含指定对象
          * @param {*} object 
-         * @returns 
+         * @returns {boolean} true表示包含
          */
         has(object) {
             return this.values.contains(object);
@@ -13273,7 +14140,7 @@
         }
     }
 
-    const shader$k = 'uniform samplerCube u_cubeMap;\n\
+    const shader$l = 'uniform samplerCube u_cubeMap;\n\
   varying vec3 v_texCoord;\n\
   void main()\n\
   {\n\
@@ -13282,7 +14149,7 @@
   }\n\
   ';
 
-    const shader$j = 'attribute vec3 position;\n\
+    const shader$k = 'attribute vec3 position;\n\
   varying vec3 v_texCoord;\n\
   uniform mat3 u_rotateMatrix;\n\
   void main()\n\
@@ -13294,15 +14161,15 @@
   ';
 
     const {
-        defaultValue: defaultValue$6,
+        defaultValue: defaultValue$7,
         destroyObject: destroyObject$5,
-        Matrix4: Matrix4$5,
+        Matrix4: Matrix4$6,
         DrawCommand: DrawCommand$2,
         BoxGeometry,
-        Cartesian3: Cartesian3$d,
+        Cartesian3: Cartesian3$e,
         defined: defined$9,
         GeometryPipeline,
-        Transforms: Transforms$5,
+        Transforms: Transforms$6,
         VertexFormat: VertexFormat$3,
         BufferUsage: BufferUsage$2,
         CubeMap,
@@ -13313,10 +14180,10 @@
         SceneMode: SceneMode$3,
         ShaderProgram: ShaderProgram$4,
         ShaderSource: ShaderSource$4,
-        Matrix3: Matrix3$1,
+        Matrix3: Matrix3$2,
     } = Cesium;
-    const SkyBoxFS = shader$k;
-    const SkyBoxVS = shader$j;
+    const SkyBoxFS = shader$l;
+    const SkyBoxVS = shader$k;
     class GroundSkyBox {
         /**
          * A sky box around the scene to draw stars.  The sky box is defined using the True Equator Mean Equinox (TEME) axes.
@@ -13345,7 +14212,7 @@
          * @see Cesium.SkyBox
          */
         constructor(options = {}) {
-            this.sources = defaultValue$6(options.sources, {
+            this.sources = defaultValue$7(options.sources, {
                 positiveX: Url.buildModuleUrl('./assets/skybox/px.png'),
                 negativeX: Url.buildModuleUrl('./assets/skybox/nx.png'),
                 positiveY: Url.buildModuleUrl('./assets/skybox/py.png'),
@@ -13360,10 +14227,10 @@
              * @type {Boolean}
              * @default true
              */
-            this.show = defaultValue$6(options.show, true);
+            this.show = defaultValue$7(options.show, true);
 
             this._command = new DrawCommand$2({
-                modelMatrix: Matrix4$5.clone(Matrix4$5.IDENTITY),
+                modelMatrix: Matrix4$6.clone(Matrix4$6.IDENTITY),
                 owner: this,
             });
             this._cubeMap = undefined;
@@ -13379,7 +14246,7 @@
          * <p>切勿主动调用该函数。</p>
          */
         update(frameState, useHdr) {
-            const skyboxMatrix3 = new Matrix3$1();
+            const skyboxMatrix3 = new Matrix3$2();
             const that = this;
 
             if (!this.show) {
@@ -13441,22 +14308,22 @@
 
             const command = this._command;
 
-            command.modelMatrix = Transforms$5.eastNorthUpToFixedFrame(frameState.camera._positionWC);
+            command.modelMatrix = Transforms$6.eastNorthUpToFixedFrame(frameState.camera._positionWC);
             if (!defined$9(command.vertexArray)) {
                 command.uniformMap = {
                     u_cubeMap() {
                         return that._cubeMap;
                     },
                     u_rotateMatrix() {
-                        if (typeof Matrix4$5.getRotation === 'function') {
-                            return Matrix4$5.getRotation(command.modelMatrix, skyboxMatrix3);
+                        if (typeof Matrix4$6.getRotation === 'function') {
+                            return Matrix4$6.getRotation(command.modelMatrix, skyboxMatrix3);
                         }
-                        return Matrix4$5.getMatrix3(command.modelMatrix, skyboxMatrix3);
+                        return Matrix4$6.getMatrix3(command.modelMatrix, skyboxMatrix3);
                     },
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$d(2.0, 2.0, 2.0),
+                    dimensions: new Cartesian3$e(2.0, 2.0, 2.0),
                     vertexFormat: VertexFormat$3.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
@@ -13524,9 +14391,6 @@
          * @param {Cesium.DistanceDisplayCondition} [options.distanceDisplayCondition]
          */
         constructor(options) {
-            // if (LonLat.isValid(options.position) === false) {
-            //     throw new CesiumProError('options.position parameter is invalid.');
-            // }
             if (options.el instanceof HTMLElement === false) {
                 throw new CesiumProError$1('options.el parameter is invalid.');
             }
@@ -13534,7 +14398,6 @@
             this._clampToGround = undefined;
             this._asynchronous = undefined;
             this._distanceDisplayCondition = options.distanceDisplayCondition;
-            if (options.position) ;
             this.createGraphic();
         }
         get clampToGround() {
@@ -13555,6 +14418,10 @@
         set color(val) {
             throw new CesiumProError$1('HtmlPointGraphic is not support color.')
         }
+        /**
+         * @type {boolean}
+         * 获得或设置要素是否显示
+         */
         set show(val) {
             if (this.el) {
                 this.display = val ? 'block': 'none'; 
@@ -13610,7 +14477,7 @@
         /**
          * 从场景移除对象
          * @param {*} graphic 
-         * @returns 
+         * @returns {HtmlPointGraphic} 被删除的对象
          */
         remove() {
             if(this.group) {
@@ -13620,7 +14487,7 @@
         }
         /**
          * 定位到对象
-         * @returns {Promise}
+         * @returns {Promise} 返回一个Promise, resolve表示飞行完成, reject表示飞行被取消
          */
         zoomTo() {
             if (!this._viewer) {
@@ -13628,9 +14495,16 @@
             }
             return this._viewer.flyTo(this.position);
         }
+        /**
+         * 更新要素的style样式
+         */
         updateStyle(styleKey, styleValue) {
             this.el.style[styleKey] = styleValue;
         }
+        /**
+         * 为dom元素添加css样式
+         * @param {*} cls 
+         */
         addClass(cls) {
             this.el.classList.add(cls);
         }
@@ -13647,7 +14521,7 @@
         constructor(viewer, options = {}) {
             super(viewer);
             this._viewer = viewer;
-            this._allowPicking = defaultValue$7(options.allowPicking, false);
+            this._allowPicking = defaultValue$9(options.allowPicking, false);
             this._createRoot();
             this._addEventListener();
             /**
@@ -13718,6 +14592,10 @@
                 self.root.removeEventListener('click', listenClick);
             };
         }
+        /**
+         * 添加HTML图形对象
+         * @param {HtmlPointGraphic} object 
+         */
         add(object) {
             if (object instanceof HtmlPointGraphic) {
                 this.values.set(object.id, object);
@@ -13741,7 +14619,7 @@
         /**
          * 根据id返回要素
          * @param {string} graphicId 
-         * @returns 
+         * @returns {HtmlPointGraphic} id对应的图形对象
          */
         getById(graphicId) {
             return this.values.get(graphicId);
@@ -13778,8 +14656,8 @@
         }
     }
 
-    const {Cartesian2: Cartesian2$3, Rectangle: Rectangle$4, GeographicProjection, Ellipsoid: Ellipsoid$1} = Cesium;
-    const CesiumMath$2 = Cesium.Math;
+    const {Cartesian2: Cartesian2$4, Rectangle: Rectangle$4, GeographicProjection, Ellipsoid: Ellipsoid$1} = Cesium;
+    const CesiumMath$3 = Cesium.Math;
 
     /**
      * A tiling scheme for geometry referenced to a simple {@link GeographicProjection} where
@@ -13799,14 +14677,14 @@
      * the tile tree.
      */
     function LonlatTilingScheme(options) {
-      options = defaultValue$7(options, defaultValue$7.EMPTY_OBJECT);
+      options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
 
-      this._ellipsoid = defaultValue$7(options.ellipsoid, Ellipsoid$1.WGS84);
-      this._rectangle = defaultValue$7(options.rectangle, Rectangle$4.MAX_VALUE);
+      this._ellipsoid = defaultValue$9(options.ellipsoid, Ellipsoid$1.WGS84);
+      this._rectangle = defaultValue$9(options.rectangle, Rectangle$4.MAX_VALUE);
       this._projection = new GeographicProjection(this._ellipsoid);
       this._numberOfLevelZeroTilesX = 36;
       this._numberOfLevelZeroTilesY = 18;
-      this._intervalOfZeorLevel = defaultValue$7(options.intervalOfZeorLevel, 16);
+      this._intervalOfZeorLevel = defaultValue$9(options.intervalOfZeorLevel, 16);
     }
 
     Object.defineProperties(LonlatTilingScheme.prototype, {
@@ -13896,8 +14774,8 @@
       // result.north = north;
       // return result;
       return {
-        lon: +CesiumMath$2.toDegrees(west).toFixed(5),
-        lat: +CesiumMath$2.toDegrees(north).toFixed(5)
+        lon: +CesiumMath$3.toDegrees(west).toFixed(5),
+        lat: +CesiumMath$3.toDegrees(north).toFixed(5)
       }
     };
 
@@ -13925,12 +14803,12 @@
       rectangle,
       result
     ) {
-      const west = CesiumMath$2.toDegrees(rectangle.west);
-      const south = CesiumMath$2.toDegrees(rectangle.south);
-      const east = CesiumMath$2.toDegrees(rectangle.east);
-      const north = CesiumMath$2.toDegrees(rectangle.north);
+      const west = CesiumMath$3.toDegrees(rectangle.west);
+      const south = CesiumMath$3.toDegrees(rectangle.south);
+      const east = CesiumMath$3.toDegrees(rectangle.east);
+      const north = CesiumMath$3.toDegrees(rectangle.north);
 
-      if (!defined$a(result)) {
+      if (!defined$b(result)) {
         return new Rectangle$4(west, south, east, north);
       }
 
@@ -13960,10 +14838,10 @@
       result
     ) {
       const rectangleRadians = this.tileXYToRectangle(x, y, level, result);
-      rectangleRadians.west = CesiumMath$2.toDegrees(rectangleRadians.west);
-      rectangleRadians.south = CesiumMath$2.toDegrees(rectangleRadians.south);
-      rectangleRadians.east = CesiumMath$2.toDegrees(rectangleRadians.east);
-      rectangleRadians.north = CesiumMath$2.toDegrees(rectangleRadians.north);
+      rectangleRadians.west = CesiumMath$3.toDegrees(rectangleRadians.west);
+      rectangleRadians.south = CesiumMath$3.toDegrees(rectangleRadians.south);
+      rectangleRadians.east = CesiumMath$3.toDegrees(rectangleRadians.east);
+      rectangleRadians.north = CesiumMath$3.toDegrees(rectangleRadians.north);
       return rectangleRadians;
     };
 
@@ -13997,7 +14875,7 @@
       var north = rectangle.north - y * yTileHeight;
       var south = rectangle.north - (y + 1) * yTileHeight;
 
-      if (!defined$a(result)) {
+      if (!defined$b(result)) {
         result = new Rectangle$4(west, south, east, north);
       }
 
@@ -14038,7 +14916,7 @@
 
       var longitude = position.longitude;
       if (rectangle.east < rectangle.west) {
-        longitude += CesiumMath$2.TWO_PI;
+        longitude += CesiumMath$3.TWO_PI;
       }
 
       var xTileCoordinate = ((longitude - rectangle.west) / xTileWidth) | 0;
@@ -14052,8 +14930,8 @@
         yTileCoordinate = yTiles - 1;
       }
 
-      if (!defined$a(result)) {
-        return new Cartesian2$3(xTileCoordinate, yTileCoordinate);
+      if (!defined$b(result)) {
+        return new Cartesian2$4(xTileCoordinate, yTileCoordinate);
       }
 
       result.x = xTileCoordinate;
@@ -14066,9 +14944,9 @@
         TerrainProvider,
         Resource: Resource$4,
         CustomDataSource: CustomDataSource$2,
-        Cartesian3: Cartesian3$c,
+        Cartesian3: Cartesian3$d,
         Entity: Entity$2,
-        Color: Color$m,
+        Color: Color$o,
         Rectangle: Rectangle$3
     } = Cesium;
     function createBoundingRect(provider) {
@@ -14085,8 +14963,8 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$c.fromRadiansArray(positions),
-                material: Color$m.fromRandom({ alpha: 1 }),
+                positions: Cartesian3$d.fromRadiansArray(positions),
+                material: Color$o.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
@@ -14139,9 +15017,9 @@
             this._hasWaterMask = false;
             this._hasVertexNormals = false;
             this._ellipsoid = options.ellipsoid;
-            this._requestVertexNormals = defaultValue$7(options.requestVertexNormals, false);
-            this._requestWaterMask = defaultValue$7(options.requestWaterMask, false);
-            this._requestMetadata = defaultValue$7(options.requestMetadata, true);
+            this._requestVertexNormals = defaultValue$9(options.requestVertexNormals, false);
+            this._requestWaterMask = defaultValue$9(options.requestWaterMask, false);
+            this._requestMetadata = defaultValue$9(options.requestMetadata, true);
             this._errorEvent = new Event$8();
 
             this._terrainProviders = [];
@@ -14460,7 +15338,7 @@
        * @fires Properties#definitionChanged
        */
       addProperty(key, value) {
-        if (!defined$a(key)) {
+        if (!defined$b(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -14477,7 +15355,7 @@
        * @fires Properties#definitionChanged
        */
       removeProperty(key) {
-        if (!defined$a(key)) {
+        if (!defined$b(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -14516,7 +15394,7 @@
        * @return {Boolean}
        */
       hasProperty(key) {
-        if (!defined$a(key)) {
+        if (!defined$b(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         return this.propertyNames.includes(key);
@@ -14566,7 +15444,7 @@
     }
 
     const {
-        Color: Color$l
+        Color: Color$n
     } = Cesium;
     class Selection{
         /**
@@ -14581,19 +15459,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$l.AQUA;
+        static pointColor = Color$n.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$l.AQUA;
+        static fillColor = Color$n.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$l.AQUA;
+        static strokeColor = Color$n.AQUA;
     }
 
     /**
@@ -14633,2435 +15511,107 @@
         BOTTOM:10
     });
 
-    class XYZLayer extends Cesium.UrlTemplateImageryProvider {
-        /**
-         * 创建一个image图层，该图层通过使用X/Y/Z指定的URL模板请求图像。你可以用它来请求TMS,WMS标准的地图服务，甚至WMTS。
-         * @extends Cesium.UrlTemplateImageryProvider
-         * @param {Promise.<Object>|Object} options 具有以下属性
-         * @param {Resource|String} options.url  瓦片的url模板，它支持以下关键字:
-         * <ul>
-         *     <li><code>{z}</code>: 瓦片的层级，第一层为0级</li>
-         *     <li><code>{x}</code>: 切片方案中X的坐标，最左边为0</li>
-         *     <li><code>{y}</code>: 切片方案中Y的坐标，最上边为0</li>
-         *     <li><code>{s}</code>: 子域名</li>
-         *     <li><code>{reverseX}</code>: 切片方案中X的坐标，最右边为0</li>
-         *     <li><code>{reverseY}</code>: 切片方案中Y的坐标，最下边为0</li>
-         *     <li><code>{reverseZ}</code>: 瓦片的层级，最大层级为0</li>
-         *     <li><code>{westDegrees}</code>: 瓦片最左边的坐标，单位度</li>
-         *     <li><code>{southDegrees}</code>: 瓦片最下边的坐标，单位度</li>
-         *     <li><code>{eastDegrees}</code>: 瓦片最右边的坐标，单位度</li>
-         *     <li><code>{northDegrees}</code>: 瓦片最上边的坐标，单位度</li>
-         *     <li><code>{westProjected}</code>: 瓦片最左边的坐标，单位米</li>
-         *     <li><code>{southProjected}</code>: 瓦片最下边的坐标，单位米</li>
-         *     <li><code>{eastProjected}</code>: 瓦片最右边的坐标，单位米</li>
-         *     <li><code>{northProjected}</code>: 瓦片最上边的坐标，单位米</li>
-         *     <li><code>{width}</code>: 瓦片宽度，单位像素</li>
-         *     <li><code>{height}</code>: 瓦片高度，单位像素</li>
-         * </ul>
-         * @param {Resource|String} [options.pickFeaturesUrl] 用于选择功能的 URL 模板，如果未定义
-         *                 {@link XYZLayer#pickFeatures} 将返回undefined，表示未选中任何内容，该模板除了支持url的所有关键字外，还支持以下关键字:
-         * <ul>
-         *     <li><code>{i}</code>: 选择位置的列，单位像素，最左边为0。</li>
-         *     <li><code>{j}</code>: 拾取位置的行，单位像素，最上边为0。</li>
-         *     <li><code>{reverseI}</code>: 选择位置的列，单位像素，最右边为0。</li>
-         *     <li><code>{reverseJ}</code>: 拾取位置的行，单位像素，最下边为0</li>
-         *     <li><code>{longitudeDegrees}</code>: 拾取位置的经度，单位度</li>
-         *     <li><code>{latitudeDegrees}</code>: 拾取位置的纬度，单位度</li>
-         *     <li><code>{longitudeProjected}</code>: 拾取位置的经度，单位米</li>
-         *     <li><code>{latitudeProjected}</code>: 拾取位置的纬度，单位米</li>
-         *     <li><code>{format}</code>: 一个函数，用于定义信息的返回形式, 如{@link Cesium.GetFeatureInfoFormat}.</li>
-         * </ul>
-         * @param {Object} [options.urlSchemeZeroPadding] 设置坐标的位数，不足的以0填充，对于urlSchemeZeroPadding : { '{x}' : '0000'}
-         * 如果x为12，将被填充为0012。它具有以下关键字：
-         * <ul>
-         *  <li> <code>{z}</code>: z关键字的填充方案</li>
-         *  <li> <code>{x}</code>: x关键字的填充方案</li>
-         *  <li> <code>{y}</code>: y关键字的填充方案</li>
-         *  <li> <code>{reverseX}</code>: reverseX关键字的填充方案</li>
-         *  <li> <code>{reverseY}</code>: reverseY关键字的填充方案</li>
-         *  <li> <code>{reverseZ}</code>: reverseZ关键字的填充方案</li>
-         * </ul>
-         * @param {String|String[]} [options.subdomains='abc'] {s}占位符可用的子域名，如果该值为字符串，由字符串中的每个字符都是一个子域名。
-         * @param {Credit|String} [options.credit=''] 数据源的版权信息.
-         * @param {Number} [options.minimumLevel=0] 图层支持的最低细节级别。在指定最小级别的瓦片数量很少时要小心，较大的数字可能会导致渲染问题。
-         * @param {Number} [options.maximumLevel] 图层支持的最大细节级别，如果未定义，则无限制。
-         * @param {Rectangle} [options.rectangle=Cesium.Rectangle.MAX_VALUE] 瓦片覆盖范围，单位弧度。
-         * @param {TilingScheme} [options.tilingScheme=Cesium.WebMercatorTilingScheme] 图层的坐标系，默认为墨卡托投影。
-         * @param {Number} [options.tileWidth=256] 瓦片宽度。
-         * @param {Number} [options.tileHeight=256] 瓦片高度。
-         * @param {Boolean} [options.hasAlphaChannel=true] 瓦片图像是否拥有alpha通道，如果为false，内存使用量和加载时间将减少，但是会失去alpha通道的数据。
-         * @param {GetFeatureInfoFormat[]} [options.getFeatureInfoFormats=XYZLayer.defaultFeatureInfoFormats]  {@link XYZLayer#pickFeatures} 调用时在指定位置获取特征信息的格式。如果未指定此参数，则禁用特征拾取。
-         * @param {Boolean} [options.enablePickFeatures=true] 是否支持要素不支持，如果为true,XYZLayer#pickFeatures将请求pickFeaturesUrl并解析其内容，否则将返回undefined。
-         * @param {Object} [options.customTags] 为URL模板自定义关键字。该对象的键必须为字符串，值为函数。
-         * 
-         * @example
-         * // Access Natural Earth II imagery, which uses a TMS tiling scheme and Geographic (EPSG:4326) project
-         * const tms = new CesiumPro.XYZLayer({
-         *     url : Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII') + '/{z}/{x}/{reverseY}.jpg',
-         *     credit : '© Analytical Graphics, Inc.',
-         *     tilingScheme : new Cesium.GeographicTilingScheme(),
-         *     maximumLevel : 5
-         * });
-         * // Access the CartoDB Positron basemap, which uses an OpenStreetMap-like tiling scheme.
-         * const positron = new CesiumPro.XYZLayer({
-         *     url : 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-         *     credit : 'Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
-         * });
-         * // Access a Web Map Service (WMS) server.
-         * const wms = new CesiumPro.XYZLayer({
-         *    url : 'https://programs.communications.gov.au/geoserver/ows?tiled=true&' +
-         *          'transparent=true&format=image%2Fpng&exceptions=application%2Fvnd.ogc.se_xml&' +
-         *          'styles=&service=WMS&version=1.1.1&request=GetMap&' +
-         *          'layers=public%3AMyBroadband_Availability&srs=EPSG%3A3857&' +
-         *          'bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&' +
-         *          'width=256&height=256',
-         *    rectangle : Cesium.Rectangle.fromDegrees(96.799393, -43.598214999057824, 153.63925700000001, -9.2159219997013)
-         * });
-         * // Using custom tags in your template url.
-         * const custom = new CesiumPro.XYZLayer({
-         *    url : 'https://yoururl/{Time}/{z}/{y}/{x}.png',
-         *    customTags : {
-         *        Time: function(imageryProvider, x, y, level) {
-         *            return '20171231'
-         *        }
-         *    }
-         * });
-         * // geoserver tms服务
-         * const  geoserverTMS = new XYZLayer({
-         *      url: 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/topp%3Astates@EPSG%3A4326@png/{z}/{x}/{reverseY}.png',
-         *      tilingScheme: proj.get('EPSG:4326')
-         *  })
-         * // geoserver wms服务，并支持pick
-         * const geoserverTMS = new XYZLayer({
-         *      pickFeaturesUrl:'http://localhost:8080/geoserver/wms?service=WMS&version=1.1.1&request=GetFeatureInfo&layers=topp%3Astates&bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&width={width}&height={height}&srs=EPSG%3A4326&query_layers=topp%3Astates&info_format={format}&x={i}&y={j}',
-         *      url: 'http://localhost:8080/geoserver/topp/wms?service=WMS&version=1.1.1&request=GetMap&layers' +
-         *          '=topp%3Astates&bbox={westDegrees}%2C{southDegrees}%2C{eastDegrees}%2C{northDegrees}&transparent=true&' +
-         *           'width=768&height=330&srs=EPSG%3A4326&format=image/png',
-         *      tilingScheme: proj.get('EPSG:4326'),
-         *      getFeatureInfoFormats: [new Cesium.GetFeatureInfoFormat("xml", "text/xml")]
-         * })
-         * // geoserver WMTS服务
-         * const layer = new XYZLayer({
-         *     url: 'http://localhost:8080/geoserver/gwc/service/wmts?layer=topp%3Astates&style=&til' +
-         *         'ematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={TileMatrix}' +
-         *         '&TileCol={tileCol}&TileRow={tileRow}',
-         *     tilingScheme: proj.get('EPSG:4326'),
-         *     customTags: {
-         *         TileMatrix: function (imageryProvider, x, y, level) {
-         *             return 'EPSG:4326:' + level
-         *         },
-         *         tileCol: function (imageryProvider, x, y, level) {
-         *             return y
-         *         },
-         *         tileRow: function (imageryProvider, x, y, level) {
-         *             return x
-         *         }
-         *     }
-         * })
-         */
-        constructor(options) {
-            if (typeof options === 'string') {
-                options = {url: options};
-            }
-            options.getFeatureInfoFormats = defaultValue$7(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
-            super(options);
-        }
-        /**
-         * 获取用于瓦片请求的URL，具有以下关键字：
-         * <ul>
-         *     <li><code>{z}</code>: 瓦片的层级，第一层为0级</li>
-         *     <li><code>{x}</code>: 切片方案中X的坐标，最左边为0</li>
-         *     <li><code>{y}</code>: 切片方案中Y的坐标，最上边为0</li>
-         *     <li><code>{s}</code>: 子域名</li>
-         *     <li><code>{reverseX}</code>: 切片方案中X的坐标，最右边为0</li>
-         *     <li><code>{reverseY}</code>: 切片方案中Y的坐标，最下边为0</li>
-         *     <li><code>{reverseZ}</code>: 瓦片的层级，最大层级为0</li>
-         *     <li><code>{westDegrees}</code>: 瓦片最左边的坐标，单位度</li>
-         *     <li><code>{southDegrees}</code>: 瓦片最下边的坐标，单位度</li>
-         *     <li><code>{eastDegrees}</code>: 瓦片最右边的坐标，单位度</li>
-         *     <li><code>{northDegrees}</code>: 瓦片最上边的坐标，单位度</li>
-         *     <li><code>{westProjected}</code>: 瓦片最左边的坐标，单位米</li>
-         *     <li><code>{southProjected}</code>: 瓦片最下边的坐标，单位米</li>
-         *     <li><code>{eastProjected}</code>: 瓦片最右边的坐标，单位米</li>
-         *     <li><code>{northProjected}</code>: 瓦片最上边的坐标，单位米</li>
-         *     <li><code>{width}</code>: 瓦片宽度，单位像素</li>
-         *     <li><code>{height}</code>: 瓦片高度，单位像素</li>
-         * </ul>
-         * @readonly
-         * @returns {String} 获取用于瓦片请求的URL
-         */
-        get url() {
-            return super.url;
-        }
-        /**
-         * 可以请求的最小瓦片级别
-         * @readonly
-         * @type {Number}
-         */
-         get minimumLevel() {
-            return super.minimumLevel;
-        }
-        /**
-         * 可以请求的最大详细级别
-         * @type {Number}
-         * @readonly
-         */
-        get maximumLevel() {
-            return super.maximumLevel;
-        }
-        /**
-         * 图层的范围
-         * @type {Cesium.Rectangle}
-         * @readonly
-         */
-         get rectangle() {
-            return super.rectangle;
-        }
-        /**
-         * 获取影像错误时触发的事件
-         * @type {Event}
-         * @readonly
-         */
-        get errorEvent() {
-            return super.errorEvent;
-        }
-        /**
-         * 获取一个值，该值指示图层是否已准备好使用。
-         * @readonly
-         * @type {Boolean}
-         */
-        get ready() {
-            return super.ready;
-        }
-        /**
-         * 获取一个Promise，该图层准备好时将resolve
-         * @readonly
-         * @type {Promise<Boolean>}
-         */
-        get readyPromise() {
-            return super.readyPromise;
-        }
-        /**
-         * 图层的坐标系
-         * @type {Cesium.TilingScheme}
-         * @readonly
-         */
-        get tilingScheme() {
-            return super.tilingScheme;
-        }
-        /**
-         * 图层是否允许被pick
-         * @default true
-         */
-        get enablePickFeatures() {
-            return super.enablePickFeatures;
-        }
-        set enablePickFeatures(val) {
-            super.enablePickFeatures = val;
-        }
+    const polylineAntialiasingMaterial = `#ifdef GL_OES_standard_derivatives
+#extension GL_OES_standard_derivatives : enable
+#endif
+uniform vec4 color;
+uniform vec4 gapColor;
+uniform float dashLength;
+uniform float dashPattern;
+varying float v_polylineAngle;
 
-        /**
-         * 确定哪些要素（如果有）位于图块内的给定经度和纬度。在{@link Cesium.ImageryProvider#ready}返回 true之前不应调用此函数。
-         * 在数据图层ready之前，该函数不能被调用
-         *
-         * @param {Number} x 瓦片的x坐标。
-         * @param {Number} y 瓦片的y坐标。
-         * @param {Number} level 瓦片的层级。
-         * @param {Number} longitude 选择要素的经度。
-         * @param {Number} latitude  选择要素的纬度
-         * @return {Promise.<Cesium.ImageryLayerFeatureInfo[]>|undefined} 
-         */
-        pickFeatures(x, y, level, longitude, latitude) {
-            return super.pickFeatures(x, y, level, longitude, latitude);
-        }
-        /**
-         * 请求指定瓦片
-         * @param {Number} x 瓦片x坐标
-         * @param {Number} y 瓦片y坐标
-         * @param {Number} level 瓦片级别
-         * @param {Cesium.Request} [request]
-         * @returns {Promise.<HTMLImageElement|HTMLCanvasElement>|undefined} 如果瓦片解析成功，返回一个异步Promise，解析的图像可以是 Image 或 Canvas DOM 对象，否则返回undefined
-         */
-        requestImage(x, y, level, request) {
-            return super.requestImage(x, y, level, request)
-        }
+const float maskLength = 16.0;
+
+mat2 rotate(float rad) {
+    float c = cos(rad);
+    float s = sin(rad);
+    return mat2(
+        c, s,
+        -s, c
+    );
+}
+
+float getPointOnLine(vec2 p0, vec2 p1, float x)
+{
+    float slope = (p0.y - p1.y) / (p0.x - p1.x);
+    return slope * (x - p0.x) + p0.y;
+}
+
+czm_material czm_getMaterial(czm_materialInput materialInput)
+{
+    czm_material material = czm_getDefaultMaterial(materialInput);
+
+    vec2 st = materialInput.st;
+
+#ifdef GL_OES_standard_derivatives
+    float base = 1.0 - abs(fwidth(st.s)) * 10.0 * czm_pixelRatio;
+#else
+    float base = 0.975; // 2.5% of the line will be the arrow head
+#endif
+    // 没有箭头
+    base = 1.0;
+
+    vec2 center = vec2(1.0, 0.5);
+    float ptOnUpperLine = getPointOnLine(vec2(base, 1.0), center, st.s);
+    float ptOnLowerLine = getPointOnLine(vec2(base, 0.0), center, st.s);
+
+    float halfWidth = 0.15;
+    float s = step(0.5 - halfWidth, st.t);
+    s *= 1.0 - step(0.5 + halfWidth, st.t);
+    s *= 1.0 - step(base, st.s);
+
+    float t = step(base, materialInput.st.s);
+    t *= 1.0 - step(ptOnUpperLine, st.t);
+    t *= step(ptOnLowerLine, st.t);
+
+    // Find the distance from the closest separator (region between two colors)
+    float dist;
+    if (st.s < base)
+    {
+        float d1 = abs(st.t - (0.5 - halfWidth));
+        float d2 = abs(st.t - (0.5 + halfWidth));
+        dist = min(d1, d2);
     }
-     /**
-     * 默认数据解析格式
-     * @constant
-     * @type {Object}
-     */
-    XYZLayer.defaultFeatureInfoFormats = Object.freeze([
-        Object.freeze(new Cesium.GetFeatureInfoFormat("json", "application/json")),
-        Object.freeze(new Cesium.GetFeatureInfoFormat("xml", "text/xml")),
-        Object.freeze(new Cesium.GetFeatureInfoFormat("text", "text/html")),
-    ]);
-
-    /**
-     * CesiumPro提供的默认图层，该图层为离线图层，可以在无互联网的环境下使用。
-     * @exports createDefaultLayer
-     * @returns {XYZLayer} 一个可以在离线环境使用的XYZLayer。
-     * @example
-     * const viewer = new CesiumPro.Viewer('container', {
-     *   imageryProvider:CesiumPro.createDefaultLayer()
-     * })
-     */
-    function createDefaultLayer() {
-        return new XYZLayer({
-            url: Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png'),
-            maximumLevel: 4
-        })
+    else
+    {
+        float d1 = czm_infinity;
+        if (st.t < 0.5 - halfWidth && st.t > 0.5 + halfWidth)
+        {
+            d1 = abs(st.s - base);
+        }
+        float d2 = abs(st.t - ptOnUpperLine);
+        float d3 = abs(st.t - ptOnLowerLine);
+        dist = min(min(d1, d2), d3);
     }
 
-    /*
-     * @Author: zhangbo
-     * @E-mail: zhangb@geovis.com.cn
-     * @Date: 2020-02-25 15:57:44
-     * @LastEditors: zhangbo
-     * @LastEditTime: 2020-02-25 18:00:16
-     * @Desc: 
-     */
-    const {
-        defined: defined$8,
-        defaultValue: defaultValue$5,
-        ColorMaterialProperty: ColorMaterialProperty$1,
-        ConstantPositionProperty: ConstantPositionProperty$1,
-        ConstantProperty: ConstantProperty$1,
-        DataSource: DataSource$1,
-        PolygonGraphics: PolygonGraphics$1,
-        PolylineGraphics: PolylineGraphics$1,
-        EntityCluster,
-        PinBuilder,
-        createGuid: createGuid$2,
-        Cartesian3: Cartesian3$b,
-        PointGraphics: PointGraphics$1,
-        ArcType: ArcType$1,
-        PolygonHierarchy: PolygonHierarchy$2,
-        Color: Color$k,
-        EntityCollection,
-        HeightReference: HeightReference$2,
-        Resource: Resource$3,
-        describe,
-        Event: Event$7
-    } = Cesium;
-    const sizes$1 = {
-        small: 24,
-        medium: 48,
-        large: 64
-    };
-    const crsLinkHrefs$1 = {};
-    const crsLinkTypes$1 = {};
-    const crsNames$1 = {
-        "urn:ogc:def:crs:OGC:1.3:CRS84": defaultCrsFunction$1,
-        "EPSG:4326": defaultCrsFunction$1,
-        "urn:ogc:def:crs:EPSG::4326": defaultCrsFunction$1,
-    };
-    const simpleStyleIdentifiers$1 = [
-        "title",
-        "description", //
-        "marker-size",
-        "marker-symbol",
-        "marker-color",
-        "stroke", //
-        "stroke-opacity",
-        "stroke-width",
-        "fill",
-        "fill-opacity",
-    ];
-    const geoJsonObjectTypes$1 = {
-        Feature: processFeature$1,
-        FeatureCollection: processFeatureCollection$1,
-        GeometryCollection: processGeometryCollection$1,
-        LineString: processLineString$1,
-        MultiLineString: processMultiLineString$1,
-        MultiPoint: processMultiPoint$1,
-        MultiPolygon: processMultiPolygon$1,
-        Point: processPoint$1,
-        Polygon: processPolygon$1,
-        Topology: processTopology$1
-    };
-    const geometryTypes$1 = {
-        GeometryCollection: processGeometryCollection$1,
-        LineString: processLineString$1,
-        MultiLineString: processMultiLineString$1,
-        MultiPoint: processMultiPoint$1,
-        MultiPolygon: processMultiPolygon$1,
-        Point: processPoint$1,
-        Polygon: processPolygon$1,
-        Topology: processTopology$1
-    };
-
-    function coordinatesArrayToCartesianArray$1(coordinates, crsFunction) {
-        var positions = new Array(coordinates.length);
-        for (var i = 0; i < coordinates.length; i++) {
-            positions[i] = crsFunction(coordinates[i]);
-        }
-        return positions;
+    vec4 outsideColor = vec4(0.0);
+    vec4 currentColor = mix(outsideColor, color, clamp(s + t, 0.0, 1.0));
+    vec4 outColor = czm_antialias(outsideColor, color, currentColor, dist);
+    // dash
+    vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;
+    // Get the relative position within the dash from 0 to 1
+    float dashPosition = fract(pos.x / (dashLength * czm_pixelRatio));
+    // Figure out the mask index.
+    float maskIndex = floor(dashPosition * maskLength);
+    // Test the bit mask.
+    float maskTest = floor(dashPattern / pow(2.0, maskIndex));
+    vec4 fragColor = (mod(maskTest, 2.0) < 1.0) ? gapColor : color;
+    if (fragColor.a < 0.005) {   // matches 0/255 and 1/255
+        discard;
     }
-    function createDescriptionCallback$1(describe, properties, nameProperty) {
-        var description;
-        return function (time, result) {
-            if (!defined$8(description)) {
-                description = describe(properties, nameProperty);
-            }
-            return description;
-        };
-    }
-    // GeoJSON processing functions
-    function createObject$1(geoJson, entityCollection, describe) {
-        var id = geoJson.id;
-        if (!defined$8(id) || geoJson.type !== 'Feature') {
-            id = createGuid$2();
-        } else {
-            var i = 2;
-            var finalId = id;
-            while (defined$8(entityCollection.getById(finalId))) {
-                finalId = id + '_' + i;
-                i++;
-            }
-            id = finalId;
-        }
-
-        var entity = entityCollection.getOrCreateEntity(id);
-        var properties = geoJson.properties;
-        if (defined$8(properties)) {
-            entity.properties = properties;
-
-            var nameProperty;
-
-            //Check for the simplestyle specified name first.
-            var name = properties.title;
-            if (defined$8(name)) {
-                entity.name = name;
-                nameProperty = 'title';
-            } else {
-                //Else, find the name by selecting an appropriate property.
-                //The name will be obtained based on this order:
-                //1) The first case-insensitive property with the name 'title',
-                //2) The first case-insensitive property with the name 'name',
-                //3) The first property containing the word 'title'.
-                //4) The first property containing the word 'name',
-                var namePropertyPrecedence = Number.MAX_VALUE;
-                for (var key in properties) {
-                    if (properties.hasOwnProperty(key) && properties[key]) {
-                        var lowerKey = key.toLowerCase();
-
-                        if (namePropertyPrecedence > 1 && lowerKey === 'title') {
-                            namePropertyPrecedence = 1;
-                            nameProperty = key;
-                            break;
-                        } else if (namePropertyPrecedence > 2 && lowerKey === 'name') {
-                            namePropertyPrecedence = 2;
-                            nameProperty = key;
-                        } else if (namePropertyPrecedence > 3 && /title/i.test(key)) {
-                            namePropertyPrecedence = 3;
-                            nameProperty = key;
-                        } else if (namePropertyPrecedence > 4 && /name/i.test(key)) {
-                            namePropertyPrecedence = 4;
-                            nameProperty = key;
-                        }
-                    }
-                }
-                if (defined$8(nameProperty)) {
-                    entity.name = properties[nameProperty];
-                }
-            }
-
-            var description = properties.description;
-            if (description !== null) {
-                entity.description = !defined$8(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
-            }
-        }
-        return entity;
-    }
-    function processFeature$1(dataSource, feature, notUsed, crsFunction, options) {
-        if (feature.geometry === null) {
-            //Null geometry is allowed, so just create an empty entity instance for it.
-            createObject$1(feature, dataSource._entityCollection, options.describe);
-            return;
-        }
-
-        if (!defined$8(feature.geometry)) {
-            throw new CesiumProError$1('feature.geometry is required.');
-        }
-
-        var geometryType = feature.geometry.type;
-        var geometryHandler = geometryTypes$1[geometryType];
-        if (!defined$8(geometryHandler)) {
-            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
-        }
-        geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
-    }
-
-    function processFeatureCollection$1(dataSource, featureCollection, notUsed, crsFunction, options) {
-        var features = featureCollection.features;
-        for (var i = 0, len = features.length; i < len; i++) {
-            processFeature$1(dataSource, features[i], undefined, crsFunction, options);
-        }
-    }
-
-    function processGeometryCollection$1(dataSource, geoJson, geometryCollection, crsFunction, options) {
-        var geometries = geometryCollection.geometries;
-        for (var i = 0, len = geometries.length; i < len; i++) {
-            var geometry = geometries[i];
-            var geometryType = geometry.type;
-            var geometryHandler = geometryTypes$1[geometryType];
-            if (!defined$8(geometryHandler)) {
-                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
-            }
-            geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
-        }
-    }
-
-    function createPoint$1(dataSource, geoJson, crsFunction, coordinates, options) {
-        let size = options.pointSize;
-        let color = options.pointColor;
-        const properties = geoJson.properties;
-        if (defined$8(properties)) {
-            const cssColor = properties['point-color'];
-            if (defined$8(cssColor)) {
-                color = Color$k.fromCssColorString(cssColor);
-            }
-
-            size = defaultValue$5(sizes$1[properties['point-size']], size);
-        }
-        const point = new PointGraphics$1();
-
-        // Clamp to ground if there isn't a height specified
-        if (coordinates.length === 2 && options.clampToGround) {
-            point.heightReference = HeightReference$2.CLAMP_TO_GROUND;
-        }
-
-        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
-        entity.point = point;
-        entity.point.color = color;
-        entity.point.pixelSize = size;
-        entity.position = new ConstantPositionProperty$1(crsFunction(coordinates));
-    }
-
-    function processPoint$1(dataSource, geoJson, geometry, crsFunction, options) {
-        createPoint$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiPoint$1(dataSource, geoJson, geometry, crsFunction, options) {
-        var coordinates = geometry.coordinates;
-        for (var i = 0; i < coordinates.length; i++) {
-            createPoint$1(dataSource, geoJson, crsFunction, coordinates[i], options);
-        }
-    }
-
-    function createLineString$1(dataSource, geoJson, crsFunction, coordinates, options) {
-        const material = options.lineColor;
-        const widthProperty = options.lineWidth;
-
-        const properties = geoJson.properties;
-        if (defined$8(properties)) {
-            const width = properties['stroke-width'];
-            if (defined$8(width)) {
-                widthProperty = new ConstantProperty$1(width);
-            }
-
-            let color;
-            let stroke = properties.stroke;
-            if (defined$8(stroke)) {
-                color = Color$k.fromCssColorString(stroke);
-            }
-            let opacity = properties['stroke-opacity'];
-            if (defined$8(opacity) && opacity !== 1.0) {
-                if (!defined$8(color)) {
-                    color = material.color.clone();
-                }
-                color.alpha = opacity;
-            }
-            if (defined$8(color)) {
-                material = new ColorMaterialProperty$1(color);
-            }
-        }
-
-        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
-        const polylineGraphics = new PolylineGraphics$1();
-        entity.polyline = polylineGraphics;
-
-        polylineGraphics.clampToGround = options.clampToGround;
-        polylineGraphics.material = material;
-        polylineGraphics.width = widthProperty;
-        polylineGraphics.positions = new ConstantProperty$1(coordinatesArrayToCartesianArray$1(coordinates, crsFunction));
-        polylineGraphics.arcType = ArcType$1.RHUMB;
-    }
-    function defaultDescribe$1(properties, nameProperty) {
-        var html = "";
-        for (var key in properties) {
-            if (properties.hasOwnProperty(key)) {
-                if (key === nameProperty || simpleStyleIdentifiers$1.indexOf(key) !== -1) {
-                    continue;
-                }
-                var value = properties[key];
-                if (defined$8(value)) {
-                    if (typeof value === "object") {
-                        html +=
-                            "<tr><th>" +
-                            key +
-                            "</th><td>" +
-                            defaultDescribe$1(value) +
-                            "</td></tr>";
-                    } else {
-                        html += "<tr><th>" + key + "</th><td>" + value + "</td></tr>";
-                    }
-                }
-            }
-        }
-
-        if (html.length > 0) {
-            html =
-                '<table class="cesium-infoBox-defaultTable"><tbody>' +
-                html +
-                "</tbody></table>";
-        }
-
-        return html;
-    }
-    function processLineString$1(dataSource, geoJson, geometry, crsFunction, options) {
-        createLineString$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiLineString$1(dataSource, geoJson, geometry, crsFunction, options) {
-        var lineStrings = geometry.coordinates;
-        for (var i = 0; i < lineStrings.length; i++) {
-            createLineString$1(dataSource, geoJson, crsFunction, lineStrings[i], options);
-        }
-    }
-
-    function createPolygon$1(dataSource, geoJson, crsFunction, coordinates, options) {
-        if (coordinates.length === 0 || coordinates[0].length === 0) {
-            return;
-        }
-
-        let outlineColor = options.outlineColor.color;
-        let material = options.fill;
-        let outlineWidth = options.outlineWidth;
-
-        const properties = geoJson.properties;
-        if (defined$8(properties)) {
-            const width = properties['stroke-width'];
-            if (defined$8(width)) {
-                outlineWidth = new ConstantProperty$1(width);
-            }
-            let color;
-            const stroke = properties.stroke;
-            if (defined$8(stroke)) {
-                color = Color$k.fromCssColorString(stroke);
-            }
-            let opacity = properties['stroke-opacity'];
-            if (defined$8(opacity) && opacity !== 1.0) {
-                if (!defined$8(color)) {
-                    color = options.outlineColor.color.clone();
-                }
-                color.alpha = opacity;
-            }
-
-            if (defined$8(color)) {
-                outlineColor = new ConstantProperty$1(color);
-            }
-
-            let fillColor;
-            const fill = properties.fill;
-            if (defined$8(fill)) {
-                fillColor = Color$k.fromCssColorString(fill);
-                fillColor.alpha = material.color.alpha;
-            }
-            opacity = properties['fill-opacity'];
-            if (defined$8(opacity) && opacity !== material.color.alpha) {
-                if (!defined$8(fillColor)) {
-                    fillColor = material.color.clone();
-                }
-                fillColor.alpha = opacity;
-            }
-            if (defined$8(fillColor)) {
-                material = new ColorMaterialProperty$1(fillColor);
-            }
-        }
-
-        const polygon = new PolygonGraphics$1();
-        polygon.outline = new ConstantProperty$1(options.outline);
-        polygon.outlineColor = outlineColor;
-        polygon.outlineWidth = outlineWidth;
-        polygon.material = material;
-        polygon.arcType = ArcType$1.RHUMB;
-
-        const extrudedHeight = options.extrudedHeight;
-        if (extrudedHeight) {
-            if (typeof extrudedHeight === 'number') {
-                polygon.extrudedHeight = extrudedHeight;
-            } else if (typeof extrudedHeight === 'string') {
-                const conditions = extrudedHeight.match(/\$\{\s*.*?\s*\}/ig);
-                if (conditions) {
-                    let extrudeValue = extrudedHeight;
-                    for (let con of conditions) {
-                        const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if (!(defined$8(value) && defined$8(value[1]))) {
-                            continue;
-                        }
-                        extrudeValue = extrudeValue.replace(con, properties[value[1]]);
-                    }
-                    try {
-                        const height = window.eval(extrudeValue);
-                        if (typeof height === 'number') {
-                            polygon.extrudedHeight = height;
-                        }
-                    } catch (e) {
-
-                    }
-                }
-            }
-        }
-
-        const holes = [];
-        for (var i = 1, len = coordinates.length; i < len; i++) {
-            holes.push(new PolygonHierarchy$2(coordinatesArrayToCartesianArray$1(coordinates[i], crsFunction)));
-        }
-
-        const positions = coordinates[0];
-        polygon.hierarchy = new ConstantProperty$1(new PolygonHierarchy$2(coordinatesArrayToCartesianArray$1(positions, crsFunction), holes));
-        if (positions[0].length > 2) {
-            polygon.perPositionHeight = new ConstantProperty$1(true);
-        } else if (!options.clampToGround) {
-            polygon.height = 0;
-        }
-
-        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
-        entity.polygon = polygon;
-    }
-
-    function processPolygon$1(dataSource, geoJson, geometry, crsFunction, options) {
-        createPolygon$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiPolygon$1(dataSource, geoJson, geometry, crsFunction, options) {
-        var polygons = geometry.coordinates;
-        for (var i = 0; i < polygons.length; i++) {
-            createPolygon$1(dataSource, geoJson, crsFunction, polygons[i], options);
-        }
-    }
-
-    function processTopology$1(dataSource, geoJson, geometry, crsFunction, options) {
-        for (var property in geometry.objects) {
-            if (geometry.objects.hasOwnProperty(property)) {
-                var feature = topojson.feature(geometry, geometry.objects[property]);
-                var typeHandler = geoJsonObjectTypes$1[feature.type];
-                typeHandler(dataSource, feature, feature, crsFunction, options);
-            }
-        }
-    }
-    function defaultDescribeProperty$1(properties, nameProperty) {
-        return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
-    }
-    function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$b.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
-    }
-    function load$1(that, geoJson, options, sourceUri) {
-        let name;
-        if (defined$8(sourceUri)) {
-            name = Cesium.getFilenameFromUri(sourceUri);
-        }
-
-        if (defined$8(name) && that._name !== name) {
-            that._name = name;
-            that._changed.raiseEvent(that);
-        }
-
-        const typeHandler = geoJsonObjectTypes$1[geoJson.type];
-        if (!defined$8(typeHandler)) {
-            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
-        }
-
-        //Check for a Coordinate Reference System.
-        const crs = geoJson.crs;
-        let crsFunction = crs !== null ? defaultCrsFunction$1 : null;
-
-        if (defined$8(crs)) {
-            if (!defined$8(crs.properties)) {
-                throw new CesiumProError$1('crs.properties is undefined.');
-            }
-
-            const properties = crs.properties;
-            if (crs.type === 'name') {
-                crsFunction = crsNames$1[properties.name];
-                if (!defined$8(crsFunction)) {
-                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
-                }
-            } else if (crs.type === 'link') {
-                var handler = crsLinkHrefs$1[properties.href];
-                if (!defined$8(handler)) {
-                    handler = crsLinkTypes$1[properties.type];
-                }
-
-                if (!defined$8(handler)) {
-                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
-                }
-
-                crsFunction = handler(properties);
-            } else if (crs.type === 'EPSG') {
-                crsFunction = crsNames$1['EPSG:' + properties.code];
-                if (!defined$8(crsFunction)) {
-                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
-                }
-            } else {
-                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
-            }
-        }
-        return Promise.resolve(crsFunction).then(function (crsFunction) {
-            that._entityCollection.removeAll();
-
-            // null is a valid value for the crs, but means the entire load process becomes a no-op
-            // because we can't assume anything about the coordinates.
-            if (crsFunction !== null) {
-                typeHandler(that, geoJson, geoJson, crsFunction, options);
-            }
-
-            return Promise.all(that._promises).then(function () {
-                that._promises.length = 0;
-                DataSource$1.setLoading(that, false);
-                return that;
-            });
-        });
-    }
-    class GeoJsonDataSource {
-        /**
-         * 创建一个GeoJson数据源
-         * @param {String} [name] 数据源名称
-         * @example
-         *  // 全局设置贴地
-         *  CesiumPro.GeoJsonDataSource.clampToGround = true
-         *  // 全局修改线样式
-         *  CesiumPro.GeoJsonDataSource.lineColor = Cesium.Color.RED;
-         *  CesiumPro.GeoJsonDataSource.lineWidth = 1;
-         *  const linstring = CesiumPro.GeoJsonDataSource.load('../data/geojson/railway.geojson')
-         *  // 修改该多边形的样式
-         *  const polygon = CesiumPro.GeoJsonDataSource.load('../data/geojson/province.geojson', {
-         *      fill: Cesium.Color.GOLD,
-         *      outline: false
-         *  })
-         *  // 使用全局方法修改点的颜色
-         *  CesiumPro.GeoJsonDataSource.pointColor = Cesium.Color.BLUE;
-         *  // 单独修本次加载点的大小
-         *  const point = CesiumPro.GeoJsonDataSource.load('../data/geojson/city.geojson', {
-         *      pointSize: 6
-         *  })
-         * // 多边形拉伸
-         *  const geojson = CesiumPro.GeoJsonDataSource.load('../data/geojson/building.geojson', {
-         *      extrudedHeight: '${Floor} * 10'
-         *  })
-         *  parent.viewer = viewer;
-         *  viewer.addLayer(geojson);
-         *  viewer.flyTo(geojson)
-         */
-        constructor(name) {
-            this._name = name;
-            this._changed = new Event$7();
-            this._error = new Event$7();
-            this._isLoading = false;
-            this._loading = new Event$7();
-            this._entityCollection = new EntityCollection(this);
-            this._promises = [];
-            this._pinBuilder = new PinBuilder();
-            this._entityCluster = new EntityCluster();
-            this._credit = undefined;
-            this._resourceCredits = [];
-        }
-        /**
-         * 点要素的默认大小
-         * @type {Number}
-         * @memberof GeoJsonDataSource
-         * @default 5
-         */
-        static pointSize = 5;
-        /**
-         * 点要素的默认颜色
-         * @memberof GeoJsonDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.ROYALBLUE
-         */
-        static pointColor = Color$k.ROYALBLUE;
-        /**
-         * 线要素的颜色
-         * @memberof GeoJsonDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.YELLOW
-         */
-        static lineColor = Color$k.YELLOW;
-        /**
-         * 多边形要素的填充色
-         * @memberof GeoJsonDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.fromBytes(255, 255, 0, 100)
-         */
-        static fill = Color$k.fromBytes(255, 255, 0, 100);
-        /**
-         * 多边形要素是否显边框
-         * @memberof GeoJsonDataSource
-         * @type {Boolean}
-         * @default true
-         */
-        static outline = true;
-        /**
-         * 多边形要素边框的颜色
-         * @memberof GeoJsonDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.YELLOW
-         */
-        static outlineColor = Color$k.YELLOW;
-        /**
-         * 线要素的宽度
-         * @memberof GeoJsonDataSource
-         * @type {Number}
-         * @default 2
-         */
-        static lineWidth = 2;
-        /**
-         * 是否贴地。
-         * @type {Boolean}
-         * @default false
-         * @memberof GeoJsonDataSource
-         */
-        static clampToGround = false;
-        /**
-         * 多边形要素的边框宽度，该属性在windows环境下可能不生效
-         * @default 1
-         * @type {Number}
-         * @memberof GeoJsonDataSource
-         */
-        static outlineWidth = 1;
-        static crsNames() {
-            return crsNames$1;
-        }
-        static crsLinkHrefs() {
-            return crsLinkHrefs$1;
-        }
-        static crsLinkTypes() {
-            return crsLinkTypes$1;
-        }
-        /**
-         * 该数据源中的entity
-         * @type {Cesium.EntityCollection}
-         * @readonly
-         */
-        get entities() {
-            return this._entityCollection;
-        }
-        /**
-         * 数据源名称
-         * @type {String}
-         */
-        get name() {
-            return this._name;
-        }
-        set name(value) {
-            if (this._name !== value) {
-                this._name = value;
-                this._changed.raiseEvent(this);
-            }
-        }
-        get clock() {
-            return undefined
-        }
-        /**
-         * 指示该数据源是否正在加载数据
-         * @readonly
-         * @type {Boolean}
-         */
-        get isLoading() {
-            return this._isLoading;
-        }
-        /**
-         * 数据发生变化时触发的事件
-         * @type {Event}
-         * @readonly
-         */
-        get changedEvent() {
-            return this._changed;
-        }
-        /**
-         * 数据加载出错时触发的事件
-         * @type {Event}
-         * @readonly
-         */
-        get errorEvent() {
-            return this._error;
-        }
-        /**
-         * 数据源开始或结束加载时触发的事件
-         * @readonly
-         * @type {Event}
-         */
-        get loadingEvent() {
-            return this._loading;
-        }
-        /**
-         * 是否显示数据源
-         * @type {Boolean}
-         * @default true
-         */
-        get show() {
-            return this._entityCollection.show;
-        }
-        set show(val) {
-            this._entityCollection.show = val;
-        }
-        /**
-         * 数据源的聚合参数
-         * @type {Cesium.EntityCluster}
-         */
-        get clustering() {
-            return this._entityCluster
-        }
-        set clustering(value) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$8(value)) {
-                throw new DeveloperError("value must be defined.");
-            }
-            //>>includeEnd('debug');
-            this._entityCluster = value;
-        }
-        /**
-         * 版权信息
-         * @type {Cesium.Credit}
-         */
-        get credit() {
-            return this._credit;
-        }
-        /** 
-         * 加载GeoJson数据
-         * @param {Cesium.Resource|String} data geojson文件路径或geojson字符串
-         * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
-         * @returns {Promise<GeoJsonDataSource>}
-         */
-        load(data, options) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$8(data)) {
-                throw new CesiumProError$1("data is required.");
-            }
-            //>>includeEnd('debug');
-
-            DataSource$1.setLoading(this, true);
-            options = defaultValue$5(options, {});
-
-            // User specified credit
-            let credit = options.credit;
-            if (typeof credit === "string") {
-                credit = new Credit(credit);
-            }
-            this._credit = credit;
-
-            let promise = data;
-            let sourceUri = options.sourceUri;
-            if (typeof data === "string" || data instanceof Resource$3) {
-                data = Resource$3.createIfNeeded(data);
-                promise = data.fetchJson();
-                sourceUri = defaultValue$5(sourceUri, data.getUrlComponent());
-
-                // Add resource credits to our list of credits to display
-                const resourceCredits = this._resourceCredits;
-                const credits = data.credits;
-                if (defined$8(credits)) {
-                    const length = credits.length;
-                    for (const i = 0; i < length; i++) {
-                        resourceCredits.push(credits[i]);
-                    }
-                }
-            }
-
-            options = {
-                describe: defaultValue$5(options.describe, defaultDescribeProperty$1),
-                pointSize: defaultValue$5(options.pointSize, GeoJsonDataSource.pointSize),
-                pointColor: defaultValue$5(options.pointColor, GeoJsonDataSource.pointColor),
-                lineWidth: new ConstantProperty$1(
-                    defaultValue$5(options.lineWidth, GeoJsonDataSource.lineWidth)
-                ),
-                outlineColor: new ColorMaterialProperty$1(
-                    defaultValue$5(options.outlineColor, GeoJsonDataSource.outlineColor)
-                ),
-                lineColor: new ColorMaterialProperty$1(defaultValue$5(options.lineColor, GeoJsonDataSource.lineColor)),
-                outlineWidth: defaultValue$5(options.outlineWidth, GeoJsonDataSource.outlineWidth),
-                fill: new ColorMaterialProperty$1(
-                    defaultValue$5(options.fill, GeoJsonDataSource.fill)
-                ),
-                outline: defaultValue$5(options.outline, GeoJsonDataSource.outline),
-                clampToGround: defaultValue$5(options.clampToGround, GeoJsonDataSource.clampToGround),
-                extrudedHeight: options.extrudedHeight
-            };
-
-            const that = this;
-            return Promise.resolve(promise)
-                .then(function (geoJson) {
-                    return load$1(that, geoJson, options, sourceUri);
-                })
-                .catch(function (error) {
-                    DataSource$1.setLoading(that, false);
-                    that._error.raiseEvent(that, error);
-                    throw error;
-                });
-        };
-        update() {
-            return true;
-        }
-    }
-
-    /**
-     * 加载GeoJson数据
-     * @param {Cesium.Resource|String} data geojson文件路径或geojson字符串
-     * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
-     * @returns {Promise<GeoJsonDataSource>}
-     */
-    GeoJsonDataSource.load = function (data, options) {
-        return new GeoJsonDataSource().load(data, options)
-    };
-
-    const exports$1 = {};
-    var array_cancel = function() {
-      this._array = null;
-      return Promise.resolve();
-    };
-
-    var array_read = function() {
-      var array = this._array;
-      this._array = null;
-      return Promise.resolve(array ? {done: false, value: array} : {done: true, value: undefined});
-    };
-
-    function array(array) {
-      return new ArraySource(array instanceof Uint8Array ? array : new Uint8Array(array));
-    }
-
-    function ArraySource(array) {
-      this._array = array;
-    }
-
-    ArraySource.prototype.read = array_read;
-    ArraySource.prototype.cancel = array_cancel;
-
-    var fetchPath = function(url) {
-      return fetch(url).then(function(response) {
-        return response.body && response.body.getReader
-            ? response.body.getReader()
-            : response.arrayBuffer().then(array);
-      });
-    };
-
-    var requestPath = function(url) {
-      return new Promise(function(resolve, reject) {
-        var request = new XMLHttpRequest;
-        request.responseType = "arraybuffer";
-        request.onload = function() { resolve(array(request.response)); };
-        request.onerror = reject;
-        request.ontimeout = reject;
-        request.open("GET", url, true);
-        request.send();
-      });
-    };
-
-    function path(path) {
-      return (typeof fetch === "function" ? fetchPath : requestPath)(path);
-    }
-
-    function stream(source) {
-      return typeof source.read === "function" ? source : source.getReader();
-    }
-
-    var empty = new Uint8Array(0);
-
-    var slice_cancel = function() {
-      return this._source.cancel();
-    };
-
-    function concat(a, b) {
-      if (!a.length) return b;
-      if (!b.length) return a;
-      var c = new Uint8Array(a.length + b.length);
-      c.set(a);
-      c.set(b, a.length);
-      return c;
-    }
-
-    var slice_read = function() {
-      var that = this, array = that._array.subarray(that._index);
-      return that._source.read().then(function(result) {
-        that._array = empty;
-        that._index = 0;
-        return result.done ? (array.length > 0
-            ? {done: false, value: array}
-            : {done: true, value: undefined})
-            : {done: false, value: concat(array, result.value)};
-      });
-    };
-
-    var slice_slice = function(length) {
-      if ((length |= 0) < 0) throw new Error("invalid length");
-      var that = this, index = this._array.length - this._index;
-
-      // If the request fits within the remaining buffer, resolve it immediately.
-      if (this._index + length <= this._array.length) {
-        return Promise.resolve(this._array.subarray(this._index, this._index += length));
-      }
-
-      // Otherwise, read chunks repeatedly until the request is fulfilled.
-      var array = new Uint8Array(length);
-      array.set(this._array.subarray(this._index));
-      return (function read() {
-        return that._source.read().then(function(result) {
-
-          // When done, it’s possible the request wasn’t fully fullfilled!
-          // If so, the pre-allocated array is too big and needs slicing.
-          if (result.done) {
-            that._array = empty;
-            that._index = 0;
-            return index > 0 ? array.subarray(0, index) : null;
-          }
-
-          // If this chunk fulfills the request, return the resulting array.
-          if (index + result.value.length >= length) {
-            that._array = result.value;
-            that._index = length - index;
-            array.set(result.value.subarray(0, length - index), index);
-            return array;
-          }
-
-          // Otherwise copy this chunk into the array, then read the next chunk.
-          array.set(result.value, index);
-          index += result.value.length;
-          return read();
-        });
-      })();
-    };
-
-    function slice(source) {
-      return typeof source.slice === "function" ? source :
-          new SliceSource(typeof source.read === "function" ? source
-              : source.getReader());
-    }
-
-    function SliceSource(source) {
-      this._source = source;
-      this._array = empty;
-      this._index = 0;
-    }
-
-    SliceSource.prototype.read = slice_read;
-    SliceSource.prototype.slice = slice_slice;
-    SliceSource.prototype.cancel = slice_cancel;
-
-    var dbf_cancel = function() {
-      return this._source.cancel();
-    };
-
-    var readBoolean = function(value) {
-      return /^[nf]$/i.test(value) ? false
-          : /^[yt]$/i.test(value) ? true
-          : null;
-    };
-
-    var readDate = function(value) {
-      return new Date(+value.substring(0, 4), value.substring(4, 6) - 1, +value.substring(6, 8));
-    };
-
-    var readNumber = function(value) {
-      return !(value = value.trim()) || isNaN(value = +value) ? null : value;
-    };
-
-    var readString = function(value) {
-      return value.trim() || null;
-    };
-
-    var types = {
-      B: readNumber,
-      C: readString,
-      D: readDate,
-      F: readNumber,
-      L: readBoolean,
-      M: readNumber,
-      N: readNumber
-    };
-
-    var dbf_read = function() {
-      var that = this, i = 1;
-      return that._source.slice(that._recordLength).then(function(value) {
-        return value && (value[0] !== 0x1a) ? {done: false, value: that._fields.reduce(function(p, f) {
-          p[f.name] = types[f.type](that._decode(value.subarray(i, i += f.length)));
-          return p;
-        }, {})} : {done: true, value: undefined};
-      });
-    };
-
-    var view = function(array) {
-      return new DataView(array.buffer, array.byteOffset, array.byteLength);
-    };
-
-    var dbf = function(source, decoder) {
-      source = slice(source);
-      return source.slice(32).then(function(array) {
-        var head = view(array);
-        return source.slice(head.getUint16(8, true) - 32).then(function(array) {
-          return new Dbf(source, decoder, head, view(array));
-        });
-      });
-    };
-
-    function Dbf(source, decoder, head, body) {
-      this._source = source;
-      this._decode = decoder.decode.bind(decoder);
-      this._recordLength = head.getUint16(10, true);
-      this._fields = [];
-      for (var n = 0; body.getUint8(n) !== 0x0d; n += 32) {
-        for (var j = 0; j < 11; ++j) if (body.getUint8(n + j) === 0) break;
-        this._fields.push({
-          name: this._decode(new Uint8Array(body.buffer, body.byteOffset + n, j)),
-          type: String.fromCharCode(body.getUint8(n + 11)),
-          length: body.getUint8(n + 16)
-        });
-      }
-    }
-
-    var prototype = Dbf.prototype;
-    prototype.read = dbf_read;
-    prototype.cancel = dbf_cancel;
-
-    function cancel() {
-      return this._source.cancel();
-    }
-
-    var parseMultiPoint = function(record) {
-      var i = 40, j, n = record.getInt32(36, true), coordinates = new Array(n);
-      for (j = 0; j < n; ++j, i += 16) coordinates[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
-      return {type: "MultiPoint", coordinates: coordinates};
-    };
-
-    var parseNull = function() {
-      return null;
-    };
-
-    var parsePoint = function(record) {
-      return {type: "Point", coordinates: [record.getFloat64(4, true), record.getFloat64(12, true)]};
-    };
-
-    var parsePolygon = function(record) {
-      var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m), polygons = [], holes = [];
-      for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
-      for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
-
-      parts.forEach(function(i, j) {
-        var ring = points.slice(i, parts[j + 1]);
-        if (ringClockwise(ring)) polygons.push([ring]);
-        else holes.push(ring);
-      });
-
-      holes.forEach(function(hole) {
-        polygons.some(function(polygon) {
-          if (ringContainsSome(polygon[0], hole)) {
-            polygon.push(hole);
-            return true;
-          }
-        }) || polygons.push([hole]);
-      });
-
-      return polygons.length === 1
-          ? {type: "Polygon", coordinates: polygons[0]}
-          : {type: "MultiPolygon", coordinates: polygons};
-    };
-
-    function ringClockwise(ring) {
-      if ((n = ring.length) < 4) return false;
-      var i = 0, n, area = ring[n - 1][1] * ring[0][0] - ring[n - 1][0] * ring[0][1];
-      while (++i < n) area += ring[i - 1][1] * ring[i][0] - ring[i - 1][0] * ring[i][1];
-      return area >= 0;
-    }
-
-    function ringContainsSome(ring, hole) {
-      var i = -1, n = hole.length, c;
-      while (++i < n) {
-        if (c = ringContains(ring, hole[i])) {
-          return c > 0;
-        }
-      }
-      return false;
-    }
-
-    function ringContains(ring, point) {
-      var x = point[0], y = point[1], contains = -1;
-      for (var i = 0, n = ring.length, j = n - 1; i < n; j = i++) {
-        var pi = ring[i], xi = pi[0], yi = pi[1],
-            pj = ring[j], xj = pj[0], yj = pj[1];
-        if (segmentContains(pi, pj, point)) {
-          return 0;
-        }
-        if (((yi > y) !== (yj > y)) && ((x < (xj - xi) * (y - yi) / (yj - yi) + xi))) {
-          contains = -contains;
-        }
-      }
-      return contains;
-    }
-
-    function segmentContains(p0, p1, p2) {
-      var x20 = p2[0] - p0[0], y20 = p2[1] - p0[1];
-      if (x20 === 0 && y20 === 0) return true;
-      var x10 = p1[0] - p0[0], y10 = p1[1] - p0[1];
-      if (x10 === 0 && y10 === 0) return false;
-      var t = (x20 * x10 + y20 * y10) / (x10 * x10 + y10 * y10);
-      return t < 0 || t > 1 ? false : t === 0 || t === 1 ? true : t * x10 === x20 && t * y10 === y20;
-    }
-
-    var parsePolyLine = function(record) {
-      var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m);
-      for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
-      for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
-      return n === 1
-          ? {type: "LineString", coordinates: points}
-          : {type: "MultiLineString", coordinates: parts.map(function(i, j) { return points.slice(i, parts[j + 1]); })};
-    };
-
-    var concat$1 = function(a, b) {
-      var ab = new Uint8Array(a.length + b.length);
-      ab.set(a, 0);
-      ab.set(b, a.length);
-      return ab;
-    };
-
-    var shp_read = function() {
-      var that = this;
-      ++that._index;
-      return that._source.slice(12).then(function(array) {
-        if (array == null) return {done: true, value: undefined};
-        var header = view(array);
-
-        // If the record starts with an invalid shape type (see #36), scan ahead in
-        // four-byte increments to find the next valid record, identified by the
-        // expected index, a non-empty content length and a valid shape type.
-        function skip() {
-          return that._source.slice(4).then(function(chunk) {
-            if (chunk == null) return {done: true, value: undefined};
-            header = view(array = concat$1(array.slice(4), chunk));
-            return header.getInt32(0, false) !== that._index ? skip() : read();
-          });
-        }
-
-        // All records should have at least four bytes (for the record shape type),
-        // so an invalid content length indicates corruption.
-        function read() {
-          var length = header.getInt32(4, false) * 2 - 4, type = header.getInt32(8, true);
-          return length < 0 || (type && type !== that._type) ? skip() : that._source.slice(length).then(function(chunk) {
-            return {done: false, value: type ? that._parse(view(concat$1(array.slice(8), chunk))) : null};
-          });
-        }
-
-        return read();
-      });
-    };
-
-    var parsers = {
-      0: parseNull,
-      1: parsePoint,
-      3: parsePolyLine,
-      5: parsePolygon,
-      8: parseMultiPoint,
-      11: parsePoint, // PointZ
-      13: parsePolyLine, // PolyLineZ
-      15: parsePolygon, // PolygonZ
-      18: parseMultiPoint, // MultiPointZ
-      21: parsePoint, // PointM
-      23: parsePolyLine, // PolyLineM
-      25: parsePolygon, // PolygonM
-      28: parseMultiPoint // MultiPointM
-    };
-
-    var shp = function(source) {
-      source = slice(source);
-      return source.slice(100).then(function(array) {
-        return new Shp(source, view(array));
-      });
-    };
-
-    function Shp(source, header) {
-      var type = header.getInt32(32, true);
-      if (!(type in parsers)) throw new Error("unsupported shape type: " + type);
-      this._source = source;
-      this._type = type;
-      this._index = 0;
-      this._parse = parsers[type];
-      this.bbox = [header.getFloat64(36, true), header.getFloat64(44, true), header.getFloat64(52, true), header.getFloat64(60, true)];
-    }
-
-    var prototype$2 = Shp.prototype;
-    prototype$2.read = shp_read;
-    prototype$2.cancel = cancel;
-
-    function noop() {}
-
-    var shapefile_cancel = function() {
-      return Promise.all([
-        this._dbf && this._dbf.cancel(),
-        this._shp.cancel()
-      ]).then(noop);
-    };
-
-    var shapefile_read = function() {
-      var that = this;
-      return Promise.all([
-        that._dbf ? that._dbf.read() : {value: {}},
-        that._shp.read()
-      ]).then(function(results) {
-        var dbf = results[0], shp = results[1];
-        return shp.done ? shp : {
-          done: false,
-          value: {
-            type: "Feature",
-            properties: dbf.value,
-            geometry: shp.value
-          }
-        };
-      });
-    };
-
-    var shapefile = function(shpSource, dbfSource, decoder) {
-      return Promise.all([
-        shp(shpSource),
-        dbfSource && dbf(dbfSource, decoder)
-      ]).then(function(sources) {
-        return new Shapefile(sources[0], sources[1]);
-      });
-    };
-
-    function Shapefile(shp$$1, dbf$$1) {
-      this._shp = shp$$1;
-      this._dbf = dbf$$1;
-      this.bbox = shp$$1.bbox;
-    }
-
-    var prototype$1 = Shapefile.prototype;
-    prototype$1.read = shapefile_read;
-    prototype$1.cancel = shapefile_cancel;
-
-    function open(shp$$1, dbf$$1, options) {
-      if (typeof dbf$$1 === "string") {
-        if (!/\.dbf$/.test(dbf$$1)) dbf$$1 += ".dbf";
-        dbf$$1 = path(dbf$$1);
-      } else if (dbf$$1 instanceof ArrayBuffer || dbf$$1 instanceof Uint8Array) {
-        dbf$$1 = array(dbf$$1);
-      } else if (dbf$$1 != null) {
-        dbf$$1 = stream(dbf$$1);
-      }
-      if (typeof shp$$1 === "string") {
-        if (!/\.shp$/.test(shp$$1)) shp$$1 += ".shp";
-        if (dbf$$1 === undefined) dbf$$1 = path(shp$$1.substring(0, shp$$1.length - 4) + ".dbf").catch(function() {});
-        shp$$1 = path(shp$$1);
-      } else if (shp$$1 instanceof ArrayBuffer || shp$$1 instanceof Uint8Array) {
-        shp$$1 = array(shp$$1);
-      } else {
-        shp$$1 = stream(shp$$1);
-      }
-      return Promise.all([shp$$1, dbf$$1]).then(function(sources) {
-        var shp$$1 = sources[0], dbf$$1 = sources[1], encoding = "windows-1252";
-        if (options && options.encoding != null) encoding = options.encoding;
-        return shapefile(shp$$1, dbf$$1, dbf$$1 && new TextDecoder(encoding));
-      });
-    }
-
-    function openShp(source, options) {
-      if (typeof source === "string") {
-        if (!/\.shp$/.test(source)) source += ".shp";
-        source = path(source);
-      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
-        source = array(source);
-      } else {
-        source = stream(source);
-      }
-      return Promise.resolve(source).then(shp);
-    }
-
-    function openDbf(source, options) {
-      var encoding = "windows-1252";
-      if (options && options.encoding != null) encoding = options.encoding;
-      encoding = new TextDecoder(encoding);
-      if (typeof source === "string") {
-        if (!/\.dbf$/.test(source)) source += ".dbf";
-        source = path(source);
-      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
-        source = array(source);
-      } else {
-        source = stream(source);
-      }
-      return Promise.resolve(source).then(function(source) {
-        return dbf(source, encoding);
-      });
-    }
-
-    function read(shp$$1, dbf$$1, options) {
-      return open(shp$$1, dbf$$1, options).then(function(source) {
-        var features = [], collection = {type: "FeatureCollection", features: features, bbox: source.bbox};
-        return source.read().then(function read(result) {
-          if (result.done) return collection;
-          features.push(result.value);
-          return source.read().then(read);
-        });
-      });
-    }
-
-    exports$1.open = open;
-    exports$1.openShp = openShp;
-    exports$1.openDbf = openDbf;
-    exports$1.read = read;
-
-    Object.defineProperty(exports$1, '__esModule', { value: true });
-
-    /*
-     * @Author: zhangbo
-     * @E-mail: zhangb@geovis.com.cn
-     * @Date: 2020-02-25 15:57:44
-     * @LastEditors: zhangbo
-     * @LastEditTime: 2020-02-25 18:00:16
-     * @Desc: 
-     */
-    const {
-        defined: defined$7,
-        defaultValue: defaultValue$4,
-        ColorMaterialProperty,
-        ConstantPositionProperty,
-        ConstantProperty,
-        DataSource,
-        PolygonGraphics,
-        PolylineGraphics,
-        createGuid: createGuid$1,
-        Cartesian3: Cartesian3$a,
-        PointGraphics,
-        ArcType,
-        PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$j,
-        HeightReference: HeightReference$1,
-        Resource: Resource$2,
-    } = Cesium;
-    const sizes = {
-        small: 24,
-        medium: 48,
-        large: 64
-    };
-    const crsLinkHrefs = {};
-    const crsLinkTypes = {};
-    const crsNames = {
-        "urn:ogc:def:crs:OGC:1.3:CRS84": defaultCrsFunction,
-        "EPSG:4326": defaultCrsFunction,
-        "urn:ogc:def:crs:EPSG::4326": defaultCrsFunction,
-    };
-    const geoJsonObjectTypes = {
-        Feature: processFeature,
-        FeatureCollection: processFeatureCollection,
-        GeometryCollection: processGeometryCollection,
-        LineString: processLineString,
-        MultiLineString: processMultiLineString,
-        MultiPoint: processMultiPoint,
-        MultiPolygon: processMultiPolygon,
-        Point: processPoint,
-        Polygon: processPolygon,
-        Topology: processTopology
-    };
-    const geometryTypes = {
-        GeometryCollection: processGeometryCollection,
-        LineString: processLineString,
-        MultiLineString: processMultiLineString,
-        MultiPoint: processMultiPoint,
-        MultiPolygon: processMultiPolygon,
-        Point: processPoint,
-        Polygon: processPolygon,
-        Topology: processTopology
-    };
-    function coordinatesArrayToCartesianArray(coordinates, crsFunction) {
-        var positions = new Array(coordinates.length);
-        for (var i = 0; i < coordinates.length; i++) {
-            positions[i] = crsFunction(coordinates[i]);
-        }
-        return positions;
-    }
-    function createDescriptionCallback(describe, properties, nameProperty) {
-        var description;
-        return function (time, result) {
-            if (!defined$7(description)) {
-                description = describe(properties, nameProperty);
-            }
-            return description;
-        };
-    }
-    // GeoJSON processing functions
-    function createObject(geoJson, entityCollection, describe) {
-        var id = geoJson.id;
-        if (!defined$7(id) || geoJson.type !== 'Feature') {
-            id = createGuid$1();
-        } else {
-            var i = 2;
-            var finalId = id;
-            while (defined$7(entityCollection.getById(finalId))) {
-                finalId = id + '_' + i;
-                i++;
-            }
-            id = finalId;
-        }
-
-        var entity = entityCollection.getOrCreateEntity(id);
-        var properties = geoJson.properties;
-        if (defined$7(properties)) {
-            entity.properties = properties;
-
-            var nameProperty;
-
-            //Check for the simplestyle specified name first.
-            var name = properties.title;
-            if (defined$7(name)) {
-                entity.name = name;
-                nameProperty = 'title';
-            } else {
-                //Else, find the name by selecting an appropriate property.
-                //The name will be obtained based on this order:
-                //1) The first case-insensitive property with the name 'title',
-                //2) The first case-insensitive property with the name 'name',
-                //3) The first property containing the word 'title'.
-                //4) The first property containing the word 'name',
-                var namePropertyPrecedence = Number.MAX_VALUE;
-                for (var key in properties) {
-                    if (properties.hasOwnProperty(key) && properties[key]) {
-                        var lowerKey = key.toLowerCase();
-
-                        if (namePropertyPrecedence > 1 && lowerKey === 'title') {
-                            namePropertyPrecedence = 1;
-                            nameProperty = key;
-                            break;
-                        } else if (namePropertyPrecedence > 2 && lowerKey === 'name') {
-                            namePropertyPrecedence = 2;
-                            nameProperty = key;
-                        } else if (namePropertyPrecedence > 3 && /title/i.test(key)) {
-                            namePropertyPrecedence = 3;
-                            nameProperty = key;
-                        } else if (namePropertyPrecedence > 4 && /name/i.test(key)) {
-                            namePropertyPrecedence = 4;
-                            nameProperty = key;
-                        }
-                    }
-                }
-                if (defined$7(nameProperty)) {
-                    entity.name = properties[nameProperty];
-                }
-            }
-
-            var description = properties.description;
-            if (description !== null) {
-                entity.description = !defined$7(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
-            }
-        }
-        return entity;
-    }
-    function processFeature(dataSource, feature, notUsed, crsFunction, options) {
-        if (feature.geometry === null) {
-            //Null geometry is allowed, so just create an empty entity instance for it.
-            createObject(feature, dataSource._entityCollection, options.describe);
-            return;
-        }
-
-        if (!defined$7(feature.geometry)) {
-            throw new CesiumProError$1('feature.geometry is required.');
-        }
-
-        var geometryType = feature.geometry.type;
-        var geometryHandler = geometryTypes[geometryType];
-        if (!defined$7(geometryHandler)) {
-            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
-        }
-        geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
-    }
-
-    function processFeatureCollection(dataSource, featureCollection, notUsed, crsFunction, options) {
-        var features = featureCollection.features;
-        for (var i = 0, len = features.length; i < len; i++) {
-            processFeature(dataSource, features[i], undefined, crsFunction, options);
-        }
-    }
-
-    function processGeometryCollection(dataSource, geoJson, geometryCollection, crsFunction, options) {
-        var geometries = geometryCollection.geometries;
-        for (var i = 0, len = geometries.length; i < len; i++) {
-            var geometry = geometries[i];
-            var geometryType = geometry.type;
-            var geometryHandler = geometryTypes[geometryType];
-            if (!defined$7(geometryHandler)) {
-                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
-            }
-            geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
-        }
-    }
-
-    function createPoint(dataSource, geoJson, crsFunction, coordinates, options) {
-        let size = options.pointSize;
-        let color = options.pointColor;
-        const properties = geoJson.properties;
-        if (defined$7(properties)) {
-            const cssColor = properties['point-color'];
-            if (defined$7(cssColor)) {
-                color = Color$j.fromCssColorString(cssColor);
-            }
-
-            size = defaultValue$4(sizes[properties['point-size']], size);
-        }
-        const point = new PointGraphics();
-
-        // Clamp to ground if there isn't a height specified
-        if (coordinates.length === 2 && options.clampToGround) {
-            point.heightReference = HeightReference$1.CLAMP_TO_GROUND;
-        }
-
-        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
-        entity.point = point;
-        entity.point.color = color;
-        entity.point.pixelSize = size;
-        entity.position = new ConstantPositionProperty(crsFunction(coordinates));
-    }
-
-    function processPoint(dataSource, geoJson, geometry, crsFunction, options) {
-        createPoint(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiPoint(dataSource, geoJson, geometry, crsFunction, options) {
-        var coordinates = geometry.coordinates;
-        for (var i = 0; i < coordinates.length; i++) {
-            createPoint(dataSource, geoJson, crsFunction, coordinates[i], options);
-        }
-    }
-
-    function createLineString(dataSource, geoJson, crsFunction, coordinates, options) {
-        const material = options.lineColor;
-        const widthProperty = options.lineWidth;
-
-        const properties = geoJson.properties;
-        if (defined$7(properties)) {
-            const width = properties['stroke-width'];
-            if (defined$7(width)) {
-                widthProperty = new ConstantProperty(width);
-            }
-
-            let color;
-            let stroke = properties.stroke;
-            if (defined$7(stroke)) {
-                color = Color$j.fromCssColorString(stroke);
-            }
-            let opacity = properties['stroke-opacity'];
-            if (defined$7(opacity) && opacity !== 1.0) {
-                if (!defined$7(color)) {
-                    color = material.color.clone();
-                }
-                color.alpha = opacity;
-            }
-            if (defined$7(color)) {
-                material = new ColorMaterialProperty(color);
-            }
-        }
-
-        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
-        const polylineGraphics = new PolylineGraphics();
-        entity.polyline = polylineGraphics;
-
-        polylineGraphics.clampToGround = options.clampToGround;
-        polylineGraphics.material = material;
-        polylineGraphics.width = widthProperty;
-        polylineGraphics.positions = new ConstantProperty(coordinatesArrayToCartesianArray(coordinates, crsFunction));
-        polylineGraphics.arcType = ArcType.RHUMB;
-    }
-
-    function processLineString(dataSource, geoJson, geometry, crsFunction, options) {
-        createLineString(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiLineString(dataSource, geoJson, geometry, crsFunction, options) {
-        var lineStrings = geometry.coordinates;
-        for (var i = 0; i < lineStrings.length; i++) {
-            createLineString(dataSource, geoJson, crsFunction, lineStrings[i], options);
-        }
-    }
-
-    function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
-        if (coordinates.length === 0 || coordinates[0].length === 0) {
-            return;
-        }
-
-        let outlineColor = options.outlineColor.color;
-        let material = options.fill;
-        let outlineWidth = options.outlineWidth;
-
-        const properties = geoJson.properties;
-        if (defined$7(properties)) {
-            const width = properties['stroke-width'];
-            if (defined$7(width)) {
-                outlineWidth = new ConstantProperty(width);
-            }
-            let color;
-            const stroke = properties.stroke;
-            if (defined$7(stroke)) {
-                color = Color$j.fromCssColorString(stroke);
-            }
-            let opacity = properties['stroke-opacity'];
-            if (defined$7(opacity) && opacity !== 1.0) {
-                if (!defined$7(color)) {
-                    color = options.outlineColor.color.clone();
-                }
-                color.alpha = opacity;
-            }
-
-            if (defined$7(color)) {
-                outlineColor = new ConstantProperty(color);
-            }
-
-            let fillColor;
-            const fill = properties.fill;
-            if (defined$7(fill)) {
-                fillColor = Color$j.fromCssColorString(fill);
-                fillColor.alpha = material.color.alpha;
-            }
-            opacity = properties['fill-opacity'];
-            if (defined$7(opacity) && opacity !== material.color.alpha) {
-                if (!defined$7(fillColor)) {
-                    fillColor = material.color.clone();
-                }
-                fillColor.alpha = opacity;
-            }
-            if (defined$7(fillColor)) {
-                material = new ColorMaterialProperty(fillColor);
-            }
-        }
-
-        const polygon = new PolygonGraphics();
-        polygon.outline = new ConstantProperty(options.outline);
-        polygon.outlineColor = outlineColor;
-        polygon.outlineWidth = outlineWidth;
-        polygon.material = material;
-        polygon.arcType = ArcType.RHUMB;
-        const extrudedHeight = options.extrudedHeight;
-        if(extrudedHeight) {
-            if(typeof extrudedHeight === 'number') {
-                polygon.extrudedHeight = extrudedHeight;
-            } else if(typeof extrudedHeight === 'string') {
-                const conditions = extrudedHeight.match(/\$\{\s*.*?\s*\}/ig);
-                if(conditions) {
-                    let extrudeValue = extrudedHeight;
-                    for(let con of conditions) {
-                        const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if(!(defined$7(value) && defined$7(value[1]))) {
-                            continue;
-                        }
-                        extrudeValue = extrudeValue.replace(con, properties[value[1]]);
-                    }
-                    try {
-                        const height = window.eval(extrudeValue);
-                        if(typeof height === 'number') {
-                            polygon.extrudedHeight = height;
-                        }
-                    }catch(e) {
-
-                    }
-                }
-            }
-        }
-
-        const holes = [];
-        for (var i = 1, len = coordinates.length; i < len; i++) {
-            holes.push(new PolygonHierarchy$1(coordinatesArrayToCartesianArray(coordinates[i], crsFunction)));
-        }
-
-        const positions = coordinates[0];
-        polygon.hierarchy = new ConstantProperty(new PolygonHierarchy$1(coordinatesArrayToCartesianArray(positions, crsFunction), holes));
-        if (positions[0].length > 2) {
-            polygon.perPositionHeight = new ConstantProperty(true);
-        } else if (!options.clampToGround) {
-            polygon.height = 0;
-        }
-
-        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
-        entity.polygon = polygon;
-    }
-
-    function processPolygon(dataSource, geoJson, geometry, crsFunction, options) {
-        createPolygon(dataSource, geoJson, crsFunction, geometry.coordinates, options);
-    }
-
-    function processMultiPolygon(dataSource, geoJson, geometry, crsFunction, options) {
-        var polygons = geometry.coordinates;
-        for (var i = 0; i < polygons.length; i++) {
-            createPolygon(dataSource, geoJson, crsFunction, polygons[i], options);
-        }
-    }
-
-    function processTopology(dataSource, geoJson, geometry, crsFunction, options) {
-        for (var property in geometry.objects) {
-            if (geometry.objects.hasOwnProperty(property)) {
-                var feature = topojson.feature(geometry, geometry.objects[property]);
-                var typeHandler = geoJsonObjectTypes[feature.type];
-                typeHandler(dataSource, feature, feature, crsFunction, options);
-            }
-        }
-    }
-    function defaultDescribe(properties, nameProperty) {
-        var html = "";
-        for (var key in properties) {
-            if (properties.hasOwnProperty(key)) {
-                if (key === nameProperty || simpleStyleIdentifiers.indexOf(key) !== -1) {
-                    continue;
-                }
-                var value = properties[key];
-                if (defined$7(value)) {
-                    if (typeof value === "object") {
-                        html +=
-                            "<tr><th>" +
-                            key +
-                            "</th><td>" +
-                            defaultDescribe(value) +
-                            "</td></tr>";
-                    } else {
-                        html += "<tr><th>" + key + "</th><td>" + value + "</td></tr>";
-                    }
-                }
-            }
-        }
-
-        if (html.length > 0) {
-            html =
-                '<table class="cesium-infoBox-defaultTable"><tbody>' +
-                html +
-                "</tbody></table>";
-        }
-
-        return html;
-    }
-    const simpleStyleIdentifiers = [
-        "title",
-        "description", //
-        "marker-size",
-        "marker-symbol",
-        "marker-color",
-        "stroke", //
-        "stroke-opacity",
-        "stroke-width",
-        "fill",
-        "fill-opacity",
-    ];
-    function defaultDescribeProperty(properties, nameProperty) {
-        return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
-    }
-    function defaultCrsFunction(coordinates) {
-        return Cartesian3$a.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
-    }
-    function load(that, geoJson, options, sourceUri) {
-        let name;
-        if (defined$7(sourceUri)) {
-            name = Cesium.getFilenameFromUri(sourceUri);
-        }
-
-        if (defined$7(name) && that._name !== name) {
-            that._name = name;
-            that._changed.raiseEvent(that);
-        }
-
-        const typeHandler = geoJsonObjectTypes[geoJson.type];
-        if (!defined$7(typeHandler)) {
-            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
-        }
-
-        //Check for a Coordinate Reference System.
-        const crs = geoJson.crs;
-        let crsFunction = crs !== null ? defaultCrsFunction : null;
-
-        if (defined$7(crs)) {
-            if (!defined$7(crs.properties)) {
-                throw new CesiumProError$1('crs.properties is undefined.');
-            }
-
-            const properties = crs.properties;
-            if (crs.type === 'name') {
-                crsFunction = crsNames[properties.name];
-                if (!defined$7(crsFunction)) {
-                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
-                }
-            } else if (crs.type === 'link') {
-                var handler = crsLinkHrefs[properties.href];
-                if (!defined$7(handler)) {
-                    handler = crsLinkTypes[properties.type];
-                }
-
-                if (!defined$7(handler)) {
-                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
-                }
-
-                crsFunction = handler(properties);
-            } else if (crs.type === 'EPSG') {
-                crsFunction = crsNames['EPSG:' + properties.code];
-                if (!defined$7(crsFunction)) {
-                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
-                }
-            } else {
-                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
-            }
-        }
-
-        return Promise.resolve(crsFunction).then(function (crsFunction) {
-            that._entityCollection.removeAll();
-
-            // null is a valid value for the crs, but means the entire load process becomes a no-op
-            // because we can't assume anything about the coordinates.
-            if (crsFunction !== null) {
-                typeHandler(that, geoJson, geoJson, crsFunction, options);
-            }
-
-            return Promise.all(that._promises).then(function () {
-                that._promises.length = 0;
-                DataSource.setLoading(that, false);
-                return that;
-            });
-        });
-    }
-    class ShapefileDataSource extends GeoJsonDataSource {
-        /**
-         * 创建一个ESRI Shapefile数据源
-         * @param {String} [name] 数据源名称
-         * @example
-         *  const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp')
-         *  const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp')
-         *  viewer.addLayer(province)
-         *  viewer.addLayer(city)
-         * @extends GeoJsonDataSource
-         */
-        constructor(name) {
-            super(name);
-            this._geoJson = undefined;
-        }
-
-        get geoJson() {
-            return this._geoJson;
-        }
-        set geoJson(v) {
-            if (this._geoJson) {
-                this._geoJson.features.push(v);
-            } else {
-                this._geoJson = {
-                    type: 'FeatureCollection',
-                    features: [v]
-                };
-            }
-        }
-        /**
-         * 点要素的默认大小
-         * @type {Number}
-         * @memberof ShapefileDataSource
-         * @default 5
-         */
-        static pointSize = 5;
-        /**
-         * 点要素的默认颜色
-         * @memberof ShapefileDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.ROYALBLUE
-         */
-        static pointColor = Color$j.ROYALBLUE;
-        /**
-         * 线要素的颜色
-         * @memberof ShapefileDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.YELLOW
-         */
-        static lineColor = Color$j.YELLOW;
-        /**
-         * 多边形要素的填充色
-         * @memberof ShapefileDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.fromBytes(255, 255, 0, 100)
-         */
-        static fill = Color$j.fromBytes(255, 255, 0, 100);
-        /**
-         * 多边形要素是否显边框
-         * @memberof ShapefileDataSource
-         * @type {Boolean}
-         * @default true
-         */
-        static outline = true;
-        /**
-         * 多边形要素边框的颜色
-         * @memberof ShapefileDataSource
-         * @type {Cesium.Color}
-         * @default Cesium.Color.YELLOW
-         */
-        static outlineColor = Color$j.YELLOW;
-        /**
-         * 线要素的宽度
-         * @memberof ShapefileDataSource
-         * @type {Number}
-         * @default 2
-         */
-        static lineWidth = 2;
-        /**
-         * 是否贴地
-         * @type {Boolean}
-         * @memberof ShapefileDataSource
-         * @default false
-         */
-        static clampToGround = false;
-        /**
-         * 多边形要素的边框宽度，该属性在windows环境下可能不生效
-         * @memberof ShapefileDataSource
-         * @type {Number}
-         * @default 1
-         */
-        static outlineWidth = 1;
-        static crsNames() {
-            return crsNames;
-        }
-        static crsLinkHrefs() {
-            return crsLinkHrefs;
-        }
-        static crsLinkTypes() {
-            return crsLinkTypes;
-        }
-        /**
-          * 加载Shapefile数据
-          * @param {String} data shapefile文件路径
-          * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
-          * @returns {Promise<ShapefileDataSource>}
-         */
-        load(data, options = { encoding: 'utf-8' }) {
-            if (!defined$7(data)) {
-                throw new CesiumProError$1('data is required.');
-            }
-
-            Cesium.DataSource.setLoading(this, true);
-
-            const credit = options.credit;
-            if (typeof credit === 'string') {
-                credit = new Cesium.Credit(credit);
-            }
-            this._credit = credit;
-            const that = this;
-
-            let promise = data;
-            let sourceUri = options.sourceUri;
-            if (typeof data === 'string' || (data instanceof Resource$2)) {
-                promise = new Promise((resolve, reject) => {
-                    exports$1.open(data, undefined, { encoding: options.encoding })
-                        .then(source =>
-                            source.read().then(function load(result) {
-                                if (result.done) {
-                                    resolve(that.geoJson);
-                                    return
-                                }                            that.geoJson = result.value;
-                                return source.read().then(load);
-                            })
-                        )
-                        .catch(error => reject(error.stack));
-                });
-                sourceUri = defaultValue$4(sourceUri, '');
-
-                // Add resource credits to our list of credits to display
-                var resourceCredits = this._resourceCredits;
-                var credits = data.credits;
-                if (defined$7(credits)) {
-                    var length = credits.length;
-                    for (var i = 0; i < length; i++) {
-                        resourceCredits.push(credits[i]);
-                    }
-                }
-            }
-
-            options = {
-                describe: defaultValue$4(options.describe, defaultDescribeProperty),
-                pointSize: defaultValue$4(options.pointSize, ShapefileDataSource.pointSize),
-                pointColor: defaultValue$4(options.pointColor, ShapefileDataSource.pointColor),
-                lineWidth: new ConstantProperty(
-                    defaultValue$4(options.lineWidth, ShapefileDataSource.lineWidth)
-                ),
-                outlineColor: new ColorMaterialProperty(
-                    defaultValue$4(options.outlineColor, ShapefileDataSource.outlineColor)
-                ),
-                lineColor: new ColorMaterialProperty(defaultValue$4(options.lineColor, ShapefileDataSource.lineColor)),
-                outlineWidth: defaultValue$4(options.outlineWidth, ShapefileDataSource.outlineWidth),
-                fill: new ColorMaterialProperty(
-                    defaultValue$4(options.fill, ShapefileDataSource.fill)
-                ),
-                outline: defaultValue$4(options.outline, ShapefileDataSource.outline),
-                clampToGround: defaultValue$4(options.clampToGround, ShapefileDataSource.clampToGround),
-                extrudedHeight: options.extrudedHeight
-            };
-            return Promise.resolve(promise)
-            .then(function (geoJson) {
-                return load(that, geoJson, options, sourceUri);
-            })
-            .catch(function (error) {
-                DataSource.setLoading(that, false);
-                that._error.raiseEvent(that, error);
-                throw error;
-            });
-        }
-
-
-    }
-    /**
-     * 加载Shapefile数据
-     * @param {String} data shapefile文件路径
-     * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
-     * @returns {Promise<ShapefileDataSource>}
-     */
-    ShapefileDataSource.load = function (data, options) {
-        return new ShapefileDataSource().load(data, options)
-    };
+    outColor *= fragColor;
+    outColor = czm_gammaCorrect(outColor);
+    material.diffuse = outColor.rgb;
+    material.alpha = outColor.a;
+    return material;
+}
+`;
 
     const {
-        buildModuleUrl: buildModuleUrl$1,
-        Color: Color$i,
-        defined: defined$6,
-        destroyObject: destroyObject$4,
-        knockout,
-        getElement,
-        subscribeAndEvaluate,
-        InfoBoxViewModel
+        Transforms: Transforms$5,
+        Cartesian3: Cartesian3$c
     } = Cesium;
-    class InfoBox {
-        /**
-         * 用于显示查询信息的小部件
-         * @param {*} container 
-         */
-        constructor(container) {
-            container = getElement(container);
-
-            var infoElement = document.createElement("div");
-            infoElement.className = "cesium-infoBox";
-            infoElement.setAttribute(
-                "data-bind",
-                '\
-      css: { "cesium-infoBox-visible" : showInfo, "cesium-infoBox-bodyless" : _bodyless }'
-            );
-            container.appendChild(infoElement);
-
-            var titleElement = document.createElement("div");
-            titleElement.className = "cesium-infoBox-title";
-            titleElement.setAttribute("data-bind", "text: titleText");
-            infoElement.appendChild(titleElement);
-
-            var closeElement = document.createElement("button");
-            closeElement.type = "button";
-            closeElement.className = "cesium-infoBox-close";
-            closeElement.setAttribute(
-                "data-bind",
-                "\
-      click: function () { closeClicked.raiseEvent(this); }"
-            );
-            closeElement.innerHTML = "&times;";
-            infoElement.appendChild(closeElement);
-
-            var frame = document.createElement("iframe");
-            frame.className = "cesium-infoBox-iframe";
-            frame.setAttribute("sandbox", "allow-same-origin allow-popups allow-forms"); //allow-pointer-lock allow-scripts allow-top-navigation
-            frame.setAttribute(
-                "data-bind",
-                "style : { maxHeight : maxHeightOffset(40) }"
-            );
-            frame.setAttribute("allowfullscreen", true);
-            infoElement.appendChild(frame);
-
-            var viewModel = new InfoBoxViewModel();
-            knockout.applyBindings(viewModel, infoElement);
-
-            this._container = container;
-            this._element = infoElement;
-            this._frame = frame;
-            this._viewModel = viewModel;
-            this._descriptionSubscription = undefined;
-
-            var that = this;
-            //We can't actually add anything into the frame until the load event is fired
-            frame.addEventListener("load", function () {
-                var frameDocument = frame.contentDocument;
-
-                //We inject default css into the content iframe,
-                //end users can remove it or add their own via the exposed frame property.
-                var cssLink = frameDocument.createElement("link");
-                cssLink.href = buildModuleUrl$1("Widgets/InfoBox/InfoBoxDescription.css");
-                cssLink.rel = "stylesheet";
-                cssLink.type = "text/css";
-
-                //div to use for description content.
-                var frameContent = frameDocument.createElement("div");
-                frameContent.className = "cesium-infoBox-description";
-
-                frameDocument.head.appendChild(cssLink);
-                frameDocument.body.appendChild(frameContent);
-
-                //We manually subscribe to the description event rather than through a binding for two reasons.
-                //1. It's an easy way to ensure order of operation so that we can adjust the height.
-                //2. Knockout does not bind to elements inside of an iFrame, so we would have to apply a second binding
-                //   model anyway.
-                that._descriptionSubscription = subscribeAndEvaluate(
-                    viewModel,
-                    "description",
-                    function (value) {
-                        // Set the frame to small height, force vertical scroll bar to appear, and text to wrap accordingly.
-                        frame.style.height = "5px";
-                        frameContent.innerHTML = value;
-
-                        //If the snippet is a single element, then use its background
-                        //color for the body of the InfoBox. This makes the padding match
-                        //the content and produces much nicer results.
-                        var background = null;
-                        var firstElementChild = frameContent.firstElementChild;
-                        if (
-                            firstElementChild !== null &&
-                            frameContent.childNodes.length === 1
-                        ) {
-                            var style = window.getComputedStyle(firstElementChild);
-                            if (style !== null) {
-                                var backgroundColor = style["background-color"];
-                                var color = Color$i.fromCssColorString(backgroundColor);
-                                if (defined$6(color) && color.alpha !== 0) {
-                                    background = style["background-color"];
-                                }
-                            }
-                        }
-                        infoElement.style["background-color"] = background;
-
-                        // Measure and set the new custom height, based on text wrapped above.
-                        var height = frameContent.getBoundingClientRect().height;
-                        frame.style.height = height + "px";
-                    }
-                );
-            });
-
-            //Chrome does not send the load event unless we explicitly set a src
-            frame.setAttribute("src", "about:blank");
-        }
-        get container() {
-            return this._container;
-        }
-        get viewModel() {
-            return this._viewModel;
-        }
-        get frame() {
-            return this._frame;
-        }
-        isDestroyed() {
-            return false;
-        }
-        destroy() {
-            var container = this._container;
-            knockout.cleanNode(this._element);
-            container.removeChild(this._element);
-        
-            if (defined$6(this._descriptionSubscription)) {
-                this._descriptionSubscription.dispose();
-            }
-        
-            return destroyObject$4(this);
-        };
-    }
-
-    const {
-        Transforms: Transforms$4,
-        Cartesian3: Cartesian3$9
-    } = Cesium;
-    class Model$1{
+    let Model$1 = class Model{
         /**
          * 创建一个gltf/glb模型
          * @param {Model.ModelOptions} optinos 模型参数
@@ -17092,20 +15642,20 @@
          * viewer.addModel(model)
          */
         constructor(options = {}) {
-            if(!defined$a(options.modelMatrix)&&defined$a(options.position)) {
+            if(!defined$b(options.modelMatrix)&&defined$b(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$9) {
+                if(options.position instanceof Cartesian3$c) {
                     cartesian = options.position;
                 } else if(options.position instanceof LonLat) {
                     cartesian = options.position.toCartesian();
                 }
                 if(cartesian) {
-                    options.modelMatrix = Transforms$4.eastNorthUpToFixedFrame(cartesian);
+                    options.modelMatrix = Transforms$5.eastNorthUpToFixedFrame(cartesian);
                 }
             }
-            if(defined$a(options.gltf)) {
+            if(defined$b(options.gltf)) {
                 this.delegate = new Cesium.Model(options);
-            } else if(defined$a(options.url)) {
+            } else if(defined$b(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
                 throw new CesiumProError$1('one of parameters url or gltf must be provided.')
@@ -17461,6 +16011,3236 @@
         get nodesByName() {
             return this.delegate._nodesByName || this.delegate_runtime
         }
+    };
+
+    const {
+      PrimitiveCollection: PrimitiveCollection$3,
+      PolylineCollection,
+      Material: Material$g,
+      Color: Color$m,
+      defaultValue: defaultValue$6,
+      Cartesian3: Cartesian3$b,
+      Cartesian2: Cartesian2$3,
+      Matrix4: Matrix4$5,
+      Matrix3: Matrix3$1,
+      Quaternion,
+      PointPrimitiveCollection,
+      ScreenSpaceEventHandler: ScreenSpaceEventHandler$1,
+      ScreenSpaceEventType: ScreenSpaceEventType$1,
+      Polyline,
+      Primitive: Primitive$5,
+      Math: CesiumMath$2,
+      Plane,
+      Model: CesiumModel,
+      IntersectionTests: IntersectionTests$1,
+      Transforms: Transforms$4
+    } = Cesium;
+    const _offset = new Cartesian3$b();
+    const _q = new Quaternion();
+    const rm3 = new Matrix3$1();
+    const cartesian3_1 = new Cartesian3$b();
+    new Cartesian3$b();
+    const mat4 = new Matrix4$5();
+    const mat4_1 = new Matrix4$5();
+
+    function setColorForPrimitive(geometry, color) {
+      if (geometry instanceof Polyline) {
+        geometry.material.uniforms.color = color;
+      } else if (geometry instanceof Primitive$5) {
+        geometry.appearance.material.uniforms.color = color;
+      }
+    }
+    function projectInAxis(normal, vector) {
+      Cartesian2$3.normalize(normal, normal);
+      return Cartesian2$3.dot(normal, vector);
+    }
+    function getPositionInPlane(pixel, helper) {
+      const mousedownCartesian = new Cartesian3$b();
+      const ray = viewer.camera.getPickRay(pixel);
+      const plane = new Plane(Cartesian3$b.UNIT_X, 0.0);  Plane.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
+      Plane.transform(plane, helper._modelMatrix, plane);
+      IntersectionTests$1.rayPlane(ray, plane, mousedownCartesian);
+      Matrix4$5.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
+      return mousedownCartesian;
+    }
+    const cartesian2_1 = new Cartesian2$3();
+    const cartesian2_2 = new Cartesian2$3();
+    function computeAngle(helper, startPosition, endPosition) {
+      const center = helper.center;
+      // const pixelCenter = LonLat.toPixel(center, helper._viewer);
+      Cartesian3$b.subtract(startPosition, center, startPosition);
+      Cartesian3$b.subtract(endPosition, center, endPosition);
+      const angle = Cartesian3$b.dot(Cartesian3$b.normalize(startPosition, startPosition),
+        Cartesian3$b.normalize(endPosition, endPosition));
+      // 旋转起点和终点的向量
+      const v1 = Cartesian3$b.subtract(startPosition, endPosition, cartesian3_1);
+      const v2 = startPosition;
+      const cross = Cartesian3$b.cross(v1, v2, cartesian3_1);
+      const normal = helper.activePrimitive.normal;
+      // 旋转平面的法线向量
+      // const v2 = Cartesian2.subtract(center, normal, cartesian2_2);
+      const sign = CesiumMath$2.sign(Cartesian3$b.dot(cross, normal));
+      return Math.acos(angle) * sign;
+    }
+    function computeOffset(helper, startPosition, endPosition, offset) {
+      const activeAxis = helper.activePrimitive.relativeAxis || [
+        helper.activePrimitive,
+      ];
+      if (!Array.isArray(activeAxis)) {
+        return;
+      }
+      const cameraHeight = helper._viewer.camera.positionCartographic.height;
+      const delta = cameraHeight / 1047;
+      for (let axis of activeAxis) {
+        const positions = axis.positions;
+        const cartList = positions.map((_) =>
+          Matrix4$5.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$b())
+        );
+        const pixelList = cartList.map((_) => LonLat.toPixel(_, helper._viewer.scene));
+        const length = projectInAxis(
+          Cartesian2$3.subtract(...pixelList, cartesian2_1),
+          Cartesian2$3.subtract(endPosition, startPosition, cartesian2_2)
+        );
+        offset[axis.axis.toLowerCase()] = length * delta;
+      }
+      return offset;
+    }
+    const EModel = {
+      N: 'None', // none
+      T: 'T', // 移动
+      R: 'R', // 旋转
+      S: 'S', // 缩放
+    };
+    class TransformHelper {
+      /**
+       * 模型编辑控制器，虽然它也适用于点元素
+       * @param {object} [options] 具有以下属性
+       * @param {number} [options.lineWidth = 15] 线宽
+       * @param {Cesium.Color} [options.xAxisColor = Cesium.Color.RED] X轴的颜色
+       * @param {Cesium.Color} [options.yAxisColor = Cesium.Color.GREEN] Y轴颜色
+       * @param {Cesium.Color} [options.zAxisColor = Cesium.Color.BLUE] Z轴颜色
+       * @param {Cesium.Color} [options.scaleAxisColor = Cesium.Color.WHITE] 缩放轴的颜色
+       * @param {Cesium.Color} [options.activeAxisColor = Cesium.Color.YELLOW] 被激活的坐标标轴颜色
+       * @param {boolean} [options.translateEnabled = true] 是否创建平移控制器
+       * @param {boolean} [options.rotateEnabled = false] 是否创建旋转控制器，仅对模型可用
+       * @param {boolean} [options.scaleEnabled = false] 是否创建缩放控制器，仅对模型有效
+       * @param {number} [options.xAxisLength] X轴的长度, 如果未定义将自动计算
+       * @param {number} [options.yAxisLength] Y轴的长度，如果未定义将自动计算
+       * @param {number} [options.zAxisLength] Z轴长度，如果未定义将自动计算
+       * @param {number} [options.scaleAxisLength] 缩放轴的长度，如果未定义将自动计算
+       * @param {number} [options.rotatePlaneRadius] 旋转轴的半径，如果未定义将自动计算
+       * @param {boolean} [options.sizeInPixel = false] 控制器的大小是否以像素为单位
+       * @param {Cesium.Cartesian3} [options.originOffset = Cesium.Cartesian3.ZERO] 默认原点在点或模型的中心位置，该值设置相对于默认位置的偏移
+       * 
+       * @example
+       * const helper = new CesiumPro.TransformHelper({            
+       *     rotateEnabled: true,
+       *     translateEnabled: true,
+       *     scaleEnabled: true,
+       *     xAxisLength: 10,
+       *     yAxisLength: 10,
+       *     zAxisLength: 10,
+       *     scaleAxisLength: 10,
+       *     rotatePlaneRadius: 8
+       * });
+       * 
+       * helper.addTo(viewer);
+       * helper.bind(model);
+       */
+      constructor(options = {}) {
+        this.lineWidth = defaultValue$6(options.lineWidth, 15);
+        this.xAxisColor = defaultValue$6(options.xAxisColor, Color$m.RED);
+        this.yAxisColor = defaultValue$6(options.yAxisColor, Color$m.GREEN);
+        this.zAxisColor = defaultValue$6(options.zAxisColor, Color$m.BLUE);
+        this.scaleAxisColor = defaultValue$6(options.scaleAxisColor, Color$m.WHITE);
+        this.activeAxisColor = defaultValue$6(options.activeAxisColor, Color$m.YELLOW);
+        this._translateEnabled = defaultValue$6(options.translateEnabled, true);
+        this._rotateEnabled = defaultValue$6(options.rotateEnabled, false);
+        this._scaleEnabled = defaultValue$6(options.scaleEnabled, false);
+        this.xAxisLength = options.xAxisLength;
+        this.yAxisLength = options.yAxisLength;
+        this.zAxisLength = options.zAxisLength;
+        this.scaleAxisLength = options.scaleAxisLength;
+        this.root = new PrimitiveCollection$3();
+        this.object = null;
+        this._modelMatrix = undefined;
+        this._primitives = [];
+        this._center = new Cartesian3$b();
+        this._radius = 0;
+        this._originOffset = defaultValue$6(options.originOffset, new Cartesian3$b());
+        this._selectedPrimitives = [];
+        this._offset = new Cartesian3$b(0, 0, 0);
+        this._angle = 0;
+        this.rotatePlaneRadius = options.rotatePlaneRadius;
+        this._mode = EModel.N;
+        /**
+         * 位置或姿态发生变化前解发的事件
+         * @type {Event}
+         */
+        this.preTranformEvent = new Event$8();
+        /**
+         * 位置或姿态发生变化后触发的事件
+         * @type {Event}
+         */
+        this.postTransformEvent = new Event$8();
+      }
+      /**
+       * 获得或设置平移控件是否显示
+       * @type {boolean}
+       */
+      get translateEnabled() {
+        return this._translateEnabled;
+      }
+      set translateEnabled(val) {
+        this._translateEnabled = val;
+        for (let primitive of this._primitives) {
+          const axis = primitive.axis;
+          if (!axis) {
+            continue;
+          }
+          if (!(axis.includes(EModel.R) || axis.includes(EModel.S))) {
+            primitive.show = val;
+          }
+        }
+      }
+      /**
+       * 获得或设置旋转控件是否显示
+       * @type {boolean}
+       */
+      get rotateEnabled() {
+        return this._rotateEnabled;
+      }
+      set rotateEnabled(val) {
+        this._rotateEnabled = val;
+        for (let primitive of this._primitives) {
+          const axis = primitive.axis;
+          if (!axis) {
+            continue;
+          }
+          if (axis.includes(EModel.R)) {
+            primitive.show = val;
+          }
+        }
+      }
+      /**
+       * 获得或设置缩放控件是否显示
+       * @type {boolean}
+       */
+      get scaleEnabled() {
+        return this._scaleEnabled;
+      }
+      set scaleEnabled(val) {
+        this._scaleEnabled = val;
+        for (let primitive of this._primitives) {
+          const axis = primitive.axis;
+          if (!axis) {
+            continue;
+          }
+          if (axis.includes(EModel.S)) {
+            primitive.show = val;
+          }
+        }
+      }
+      /**
+       * 中心位置的坐标
+       * @type {Ceium.Cartesian3}
+       */
+      get center() {
+        return Cartesian3$b.add(this._center, this._originOffset, new Cartesian3$b());
+      }
+      /**
+       * 模型矩阵
+       * @type {Cesium.Matrix4}
+       */
+      get modelMatrix() {
+        return this._modelMatrix;
+      }
+      set modelMatrix(matrix) {
+        if (!matrix) {
+          this._modelMatrix = undefined;
+          this._inverseModelMatrix = undefined;
+          return;
+        }
+        this._modelMatrix = matrix;
+        this._inverseModelMatrix = Matrix4$5.inverse(matrix, new Matrix4$5);
+      }
+      /**
+       * 创建XYZ坐标轴
+       * @private
+       * @param {*} boundingSphere
+       */
+      createMoveAxis() {
+        if (!this.center) {
+          return;
+        }
+        const lineLength = this._radius * 1.3;
+        const plc = this.axisRoot;
+        const center = this.center;
+        this.xAxis = plc.add({
+          positions: [
+            center,
+            new Cartesian3$b(
+              defaultValue$6(this.xAxisLength, lineLength) + center.x,
+              center.y,
+              center.z
+            ),
+          ],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.xAxisColor),
+        });
+        this.xAux = plc.add({
+          positions: [],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.activeAxisColor, true),
+        });
+        this.xAxis.axis = "X";
+        this.xAxis.color = this.xAxisColor;
+        this.yAxis = plc.add({
+          positions: [
+            center,
+            new Cartesian3$b(
+              center.x,
+              -(defaultValue$6(this.yAxisLength, lineLength) + center.y),
+              center.z
+            ),
+          ],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.yAxisColor),
+        });
+        this.yAux = plc.add({
+          positions: [],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.activeAxisColor, true),
+        });
+        this.yAxis.axis = "Y";
+        this.yAxis.color = this.yAxisColor;
+        this.zAxis = plc.add({
+          positions: [
+            center,
+            new Cartesian3$b(
+              center.x,
+              center.y,
+              defaultValue$6(this.zAxisLength, lineLength) + center.z
+            ),
+          ],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.zAxisColor),
+        });
+        this.zAux = plc.add({
+          positions: [],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.activeAxisColor, true),
+        });
+        this.zAxis.axis = "Z";
+        this.zAxis.color = this.zAxisColor;
+        this._primitives.push(this.xAxis, this.yAxis, this.zAxis);
+      }
+      /**
+       * 创建坐标平面
+       * @private
+       */
+      createAxisPlane() {
+        this.XOYPlane = this.root.add(
+          new AxisPlane({
+            color: this.zAxisColor,
+            modelMatrix: this.modelMatrix,
+            center: this.center,
+            radius: this._radius,
+            normal: new Cartesian3$b(0, 0, 1),
+            axis: "XY",
+          })
+        );
+        this.XOYPlane.relativeAxis = [this.xAxis, this.yAxis];
+        this.XOZPlane = this.root.add(
+          new AxisPlane({
+            color: this.yAxisColor,
+            modelMatrix: this.modelMatrix,
+            center: this.center,
+            radius: this._radius,
+            normal: new Cartesian3$b(0, 1, 0),
+            axis: "XZ",
+          })
+        );
+        this.XOZPlane.relativeAxis = [this.xAxis, this.zAxis];
+        this.YOZPlane = this.root.add(
+          new AxisPlane({
+            color: this.xAxisColor,
+            modelMatrix: this.modelMatrix,
+            center: this.center,
+            radius: this._radius,
+            normal: new Cartesian3$b(1, 0, 0),
+            axis: "YZ",
+          })
+        );
+        this.YOZPlane.relativeAxis = [this.yAxis, this.zAxis];
+        this._primitives.push(this.XOYPlane, this.YOZPlane, this.XOZPlane);
+      }
+      /**
+       * 创建坐标原点
+       * @private
+       */
+      createOrignPoint() {
+        const pc = new PointPrimitiveCollection({
+          modelMatrix: this.modelMatrix,
+        });
+        this.origin = pc.add({
+          show: true,
+          position: this.center,
+          pixelSize: this.lineWidth * 1.5,
+          color: Cesium.Color.WHITE,
+        });
+        this.root.add(pc);
+        this._primitives.push(this.origin);
+      }
+      /**
+       * 创建坐标轴材质
+       * @private
+       */
+      getAxisMaterial(color, dash = false, dashLength = 16) {
+        if (dash) {
+          return new Material$g({
+            fabric: {
+              type: "dasharrow",
+              source: polylineAntialiasingMaterial,
+              uniforms: {
+                color: color,
+                gapColor: Color$m.TRANSPARENT,
+                dashLength: dashLength,
+                dashPattern: 255,
+              },
+            },
+          });
+        } else {
+          return new Material$g({
+            fabric: {
+              type: "PolylineArrow",
+              uniforms: {
+                color: color,
+              },
+            },
+          });
+        }
+      }
+      /**
+       * 创建旋转轴
+       * @private
+       */
+      createRotateAxis() {
+        const pts = [];
+        const radius = this.rotatePlaneRadius || this._radius;
+        const center = this.center;
+        for (let i = 0; i <= 360; i++) {
+          const rad = (i / 180) * Math.PI;
+          pts.push(
+            new Cartesian3$b(
+              center.x + radius * Math.cos(rad),
+              center.y + radius * Math.sin(rad),
+              center.z
+            )
+          );
+        }
+        this.zRotate = this.axisRoot.add({
+          positions: [...pts],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.zAxisColor, true, 0),
+        });
+        this.zRotate.axis = "RZ";
+        this.zRotate.color = this.zAxisColor;
+        this.zRotate.normal = new Cartesian3$b(0, 0, 1);
+        pts.splice(0);
+        for (let i = 0; i <= 360; i++) {
+          const rad = (i / 180) * Math.PI;
+          pts.push(
+            new Cartesian3$b(
+              center.x + radius * Math.cos(rad),
+              center.y,
+              center.z + radius * Math.sin(rad)
+            )
+          );
+        }
+        this.yRotate = this.axisRoot.add({
+          positions: [...pts],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.yAxisColor, true, 0),
+        });
+        this.yRotate.axis = "RY";
+        this.yRotate.color = this.yAxisColor;
+        this.yRotate.normal = new Cartesian3$b(0, 1, 0);
+        pts.splice(0);
+        for (let i = 0; i <= 360; i++) {
+          const rad = (i / 180) * Math.PI;
+          pts.push(
+            new Cartesian3$b(
+              center.x,
+              center.y + radius * Math.cos(rad),
+              center.z + radius * Math.sin(rad)
+            )
+          );
+        }
+        this.xRotate = this.axisRoot.add({
+          positions: [...pts],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.xAxisColor, true, 0),
+        });
+        this.xRotate.axis = "RX";
+        this.xRotate.color = this.xAxisColor;
+        this.xRotate.normal = new Cartesian3$b(-1, 0, 0);
+
+        this.rAxuStart = this.axisRoot.add({
+          positions: [],
+          width: this.lineWidth / 2,
+          material: this.getAxisMaterial(this.activeAxisColor, true, 0)
+        });
+        this.rAxuEnd = this.axisRoot.add({
+          positions: [],
+          width: this.lineWidth / 2,
+          material: this.getAxisMaterial(this.activeAxisColor, true, 0)
+        });
+        this._primitives.push(this.xRotate, this.yRotate, this.zRotate, this.rAxuStart, this.rAxuEnd);
+      }
+      /**
+       * 创建缩放轴
+       */
+      createScaleAxis() {
+        const lineLength = this._radius * 1.1;    
+        const l = defaultValue$6(this.scaleAxisLength, lineLength);
+        const delta = Math.sqrt(3);
+        this.scaleAxis = this.axisRoot.add({
+          positions: [
+            this._center,
+            new Cartesian3$b((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+          ],
+          width: this.lineWidth,
+          material: this.getAxisMaterial(this.scaleAxisColor),
+        });
+        this._primitives.push(this.scaleAxis);
+        this.scaleAxis.axis = 'SXYZ';
+        this.scaleAxis.color = this.scaleAxisColor;
+      }
+      /**
+       * 绑定一个对象
+       * @param {Model|Cesium.Model|Cesium.Cartesian3} object
+       */
+      bind(object) {
+        if (!this._viewer) {
+          return;
+        }
+        this.unbind();
+        if (object instanceof Model$1) {
+          object = object.delegate;
+        }
+        this.object = object;
+        if (object instanceof CesiumModel === false) {
+          this.bindPosition(object);
+          return;
+        }
+        this.modelMatrix = object.modelMatrix;
+        object.readyPromise.then(() => {
+          const center = Cartesian3$b.clone(object.boundingSphere.center);
+          Matrix4$5.multiplyByPoint(this._inverseModelMatrix, center, this._center);
+          this._radius = object.boundingSphere.radius;
+          this.createPrimitive();
+        });
+      }
+      /**
+       * 为控制器绑定一个点
+       * @private
+       * @param {*} position 
+       */
+      bindPosition(position) {
+        if (position instanceof Cesium.Property) {
+          position = position.getValue(this._viewer.clock.currentTime);
+        }
+        if (position instanceof Cartesian3$b === false) {
+          throw new CesiumProError$1('position is invalid')
+        }
+        this.modelMatrix = Transforms$4.eastNorthUpToFixedFrame(position);
+        this._center = new Cartesian3$b();
+        Cartesian3$b.clone(this.originOffset, this._center);
+        this._radius = 10;
+        this.createPrimitive();
+      }
+      /**
+       * @private
+       * 创建控制器需要的要素
+       */
+      createPrimitive(isModel = true) {
+        const plc = new PolylineCollection({
+          modelMatrix: this.modelMatrix,
+        });
+        this.axisRoot = plc;
+        this.root.add(plc);
+        this.createOrignPoint();
+        this.translateEnabled && this.createMoveAxis();
+        this.translateEnabled && this.createAxisPlane();
+        (isModel && this.rotateEnabled) && this.createRotateAxis();
+        (isModel && this.scaleEnabled) && this.createScaleAxis();
+      }
+      /**
+       * 解绑当前绑定对象
+       */
+      unbind() {
+        this.object = undefined;
+        this.root.removeAll();
+        this.origon = undefined;
+        this.xAxis = undefined;
+        this.yAxis = undefined;
+        this.zAxis = undefined;
+        this.modelMatrix = undefined;
+      }
+      /**
+       * 添加到场景
+       * @param {Cesium.Viewer} viewer
+       */
+      addTo(viewer) {
+        this._viewer = viewer;
+        viewer.scene.primitives.add(this.root);
+        this.addEventListener();
+      }
+      /**
+       * @private
+       * 监听鼠标事件
+       */
+      addEventListener() {
+        const viewer = this._viewer;
+        const handler = new ScreenSpaceEventHandler$1(viewer.canvas);
+        handler.setInputAction((e) => {
+          const feat = viewer.scene.pick(e.position);
+          if (!feat) {
+            return;
+          }
+          if (this._primitives.includes(feat.primitive)) {
+            this._mousedownPixel = e.position;
+            this.active(feat.primitive);
+            this._offset = new Cartesian3$b();
+            this._angle = 0;
+            handler.setInputAction((e) => {
+              const { startPosition, endPosition } = e;
+              this.transform(startPosition, endPosition);
+            }, ScreenSpaceEventType$1.MOUSE_MOVE);
+            viewer.scene.screenSpaceCameraController.enableRotate = false;
+          }
+        }, ScreenSpaceEventType$1.LEFT_DOWN);
+
+        handler.setInputAction((e) => {
+          this.active(null);
+          handler.removeInputAction(ScreenSpaceEventType$1.MOUSE_MOVE);
+          viewer.scene.screenSpaceCameraController.enableRotate = true;
+          if (this.translateEnabled) {
+            this.xAux.positions = [];
+            this.yAux.positions = [];
+            this.zAux.positions = [];
+          }
+          if (this.rotateEnabled) {
+            this.rAxuStart.positions = [];
+            this.rAxuEnd.positions = [];
+          }
+        }, ScreenSpaceEventType$1.LEFT_UP);
+        this._removeEventListener = function () {
+          handler.removeInputAction(ScreenSpaceEventType$1.LEFT_DOWN);
+          handler.removeInputAction(ScreenSpaceEventType$1.LEFT_UP);
+        };
+      }
+      /**
+       * 当前操作的坐标轴或坐标平面
+       * @private
+       * @param {*} axis
+       */
+      active(geometry) {
+        if (!(geometry || this.activePrimitive)) {
+          return;
+        }
+        if (!geometry && this.activePrimitive) {
+          setColorForPrimitive(this.activePrimitive, this.activePrimitive.color);
+          if (this.activePrimitive.isAxisPlane) {
+            for (let a of this.activePrimitive.relativeAxis) {
+              setColorForPrimitive(a, a.color);
+            }
+          }
+          this.activePrimitive = undefined;
+          this._mode = EModel.N;
+          return;
+        }
+        // 如果激活的是坐标平面，平面所在的坐标轴也需要高亮
+        if (geometry.isAxisPlane) {
+          for (let a of geometry.relativeAxis) {
+            setColorForPrimitive(a, this.activeAxisColor);
+          }
+        }
+        this.activePrimitive = geometry;
+        setColorForPrimitive(this.activePrimitive, this.activeAxisColor);
+        if (!geometry.axis) {
+          return;
+        }
+        if (geometry.axis.includes("R")) {
+          this._mode = EModel.R;
+          const mousedownCartesian = getPositionInPlane(this._mousedownPixel, helper);
+          this.rAxuStart.positions = [this.center, mousedownCartesian];
+          this._startLocalPosition = mousedownCartesian;
+        } else if (geometry.axis.includes("S")) {
+          this._mode = EModel.S;
+        } else {
+          this._mode = EModel.T;
+        }
+      }
+      /**
+       * 从场景中删除
+       */
+      remove() {
+        this._viewer.scene.primitives.remove(this.root);
+        this._removeEventListener();
+        this._primitives.splice(0);
+      }
+      /**
+       * 平移
+       * @private
+       * @param {*} startPosition 
+       * @param {*} endPosition 
+       */
+      transform(startPosition, endPosition) {
+        this.preTranformEvent.raise(this.modelMatrix);
+        if (this._mode === EModel.T) {
+          computeOffset(this, startPosition, endPosition, _offset);
+          this.translate(_offset);
+        } else if (this._mode === EModel.R) {
+          const startLocalPosition = getPositionInPlane(startPosition, this);
+          const endLocalPosition = getPositionInPlane(endPosition, this);
+          const angle = computeAngle(this, startLocalPosition, endLocalPosition);
+          this.rotate(angle);
+        } else if (this._mode = EModel.S) {
+          computeOffset(this, startPosition, endPosition, _offset);
+          const s = -_offset.sxyz / Cartesian3$b.distance(...this.scaleAxis.positions) + 1;
+          this.scale(new Cartesian3$b(s, s, s));
+        }
+        this.postTransformEvent.raise(this.modelMatrix);
+      }
+      scale(scale) {
+        const scaleMatrix = Matrix4$5.fromScale(scale, mat4);
+        Matrix4$5.multiply(this._modelMatrix, scaleMatrix, this._modelMatrix);
+        this.modelMatrix = this._modelMatrix;
+        for (let primitive of this.root._primitives) {
+          Matrix4$5.multiply(primitive.modelMatrix, scaleMatrix, primitive.modelMatrix);
+        }
+      }
+      /**
+       * 旋转
+       * @private
+       * @param {*} angle 
+       */
+      rotate(angle) {
+        this._angle += angle;
+        const axis = this.activePrimitive.normal;
+        const translation = Matrix4$5.fromTranslation(this.center, mat4);
+        const q = Quaternion.fromAxisAngle(axis, angle, _q);
+        const roateMatrix = Matrix3$1.fromQuaternion(q, rm3);
+        const inverseTranslation = Matrix4$5.fromTranslation(Cartesian3$b.negate(this.center, cartesian3_1), mat4_1);
+        Matrix4$5.multiply(this.modelMatrix, translation, this.modelMatrix);
+        Matrix4$5.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
+        Matrix4$5.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
+        for (let primitive of this.root._primitives) {
+          Matrix4$5.multiply(primitive.modelMatrix, translation, primitive.modelMatrix);
+          Matrix4$5.multiplyByMatrix3(primitive.modelMatrix, roateMatrix, primitive.modelMatrix);
+          Matrix4$5.multiply(primitive.modelMatrix, inverseTranslation, primitive.modelMatrix);
+        }
+        this.modelMatrix = this._modelMatrix;
+        this.createRotateAux(this._startLocalPosition, this._angle);
+      }
+      /**
+       * 平移
+       * @param {*} offset 
+       */
+      translate(offset) {
+        if (!this.activePrimitive) {
+          return;
+        }
+        const axis = this.activePrimitive.axis;
+        if (axis.indexOf("X") === -1) {
+          offset.x = 0;
+        }
+        if (axis.indexOf("Y") === -1) {
+          offset.y = 0;
+        }
+        if (axis.indexOf("Z") === -1) {
+          offset.z = 0;
+        }
+        offset.x = -offset.x;
+        offset.z = -offset.z;
+        Cartesian3$b.add(this._offset, offset, this._offset);
+        const matrix = Matrix4$5.fromTranslation(offset);
+        Matrix4$5.multiply(this._modelMatrix, matrix, this._modelMatrix);
+        this.modelMatrix = this._modelMatrix;
+        for (let primitive of this.root._primitives) {
+          Matrix4$5.multiply(primitive.modelMatrix, matrix, primitive.modelMatrix);
+        }
+        this.createAux(this._offset, matrix);
+      }
+      /**
+       * 创建平移辅助线
+       * @private
+       * @param {*} offset 
+       */
+      createAux(offset) {
+        if (offset.x > 0) {
+          const p1 = Cartesian3$b.clone(this.xAxis.positions[0]);
+          const p2 = Cartesian3$b.clone(this.xAxis.positions[0]);
+          p2.x += -offset.x;
+          this.xAux.positions = [p1, p2];
+        } else {
+          const p1 = Cartesian3$b.clone(this.xAxis.positions[1]);
+          const p2 = Cartesian3$b.clone(this.xAxis.positions[1]);
+          p2.x += -offset.x;
+          this.xAux.positions = [p1, p2];
+        }
+        if (offset.y < 0) {
+          const p1 = Cartesian3$b.clone(this.yAxis.positions[0]);
+          const p2 = Cartesian3$b.clone(this.yAxis.positions[0]);
+          p2.y += -offset.y;
+          this.yAux.positions = [p1, p2];
+        } else {
+          const p1 = Cartesian3$b.clone(this.yAxis.positions[1]);
+          const p2 = Cartesian3$b.clone(this.yAxis.positions[1]);
+          p2.y += -offset.y;
+          this.yAux.positions = [p1, p2];
+        }
+        if (offset.z > 0) {
+          const p1 = Cartesian3$b.clone(this.zAxis.positions[0]);
+          const p2 = Cartesian3$b.clone(this.zAxis.positions[0]);
+          p2.z += -offset.z;
+          this.zAux.positions = [p1, p2];
+        } else {
+          const p1 = Cartesian3$b.clone(this.zAxis.positions[1]);
+          const p2 = Cartesian3$b.clone(this.zAxis.positions[1]);
+          p2.z += -offset.z;
+          this.zAux.positions = [p1, p2];
+        }
+      }
+      /**
+       * 创建旋转辅助线
+       * @private
+       * @param {*} startLocalPosition 
+       * @param {*} angle 
+       */
+      createRotateAux(startLocalPosition, angle) {
+        const startPosition = this._startLocalPosition;
+        if (!startPosition) {
+          return;
+        }
+        const q = Quaternion.fromAxisAngle(this.activePrimitive.normal, -angle);
+        const matrix3 = Matrix3$1.fromQuaternion(q, rm3);
+        const rotation = Matrix4$5.fromRotation(matrix3, mat4);
+        let position = Cartesian3$b.subtract(startLocalPosition, this.center, cartesian3_1);
+        Matrix4$5.multiplyByPoint(rotation, position, position);
+        Cartesian3$b.add(this.center, position, position);
+        this.rAxuEnd.positions = [this.center, position];
+      }
+    }
+
+    class XYZLayer extends Cesium.UrlTemplateImageryProvider {
+        /**
+         * 创建一个image图层，该图层通过使用X/Y/Z指定的URL模板请求图像。你可以用它来请求TMS,WMS标准的地图服务，甚至WMTS。
+         * @extends Cesium.UrlTemplateImageryProvider
+         * @param {Promise.<Object>|Object} options 具有以下属性
+         * @param {Resource|String} options.url  瓦片的url模板，它支持以下关键字:
+         * <ul>
+         *     <li><code>{z}</code>: 瓦片的层级，第一层为0级</li>
+         *     <li><code>{x}</code>: 切片方案中X的坐标，最左边为0</li>
+         *     <li><code>{y}</code>: 切片方案中Y的坐标，最上边为0</li>
+         *     <li><code>{s}</code>: 子域名</li>
+         *     <li><code>{reverseX}</code>: 切片方案中X的坐标，最右边为0</li>
+         *     <li><code>{reverseY}</code>: 切片方案中Y的坐标，最下边为0</li>
+         *     <li><code>{reverseZ}</code>: 瓦片的层级，最大层级为0</li>
+         *     <li><code>{westDegrees}</code>: 瓦片最左边的坐标，单位度</li>
+         *     <li><code>{southDegrees}</code>: 瓦片最下边的坐标，单位度</li>
+         *     <li><code>{eastDegrees}</code>: 瓦片最右边的坐标，单位度</li>
+         *     <li><code>{northDegrees}</code>: 瓦片最上边的坐标，单位度</li>
+         *     <li><code>{westProjected}</code>: 瓦片最左边的坐标，单位米</li>
+         *     <li><code>{southProjected}</code>: 瓦片最下边的坐标，单位米</li>
+         *     <li><code>{eastProjected}</code>: 瓦片最右边的坐标，单位米</li>
+         *     <li><code>{northProjected}</code>: 瓦片最上边的坐标，单位米</li>
+         *     <li><code>{width}</code>: 瓦片宽度，单位像素</li>
+         *     <li><code>{height}</code>: 瓦片高度，单位像素</li>
+         * </ul>
+         * @param {Resource|String} [options.pickFeaturesUrl] 用于选择功能的 URL 模板，如果未定义
+         *                 {@link XYZLayer#pickFeatures} 将返回undefined，表示未选中任何内容，该模板除了支持url的所有关键字外，还支持以下关键字:
+         * <ul>
+         *     <li><code>{i}</code>: 选择位置的列，单位像素，最左边为0。</li>
+         *     <li><code>{j}</code>: 拾取位置的行，单位像素，最上边为0。</li>
+         *     <li><code>{reverseI}</code>: 选择位置的列，单位像素，最右边为0。</li>
+         *     <li><code>{reverseJ}</code>: 拾取位置的行，单位像素，最下边为0</li>
+         *     <li><code>{longitudeDegrees}</code>: 拾取位置的经度，单位度</li>
+         *     <li><code>{latitudeDegrees}</code>: 拾取位置的纬度，单位度</li>
+         *     <li><code>{longitudeProjected}</code>: 拾取位置的经度，单位米</li>
+         *     <li><code>{latitudeProjected}</code>: 拾取位置的纬度，单位米</li>
+         *     <li><code>{format}</code>: 一个函数，用于定义信息的返回形式, 如{@link Cesium.GetFeatureInfoFormat}.</li>
+         * </ul>
+         * @param {Object} [options.urlSchemeZeroPadding] 设置坐标的位数，不足的以0填充，对于urlSchemeZeroPadding : { '{x}' : '0000'}
+         * 如果x为12，将被填充为0012。它具有以下关键字：
+         * <ul>
+         *  <li> <code>{z}</code>: z关键字的填充方案</li>
+         *  <li> <code>{x}</code>: x关键字的填充方案</li>
+         *  <li> <code>{y}</code>: y关键字的填充方案</li>
+         *  <li> <code>{reverseX}</code>: reverseX关键字的填充方案</li>
+         *  <li> <code>{reverseY}</code>: reverseY关键字的填充方案</li>
+         *  <li> <code>{reverseZ}</code>: reverseZ关键字的填充方案</li>
+         * </ul>
+         * @param {String|String[]} [options.subdomains='abc'] {s}占位符可用的子域名，如果该值为字符串，由字符串中的每个字符都是一个子域名。
+         * @param {Credit|String} [options.credit=''] 数据源的版权信息.
+         * @param {Number} [options.minimumLevel=0] 图层支持的最低细节级别。在指定最小级别的瓦片数量很少时要小心，较大的数字可能会导致渲染问题。
+         * @param {Number} [options.maximumLevel] 图层支持的最大细节级别，如果未定义，则无限制。
+         * @param {Rectangle} [options.rectangle=Cesium.Rectangle.MAX_VALUE] 瓦片覆盖范围，单位弧度。
+         * @param {TilingScheme} [options.tilingScheme=Cesium.WebMercatorTilingScheme] 图层的坐标系，默认为墨卡托投影。
+         * @param {Number} [options.tileWidth=256] 瓦片宽度。
+         * @param {Number} [options.tileHeight=256] 瓦片高度。
+         * @param {Boolean} [options.hasAlphaChannel=true] 瓦片图像是否拥有alpha通道，如果为false，内存使用量和加载时间将减少，但是会失去alpha通道的数据。
+         * @param {GetFeatureInfoFormat[]} [options.getFeatureInfoFormats=XYZLayer.defaultFeatureInfoFormats]  {@link XYZLayer#pickFeatures} 调用时在指定位置获取特征信息的格式。如果未指定此参数，则禁用特征拾取。
+         * @param {Boolean} [options.enablePickFeatures=true] 是否支持要素不支持，如果为true,XYZLayer#pickFeatures将请求pickFeaturesUrl并解析其内容，否则将返回undefined。
+         * @param {Object} [options.customTags] 为URL模板自定义关键字。该对象的键必须为字符串，值为函数。
+         * 
+         * @example
+         * // Access Natural Earth II imagery, which uses a TMS tiling scheme and Geographic (EPSG:4326) project
+         * const tms = new CesiumPro.XYZLayer({
+         *     url : Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII') + '/{z}/{x}/{reverseY}.jpg',
+         *     credit : '© Analytical Graphics, Inc.',
+         *     tilingScheme : new Cesium.GeographicTilingScheme(),
+         *     maximumLevel : 5
+         * });
+         * // Access the CartoDB Positron basemap, which uses an OpenStreetMap-like tiling scheme.
+         * const positron = new CesiumPro.XYZLayer({
+         *     url : 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+         *     credit : 'Map tiles by CartoDB, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+         * });
+         * // Access a Web Map Service (WMS) server.
+         * const wms = new CesiumPro.XYZLayer({
+         *    url : 'https://programs.communications.gov.au/geoserver/ows?tiled=true&' +
+         *          'transparent=true&format=image%2Fpng&exceptions=application%2Fvnd.ogc.se_xml&' +
+         *          'styles=&service=WMS&version=1.1.1&request=GetMap&' +
+         *          'layers=public%3AMyBroadband_Availability&srs=EPSG%3A3857&' +
+         *          'bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&' +
+         *          'width=256&height=256',
+         *    rectangle : Cesium.Rectangle.fromDegrees(96.799393, -43.598214999057824, 153.63925700000001, -9.2159219997013)
+         * });
+         * // Using custom tags in your template url.
+         * const custom = new CesiumPro.XYZLayer({
+         *    url : 'https://yoururl/{Time}/{z}/{y}/{x}.png',
+         *    customTags : {
+         *        Time: function(imageryProvider, x, y, level) {
+         *            return '20171231'
+         *        }
+         *    }
+         * });
+         * // geoserver tms服务
+         * const  geoserverTMS = new XYZLayer({
+         *      url: 'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/topp%3Astates@EPSG%3A4326@png/{z}/{x}/{reverseY}.png',
+         *      tilingScheme: proj.get('EPSG:4326')
+         *  })
+         * // geoserver wms服务，并支持pick
+         * const geoserverTMS = new XYZLayer({
+         *      pickFeaturesUrl:'http://localhost:8080/geoserver/wms?service=WMS&version=1.1.1&request=GetFeatureInfo&layers=topp%3Astates&bbox={westProjected}%2C{southProjected}%2C{eastProjected}%2C{northProjected}&width={width}&height={height}&srs=EPSG%3A4326&query_layers=topp%3Astates&info_format={format}&x={i}&y={j}',
+         *      url: 'http://localhost:8080/geoserver/topp/wms?service=WMS&version=1.1.1&request=GetMap&layers' +
+         *          '=topp%3Astates&bbox={westDegrees}%2C{southDegrees}%2C{eastDegrees}%2C{northDegrees}&transparent=true&' +
+         *           'width=768&height=330&srs=EPSG%3A4326&format=image/png',
+         *      tilingScheme: proj.get('EPSG:4326'),
+         *      getFeatureInfoFormats: [new Cesium.GetFeatureInfoFormat("xml", "text/xml")]
+         * })
+         * // geoserver WMTS服务
+         * const layer = new XYZLayer({
+         *     url: 'http://localhost:8080/geoserver/gwc/service/wmts?layer=topp%3Astates&style=&til' +
+         *         'ematrixset=EPSG%3A4326&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={TileMatrix}' +
+         *         '&TileCol={tileCol}&TileRow={tileRow}',
+         *     tilingScheme: proj.get('EPSG:4326'),
+         *     customTags: {
+         *         TileMatrix: function (imageryProvider, x, y, level) {
+         *             return 'EPSG:4326:' + level
+         *         },
+         *         tileCol: function (imageryProvider, x, y, level) {
+         *             return y
+         *         },
+         *         tileRow: function (imageryProvider, x, y, level) {
+         *             return x
+         *         }
+         *     }
+         * })
+         */
+        constructor(options) {
+            if (typeof options === 'string') {
+                options = {url: options};
+            }
+            options.getFeatureInfoFormats = defaultValue$9(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
+            super(options);
+        }
+        /**
+         * 获取用于瓦片请求的URL，具有以下关键字：
+         * <ul>
+         *     <li><code>{z}</code>: 瓦片的层级，第一层为0级</li>
+         *     <li><code>{x}</code>: 切片方案中X的坐标，最左边为0</li>
+         *     <li><code>{y}</code>: 切片方案中Y的坐标，最上边为0</li>
+         *     <li><code>{s}</code>: 子域名</li>
+         *     <li><code>{reverseX}</code>: 切片方案中X的坐标，最右边为0</li>
+         *     <li><code>{reverseY}</code>: 切片方案中Y的坐标，最下边为0</li>
+         *     <li><code>{reverseZ}</code>: 瓦片的层级，最大层级为0</li>
+         *     <li><code>{westDegrees}</code>: 瓦片最左边的坐标，单位度</li>
+         *     <li><code>{southDegrees}</code>: 瓦片最下边的坐标，单位度</li>
+         *     <li><code>{eastDegrees}</code>: 瓦片最右边的坐标，单位度</li>
+         *     <li><code>{northDegrees}</code>: 瓦片最上边的坐标，单位度</li>
+         *     <li><code>{westProjected}</code>: 瓦片最左边的坐标，单位米</li>
+         *     <li><code>{southProjected}</code>: 瓦片最下边的坐标，单位米</li>
+         *     <li><code>{eastProjected}</code>: 瓦片最右边的坐标，单位米</li>
+         *     <li><code>{northProjected}</code>: 瓦片最上边的坐标，单位米</li>
+         *     <li><code>{width}</code>: 瓦片宽度，单位像素</li>
+         *     <li><code>{height}</code>: 瓦片高度，单位像素</li>
+         * </ul>
+         * @readonly
+         * @returns {String} 获取用于瓦片请求的URL
+         */
+        get url() {
+            return super.url;
+        }
+        /**
+         * 可以请求的最小瓦片级别
+         * @readonly
+         * @type {Number}
+         */
+         get minimumLevel() {
+            return super.minimumLevel;
+        }
+        /**
+         * 可以请求的最大详细级别
+         * @type {Number}
+         * @readonly
+         */
+        get maximumLevel() {
+            return super.maximumLevel;
+        }
+        /**
+         * 图层的范围
+         * @type {Cesium.Rectangle}
+         * @readonly
+         */
+         get rectangle() {
+            return super.rectangle;
+        }
+        /**
+         * 获取影像错误时触发的事件
+         * @type {Event}
+         * @readonly
+         */
+        get errorEvent() {
+            return super.errorEvent;
+        }
+        /**
+         * 获取一个值，该值指示图层是否已准备好使用。
+         * @readonly
+         * @type {Boolean}
+         */
+        get ready() {
+            return super.ready;
+        }
+        /**
+         * 获取一个Promise，该图层准备好时将resolve
+         * @readonly
+         * @type {Promise<Boolean>}
+         */
+        get readyPromise() {
+            return super.readyPromise;
+        }
+        /**
+         * 图层的坐标系
+         * @type {Cesium.TilingScheme}
+         * @readonly
+         */
+        get tilingScheme() {
+            return super.tilingScheme;
+        }
+        /**
+         * 图层是否允许被pick
+         * @default true
+         */
+        get enablePickFeatures() {
+            return super.enablePickFeatures;
+        }
+        set enablePickFeatures(val) {
+            super.enablePickFeatures = val;
+        }
+
+        /**
+         * 确定哪些要素（如果有）位于图块内的给定经度和纬度。在{@link Cesium.ImageryProvider#ready}返回 true之前不应调用此函数。
+         * 在数据图层ready之前，该函数不能被调用
+         *
+         * @param {Number} x 瓦片的x坐标。
+         * @param {Number} y 瓦片的y坐标。
+         * @param {Number} level 瓦片的层级。
+         * @param {Number} longitude 选择要素的经度。
+         * @param {Number} latitude  选择要素的纬度
+         * @return {Promise.<Cesium.ImageryLayerFeatureInfo[]>|undefined} 
+         */
+        pickFeatures(x, y, level, longitude, latitude) {
+            return super.pickFeatures(x, y, level, longitude, latitude);
+        }
+        /**
+         * 请求指定瓦片
+         * @param {Number} x 瓦片x坐标
+         * @param {Number} y 瓦片y坐标
+         * @param {Number} level 瓦片级别
+         * @param {Cesium.Request} [request]
+         * @returns {Promise.<HTMLImageElement|HTMLCanvasElement>|undefined} 如果瓦片解析成功，返回一个异步Promise，解析的图像可以是 Image 或 Canvas DOM 对象，否则返回undefined
+         */
+        requestImage(x, y, level, request) {
+            return super.requestImage(x, y, level, request)
+        }
+    }
+     /**
+     * 默认数据解析格式
+     * @constant
+     * @type {Object}
+     */
+    XYZLayer.defaultFeatureInfoFormats = Object.freeze([
+        Object.freeze(new Cesium.GetFeatureInfoFormat("json", "application/json")),
+        Object.freeze(new Cesium.GetFeatureInfoFormat("xml", "text/xml")),
+        Object.freeze(new Cesium.GetFeatureInfoFormat("text", "text/html")),
+    ]);
+
+    /**
+     * CesiumPro提供的默认图层，该图层为离线图层，可以在无互联网的环境下使用。
+     * @exports createDefaultLayer
+     * @returns {XYZLayer} 一个可以在离线环境使用的XYZLayer。
+     * @example
+     * const viewer = new CesiumPro.Viewer('container', {
+     *   imageryProvider:CesiumPro.createDefaultLayer()
+     * })
+     */
+    function createDefaultLayer() {
+        return new XYZLayer({
+            url: Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png'),
+            maximumLevel: 4
+        })
+    }
+
+    const {
+        defined: defined$8,
+        defaultValue: defaultValue$5,
+        ColorMaterialProperty: ColorMaterialProperty$1,
+        ConstantPositionProperty: ConstantPositionProperty$1,
+        ConstantProperty: ConstantProperty$1,
+        DataSource: DataSource$1,
+        PolygonGraphics: PolygonGraphics$1,
+        PolylineGraphics: PolylineGraphics$1,
+        EntityCluster,
+        PinBuilder,
+        createGuid: createGuid$2,
+        Cartesian3: Cartesian3$a,
+        PointGraphics: PointGraphics$1,
+        ArcType: ArcType$1,
+        PolygonHierarchy: PolygonHierarchy$2,
+        Color: Color$l,
+        EntityCollection,
+        HeightReference: HeightReference$2,
+        Resource: Resource$3,
+        describe,
+        Event: Event$7
+    } = Cesium;
+    const sizes$1 = {
+        small: 24,
+        medium: 48,
+        large: 64
+    };
+    const crsLinkHrefs$1 = {};
+    const crsLinkTypes$1 = {};
+    const crsNames$1 = {
+        "urn:ogc:def:crs:OGC:1.3:CRS84": defaultCrsFunction$1,
+        "EPSG:4326": defaultCrsFunction$1,
+        "urn:ogc:def:crs:EPSG::4326": defaultCrsFunction$1,
+    };
+    const simpleStyleIdentifiers$1 = [
+        "title",
+        "description", //
+        "marker-size",
+        "marker-symbol",
+        "marker-color",
+        "stroke", //
+        "stroke-opacity",
+        "stroke-width",
+        "fill",
+        "fill-opacity",
+    ];
+    const geoJsonObjectTypes$1 = {
+        Feature: processFeature$1,
+        FeatureCollection: processFeatureCollection$1,
+        GeometryCollection: processGeometryCollection$1,
+        LineString: processLineString$1,
+        MultiLineString: processMultiLineString$1,
+        MultiPoint: processMultiPoint$1,
+        MultiPolygon: processMultiPolygon$1,
+        Point: processPoint$1,
+        Polygon: processPolygon$1,
+        Topology: processTopology$1
+    };
+    const geometryTypes$1 = {
+        GeometryCollection: processGeometryCollection$1,
+        LineString: processLineString$1,
+        MultiLineString: processMultiLineString$1,
+        MultiPoint: processMultiPoint$1,
+        MultiPolygon: processMultiPolygon$1,
+        Point: processPoint$1,
+        Polygon: processPolygon$1,
+        Topology: processTopology$1
+    };
+
+    function coordinatesArrayToCartesianArray$1(coordinates, crsFunction) {
+        var positions = new Array(coordinates.length);
+        for (var i = 0; i < coordinates.length; i++) {
+            positions[i] = crsFunction(coordinates[i]);
+        }
+        return positions;
+    }
+    function createDescriptionCallback$1(describe, properties, nameProperty) {
+        var description;
+        return function (time, result) {
+            if (!defined$8(description)) {
+                description = describe(properties, nameProperty);
+            }
+            return description;
+        };
+    }
+    // GeoJSON processing functions
+    function createObject$1(geoJson, entityCollection, describe) {
+        var id = geoJson.id;
+        if (!defined$8(id) || geoJson.type !== 'Feature') {
+            id = createGuid$2();
+        } else {
+            var i = 2;
+            var finalId = id;
+            while (defined$8(entityCollection.getById(finalId))) {
+                finalId = id + '_' + i;
+                i++;
+            }
+            id = finalId;
+        }
+
+        var entity = entityCollection.getOrCreateEntity(id);
+        var properties = geoJson.properties;
+        if (defined$8(properties)) {
+            entity.properties = properties;
+
+            var nameProperty;
+
+            //Check for the simplestyle specified name first.
+            var name = properties.title;
+            if (defined$8(name)) {
+                entity.name = name;
+                nameProperty = 'title';
+            } else {
+                //Else, find the name by selecting an appropriate property.
+                //The name will be obtained based on this order:
+                //1) The first case-insensitive property with the name 'title',
+                //2) The first case-insensitive property with the name 'name',
+                //3) The first property containing the word 'title'.
+                //4) The first property containing the word 'name',
+                var namePropertyPrecedence = Number.MAX_VALUE;
+                for (var key in properties) {
+                    if (properties.hasOwnProperty(key) && properties[key]) {
+                        var lowerKey = key.toLowerCase();
+
+                        if (namePropertyPrecedence > 1 && lowerKey === 'title') {
+                            namePropertyPrecedence = 1;
+                            nameProperty = key;
+                            break;
+                        } else if (namePropertyPrecedence > 2 && lowerKey === 'name') {
+                            namePropertyPrecedence = 2;
+                            nameProperty = key;
+                        } else if (namePropertyPrecedence > 3 && /title/i.test(key)) {
+                            namePropertyPrecedence = 3;
+                            nameProperty = key;
+                        } else if (namePropertyPrecedence > 4 && /name/i.test(key)) {
+                            namePropertyPrecedence = 4;
+                            nameProperty = key;
+                        }
+                    }
+                }
+                if (defined$8(nameProperty)) {
+                    entity.name = properties[nameProperty];
+                }
+            }
+
+            var description = properties.description;
+            if (description !== null) {
+                entity.description = !defined$8(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
+            }
+        }
+        return entity;
+    }
+    function processFeature$1(dataSource, feature, notUsed, crsFunction, options) {
+        if (feature.geometry === null) {
+            //Null geometry is allowed, so just create an empty entity instance for it.
+            createObject$1(feature, dataSource._entityCollection, options.describe);
+            return;
+        }
+
+        if (!defined$8(feature.geometry)) {
+            throw new CesiumProError$1('feature.geometry is required.');
+        }
+
+        var geometryType = feature.geometry.type;
+        var geometryHandler = geometryTypes$1[geometryType];
+        if (!defined$8(geometryHandler)) {
+            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
+        }
+        geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
+    }
+
+    function processFeatureCollection$1(dataSource, featureCollection, notUsed, crsFunction, options) {
+        var features = featureCollection.features;
+        for (var i = 0, len = features.length; i < len; i++) {
+            processFeature$1(dataSource, features[i], undefined, crsFunction, options);
+        }
+    }
+
+    function processGeometryCollection$1(dataSource, geoJson, geometryCollection, crsFunction, options) {
+        var geometries = geometryCollection.geometries;
+        for (var i = 0, len = geometries.length; i < len; i++) {
+            var geometry = geometries[i];
+            var geometryType = geometry.type;
+            var geometryHandler = geometryTypes$1[geometryType];
+            if (!defined$8(geometryHandler)) {
+                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
+            }
+            geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
+        }
+    }
+
+    function createPoint$1(dataSource, geoJson, crsFunction, coordinates, options) {
+        let size = options.pointSize;
+        let color = options.pointColor;
+        const properties = geoJson.properties;
+        if (defined$8(properties)) {
+            const cssColor = properties['point-color'];
+            if (defined$8(cssColor)) {
+                color = Color$l.fromCssColorString(cssColor);
+            }
+
+            size = defaultValue$5(sizes$1[properties['point-size']], size);
+        }
+        const point = new PointGraphics$1();
+
+        // Clamp to ground if there isn't a height specified
+        if (coordinates.length === 2 && options.clampToGround) {
+            point.heightReference = HeightReference$2.CLAMP_TO_GROUND;
+        }
+
+        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
+        entity.point = point;
+        entity.point.color = color;
+        entity.point.pixelSize = size;
+        entity.position = new ConstantPositionProperty$1(crsFunction(coordinates));
+    }
+
+    function processPoint$1(dataSource, geoJson, geometry, crsFunction, options) {
+        createPoint$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiPoint$1(dataSource, geoJson, geometry, crsFunction, options) {
+        var coordinates = geometry.coordinates;
+        for (var i = 0; i < coordinates.length; i++) {
+            createPoint$1(dataSource, geoJson, crsFunction, coordinates[i], options);
+        }
+    }
+
+    function createLineString$1(dataSource, geoJson, crsFunction, coordinates, options) {
+        const material = options.lineColor;
+        const widthProperty = options.lineWidth;
+
+        const properties = geoJson.properties;
+        if (defined$8(properties)) {
+            const width = properties['stroke-width'];
+            if (defined$8(width)) {
+                widthProperty = new ConstantProperty$1(width);
+            }
+
+            let color;
+            let stroke = properties.stroke;
+            if (defined$8(stroke)) {
+                color = Color$l.fromCssColorString(stroke);
+            }
+            let opacity = properties['stroke-opacity'];
+            if (defined$8(opacity) && opacity !== 1.0) {
+                if (!defined$8(color)) {
+                    color = material.color.clone();
+                }
+                color.alpha = opacity;
+            }
+            if (defined$8(color)) {
+                material = new ColorMaterialProperty$1(color);
+            }
+        }
+
+        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
+        const polylineGraphics = new PolylineGraphics$1();
+        entity.polyline = polylineGraphics;
+
+        polylineGraphics.clampToGround = options.clampToGround;
+        polylineGraphics.material = material;
+        polylineGraphics.width = widthProperty;
+        polylineGraphics.positions = new ConstantProperty$1(coordinatesArrayToCartesianArray$1(coordinates, crsFunction));
+        polylineGraphics.arcType = ArcType$1.RHUMB;
+    }
+    function defaultDescribe$1(properties, nameProperty) {
+        var html = "";
+        for (var key in properties) {
+            if (properties.hasOwnProperty(key)) {
+                if (key === nameProperty || simpleStyleIdentifiers$1.indexOf(key) !== -1) {
+                    continue;
+                }
+                var value = properties[key];
+                if (defined$8(value)) {
+                    if (typeof value === "object") {
+                        html +=
+                            "<tr><th>" +
+                            key +
+                            "</th><td>" +
+                            defaultDescribe$1(value) +
+                            "</td></tr>";
+                    } else {
+                        html += "<tr><th>" + key + "</th><td>" + value + "</td></tr>";
+                    }
+                }
+            }
+        }
+
+        if (html.length > 0) {
+            html =
+                '<table class="cesium-infoBox-defaultTable"><tbody>' +
+                html +
+                "</tbody></table>";
+        }
+
+        return html;
+    }
+    function processLineString$1(dataSource, geoJson, geometry, crsFunction, options) {
+        createLineString$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiLineString$1(dataSource, geoJson, geometry, crsFunction, options) {
+        var lineStrings = geometry.coordinates;
+        for (var i = 0; i < lineStrings.length; i++) {
+            createLineString$1(dataSource, geoJson, crsFunction, lineStrings[i], options);
+        }
+    }
+
+    function createPolygon$1(dataSource, geoJson, crsFunction, coordinates, options) {
+        if (coordinates.length === 0 || coordinates[0].length === 0) {
+            return;
+        }
+
+        let outlineColor = options.outlineColor.color;
+        let material = options.fill;
+        let outlineWidth = options.outlineWidth;
+
+        const properties = geoJson.properties;
+        if (defined$8(properties)) {
+            const width = properties['stroke-width'];
+            if (defined$8(width)) {
+                outlineWidth = new ConstantProperty$1(width);
+            }
+            let color;
+            const stroke = properties.stroke;
+            if (defined$8(stroke)) {
+                color = Color$l.fromCssColorString(stroke);
+            }
+            let opacity = properties['stroke-opacity'];
+            if (defined$8(opacity) && opacity !== 1.0) {
+                if (!defined$8(color)) {
+                    color = options.outlineColor.color.clone();
+                }
+                color.alpha = opacity;
+            }
+
+            if (defined$8(color)) {
+                outlineColor = new ConstantProperty$1(color);
+            }
+
+            let fillColor;
+            const fill = properties.fill;
+            if (defined$8(fill)) {
+                fillColor = Color$l.fromCssColorString(fill);
+                fillColor.alpha = material.color.alpha;
+            }
+            opacity = properties['fill-opacity'];
+            if (defined$8(opacity) && opacity !== material.color.alpha) {
+                if (!defined$8(fillColor)) {
+                    fillColor = material.color.clone();
+                }
+                fillColor.alpha = opacity;
+            }
+            if (defined$8(fillColor)) {
+                material = new ColorMaterialProperty$1(fillColor);
+            }
+        }
+
+        const polygon = new PolygonGraphics$1();
+        polygon.outline = new ConstantProperty$1(options.outline);
+        polygon.outlineColor = outlineColor;
+        polygon.outlineWidth = outlineWidth;
+        polygon.material = material;
+        polygon.arcType = ArcType$1.RHUMB;
+
+        const extrudedHeight = options.extrudedHeight;
+        if (extrudedHeight) {
+            if (typeof extrudedHeight === 'number') {
+                polygon.extrudedHeight = extrudedHeight;
+            } else if (typeof extrudedHeight === 'string') {
+                const conditions = extrudedHeight.match(/\$\{\s*.*?\s*\}/ig);
+                if (conditions) {
+                    let extrudeValue = extrudedHeight;
+                    for (let con of conditions) {
+                        const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
+                        if (!(defined$8(value) && defined$8(value[1]))) {
+                            continue;
+                        }
+                        extrudeValue = extrudeValue.replace(con, properties[value[1]]);
+                    }
+                    try {
+                        const height = window.eval(extrudeValue);
+                        if (typeof height === 'number') {
+                            polygon.extrudedHeight = height;
+                        }
+                    } catch (e) {
+
+                    }
+                }
+            }
+        }
+
+        const holes = [];
+        for (var i = 1, len = coordinates.length; i < len; i++) {
+            holes.push(new PolygonHierarchy$2(coordinatesArrayToCartesianArray$1(coordinates[i], crsFunction)));
+        }
+
+        const positions = coordinates[0];
+        polygon.hierarchy = new ConstantProperty$1(new PolygonHierarchy$2(coordinatesArrayToCartesianArray$1(positions, crsFunction), holes));
+        if (positions[0].length > 2) {
+            polygon.perPositionHeight = new ConstantProperty$1(true);
+        } else if (!options.clampToGround) {
+            polygon.height = 0;
+        }
+
+        const entity = createObject$1(geoJson, dataSource._entityCollection, options.describe);
+        entity.polygon = polygon;
+    }
+
+    function processPolygon$1(dataSource, geoJson, geometry, crsFunction, options) {
+        createPolygon$1(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiPolygon$1(dataSource, geoJson, geometry, crsFunction, options) {
+        var polygons = geometry.coordinates;
+        for (var i = 0; i < polygons.length; i++) {
+            createPolygon$1(dataSource, geoJson, crsFunction, polygons[i], options);
+        }
+    }
+
+    function processTopology$1(dataSource, geoJson, geometry, crsFunction, options) {
+        for (var property in geometry.objects) {
+            if (geometry.objects.hasOwnProperty(property)) {
+                var feature = topojson.feature(geometry, geometry.objects[property]);
+                var typeHandler = geoJsonObjectTypes$1[feature.type];
+                typeHandler(dataSource, feature, feature, crsFunction, options);
+            }
+        }
+    }
+    function defaultDescribeProperty$1(properties, nameProperty) {
+        return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
+    }
+    function defaultCrsFunction$1(coordinates) {
+        return Cartesian3$a.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+    }
+    function load$1(that, geoJson, options, sourceUri) {
+        let name;
+        if (defined$8(sourceUri)) {
+            name = Cesium.getFilenameFromUri(sourceUri);
+        }
+
+        if (defined$8(name) && that._name !== name) {
+            that._name = name;
+            that._changed.raiseEvent(that);
+        }
+
+        const typeHandler = geoJsonObjectTypes$1[geoJson.type];
+        if (!defined$8(typeHandler)) {
+            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
+        }
+
+        //Check for a Coordinate Reference System.
+        const crs = geoJson.crs;
+        let crsFunction = crs !== null ? defaultCrsFunction$1 : null;
+
+        if (defined$8(crs)) {
+            if (!defined$8(crs.properties)) {
+                throw new CesiumProError$1('crs.properties is undefined.');
+            }
+
+            const properties = crs.properties;
+            if (crs.type === 'name') {
+                crsFunction = crsNames$1[properties.name];
+                if (!defined$8(crsFunction)) {
+                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
+                }
+            } else if (crs.type === 'link') {
+                var handler = crsLinkHrefs$1[properties.href];
+                if (!defined$8(handler)) {
+                    handler = crsLinkTypes$1[properties.type];
+                }
+
+                if (!defined$8(handler)) {
+                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
+                }
+
+                crsFunction = handler(properties);
+            } else if (crs.type === 'EPSG') {
+                crsFunction = crsNames$1['EPSG:' + properties.code];
+                if (!defined$8(crsFunction)) {
+                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
+                }
+            } else {
+                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
+            }
+        }
+        return Promise.resolve(crsFunction).then(function (crsFunction) {
+            that._entityCollection.removeAll();
+
+            // null is a valid value for the crs, but means the entire load process becomes a no-op
+            // because we can't assume anything about the coordinates.
+            if (crsFunction !== null) {
+                typeHandler(that, geoJson, geoJson, crsFunction, options);
+            }
+
+            return Promise.all(that._promises).then(function () {
+                that._promises.length = 0;
+                DataSource$1.setLoading(that, false);
+                return that;
+            });
+        });
+    }
+    class GeoJsonDataSource {
+        /**
+         * 创建一个GeoJson数据源
+         * @param {String} [name] 数据源名称
+         * @example
+         *  // 全局设置贴地
+         *  CesiumPro.GeoJsonDataSource.clampToGround = true
+         *  // 全局修改线样式
+         *  CesiumPro.GeoJsonDataSource.lineColor = Cesium.Color.RED;
+         *  CesiumPro.GeoJsonDataSource.lineWidth = 1;
+         *  const linstring = CesiumPro.GeoJsonDataSource.load('../data/geojson/railway.geojson')
+         *  // 修改该多边形的样式
+         *  const polygon = CesiumPro.GeoJsonDataSource.load('../data/geojson/province.geojson', {
+         *      fill: Cesium.Color.GOLD,
+         *      outline: false
+         *  })
+         *  // 使用全局方法修改点的颜色
+         *  CesiumPro.GeoJsonDataSource.pointColor = Cesium.Color.BLUE;
+         *  // 单独修本次加载点的大小
+         *  const point = CesiumPro.GeoJsonDataSource.load('../data/geojson/city.geojson', {
+         *      pointSize: 6
+         *  })
+         * // 多边形拉伸
+         *  const geojson = CesiumPro.GeoJsonDataSource.load('../data/geojson/building.geojson', {
+         *      extrudedHeight: '${Floor} * 10'
+         *  })
+         *  parent.viewer = viewer;
+         *  viewer.addLayer(geojson);
+         *  viewer.flyTo(geojson)
+         */
+        constructor(name) {
+            this._name = name;
+            this._changed = new Event$7();
+            this._error = new Event$7();
+            this._isLoading = false;
+            this._loading = new Event$7();
+            this._entityCollection = new EntityCollection(this);
+            this._promises = [];
+            this._pinBuilder = new PinBuilder();
+            this._entityCluster = new EntityCluster();
+            this._credit = undefined;
+            this._resourceCredits = [];
+        }
+        /**
+         * 点要素的默认大小
+         * @type {Number}
+         * @memberof GeoJsonDataSource
+         * @default 5
+         */
+        static pointSize = 5;
+        /**
+         * 点要素的默认颜色
+         * @memberof GeoJsonDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.ROYALBLUE
+         */
+        static pointColor = Color$l.ROYALBLUE;
+        /**
+         * 线要素的颜色
+         * @memberof GeoJsonDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.YELLOW
+         */
+        static lineColor = Color$l.YELLOW;
+        /**
+         * 多边形要素的填充色
+         * @memberof GeoJsonDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.fromBytes(255, 255, 0, 100)
+         */
+        static fill = Color$l.fromBytes(255, 255, 0, 100);
+        /**
+         * 多边形要素是否显边框
+         * @memberof GeoJsonDataSource
+         * @type {Boolean}
+         * @default true
+         */
+        static outline = true;
+        /**
+         * 多边形要素边框的颜色
+         * @memberof GeoJsonDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.YELLOW
+         */
+        static outlineColor = Color$l.YELLOW;
+        /**
+         * 线要素的宽度
+         * @memberof GeoJsonDataSource
+         * @type {Number}
+         * @default 2
+         */
+        static lineWidth = 2;
+        /**
+         * 是否贴地。
+         * @type {Boolean}
+         * @default false
+         * @memberof GeoJsonDataSource
+         */
+        static clampToGround = false;
+        /**
+         * 多边形要素的边框宽度，该属性在windows环境下可能不生效
+         * @default 1
+         * @type {Number}
+         * @memberof GeoJsonDataSource
+         */
+        static outlineWidth = 1;
+        static crsNames() {
+            return crsNames$1;
+        }
+        static crsLinkHrefs() {
+            return crsLinkHrefs$1;
+        }
+        static crsLinkTypes() {
+            return crsLinkTypes$1;
+        }
+        /**
+         * 该数据源中的entity
+         * @type {Cesium.EntityCollection}
+         * @readonly
+         */
+        get entities() {
+            return this._entityCollection;
+        }
+        /**
+         * 数据源名称
+         * @type {String}
+         */
+        get name() {
+            return this._name;
+        }
+        set name(value) {
+            if (this._name !== value) {
+                this._name = value;
+                this._changed.raiseEvent(this);
+            }
+        }
+        get clock() {
+            return undefined
+        }
+        /**
+         * 指示该数据源是否正在加载数据
+         * @readonly
+         * @type {Boolean}
+         */
+        get isLoading() {
+            return this._isLoading;
+        }
+        /**
+         * 数据发生变化时触发的事件
+         * @type {Event}
+         * @readonly
+         */
+        get changedEvent() {
+            return this._changed;
+        }
+        /**
+         * 数据加载出错时触发的事件
+         * @type {Event}
+         * @readonly
+         */
+        get errorEvent() {
+            return this._error;
+        }
+        /**
+         * 数据源开始或结束加载时触发的事件
+         * @readonly
+         * @type {Event}
+         */
+        get loadingEvent() {
+            return this._loading;
+        }
+        /**
+         * 是否显示数据源
+         * @type {Boolean}
+         * @default true
+         */
+        get show() {
+            return this._entityCollection.show;
+        }
+        set show(val) {
+            this._entityCollection.show = val;
+        }
+        /**
+         * 数据源的聚合参数
+         * @type {Cesium.EntityCluster}
+         */
+        get clustering() {
+            return this._entityCluster
+        }
+        set clustering(value) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$8(value)) {
+                throw new DeveloperError("value must be defined.");
+            }
+            //>>includeEnd('debug');
+            this._entityCluster = value;
+        }
+        /**
+         * 版权信息
+         * @type {Cesium.Credit}
+         */
+        get credit() {
+            return this._credit;
+        }
+        /** 
+         * 加载GeoJson数据
+         * @param {Cesium.Resource|String} data geojson文件路径或geojson字符串
+         * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+         * @returns {Promise<GeoJsonDataSource>}
+         */
+        load(data, options) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$8(data)) {
+                throw new CesiumProError$1("data is required.");
+            }
+            //>>includeEnd('debug');
+
+            DataSource$1.setLoading(this, true);
+            options = defaultValue$5(options, {});
+
+            // User specified credit
+            let credit = options.credit;
+            if (typeof credit === "string") {
+                credit = new Credit(credit);
+            }
+            this._credit = credit;
+
+            let promise = data;
+            let sourceUri = options.sourceUri;
+            if (typeof data === "string" || data instanceof Resource$3) {
+                data = Resource$3.createIfNeeded(data);
+                promise = data.fetchJson();
+                sourceUri = defaultValue$5(sourceUri, data.getUrlComponent());
+
+                // Add resource credits to our list of credits to display
+                const resourceCredits = this._resourceCredits;
+                const credits = data.credits;
+                if (defined$8(credits)) {
+                    const length = credits.length;
+                    for (const i = 0; i < length; i++) {
+                        resourceCredits.push(credits[i]);
+                    }
+                }
+            }
+
+            options = {
+                describe: defaultValue$5(options.describe, defaultDescribeProperty$1),
+                pointSize: defaultValue$5(options.pointSize, GeoJsonDataSource.pointSize),
+                pointColor: defaultValue$5(options.pointColor, GeoJsonDataSource.pointColor),
+                lineWidth: new ConstantProperty$1(
+                    defaultValue$5(options.lineWidth, GeoJsonDataSource.lineWidth)
+                ),
+                outlineColor: new ColorMaterialProperty$1(
+                    defaultValue$5(options.outlineColor, GeoJsonDataSource.outlineColor)
+                ),
+                lineColor: new ColorMaterialProperty$1(defaultValue$5(options.lineColor, GeoJsonDataSource.lineColor)),
+                outlineWidth: defaultValue$5(options.outlineWidth, GeoJsonDataSource.outlineWidth),
+                fill: new ColorMaterialProperty$1(
+                    defaultValue$5(options.fill, GeoJsonDataSource.fill)
+                ),
+                outline: defaultValue$5(options.outline, GeoJsonDataSource.outline),
+                clampToGround: defaultValue$5(options.clampToGround, GeoJsonDataSource.clampToGround),
+                extrudedHeight: options.extrudedHeight
+            };
+
+            const that = this;
+            return Promise.resolve(promise)
+                .then(function (geoJson) {
+                    return load$1(that, geoJson, options, sourceUri);
+                })
+                .catch(function (error) {
+                    DataSource$1.setLoading(that, false);
+                    that._error.raiseEvent(that, error);
+                    throw error;
+                });
+        };
+        update() {
+            return true;
+        }
+    }
+
+    /**
+     * 加载GeoJson数据
+     * @param {Cesium.Resource|String} data geojson文件路径或geojson字符串
+     * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+     * @returns {Promise<GeoJsonDataSource>}
+     */
+    GeoJsonDataSource.load = function (data, options) {
+        return new GeoJsonDataSource().load(data, options)
+    };
+
+    const exports$1 = {};
+    var array_cancel = function() {
+      this._array = null;
+      return Promise.resolve();
+    };
+
+    var array_read = function() {
+      var array = this._array;
+      this._array = null;
+      return Promise.resolve(array ? {done: false, value: array} : {done: true, value: undefined});
+    };
+
+    function array(array) {
+      return new ArraySource(array instanceof Uint8Array ? array : new Uint8Array(array));
+    }
+
+    function ArraySource(array) {
+      this._array = array;
+    }
+
+    ArraySource.prototype.read = array_read;
+    ArraySource.prototype.cancel = array_cancel;
+
+    var fetchPath = function(url) {
+      return fetch(url).then(function(response) {
+        return response.body && response.body.getReader
+            ? response.body.getReader()
+            : response.arrayBuffer().then(array);
+      });
+    };
+
+    var requestPath = function(url) {
+      return new Promise(function(resolve, reject) {
+        var request = new XMLHttpRequest;
+        request.responseType = "arraybuffer";
+        request.onload = function() { resolve(array(request.response)); };
+        request.onerror = reject;
+        request.ontimeout = reject;
+        request.open("GET", url, true);
+        request.send();
+      });
+    };
+
+    function path(path) {
+      return (typeof fetch === "function" ? fetchPath : requestPath)(path);
+    }
+
+    function stream(source) {
+      return typeof source.read === "function" ? source : source.getReader();
+    }
+
+    var empty = new Uint8Array(0);
+
+    var slice_cancel = function() {
+      return this._source.cancel();
+    };
+
+    function concat(a, b) {
+      if (!a.length) return b;
+      if (!b.length) return a;
+      var c = new Uint8Array(a.length + b.length);
+      c.set(a);
+      c.set(b, a.length);
+      return c;
+    }
+
+    var slice_read = function() {
+      var that = this, array = that._array.subarray(that._index);
+      return that._source.read().then(function(result) {
+        that._array = empty;
+        that._index = 0;
+        return result.done ? (array.length > 0
+            ? {done: false, value: array}
+            : {done: true, value: undefined})
+            : {done: false, value: concat(array, result.value)};
+      });
+    };
+
+    var slice_slice = function(length) {
+      if ((length |= 0) < 0) throw new Error("invalid length");
+      var that = this, index = this._array.length - this._index;
+
+      // If the request fits within the remaining buffer, resolve it immediately.
+      if (this._index + length <= this._array.length) {
+        return Promise.resolve(this._array.subarray(this._index, this._index += length));
+      }
+
+      // Otherwise, read chunks repeatedly until the request is fulfilled.
+      var array = new Uint8Array(length);
+      array.set(this._array.subarray(this._index));
+      return (function read() {
+        return that._source.read().then(function(result) {
+
+          // When done, it’s possible the request wasn’t fully fullfilled!
+          // If so, the pre-allocated array is too big and needs slicing.
+          if (result.done) {
+            that._array = empty;
+            that._index = 0;
+            return index > 0 ? array.subarray(0, index) : null;
+          }
+
+          // If this chunk fulfills the request, return the resulting array.
+          if (index + result.value.length >= length) {
+            that._array = result.value;
+            that._index = length - index;
+            array.set(result.value.subarray(0, length - index), index);
+            return array;
+          }
+
+          // Otherwise copy this chunk into the array, then read the next chunk.
+          array.set(result.value, index);
+          index += result.value.length;
+          return read();
+        });
+      })();
+    };
+
+    function slice(source) {
+      return typeof source.slice === "function" ? source :
+          new SliceSource(typeof source.read === "function" ? source
+              : source.getReader());
+    }
+
+    function SliceSource(source) {
+      this._source = source;
+      this._array = empty;
+      this._index = 0;
+    }
+
+    SliceSource.prototype.read = slice_read;
+    SliceSource.prototype.slice = slice_slice;
+    SliceSource.prototype.cancel = slice_cancel;
+
+    var dbf_cancel = function() {
+      return this._source.cancel();
+    };
+
+    var readBoolean = function(value) {
+      return /^[nf]$/i.test(value) ? false
+          : /^[yt]$/i.test(value) ? true
+          : null;
+    };
+
+    var readDate = function(value) {
+      return new Date(+value.substring(0, 4), value.substring(4, 6) - 1, +value.substring(6, 8));
+    };
+
+    var readNumber$1 = function(value) {
+      return !(value = value.trim()) || isNaN(value = +value) ? null : value;
+    };
+
+    var readString = function(value) {
+      return value.trim() || null;
+    };
+
+    var types$4 = {
+      B: readNumber$1,
+      C: readString,
+      D: readDate,
+      F: readNumber$1,
+      L: readBoolean,
+      M: readNumber$1,
+      N: readNumber$1
+    };
+
+    var dbf_read = function() {
+      var that = this, i = 1;
+      return that._source.slice(that._recordLength).then(function(value) {
+        return value && (value[0] !== 0x1a) ? {done: false, value: that._fields.reduce(function(p, f) {
+          p[f.name] = types$4[f.type](that._decode(value.subarray(i, i += f.length)));
+          return p;
+        }, {})} : {done: true, value: undefined};
+      });
+    };
+
+    var view = function(array) {
+      return new DataView(array.buffer, array.byteOffset, array.byteLength);
+    };
+
+    var dbf = function(source, decoder) {
+      source = slice(source);
+      return source.slice(32).then(function(array) {
+        var head = view(array);
+        return source.slice(head.getUint16(8, true) - 32).then(function(array) {
+          return new Dbf(source, decoder, head, view(array));
+        });
+      });
+    };
+
+    function Dbf(source, decoder, head, body) {
+      this._source = source;
+      this._decode = decoder.decode.bind(decoder);
+      this._recordLength = head.getUint16(10, true);
+      this._fields = [];
+      for (var n = 0; body.getUint8(n) !== 0x0d; n += 32) {
+        for (var j = 0; j < 11; ++j) if (body.getUint8(n + j) === 0) break;
+        this._fields.push({
+          name: this._decode(new Uint8Array(body.buffer, body.byteOffset + n, j)),
+          type: String.fromCharCode(body.getUint8(n + 11)),
+          length: body.getUint8(n + 16)
+        });
+      }
+    }
+
+    var prototype = Dbf.prototype;
+    prototype.read = dbf_read;
+    prototype.cancel = dbf_cancel;
+
+    function cancel() {
+      return this._source.cancel();
+    }
+
+    var parseMultiPoint = function(record) {
+      var i = 40, j, n = record.getInt32(36, true), coordinates = new Array(n);
+      for (j = 0; j < n; ++j, i += 16) coordinates[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
+      return {type: "MultiPoint", coordinates: coordinates};
+    };
+
+    var parseNull = function() {
+      return null;
+    };
+
+    var parsePoint = function(record) {
+      return {type: "Point", coordinates: [record.getFloat64(4, true), record.getFloat64(12, true)]};
+    };
+
+    var parsePolygon = function(record) {
+      var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m), polygons = [], holes = [];
+      for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
+      for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
+
+      parts.forEach(function(i, j) {
+        var ring = points.slice(i, parts[j + 1]);
+        if (ringClockwise(ring)) polygons.push([ring]);
+        else holes.push(ring);
+      });
+
+      holes.forEach(function(hole) {
+        polygons.some(function(polygon) {
+          if (ringContainsSome(polygon[0], hole)) {
+            polygon.push(hole);
+            return true;
+          }
+        }) || polygons.push([hole]);
+      });
+
+      return polygons.length === 1
+          ? {type: "Polygon", coordinates: polygons[0]}
+          : {type: "MultiPolygon", coordinates: polygons};
+    };
+
+    function ringClockwise(ring) {
+      if ((n = ring.length) < 4) return false;
+      var i = 0, n, area = ring[n - 1][1] * ring[0][0] - ring[n - 1][0] * ring[0][1];
+      while (++i < n) area += ring[i - 1][1] * ring[i][0] - ring[i - 1][0] * ring[i][1];
+      return area >= 0;
+    }
+
+    function ringContainsSome(ring, hole) {
+      var i = -1, n = hole.length, c;
+      while (++i < n) {
+        if (c = ringContains(ring, hole[i])) {
+          return c > 0;
+        }
+      }
+      return false;
+    }
+
+    function ringContains(ring, point) {
+      var x = point[0], y = point[1], contains = -1;
+      for (var i = 0, n = ring.length, j = n - 1; i < n; j = i++) {
+        var pi = ring[i], xi = pi[0], yi = pi[1],
+            pj = ring[j], xj = pj[0], yj = pj[1];
+        if (segmentContains(pi, pj, point)) {
+          return 0;
+        }
+        if (((yi > y) !== (yj > y)) && ((x < (xj - xi) * (y - yi) / (yj - yi) + xi))) {
+          contains = -contains;
+        }
+      }
+      return contains;
+    }
+
+    function segmentContains(p0, p1, p2) {
+      var x20 = p2[0] - p0[0], y20 = p2[1] - p0[1];
+      if (x20 === 0 && y20 === 0) return true;
+      var x10 = p1[0] - p0[0], y10 = p1[1] - p0[1];
+      if (x10 === 0 && y10 === 0) return false;
+      var t = (x20 * x10 + y20 * y10) / (x10 * x10 + y10 * y10);
+      return t < 0 || t > 1 ? false : t === 0 || t === 1 ? true : t * x10 === x20 && t * y10 === y20;
+    }
+
+    var parsePolyLine = function(record) {
+      var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m);
+      for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
+      for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
+      return n === 1
+          ? {type: "LineString", coordinates: points}
+          : {type: "MultiLineString", coordinates: parts.map(function(i, j) { return points.slice(i, parts[j + 1]); })};
+    };
+
+    var concat$1 = function(a, b) {
+      var ab = new Uint8Array(a.length + b.length);
+      ab.set(a, 0);
+      ab.set(b, a.length);
+      return ab;
+    };
+
+    var shp_read = function() {
+      var that = this;
+      ++that._index;
+      return that._source.slice(12).then(function(array) {
+        if (array == null) return {done: true, value: undefined};
+        var header = view(array);
+
+        // If the record starts with an invalid shape type (see #36), scan ahead in
+        // four-byte increments to find the next valid record, identified by the
+        // expected index, a non-empty content length and a valid shape type.
+        function skip() {
+          return that._source.slice(4).then(function(chunk) {
+            if (chunk == null) return {done: true, value: undefined};
+            header = view(array = concat$1(array.slice(4), chunk));
+            return header.getInt32(0, false) !== that._index ? skip() : read();
+          });
+        }
+
+        // All records should have at least four bytes (for the record shape type),
+        // so an invalid content length indicates corruption.
+        function read() {
+          var length = header.getInt32(4, false) * 2 - 4, type = header.getInt32(8, true);
+          return length < 0 || (type && type !== that._type) ? skip() : that._source.slice(length).then(function(chunk) {
+            return {done: false, value: type ? that._parse(view(concat$1(array.slice(8), chunk))) : null};
+          });
+        }
+
+        return read();
+      });
+    };
+
+    var parsers = {
+      0: parseNull,
+      1: parsePoint,
+      3: parsePolyLine,
+      5: parsePolygon,
+      8: parseMultiPoint,
+      11: parsePoint, // PointZ
+      13: parsePolyLine, // PolyLineZ
+      15: parsePolygon, // PolygonZ
+      18: parseMultiPoint, // MultiPointZ
+      21: parsePoint, // PointM
+      23: parsePolyLine, // PolyLineM
+      25: parsePolygon, // PolygonM
+      28: parseMultiPoint // MultiPointM
+    };
+
+    var shp = function(source) {
+      source = slice(source);
+      return source.slice(100).then(function(array) {
+        return new Shp(source, view(array));
+      });
+    };
+
+    function Shp(source, header) {
+      var type = header.getInt32(32, true);
+      if (!(type in parsers)) throw new Error("unsupported shape type: " + type);
+      this._source = source;
+      this._type = type;
+      this._index = 0;
+      this._parse = parsers[type];
+      this.bbox = [header.getFloat64(36, true), header.getFloat64(44, true), header.getFloat64(52, true), header.getFloat64(60, true)];
+    }
+
+    var prototype$2 = Shp.prototype;
+    prototype$2.read = shp_read;
+    prototype$2.cancel = cancel;
+
+    function noop() {}
+
+    var shapefile_cancel = function() {
+      return Promise.all([
+        this._dbf && this._dbf.cancel(),
+        this._shp.cancel()
+      ]).then(noop);
+    };
+
+    var shapefile_read = function() {
+      var that = this;
+      return Promise.all([
+        that._dbf ? that._dbf.read() : {value: {}},
+        that._shp.read()
+      ]).then(function(results) {
+        var dbf = results[0], shp = results[1];
+        return shp.done ? shp : {
+          done: false,
+          value: {
+            type: "Feature",
+            properties: dbf.value,
+            geometry: shp.value
+          }
+        };
+      });
+    };
+
+    var shapefile = function(shpSource, dbfSource, decoder) {
+      return Promise.all([
+        shp(shpSource),
+        dbfSource && dbf(dbfSource, decoder)
+      ]).then(function(sources) {
+        return new Shapefile(sources[0], sources[1]);
+      });
+    };
+
+    function Shapefile(shp$$1, dbf$$1) {
+      this._shp = shp$$1;
+      this._dbf = dbf$$1;
+      this.bbox = shp$$1.bbox;
+    }
+
+    var prototype$1 = Shapefile.prototype;
+    prototype$1.read = shapefile_read;
+    prototype$1.cancel = shapefile_cancel;
+
+    function open(shp$$1, dbf$$1, options) {
+      if (typeof dbf$$1 === "string") {
+        if (!/\.dbf$/.test(dbf$$1)) dbf$$1 += ".dbf";
+        dbf$$1 = path(dbf$$1);
+      } else if (dbf$$1 instanceof ArrayBuffer || dbf$$1 instanceof Uint8Array) {
+        dbf$$1 = array(dbf$$1);
+      } else if (dbf$$1 != null) {
+        dbf$$1 = stream(dbf$$1);
+      }
+      if (typeof shp$$1 === "string") {
+        if (!/\.shp$/.test(shp$$1)) shp$$1 += ".shp";
+        if (dbf$$1 === undefined) dbf$$1 = path(shp$$1.substring(0, shp$$1.length - 4) + ".dbf").catch(function() {});
+        shp$$1 = path(shp$$1);
+      } else if (shp$$1 instanceof ArrayBuffer || shp$$1 instanceof Uint8Array) {
+        shp$$1 = array(shp$$1);
+      } else {
+        shp$$1 = stream(shp$$1);
+      }
+      return Promise.all([shp$$1, dbf$$1]).then(function(sources) {
+        var shp$$1 = sources[0], dbf$$1 = sources[1], encoding = "windows-1252";
+        if (options && options.encoding != null) encoding = options.encoding;
+        return shapefile(shp$$1, dbf$$1, dbf$$1 && new TextDecoder(encoding));
+      });
+    }
+
+    function openShp(source, options) {
+      if (typeof source === "string") {
+        if (!/\.shp$/.test(source)) source += ".shp";
+        source = path(source);
+      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
+        source = array(source);
+      } else {
+        source = stream(source);
+      }
+      return Promise.resolve(source).then(shp);
+    }
+
+    function openDbf(source, options) {
+      var encoding = "windows-1252";
+      if (options && options.encoding != null) encoding = options.encoding;
+      encoding = new TextDecoder(encoding);
+      if (typeof source === "string") {
+        if (!/\.dbf$/.test(source)) source += ".dbf";
+        source = path(source);
+      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
+        source = array(source);
+      } else {
+        source = stream(source);
+      }
+      return Promise.resolve(source).then(function(source) {
+        return dbf(source, encoding);
+      });
+    }
+
+    function read(shp$$1, dbf$$1, options) {
+      return open(shp$$1, dbf$$1, options).then(function(source) {
+        var features = [], collection = {type: "FeatureCollection", features: features, bbox: source.bbox};
+        return source.read().then(function read(result) {
+          if (result.done) return collection;
+          features.push(result.value);
+          return source.read().then(read);
+        });
+      });
+    }
+
+    exports$1.open = open;
+    exports$1.openShp = openShp;
+    exports$1.openDbf = openDbf;
+    exports$1.read = read;
+
+    Object.defineProperty(exports$1, '__esModule', { value: true });
+
+    const {
+        defined: defined$7,
+        defaultValue: defaultValue$4,
+        ColorMaterialProperty,
+        ConstantPositionProperty,
+        ConstantProperty,
+        DataSource,
+        PolygonGraphics,
+        PolylineGraphics,
+        createGuid: createGuid$1,
+        Cartesian3: Cartesian3$9,
+        PointGraphics,
+        ArcType,
+        PolygonHierarchy: PolygonHierarchy$1,
+        Color: Color$k,
+        HeightReference: HeightReference$1,
+        Resource: Resource$2,
+    } = Cesium;
+    const sizes = {
+        small: 24,
+        medium: 48,
+        large: 64
+    };
+    const crsLinkHrefs = {};
+    const crsLinkTypes = {};
+    const crsNames = {
+        "urn:ogc:def:crs:OGC:1.3:CRS84": defaultCrsFunction,
+        "EPSG:4326": defaultCrsFunction,
+        "urn:ogc:def:crs:EPSG::4326": defaultCrsFunction,
+    };
+    const geoJsonObjectTypes = {
+        Feature: processFeature,
+        FeatureCollection: processFeatureCollection,
+        GeometryCollection: processGeometryCollection,
+        LineString: processLineString,
+        MultiLineString: processMultiLineString,
+        MultiPoint: processMultiPoint,
+        MultiPolygon: processMultiPolygon,
+        Point: processPoint,
+        Polygon: processPolygon,
+        Topology: processTopology
+    };
+    const geometryTypes = {
+        GeometryCollection: processGeometryCollection,
+        LineString: processLineString,
+        MultiLineString: processMultiLineString,
+        MultiPoint: processMultiPoint,
+        MultiPolygon: processMultiPolygon,
+        Point: processPoint,
+        Polygon: processPolygon,
+        Topology: processTopology
+    };
+    function coordinatesArrayToCartesianArray(coordinates, crsFunction) {
+        var positions = new Array(coordinates.length);
+        for (var i = 0; i < coordinates.length; i++) {
+            positions[i] = crsFunction(coordinates[i]);
+        }
+        return positions;
+    }
+    function createDescriptionCallback(describe, properties, nameProperty) {
+        var description;
+        return function (time, result) {
+            if (!defined$7(description)) {
+                description = describe(properties, nameProperty);
+            }
+            return description;
+        };
+    }
+    // GeoJSON processing functions
+    function createObject(geoJson, entityCollection, describe) {
+        var id = geoJson.id;
+        if (!defined$7(id) || geoJson.type !== 'Feature') {
+            id = createGuid$1();
+        } else {
+            var i = 2;
+            var finalId = id;
+            while (defined$7(entityCollection.getById(finalId))) {
+                finalId = id + '_' + i;
+                i++;
+            }
+            id = finalId;
+        }
+
+        var entity = entityCollection.getOrCreateEntity(id);
+        var properties = geoJson.properties;
+        if (defined$7(properties)) {
+            entity.properties = properties;
+
+            var nameProperty;
+
+            //Check for the simplestyle specified name first.
+            var name = properties.title;
+            if (defined$7(name)) {
+                entity.name = name;
+                nameProperty = 'title';
+            } else {
+                //Else, find the name by selecting an appropriate property.
+                //The name will be obtained based on this order:
+                //1) The first case-insensitive property with the name 'title',
+                //2) The first case-insensitive property with the name 'name',
+                //3) The first property containing the word 'title'.
+                //4) The first property containing the word 'name',
+                var namePropertyPrecedence = Number.MAX_VALUE;
+                for (var key in properties) {
+                    if (properties.hasOwnProperty(key) && properties[key]) {
+                        var lowerKey = key.toLowerCase();
+
+                        if (namePropertyPrecedence > 1 && lowerKey === 'title') {
+                            namePropertyPrecedence = 1;
+                            nameProperty = key;
+                            break;
+                        } else if (namePropertyPrecedence > 2 && lowerKey === 'name') {
+                            namePropertyPrecedence = 2;
+                            nameProperty = key;
+                        } else if (namePropertyPrecedence > 3 && /title/i.test(key)) {
+                            namePropertyPrecedence = 3;
+                            nameProperty = key;
+                        } else if (namePropertyPrecedence > 4 && /name/i.test(key)) {
+                            namePropertyPrecedence = 4;
+                            nameProperty = key;
+                        }
+                    }
+                }
+                if (defined$7(nameProperty)) {
+                    entity.name = properties[nameProperty];
+                }
+            }
+
+            var description = properties.description;
+            if (description !== null) {
+                entity.description = !defined$7(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
+            }
+        }
+        return entity;
+    }
+    function processFeature(dataSource, feature, notUsed, crsFunction, options) {
+        if (feature.geometry === null) {
+            //Null geometry is allowed, so just create an empty entity instance for it.
+            createObject(feature, dataSource._entityCollection, options.describe);
+            return;
+        }
+
+        if (!defined$7(feature.geometry)) {
+            throw new CesiumProError$1('feature.geometry is required.');
+        }
+
+        var geometryType = feature.geometry.type;
+        var geometryHandler = geometryTypes[geometryType];
+        if (!defined$7(geometryHandler)) {
+            throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
+        }
+        geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
+    }
+
+    function processFeatureCollection(dataSource, featureCollection, notUsed, crsFunction, options) {
+        var features = featureCollection.features;
+        for (var i = 0, len = features.length; i < len; i++) {
+            processFeature(dataSource, features[i], undefined, crsFunction, options);
+        }
+    }
+
+    function processGeometryCollection(dataSource, geoJson, geometryCollection, crsFunction, options) {
+        var geometries = geometryCollection.geometries;
+        for (var i = 0, len = geometries.length; i < len; i++) {
+            var geometry = geometries[i];
+            var geometryType = geometry.type;
+            var geometryHandler = geometryTypes[geometryType];
+            if (!defined$7(geometryHandler)) {
+                throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
+            }
+            geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
+        }
+    }
+
+    function createPoint(dataSource, geoJson, crsFunction, coordinates, options) {
+        let size = options.pointSize;
+        let color = options.pointColor;
+        const properties = geoJson.properties;
+        if (defined$7(properties)) {
+            const cssColor = properties['point-color'];
+            if (defined$7(cssColor)) {
+                color = Color$k.fromCssColorString(cssColor);
+            }
+
+            size = defaultValue$4(sizes[properties['point-size']], size);
+        }
+        const point = new PointGraphics();
+
+        // Clamp to ground if there isn't a height specified
+        if (coordinates.length === 2 && options.clampToGround) {
+            point.heightReference = HeightReference$1.CLAMP_TO_GROUND;
+        }
+
+        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
+        entity.point = point;
+        entity.point.color = color;
+        entity.point.pixelSize = size;
+        entity.position = new ConstantPositionProperty(crsFunction(coordinates));
+    }
+
+    function processPoint(dataSource, geoJson, geometry, crsFunction, options) {
+        createPoint(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiPoint(dataSource, geoJson, geometry, crsFunction, options) {
+        var coordinates = geometry.coordinates;
+        for (var i = 0; i < coordinates.length; i++) {
+            createPoint(dataSource, geoJson, crsFunction, coordinates[i], options);
+        }
+    }
+
+    function createLineString(dataSource, geoJson, crsFunction, coordinates, options) {
+        const material = options.lineColor;
+        const widthProperty = options.lineWidth;
+
+        const properties = geoJson.properties;
+        if (defined$7(properties)) {
+            const width = properties['stroke-width'];
+            if (defined$7(width)) {
+                widthProperty = new ConstantProperty(width);
+            }
+
+            let color;
+            let stroke = properties.stroke;
+            if (defined$7(stroke)) {
+                color = Color$k.fromCssColorString(stroke);
+            }
+            let opacity = properties['stroke-opacity'];
+            if (defined$7(opacity) && opacity !== 1.0) {
+                if (!defined$7(color)) {
+                    color = material.color.clone();
+                }
+                color.alpha = opacity;
+            }
+            if (defined$7(color)) {
+                material = new ColorMaterialProperty(color);
+            }
+        }
+
+        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
+        const polylineGraphics = new PolylineGraphics();
+        entity.polyline = polylineGraphics;
+
+        polylineGraphics.clampToGround = options.clampToGround;
+        polylineGraphics.material = material;
+        polylineGraphics.width = widthProperty;
+        polylineGraphics.positions = new ConstantProperty(coordinatesArrayToCartesianArray(coordinates, crsFunction));
+        polylineGraphics.arcType = ArcType.RHUMB;
+    }
+
+    function processLineString(dataSource, geoJson, geometry, crsFunction, options) {
+        createLineString(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiLineString(dataSource, geoJson, geometry, crsFunction, options) {
+        var lineStrings = geometry.coordinates;
+        for (var i = 0; i < lineStrings.length; i++) {
+            createLineString(dataSource, geoJson, crsFunction, lineStrings[i], options);
+        }
+    }
+
+    function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
+        if (coordinates.length === 0 || coordinates[0].length === 0) {
+            return;
+        }
+
+        let outlineColor = options.outlineColor.color;
+        let material = options.fill;
+        let outlineWidth = options.outlineWidth;
+
+        const properties = geoJson.properties;
+        if (defined$7(properties)) {
+            const width = properties['stroke-width'];
+            if (defined$7(width)) {
+                outlineWidth = new ConstantProperty(width);
+            }
+            let color;
+            const stroke = properties.stroke;
+            if (defined$7(stroke)) {
+                color = Color$k.fromCssColorString(stroke);
+            }
+            let opacity = properties['stroke-opacity'];
+            if (defined$7(opacity) && opacity !== 1.0) {
+                if (!defined$7(color)) {
+                    color = options.outlineColor.color.clone();
+                }
+                color.alpha = opacity;
+            }
+
+            if (defined$7(color)) {
+                outlineColor = new ConstantProperty(color);
+            }
+
+            let fillColor;
+            const fill = properties.fill;
+            if (defined$7(fill)) {
+                fillColor = Color$k.fromCssColorString(fill);
+                fillColor.alpha = material.color.alpha;
+            }
+            opacity = properties['fill-opacity'];
+            if (defined$7(opacity) && opacity !== material.color.alpha) {
+                if (!defined$7(fillColor)) {
+                    fillColor = material.color.clone();
+                }
+                fillColor.alpha = opacity;
+            }
+            if (defined$7(fillColor)) {
+                material = new ColorMaterialProperty(fillColor);
+            }
+        }
+
+        const polygon = new PolygonGraphics();
+        polygon.outline = new ConstantProperty(options.outline);
+        polygon.outlineColor = outlineColor;
+        polygon.outlineWidth = outlineWidth;
+        polygon.material = material;
+        polygon.arcType = ArcType.RHUMB;
+        const extrudedHeight = options.extrudedHeight;
+        if(extrudedHeight) {
+            if(typeof extrudedHeight === 'number') {
+                polygon.extrudedHeight = extrudedHeight;
+            } else if(typeof extrudedHeight === 'string') {
+                const conditions = extrudedHeight.match(/\$\{\s*.*?\s*\}/ig);
+                if(conditions) {
+                    let extrudeValue = extrudedHeight;
+                    for(let con of conditions) {
+                        const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
+                        if(!(defined$7(value) && defined$7(value[1]))) {
+                            continue;
+                        }
+                        extrudeValue = extrudeValue.replace(con, properties[value[1]]);
+                    }
+                    try {
+                        const height = window.eval(extrudeValue);
+                        if(typeof height === 'number') {
+                            polygon.extrudedHeight = height;
+                        }
+                    }catch(e) {
+
+                    }
+                }
+            }
+        }
+
+        const holes = [];
+        for (var i = 1, len = coordinates.length; i < len; i++) {
+            holes.push(new PolygonHierarchy$1(coordinatesArrayToCartesianArray(coordinates[i], crsFunction)));
+        }
+
+        const positions = coordinates[0];
+        polygon.hierarchy = new ConstantProperty(new PolygonHierarchy$1(coordinatesArrayToCartesianArray(positions, crsFunction), holes));
+        if (positions[0].length > 2) {
+            polygon.perPositionHeight = new ConstantProperty(true);
+        } else if (!options.clampToGround) {
+            polygon.height = 0;
+        }
+
+        const entity = createObject(geoJson, dataSource._entityCollection, options.describe);
+        entity.polygon = polygon;
+    }
+
+    function processPolygon(dataSource, geoJson, geometry, crsFunction, options) {
+        createPolygon(dataSource, geoJson, crsFunction, geometry.coordinates, options);
+    }
+
+    function processMultiPolygon(dataSource, geoJson, geometry, crsFunction, options) {
+        var polygons = geometry.coordinates;
+        for (var i = 0; i < polygons.length; i++) {
+            createPolygon(dataSource, geoJson, crsFunction, polygons[i], options);
+        }
+    }
+
+    function processTopology(dataSource, geoJson, geometry, crsFunction, options) {
+        for (var property in geometry.objects) {
+            if (geometry.objects.hasOwnProperty(property)) {
+                var feature = topojson.feature(geometry, geometry.objects[property]);
+                var typeHandler = geoJsonObjectTypes[feature.type];
+                typeHandler(dataSource, feature, feature, crsFunction, options);
+            }
+        }
+    }
+    function defaultDescribe(properties, nameProperty) {
+        var html = "";
+        for (var key in properties) {
+            if (properties.hasOwnProperty(key)) {
+                if (key === nameProperty || simpleStyleIdentifiers.indexOf(key) !== -1) {
+                    continue;
+                }
+                var value = properties[key];
+                if (defined$7(value)) {
+                    if (typeof value === "object") {
+                        html +=
+                            "<tr><th>" +
+                            key +
+                            "</th><td>" +
+                            defaultDescribe(value) +
+                            "</td></tr>";
+                    } else {
+                        html += "<tr><th>" + key + "</th><td>" + value + "</td></tr>";
+                    }
+                }
+            }
+        }
+
+        if (html.length > 0) {
+            html =
+                '<table class="cesium-infoBox-defaultTable"><tbody>' +
+                html +
+                "</tbody></table>";
+        }
+
+        return html;
+    }
+    const simpleStyleIdentifiers = [
+        "title",
+        "description", //
+        "marker-size",
+        "marker-symbol",
+        "marker-color",
+        "stroke", //
+        "stroke-opacity",
+        "stroke-width",
+        "fill",
+        "fill-opacity",
+    ];
+    function defaultDescribeProperty(properties, nameProperty) {
+        return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
+    }
+    function defaultCrsFunction(coordinates) {
+        return Cartesian3$9.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+    }
+    function load(that, geoJson, options, sourceUri) {
+        let name;
+        if (defined$7(sourceUri)) {
+            name = Cesium.getFilenameFromUri(sourceUri);
+        }
+
+        if (defined$7(name) && that._name !== name) {
+            that._name = name;
+            that._changed.raiseEvent(that);
+        }
+
+        const typeHandler = geoJsonObjectTypes[geoJson.type];
+        if (!defined$7(typeHandler)) {
+            throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
+        }
+
+        //Check for a Coordinate Reference System.
+        const crs = geoJson.crs;
+        let crsFunction = crs !== null ? defaultCrsFunction : null;
+
+        if (defined$7(crs)) {
+            if (!defined$7(crs.properties)) {
+                throw new CesiumProError$1('crs.properties is undefined.');
+            }
+
+            const properties = crs.properties;
+            if (crs.type === 'name') {
+                crsFunction = crsNames[properties.name];
+                if (!defined$7(crsFunction)) {
+                    throw new CesiumProError$1('Unknown crs name: ' + properties.name);
+                }
+            } else if (crs.type === 'link') {
+                var handler = crsLinkHrefs[properties.href];
+                if (!defined$7(handler)) {
+                    handler = crsLinkTypes[properties.type];
+                }
+
+                if (!defined$7(handler)) {
+                    throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
+                }
+
+                crsFunction = handler(properties);
+            } else if (crs.type === 'EPSG') {
+                crsFunction = crsNames['EPSG:' + properties.code];
+                if (!defined$7(crsFunction)) {
+                    throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
+                }
+            } else {
+                throw new CesiumProError$1('Unknown crs type: ' + crs.type);
+            }
+        }
+
+        return Promise.resolve(crsFunction).then(function (crsFunction) {
+            that._entityCollection.removeAll();
+
+            // null is a valid value for the crs, but means the entire load process becomes a no-op
+            // because we can't assume anything about the coordinates.
+            if (crsFunction !== null) {
+                typeHandler(that, geoJson, geoJson, crsFunction, options);
+            }
+
+            return Promise.all(that._promises).then(function () {
+                that._promises.length = 0;
+                DataSource.setLoading(that, false);
+                return that;
+            });
+        });
+    }
+    class ShapefileDataSource extends GeoJsonDataSource {
+        /**
+         * 创建一个ESRI Shapefile数据源
+         * @param {String} [name] 数据源名称
+         * @example
+         *  const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp')
+         *  const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp')
+         *  viewer.addLayer(province)
+         *  viewer.addLayer(city)
+         * @extends GeoJsonDataSource
+         */
+        constructor(name) {
+            super(name);
+            this._geoJson = undefined;
+        }
+
+        get geoJson() {
+            return this._geoJson;
+        }
+        set geoJson(v) {
+            if (this._geoJson) {
+                this._geoJson.features.push(v);
+            } else {
+                this._geoJson = {
+                    type: 'FeatureCollection',
+                    features: [v]
+                };
+            }
+        }
+        /**
+         * 点要素的默认大小
+         * @type {Number}
+         * @memberof ShapefileDataSource
+         * @default 5
+         */
+        static pointSize = 5;
+        /**
+         * 点要素的默认颜色
+         * @memberof ShapefileDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.ROYALBLUE
+         */
+        static pointColor = Color$k.ROYALBLUE;
+        /**
+         * 线要素的颜色
+         * @memberof ShapefileDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.YELLOW
+         */
+        static lineColor = Color$k.YELLOW;
+        /**
+         * 多边形要素的填充色
+         * @memberof ShapefileDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.fromBytes(255, 255, 0, 100)
+         */
+        static fill = Color$k.fromBytes(255, 255, 0, 100);
+        /**
+         * 多边形要素是否显边框
+         * @memberof ShapefileDataSource
+         * @type {Boolean}
+         * @default true
+         */
+        static outline = true;
+        /**
+         * 多边形要素边框的颜色
+         * @memberof ShapefileDataSource
+         * @type {Cesium.Color}
+         * @default Cesium.Color.YELLOW
+         */
+        static outlineColor = Color$k.YELLOW;
+        /**
+         * 线要素的宽度
+         * @memberof ShapefileDataSource
+         * @type {Number}
+         * @default 2
+         */
+        static lineWidth = 2;
+        /**
+         * 是否贴地
+         * @type {Boolean}
+         * @memberof ShapefileDataSource
+         * @default false
+         */
+        static clampToGround = false;
+        /**
+         * 多边形要素的边框宽度，该属性在windows环境下可能不生效
+         * @memberof ShapefileDataSource
+         * @type {Number}
+         * @default 1
+         */
+        static outlineWidth = 1;
+        static crsNames() {
+            return crsNames;
+        }
+        static crsLinkHrefs() {
+            return crsLinkHrefs;
+        }
+        static crsLinkTypes() {
+            return crsLinkTypes;
+        }
+        /**
+          * 加载Shapefile数据
+          * @param {String} data shapefile文件路径
+          * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+          * @returns {Promise<ShapefileDataSource>}
+         */
+        load(data, options = { encoding: 'utf-8' }) {
+            if (!defined$7(data)) {
+                throw new CesiumProError$1('data is required.');
+            }
+
+            Cesium.DataSource.setLoading(this, true);
+
+            const credit = options.credit;
+            if (typeof credit === 'string') {
+                credit = new Cesium.Credit(credit);
+            }
+            this._credit = credit;
+            const that = this;
+
+            let promise = data;
+            let sourceUri = options.sourceUri;
+            if (typeof data === 'string' || (data instanceof Resource$2)) {
+                promise = new Promise((resolve, reject) => {
+                    exports$1.open(data, undefined, { encoding: options.encoding })
+                        .then(source =>
+                            source.read().then(function load(result) {
+                                if (result.done) {
+                                    resolve(that.geoJson);
+                                    return
+                                }                            that.geoJson = result.value;
+                                return source.read().then(load);
+                            })
+                        )
+                        .catch(error => reject(error.stack));
+                });
+                sourceUri = defaultValue$4(sourceUri, '');
+
+                // Add resource credits to our list of credits to display
+                var resourceCredits = this._resourceCredits;
+                var credits = data.credits;
+                if (defined$7(credits)) {
+                    var length = credits.length;
+                    for (var i = 0; i < length; i++) {
+                        resourceCredits.push(credits[i]);
+                    }
+                }
+            }
+
+            options = {
+                describe: defaultValue$4(options.describe, defaultDescribeProperty),
+                pointSize: defaultValue$4(options.pointSize, ShapefileDataSource.pointSize),
+                pointColor: defaultValue$4(options.pointColor, ShapefileDataSource.pointColor),
+                lineWidth: new ConstantProperty(
+                    defaultValue$4(options.lineWidth, ShapefileDataSource.lineWidth)
+                ),
+                outlineColor: new ColorMaterialProperty(
+                    defaultValue$4(options.outlineColor, ShapefileDataSource.outlineColor)
+                ),
+                lineColor: new ColorMaterialProperty(defaultValue$4(options.lineColor, ShapefileDataSource.lineColor)),
+                outlineWidth: defaultValue$4(options.outlineWidth, ShapefileDataSource.outlineWidth),
+                fill: new ColorMaterialProperty(
+                    defaultValue$4(options.fill, ShapefileDataSource.fill)
+                ),
+                outline: defaultValue$4(options.outline, ShapefileDataSource.outline),
+                clampToGround: defaultValue$4(options.clampToGround, ShapefileDataSource.clampToGround),
+                extrudedHeight: options.extrudedHeight
+            };
+            return Promise.resolve(promise)
+            .then(function (geoJson) {
+                return load(that, geoJson, options, sourceUri);
+            })
+            .catch(function (error) {
+                DataSource.setLoading(that, false);
+                that._error.raiseEvent(that, error);
+                throw error;
+            });
+        }
+
+
+    }
+    /**
+     * 加载Shapefile数据
+     * @param {String} data shapefile文件路径
+     * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+     * @returns {Promise<ShapefileDataSource>}
+     */
+    ShapefileDataSource.load = function (data, options) {
+        return new ShapefileDataSource().load(data, options)
+    };
+
+    const {
+        buildModuleUrl: buildModuleUrl$1,
+        Color: Color$j,
+        defined: defined$6,
+        destroyObject: destroyObject$4,
+        knockout,
+        getElement,
+        subscribeAndEvaluate,
+        InfoBoxViewModel
+    } = Cesium;
+    class InfoBox {
+        /**
+         * 用于显示查询信息的小部件
+         * @param {*} container 
+         */
+        constructor(container) {
+            container = getElement(container);
+
+            var infoElement = document.createElement("div");
+            infoElement.className = "cesium-infoBox";
+            infoElement.setAttribute(
+                "data-bind",
+                '\
+      css: { "cesium-infoBox-visible" : showInfo, "cesium-infoBox-bodyless" : _bodyless }'
+            );
+            container.appendChild(infoElement);
+
+            var titleElement = document.createElement("div");
+            titleElement.className = "cesium-infoBox-title";
+            titleElement.setAttribute("data-bind", "text: titleText");
+            infoElement.appendChild(titleElement);
+
+            var closeElement = document.createElement("button");
+            closeElement.type = "button";
+            closeElement.className = "cesium-infoBox-close";
+            closeElement.setAttribute(
+                "data-bind",
+                "\
+      click: function () { closeClicked.raiseEvent(this); }"
+            );
+            closeElement.innerHTML = "&times;";
+            infoElement.appendChild(closeElement);
+
+            var frame = document.createElement("iframe");
+            frame.className = "cesium-infoBox-iframe";
+            frame.setAttribute("sandbox", "allow-same-origin allow-popups allow-forms"); //allow-pointer-lock allow-scripts allow-top-navigation
+            frame.setAttribute(
+                "data-bind",
+                "style : { maxHeight : maxHeightOffset(40) }"
+            );
+            frame.setAttribute("allowfullscreen", true);
+            infoElement.appendChild(frame);
+
+            var viewModel = new InfoBoxViewModel();
+            knockout.applyBindings(viewModel, infoElement);
+
+            this._container = container;
+            this._element = infoElement;
+            this._frame = frame;
+            this._viewModel = viewModel;
+            this._descriptionSubscription = undefined;
+
+            var that = this;
+            //We can't actually add anything into the frame until the load event is fired
+            frame.addEventListener("load", function () {
+                var frameDocument = frame.contentDocument;
+
+                //We inject default css into the content iframe,
+                //end users can remove it or add their own via the exposed frame property.
+                var cssLink = frameDocument.createElement("link");
+                cssLink.href = buildModuleUrl$1("Widgets/InfoBox/InfoBoxDescription.css");
+                cssLink.rel = "stylesheet";
+                cssLink.type = "text/css";
+
+                //div to use for description content.
+                var frameContent = frameDocument.createElement("div");
+                frameContent.className = "cesium-infoBox-description";
+
+                frameDocument.head.appendChild(cssLink);
+                frameDocument.body.appendChild(frameContent);
+
+                //We manually subscribe to the description event rather than through a binding for two reasons.
+                //1. It's an easy way to ensure order of operation so that we can adjust the height.
+                //2. Knockout does not bind to elements inside of an iFrame, so we would have to apply a second binding
+                //   model anyway.
+                that._descriptionSubscription = subscribeAndEvaluate(
+                    viewModel,
+                    "description",
+                    function (value) {
+                        // Set the frame to small height, force vertical scroll bar to appear, and text to wrap accordingly.
+                        frame.style.height = "5px";
+                        frameContent.innerHTML = value;
+
+                        //If the snippet is a single element, then use its background
+                        //color for the body of the InfoBox. This makes the padding match
+                        //the content and produces much nicer results.
+                        var background = null;
+                        var firstElementChild = frameContent.firstElementChild;
+                        if (
+                            firstElementChild !== null &&
+                            frameContent.childNodes.length === 1
+                        ) {
+                            var style = window.getComputedStyle(firstElementChild);
+                            if (style !== null) {
+                                var backgroundColor = style["background-color"];
+                                var color = Color$j.fromCssColorString(backgroundColor);
+                                if (defined$6(color) && color.alpha !== 0) {
+                                    background = style["background-color"];
+                                }
+                            }
+                        }
+                        infoElement.style["background-color"] = background;
+
+                        // Measure and set the new custom height, based on text wrapped above.
+                        var height = frameContent.getBoundingClientRect().height;
+                        frame.style.height = height + "px";
+                    }
+                );
+            });
+
+            //Chrome does not send the load event unless we explicitly set a src
+            frame.setAttribute("src", "about:blank");
+        }
+        get container() {
+            return this._container;
+        }
+        get viewModel() {
+            return this._viewModel;
+        }
+        get frame() {
+            return this._frame;
+        }
+        isDestroyed() {
+            return false;
+        }
+        destroy() {
+            var container = this._container;
+            knockout.cleanNode(this._element);
+            container.removeChild(this._element);
+        
+            if (defined$6(this._descriptionSubscription)) {
+                this._descriptionSubscription.dispose();
+            }
+        
+            return destroyObject$4(this);
+        };
     }
 
     function adjustLocation(tileset, transform, position, rotationZ) {
@@ -18330,16 +20110,16 @@
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(options.objects)) {
+            if (!defined$b(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
                 throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
-            this._id = defaultValue$7(options.id, createGuid$3());
-            this._maxClusterLevel = defaultValue$7(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$7(options.minLoadLevel, 12);
+            this._id = defaultValue$9(options.id, createGuid$3());
+            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
             this._objects = undefined;
         }
         /**
@@ -18560,7 +20340,7 @@
                 tile.level,
                 request
             );
-            if (defined$a(requestPromise)) {
+            if (defined$b(requestPromise)) {
                 surfaceTile.terrainState = TerrainState.RECEIVING;
                 Promise.resolve(requestPromise)
                     .then(function (terrainData) {
@@ -18602,7 +20382,7 @@
         const terrainData = surfaceTile.terrainData;
         const meshPromise = terrainData.createMesh(createMeshOptions);
 
-        if (!defined$a(meshPromise)) {
+        if (!defined$b(meshPromise)) {
             // Postponed.
             return;
         }
@@ -18639,13 +20419,13 @@
     function getObjectByTile(objects, tile) {
         const tileObject = [];
         for (let object of objects) {
-            if (!defined$a(object)) {
+            if (!defined$b(object)) {
                 continue;
             }
-            if (!defined$a(object.id)) {
+            if (!defined$b(object.id)) {
                 object.id = createGuid$3();
             }
-            if (!(defined$a(object) && defined$a(object.position))) {
+            if (!(defined$b(object) && defined$b(object.position))) {
                 continue;
             }
             if (object.position instanceof Cartesian3$8) {
@@ -18691,7 +20471,7 @@
         }
         static initialize(tile, terrainProvider) {
             let surfaceTile = tile.data;
-            if (!defined$a(surfaceTile)) {
+            if (!defined$b(surfaceTile)) {
                 surfaceTile = tile.data = new QuadTile();
             }
 
@@ -18781,7 +20561,7 @@
             return this._quadtree;
         }
         set quadtree(val) {
-            if (defined$a(val)) {
+            if (defined$b(val)) {
                 this._quadtree = val;
             }
         }
@@ -18812,7 +20592,7 @@
          */
         showTileThisFrame(tile, framestate) {
             const surfaceData = tile.data;
-            if (!defined$a(surfaceData)) {
+            if (!defined$b(surfaceData)) {
                 return;
             }
             if (!this._tilesCahced.includes(tile)) {
@@ -18821,7 +20601,7 @@
             const layers = this._layers.values;
             getTimestamp();
             for (let layer of layers) {
-                if (!(defined$a(layer.objects) && Array.isArray(layer.objects))) {
+                if (!(defined$b(layer.objects) && Array.isArray(layer.objects))) {
                     continue;
                 }
                 // if(getTimestamp() < time + loadQueueTimeSlice) {
@@ -18833,7 +20613,7 @@
                     return;
                 }
                 let tileObjects = surfaceData._objectsOfTile.get(id);
-                if (!defined$a(tileObjects) || layer._needReclass) {
+                if (!defined$b(tileObjects) || layer._needReclass) {
                     tileObjects = getObjectByTile(layer.objects, tile);
                     surfaceData._objectsOfTile.set(id, tileObjects);
                 }
@@ -18905,7 +20685,7 @@
             return GlobeSurfaceTileProvider$1.prototype.canRefine.call(this, tile);
         }
         computeTileVisibility(tile, frameState, occluders) {
-            if (!defined$a(tile.data)) {
+            if (!defined$b(tile.data)) {
                 tile.data = new QuadTile();
             }
             return GlobeSurfaceTileProvider$1.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
@@ -19624,7 +21404,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 #endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
 ";
 
-    const { BoundingSphere: BoundingSphere$6, buildModuleUrl, Cartesian3: Cartesian3$7, Cartographic: Cartographic$3, Color: Color$h, defaultValue: defaultValue$3, defined: defined$5, destroyObject: destroyObject$3, DeveloperError: DeveloperError$2, Ellipsoid, EllipsoidTerrainProvider, Event: Event$5, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$3, Texture: Texture$1, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
+    const { BoundingSphere: BoundingSphere$6, buildModuleUrl, Cartesian3: Cartesian3$7, Cartographic: Cartographic$3, Color: Color$i, defaultValue: defaultValue$3, defined: defined$5, destroyObject: destroyObject$3, DeveloperError: DeveloperError$2, Ellipsoid, EllipsoidTerrainProvider, Event: Event$5, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$3, Texture: Texture$1, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
     const GlobeVS = Cesium._shadersGlobeVS;
     // const GlobeFS = Cesium._shadersGlobeFS;
     const AtmosphereCommon = Cesium._shadersAtmosphereCommon;
@@ -19664,7 +21444,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       this._terrainProvider = terrainProvider;
       this._terrainProviderChanged = new Event$5();
 
-      this._undergroundColor = Color$h.clone(Color$h.BLACK);
+      this._undergroundColor = Color$i.clone(Color$i.BLACK);
       this._undergroundColorAlphaByDistance = new NearFarScalar(
         ellipsoid.maximumRadius / 1000.0,
         0.0,
@@ -20179,7 +21959,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           return this._undergroundColor;
         },
         set: function (value) {
-          this._undergroundColor = Color$h.clone(value, this._undergroundColor);
+          this._undergroundColor = Color$i.clone(value, this._undergroundColor);
         },
       },
 
@@ -21195,7 +22975,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         Cesium3DTilePassState,
         Cesium3DTilePass,
         defaultValue: defaultValue$2,
-        Color: Color$g,
+        Color: Color$h,
         BoundingRectangle: BoundingRectangle$1,
         Pass: Pass$2,
         SunLight,
@@ -21335,9 +23115,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.passes.postProcess = scene.postProcessStages.hasSelected;
         frameState.tilesetPassState = renderTilesetPassState;
 
-        var backgroundColor = defaultValue$2(scene.backgroundColor, Color$g.BLACK);
+        var backgroundColor = defaultValue$2(scene.backgroundColor, Color$h.BLACK);
         if (scene._hdr) {
-            backgroundColor = Color$g.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor = Color$h.clone(backgroundColor, scratchBackgroundColor);
             backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
             backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
             backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
@@ -21795,10 +23575,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._url = options.url;
             this._typeName = options.typeName;
             this._style = options.style;
-            if (!defined$a(this._url)) {
+            if (!defined$b(this._url)) {
                 throw new CesiumProError$1('parameter url must be provided.')
             }
-            if (!defined$a(this._typeName)) {
+            if (!defined$b(this._typeName)) {
                 throw new CesiumProError$1('parameter typeName must be provided.')
             }
             const resource = new Resource({
@@ -21836,39 +23616,39 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         CustomDataSource: CustomDataSource$1,
-        Color: Color$f,
+        Color: Color$g,
         HeightReference,
         HorizontalOrigin,
-        VerticalOrigin
+        VerticalOrigin: VerticalOrigin$1
     } = Cesium;
 
     class DefaultDataSource {
         constructor(viewer, options = {}) {
             this.viewer = viewer;
-            this.pointStyle = defaultValue$7(options.point, {
-                color: Color$f.RED,
+            this.pointStyle = defaultValue$9(options.point, {
+                color: Color$g.RED,
                 pixelSize: 10,
-                outlineColor: Color$f.WHITE,
+                outlineColor: Color$g.WHITE,
                 outlineWidth: 4,
             });
-            this.lineStyle = defaultValue$7(options.polyline, {
+            this.lineStyle = defaultValue$9(options.polyline, {
                 width: 5,
-                material: Color$f.GOLD.withAlpha(0.5),
+                material: Color$g.GOLD.withAlpha(0.5),
                 clampToGround: true,
             });
-            this.labelStyle = defaultValue$7(options.label, {
-                fillColor: Color$f.WHITE,
+            this.labelStyle = defaultValue$9(options.label, {
+                fillColor: Color$g.WHITE,
                 showBackground: true,
                 horizontalOrigin: HorizontalOrigin.LEFT,
-                verticalOrigin: VerticalOrigin.TOP,
+                verticalOrigin: VerticalOrigin$1.TOP,
                 showBackground: true,
-                backgroundColor: Color$f.BLACK.withAlpha(0.5),
-                fillColor: Color$f.WHITE,
+                backgroundColor: Color$g.BLACK.withAlpha(0.5),
+                fillColor: Color$g.WHITE,
                 font: '40px sans-serif',
                 scale: 0.5
             });
-            this.polygonStyle = defaultValue$7(options.polygon, {
-                material: Color$f.GOLD.withAlpha(0.6),
+            this.polygonStyle = defaultValue$9(options.polygon, {
+                material: Color$g.GOLD.withAlpha(0.6),
             });
             this.ds = new CustomDataSource$1('cesiumpro-default');
             viewer.dataSources.add(this.ds);
@@ -21976,10 +23756,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     let fpsCount = 0, msCount = 0;
     let fps = 'N/A', ms = 'N/A';
     function updateFps() {
-        if (!defined$a(lastFpsTime)) {
+        if (!defined$b(lastFpsTime)) {
             lastFpsTime = Cesium.getTimestamp();
         }
-        if (!defined$a(lastMsTime)) {
+        if (!defined$b(lastMsTime)) {
             lastMsTime = Cesium.getTimestamp();
         }
         fpsCount++;
@@ -22017,7 +23797,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(
             viewer.clock.currentTime
         );
-        if (defined$a(icrfToFixed)) {
+        if (defined$b(icrfToFixed)) {
             const camera = viewer.camera;
             const offset = Cesium.Cartesian3.clone(camera.position);
             const transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
@@ -22053,9 +23833,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const {
             camera
         } = viewer;
-        const step1 = defaultValue$7(options.step1Duration, 3);
-        const step2 = defaultValue$7(options.step2Duration, 3);
-        const step3 = defaultValue$7(options.step3Duration, 3);
+        const step1 = defaultValue$9(options.step1Duration, 3);
+        const step2 = defaultValue$9(options.step2Duration, 3);
+        const step3 = defaultValue$9(options.step3Duration, 3);
 
         const cartographic = options.destination;
         // 第一步改变位置
@@ -22251,6 +24031,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @param {Number} [options.maximumRenderTimeChange=0.0] 如果requestRenderMode为 true，则此值定义在请求渲染之前允许的模拟时间的最大更改。即模拟时间超maximumRenderTimeChange，将自动调用{@link Cesium.Scene#requestRender}
          */
         constructor(container, options = {}) {
+            overrideCesium();
             //>>includeStart('debug', pragmas.debug);
             options = options || {};
             //>>includeEnd('debug')
@@ -22340,13 +24121,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @type {Boolean}
          */
         get enableLighting() {
-            if (!defined$a(this.globe)) {
+            if (!defined$b(this.globe)) {
                 return;
             }
             return this.scene.globe.enableLighting
         }
         set enableLighting(val) {
-            if (!defined$a(this.globe)) {
+            if (!defined$b(this.globe)) {
                 return;
             }
             this.scene.globe.enableLighting = val;
@@ -22444,7 +24225,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             return this.terrainProvider;
         }
         set terrain(value) {
-            if (!defined$a(value) || value === false) {
+            if (!defined$b(value) || value === false) {
                 this.terrainProvider = new Cesium.EllipsoidTerrainProvider();
             }
             if (value !== this.terrainProvider) {
@@ -22619,7 +24400,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * cancelLink();
          */
         linkView(viewer) {
-            if (!defined$a(viewer)) {
+            if (!defined$b(viewer)) {
                 throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
@@ -22658,7 +24439,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                     resolve(value);
                   };
                 });
-                const radius = defaultValue$7(options.radius, 1000);
+                const radius = defaultValue$9(options.radius, 1000);
                 delete options.radius;
                 const boundingSphere = new Cesium.BoundingSphere(target, radius);
                 flyTo(this, boundingSphere, options);
@@ -22705,12 +24486,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 //>>includeStart('debug', pragmas.debug);
                 throw new CesiumProError$1('point不是一个有效值。')
             }
-            const multiplier = defaultValue$7(options.multiplier, 1);
-            const offset = defaultValue$7(options.offset, {});
+            const multiplier = defaultValue$9(options.multiplier, 1);
+            const offset = defaultValue$9(options.offset, {});
             function rotate() {
-                const heading = Cesium.Math.toRadians(defaultValue$7(offset.heading, viewer.heading) + 1 * multiplier);
-                const pitch = Cesium.Math.toRadians(defaultValue$7(offset.pitch, -20));
-                const range = defaultValue$7(offset.range, 10000);
+                const heading = Cesium.Math.toRadians(defaultValue$9(offset.heading, viewer.heading) + 1 * multiplier);
+                const pitch = Cesium.Math.toRadians(defaultValue$9(offset.pitch, -20));
+                const range = defaultValue$9(offset.range, 10000);
                 viewer.flyTo(target, {
                     duration: 0,
                     offset: new Cesium.HeadingPitchRange(heading, pitch, range)
@@ -22873,17 +24654,15 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
 
     }
-    // 生写Cesium中的部分函数
-    overrideCesium();
 
     const {
-        Color: Color$e,
+        Color: Color$f,
         MaterialAppearance: MaterialAppearance$5,
         CircleGeometry: CircleGeometry$1,
         GroundPrimitive: GroundPrimitive$1,
         Primitive: Primitive$2,
         GeometryInstance: GeometryInstance$2,
-        Material: Material$e
+        Material: Material$f
     } = Cesium;
     class PointBaseGraphic extends Graphic {
         /**
@@ -22892,7 +24671,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @param {PointBaseGraphic.ConstructorOptions} options 描述一个几何要素的属性信息
          */
         constructor(options) {
-            if (!defined$a(options)) {
+            if (!defined$b(options)) {
                 throw new CesiumProError$1("options must be provided.")
             }
             if (LonLat.isValid(options.position) === false) {
@@ -22902,16 +24681,16 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 throw new CesiumProError$1("options.radius parameter must be a number greater than 0.");
             }
             super(options);
-            this._color = defaultValue$7(options.color, Color$e.WHITE);
+            this._color = defaultValue$9(options.color, Color$f.WHITE);
             if (typeof this._color === 'string') {
-                this._color = Color$e.fromCssColorString(this._color);
+                this._color = Color$f.fromCssColorString(this._color);
             }
             this._position = options.position;
             this._radius = options.radius;
-            this._stRotation = Cesium.Math.toRadians(defaultValue$7(options.stRotation, 0));
-            this._height = defaultValue$7(options.height, 0);
-            this._extrudedHeight = defaultValue$7(options.extrudedHeight, 0);
-            this._asynchronous = defaultValue$7(options.asynchronous, true);
+            this._stRotation = Cesium.Math.toRadians(defaultValue$9(options.stRotation, 0));
+            this._height = defaultValue$9(options.height, 0);
+            this._extrudedHeight = defaultValue$9(options.extrudedHeight, 0);
+            this._asynchronous = defaultValue$9(options.asynchronous, true);
         }
         /**
          * @private
@@ -22979,11 +24758,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @returns 外观
          */
         createAppearance() {
-            if (defined$a(this._appearance)) {
+            if (defined$b(this._appearance)) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$5({
-                material: Material$e.fromType('Color', {
+                material: Material$f.fromType('Color', {
                     color: this._color
                 })
             });
@@ -23045,7 +24824,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * graphic.color = '#FF0000'
          */
         get color() {
-            if (!defined$a(this._color)) {
+            if (!defined$b(this._color)) {
                 return;
             }
             return this._color.toCssColorString();
@@ -23088,7 +24867,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._viewer.camera.flyToBoundingSphere(boundingSphere, options);
         }
         get boundingSphere() {
-            return new Cesium.BoundingSphere(LonLat.toCartesian(_.position, 1000))
+            return new Cesium.BoundingSphere(LonLat.toCartesian(this.position, this.radius || 1000))
         }
     }
 
@@ -23120,7 +24899,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         MaterialAppearance: MaterialAppearance$4,
-        Material: Material$d
+        Material: Material$e
     } = Cesium;
     class CircleScanGraphic extends PointBaseGraphic {
         /**
@@ -23141,7 +24920,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$7(options.speed, 10);
+            this._speed = defaultValue$9(options.speed, 10);
             this._time = 0;
             this.createGraphic();
         }
@@ -23168,7 +24947,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$4({
-                material: new Material$d({
+                material: new Material$e({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -23204,7 +24983,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
 
-    const shader$i = `
+    const shader$j = `
 float circle(vec2 uv, float r, float blur) {
     float d = length(uv) * 2.0;
     float c = smoothstep(r+blur, r, d);
@@ -23235,7 +25014,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         MaterialAppearance: MaterialAppearance$3,
-        Material: Material$c
+        Material: Material$d
     } = Cesium;
     class CircleSpreadGraphic extends PointBaseGraphic {
         /**
@@ -23256,7 +25035,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$7(options.speed, 10);
+            this._speed = defaultValue$9(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -23283,14 +25062,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$3({
-                material: new Material$c({
+                material: new Material$d({
                     translucent: true,
                     fabric: {
                         uniforms: {
                             color: this._color,
                             time: 0.0,
                         },
-                        source: shader$i
+                        source: shader$j
                     },
                 })
             });
@@ -23436,13 +25215,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
 
         var length = array.length >>> 0;
-        var relativeStart = defaultValue$7(start, 0);
+        var relativeStart = defaultValue$9(start, 0);
         // If negative, find wrap around position
         var k =
             relativeStart < 0
                 ? Math.max(length + relativeStart, 0)
                 : Math.min(relativeStart, length);
-        var relativeEnd = defaultValue$7(end, length);
+        var relativeEnd = defaultValue$9(end, length);
         // If negative, find wrap around position
         var last =
             relativeEnd < 0
@@ -23533,22 +25312,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
      */
     function CylinderGeometry$1(options) {
-        options = defaultValue$7(options, defaultValue$7.EMPTY_OBJECT);
+        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
 
         var length = options.length;
         var topRadius = options.topRadius;
         var bottomRadius = options.bottomRadius;
-        var vertexFormat = defaultValue$7(options.vertexFormat, VertexFormat$2.DEFAULT);
-        var slices = defaultValue$7(options.slices, 128);
+        var vertexFormat = defaultValue$9(options.vertexFormat, VertexFormat$2.DEFAULT);
+        var slices = defaultValue$9(options.slices, 128);
 
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$a(length)) {
+        if (!defined$b(length)) {
             throw new CesiumProError$1("options.length must be defined.");
         }
-        if (!defined$a(topRadius)) {
+        if (!defined$b(topRadius)) {
             throw new CesiumProError$1("options.topRadius must be defined.");
         }
-        if (!defined$a(bottomRadius)) {
+        if (!defined$b(bottomRadius)) {
             throw new CesiumProError$1("options.bottomRadius must be defined.");
         }
         if (slices < 3) {
@@ -23557,7 +25336,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             );
         }
         if (
-            defined$a(options.offsetAttribute) &&
+            defined$b(options.offsetAttribute) &&
             options.offsetAttribute === GeometryOffsetAttribute.TOP
         ) {
             throw new CesiumProError$1(
@@ -23592,15 +25371,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.pack = function (value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$a(value)) {
+        if (!defined$b(value)) {
             throw new CesiumProError$1("value is required");
         }
-        if (!defined$a(array)) {
+        if (!defined$b(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$7(startingIndex, 0);
+        startingIndex = defaultValue$9(startingIndex, 0);
 
         VertexFormat$2.pack(value._vertexFormat, array, startingIndex);
         startingIndex += VertexFormat$2.packedLength;
@@ -23609,7 +25388,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         array[startingIndex++] = value._topRadius;
         array[startingIndex++] = value._bottomRadius;
         array[startingIndex++] = value._slices;
-        array[startingIndex] = defaultValue$7(value._offsetAttribute, -1);
+        array[startingIndex] = defaultValue$9(value._offsetAttribute, -1);
 
         return array;
     };
@@ -23634,12 +25413,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.unpack = function (array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$a(array)) {
+        if (!defined$b(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$7(startingIndex, 0);
+        startingIndex = defaultValue$9(startingIndex, 0);
 
         var vertexFormat = VertexFormat$2.unpack(
             array,
@@ -23654,7 +25433,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var slices = array[startingIndex++];
         var offsetAttribute = array[startingIndex];
 
-        if (!defined$a(result)) {
+        if (!defined$b(result)) {
             scratchOptions.length = length;
             scratchOptions.topRadius = topRadius;
             scratchOptions.bottomRadius = bottomRadius;
@@ -23879,7 +25658,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             Cartesian2$2.magnitude(radiusScratch)
         );
 
-        if (defined$a(cylinderGeometry._offsetAttribute)) {
+        if (defined$b(cylinderGeometry._offsetAttribute)) {
             length = positions.length;
             var applyOffset = new Uint8Array(length / 3);
             var offsetValue =
@@ -23912,7 +25691,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * @private
      */
     CylinderGeometry$1.getUnitCylinder = function () {
-        if (!defined$a(unitCylinderGeometry)) {
+        if (!defined$b(unitCylinderGeometry)) {
             unitCylinderGeometry = CylinderGeometry$1.createGeometry(
                 new CylinderGeometry$1({
                     topRadius: 1.0,
@@ -23928,7 +25707,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const { baseMaterialShader, dashCircleMaterialShader, coneMaterialShader, cylinderMaterialShader } = glsl$1;
     const {
         MaterialAppearance: MaterialAppearance$2,
-        Material: Material$b,
+        Material: Material$c,
         GroundPrimitive,
         Primitive: Primitive$1,
         GeometryInstance: GeometryInstance$1,
@@ -23957,8 +25736,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$7(options.speed, 1);
-            this._image = defaultValue$7(options.image, Url.buildModuleUrl('assets/img/particle.png'));
+            this._speed = defaultValue$9(options.speed, 1);
+            this._image = defaultValue$9(options.image, Url.buildModuleUrl('assets/img/particle.png'));
             this._appearance = {};
             this._length = options.length;
             this._primitive = new PrimitiveCollection$2();
@@ -24059,7 +25838,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (this.isDestroyed()) {
                 return;
             }
-            const length = defaultValue$7(this._length, this._radius * 0.35 * 8) * heighFactor;
+            const length = defaultValue$9(this._length, this._radius * 0.35 * 8) * heighFactor;
             const matrix = Transforms$3.eastNorthUpToFixedFrame(LonLat.toCartesian(this._position));
             const translation = Matrix4$3.fromTranslation(new Cartesian3$4(0, 0, length / 2 + this._height));
             Matrix4$3.multiply(matrix, translation, matrix);
@@ -24141,7 +25920,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
             this._appearance[shader] = new MaterialAppearance$2({
                 flat: true,
-                material: new Material$b({
+                material: new Material$c({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -24159,7 +25938,993 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
     }
 
-    const shader$h = `
+    var bitsToNum = function (ba) {
+        return ba.reduce(function (s, n) {
+            return s * 2 + n;
+        }, 0);
+    };
+
+    var byteToBitArr = function (bite) {
+        var a = [];
+        for (var i = 7; i >= 0; i--) {
+            a.push( !! (bite & (1 << i)));
+        }
+        return a;
+    };
+
+    // Stream
+    /**
+     * @constructor
+     */
+    // Make compiler happy.
+    var Stream = function (data) {
+        this.data = data;
+        this.len = this.data.length;
+        this.pos = 0;
+
+        this.readByte = function () {
+            if (this.pos >= this.data.length) {
+                throw new Error('Attempted to read past end of stream.');
+            }
+            if (data instanceof Uint8Array)
+                return data[this.pos++];
+            else
+                return data.charCodeAt(this.pos++) & 0xFF;
+        };
+
+        this.readBytes = function (n) {
+            var bytes = [];
+            for (var i = 0; i < n; i++) {
+                bytes.push(this.readByte());
+            }
+            return bytes;
+        };
+
+        this.read = function (n) {
+            var s = '';
+            for (var i = 0; i < n; i++) {
+                s += String.fromCharCode(this.readByte());
+            }
+            return s;
+        };
+
+        this.readUnsigned = function () { // Little-endian.
+            var a = this.readBytes(2);
+            return (a[1] << 8) + a[0];
+        };
+    };
+
+    var lzwDecode = function (minCodeSize, data) {
+        // TODO: Now that the GIF parser is a bit different, maybe this should get an array of bytes instead of a String?
+        var pos = 0; // Maybe this streaming thing should be merged with the Stream?
+        var readCode = function (size) {
+            var code = 0;
+            for (var i = 0; i < size; i++) {
+                if (data.charCodeAt(pos >> 3) & (1 << (pos & 7))) {
+                    code |= 1 << i;
+                }
+                pos++;
+            }
+            return code;
+        };
+
+        var output = [];
+
+        var clearCode = 1 << minCodeSize;
+        var eoiCode = clearCode + 1;
+
+        var codeSize = minCodeSize + 1;
+
+        var dict = [];
+
+        var clear = function () {
+            dict = [];
+            codeSize = minCodeSize + 1;
+            for (var i = 0; i < clearCode; i++) {
+                dict[i] = [i];
+            }
+            dict[clearCode] = [];
+            dict[eoiCode] = null;
+
+        };
+
+        var code;
+        var last;
+
+        while (true) {
+            last = code;
+            code = readCode(codeSize);
+
+            if (code === clearCode) {
+                clear();
+                continue;
+            }
+            if (code === eoiCode) break;
+
+            if (code < dict.length) {
+                if (last !== clearCode) {
+                    dict.push(dict[last].concat(dict[code][0]));
+                }
+            }
+            else {
+                if (code !== dict.length) throw new Error('Invalid LZW code.');
+                dict.push(dict[last].concat(dict[last][0]));
+            }
+            output.push.apply(output, dict[code]);
+
+            if (dict.length === (1 << codeSize) && codeSize < 12) {
+                // If we're at the last code and codeSize is 12, the next code will be a clearCode, and it'll be 12 bits long.
+                codeSize++;
+            }
+        }
+
+        // I don't know if this is technically an error, but some GIFs do it.
+        //if (Math.ceil(pos / 8) !== data.length) throw new Error('Extraneous LZW bytes.');
+        return output;
+    };
+
+
+    // The actual parsing; returns an object with properties.
+    var parseGIF = function (st, handler) {
+        handler || (handler = {});
+
+        // LZW (GIF-specific)
+        var parseCT = function (entries) { // Each entry is 3 bytes, for RGB.
+            var ct = [];
+            for (var i = 0; i < entries; i++) {
+                ct.push(st.readBytes(3));
+            }
+            return ct;
+        };
+
+        var readSubBlocks = function () {
+            var size, data;
+            data = '';
+            do {
+                size = st.readByte();
+                data += st.read(size);
+            } while (size !== 0);
+            return data;
+        };
+
+        var parseHeader = function () {
+            var hdr = {};
+            hdr.sig = st.read(3);
+            hdr.ver = st.read(3);
+            if (hdr.sig !== 'GIF') throw new Error('Not a GIF file.'); // XXX: This should probably be handled more nicely.
+            hdr.width = st.readUnsigned();
+            hdr.height = st.readUnsigned();
+
+            var bits = byteToBitArr(st.readByte());
+            hdr.gctFlag = bits.shift();
+            hdr.colorRes = bitsToNum(bits.splice(0, 3));
+            hdr.sorted = bits.shift();
+            hdr.gctSize = bitsToNum(bits.splice(0, 3));
+
+            hdr.bgColor = st.readByte();
+            hdr.pixelAspectRatio = st.readByte(); // if not 0, aspectRatio = (pixelAspectRatio + 15) / 64
+            if (hdr.gctFlag) {
+                hdr.gct = parseCT(1 << (hdr.gctSize + 1));
+            }
+            handler.hdr && handler.hdr(hdr);
+        };
+
+        var parseExt = function (block) {
+            var parseGCExt = function (block) {
+                st.readByte(); // Always 4
+                var bits = byteToBitArr(st.readByte());
+                block.reserved = bits.splice(0, 3); // Reserved; should be 000.
+                block.disposalMethod = bitsToNum(bits.splice(0, 3));
+                block.userInput = bits.shift();
+                block.transparencyGiven = bits.shift();
+
+                block.delayTime = st.readUnsigned();
+
+                block.transparencyIndex = st.readByte();
+
+                block.terminator = st.readByte();
+
+                handler.gce && handler.gce(block);
+            };
+
+            var parseComExt = function (block) {
+                block.comment = readSubBlocks();
+                handler.com && handler.com(block);
+            };
+
+            var parsePTExt = function (block) {
+                // No one *ever* uses this. If you use it, deal with parsing it yourself.
+                st.readByte(); // Always 12
+                block.ptHeader = st.readBytes(12);
+                block.ptData = readSubBlocks();
+                handler.pte && handler.pte(block);
+            };
+
+            var parseAppExt = function (block) {
+                var parseNetscapeExt = function (block) {
+                    st.readByte(); // Always 3
+                    block.unknown = st.readByte(); // ??? Always 1? What is this?
+                    block.iterations = st.readUnsigned();
+                    block.terminator = st.readByte();
+                    handler.app && handler.app.NETSCAPE && handler.app.NETSCAPE(block);
+                };
+
+                var parseUnknownAppExt = function (block) {
+                    block.appData = readSubBlocks();
+                    // FIXME: This won't work if a handler wants to match on any identifier.
+                    handler.app && handler.app[block.identifier] && handler.app[block.identifier](block);
+                };
+
+                st.readByte(); // Always 11
+                block.identifier = st.read(8);
+                block.authCode = st.read(3);
+                switch (block.identifier) {
+                    case 'NETSCAPE':
+                        parseNetscapeExt(block);
+                        break;
+                    default:
+                        parseUnknownAppExt(block);
+                        break;
+                }
+            };
+
+            var parseUnknownExt = function (block) {
+                block.data = readSubBlocks();
+                handler.unknown && handler.unknown(block);
+            };
+
+            block.label = st.readByte();
+            switch (block.label) {
+                case 0xF9:
+                    block.extType = 'gce';
+                    parseGCExt(block);
+                    break;
+                case 0xFE:
+                    block.extType = 'com';
+                    parseComExt(block);
+                    break;
+                case 0x01:
+                    block.extType = 'pte';
+                    parsePTExt(block);
+                    break;
+                case 0xFF:
+                    block.extType = 'app';
+                    parseAppExt(block);
+                    break;
+                default:
+                    block.extType = 'unknown';
+                    parseUnknownExt(block);
+                    break;
+            }
+        };
+
+        var parseImg = function (img) {
+            var deinterlace = function (pixels, width) {
+                // Of course this defeats the purpose of interlacing. And it's *probably*
+                // the least efficient way it's ever been implemented. But nevertheless...
+                var newPixels = new Array(pixels.length);
+                var rows = pixels.length / width;
+                var cpRow = function (toRow, fromRow) {
+                    var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
+                    newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
+                };
+
+                // See appendix E.
+                var offsets = [0, 4, 2, 1];
+                var steps = [8, 8, 4, 2];
+
+                var fromRow = 0;
+                for (var pass = 0; pass < 4; pass++) {
+                    for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
+                        cpRow(toRow, fromRow);
+                        fromRow++;
+                    }
+                }
+
+                return newPixels;
+            };
+
+            img.leftPos = st.readUnsigned();
+            img.topPos = st.readUnsigned();
+            img.width = st.readUnsigned();
+            img.height = st.readUnsigned();
+
+            var bits = byteToBitArr(st.readByte());
+            img.lctFlag = bits.shift();
+            img.interlaced = bits.shift();
+            img.sorted = bits.shift();
+            img.reserved = bits.splice(0, 2);
+            img.lctSize = bitsToNum(bits.splice(0, 3));
+
+            if (img.lctFlag) {
+                img.lct = parseCT(1 << (img.lctSize + 1));
+            }
+
+            img.lzwMinCodeSize = st.readByte();
+
+            var lzwData = readSubBlocks();
+
+            img.pixels = lzwDecode(img.lzwMinCodeSize, lzwData);
+
+            if (img.interlaced) { // Move
+                img.pixels = deinterlace(img.pixels, img.width);
+            }
+
+            handler.img && handler.img(img);
+        };
+
+        var parseBlock = function () {
+            var block = {};
+            block.sentinel = st.readByte();
+
+            switch (String.fromCharCode(block.sentinel)) { // For ease of matching
+                case '!':
+                    block.type = 'ext';
+                    parseExt(block);
+                    break;
+                case ',':
+                    block.type = 'img';
+                    parseImg(block);
+                    break;
+                case ';':
+                    block.type = 'eof';
+                    handler.eof && handler.eof(block);
+                    break;
+                default:
+                    throw new Error('Unknown block: 0x' + block.sentinel.toString(16)); // TODO: Pad this with a 0.
+            }
+
+            if (block.type !== 'eof') setTimeout(parseBlock, 0);
+        };
+
+        var parse = function () {
+            parseHeader();
+            setTimeout(parseBlock, 0);
+        };
+
+        parse();
+    };
+
+    var SuperGif = function ( opts ) {
+        var options = {
+            //viewport position
+            vp_l: 0,
+            vp_t: 0,
+            vp_w: null,
+            vp_h: null,
+            //canvas sizes
+            c_w: null,
+            c_h: null
+        };
+        for (var i in opts ) { options[i] = opts[i]; }
+        if (options.vp_w && options.vp_h) options.is_vp = true;
+
+        var stream;
+        var hdr;
+
+        var loadError = null;
+        var loading = false;
+
+        var transparency = null;
+        var delay = null;
+        var disposalMethod = null;
+        var disposalRestoreFromIdx = null;
+        var lastDisposalMethod = null;
+        var frame = null;
+        var lastImg = null;
+
+        var playing = true;
+
+        var ctx_scaled = false;
+
+        var frames = [];
+        var frameOffsets = []; // elements have .x and .y properties
+
+        var gif = options.gif;
+        if (typeof options.auto_play == 'undefined')
+            options.auto_play = (!gif.getAttribute('rel:auto_play') || gif.getAttribute('rel:auto_play') == '1');
+
+        var onEndListener = (options.hasOwnProperty('on_end') ? options.on_end : null);
+        var loopDelay = (options.hasOwnProperty('loop_delay') ? options.loop_delay : 0);
+        var overrideLoopMode = (options.hasOwnProperty('loop_mode') ? options.loop_mode : 'auto');
+        var drawWhileLoading = (options.hasOwnProperty('draw_while_loading') ? options.draw_while_loading : true);
+        var showProgressBar = drawWhileLoading ? (options.hasOwnProperty('show_progress_bar') ? options.show_progress_bar : true) : false;
+        var progressBarHeight = (options.hasOwnProperty('progressbar_height') ? options.progressbar_height : 25);
+        var progressBarBackgroundColor = (options.hasOwnProperty('progressbar_background_color') ? options.progressbar_background_color : 'rgba(255,255,255,0.4)');
+        var progressBarForegroundColor = (options.hasOwnProperty('progressbar_foreground_color') ? options.progressbar_foreground_color : 'rgba(255,0,22,.8)');
+
+        var clear = function () {
+            transparency = null;
+            delay = null;
+            lastDisposalMethod = disposalMethod;
+            disposalMethod = null;
+            frame = null;
+        };
+
+        // XXX: There's probably a better way to handle catching exceptions when
+        // callbacks are involved.
+        var doParse = function () {
+            try {
+                parseGIF(stream, handler);
+            }
+            catch (err) {
+                doLoadError('parse');
+            }
+        };
+
+        var setSizes = function(w, h) {
+            canvas.width = w * get_canvas_scale();
+            canvas.height = h * get_canvas_scale();
+            toolbar.style.minWidth = ( w * get_canvas_scale() ) + 'px';
+
+            tmpCanvas.width = w;
+            tmpCanvas.height = h;
+            tmpCanvas.style.width = w + 'px';
+            tmpCanvas.style.height = h + 'px';
+            tmpCanvas.getContext('2d').setTransform(1, 0, 0, 1, 0, 0);
+        };
+
+        var setFrameOffset = function(frame, offset) {
+            if (!frameOffsets[frame]) {
+                frameOffsets[frame] = offset;
+                return;
+            }
+            if (typeof offset.x !== 'undefined') {
+                frameOffsets[frame].x = offset.x;
+            }
+            if (typeof offset.y !== 'undefined') {
+                frameOffsets[frame].y = offset.y;
+            }
+        };
+
+        var doShowProgress = function (pos, length, draw) {
+            if (draw && showProgressBar) {
+                var height = progressBarHeight;
+                var left, mid, top, width;
+                if (options.is_vp) {
+                    if (!ctx_scaled) {
+                        top = (options.vp_t + options.vp_h - height);
+                        height = height;
+                        left = options.vp_l;
+                        mid = left + (pos / length) * options.vp_w;
+                        width = canvas.width;
+                    } else {
+                        top = (options.vp_t + options.vp_h - height) / get_canvas_scale();
+                        height = height / get_canvas_scale();
+                        left = (options.vp_l / get_canvas_scale() );
+                        mid = left + (pos / length) * (options.vp_w / get_canvas_scale());
+                        width = canvas.width / get_canvas_scale();
+                    }
+                }
+                else {
+                    top = (canvas.height - height) / (ctx_scaled ? get_canvas_scale() : 1);
+                    mid = ((pos / length) * canvas.width) / (ctx_scaled ? get_canvas_scale() : 1);
+                    width = canvas.width / (ctx_scaled ? get_canvas_scale() : 1 );
+                    height /= ctx_scaled ? get_canvas_scale() : 1;
+                }
+
+                ctx.fillStyle = progressBarBackgroundColor;
+                ctx.fillRect(mid, top, width - mid, height);
+
+                ctx.fillStyle = progressBarForegroundColor;
+                ctx.fillRect(0, top, mid, height);
+            }
+        };
+
+        var doLoadError = function (originOfError) {
+            var drawError = function () {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.moveTo(0, 0);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, options.c_h ? options.c_h : hdr.height);
+                ctx.moveTo(0, options.c_h ? options.c_h : hdr.height);
+                ctx.lineTo(options.c_w ? options.c_w : hdr.width, 0);
+                ctx.stroke();
+            };
+
+            loadError = originOfError;
+            hdr = {
+                width: gif.width,
+                height: gif.height
+            }; // Fake header.
+            frames = [];
+            drawError();
+        };
+
+        var doHdr = function (_hdr) {
+            hdr = _hdr;
+            setSizes(hdr.width, hdr.height);
+        };
+
+        var doGCE = function (gce) {
+            pushFrame();
+            clear();
+            transparency = gce.transparencyGiven ? gce.transparencyIndex : null;
+            delay = gce.delayTime;
+            disposalMethod = gce.disposalMethod;
+            // We don't have much to do with the rest of GCE.
+        };
+
+        var pushFrame = function () {
+            if (!frame) return;
+            frames.push({
+                            data: frame.getImageData(0, 0, hdr.width, hdr.height),
+                            delay: delay
+                        });
+            frameOffsets.push({ x: 0, y: 0 });
+        };
+
+        var doImg = function (img) {
+            if (!frame) frame = tmpCanvas.getContext('2d');
+
+            var currIdx = frames.length;
+
+            //ct = color table, gct = global color table
+            var ct = img.lctFlag ? img.lct : hdr.gct; // TODO: What if neither exists?
+
+            /*
+            Disposal method indicates the way in which the graphic is to
+            be treated after being displayed.
+
+            Values :    0 - No disposal specified. The decoder is
+                            not required to take any action.
+                        1 - Do not dispose. The graphic is to be left
+                            in place.
+                        2 - Restore to background color. The area used by the
+                            graphic must be restored to the background color.
+                        3 - Restore to previous. The decoder is required to
+                            restore the area overwritten by the graphic with
+                            what was there prior to rendering the graphic.
+
+                            Importantly, "previous" means the frame state
+                            after the last disposal of method 0, 1, or 2.
+            */
+            if (currIdx > 0) {
+                if (lastDisposalMethod === 3) {
+                    // Restore to previous
+                    // If we disposed every frame including first frame up to this point, then we have
+                    // no composited frame to restore to. In this case, restore to background instead.
+                    if (disposalRestoreFromIdx !== null) {
+                        frame.putImageData(frames[disposalRestoreFromIdx].data, 0, 0);
+                    } else {
+                        frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                    }
+                } else {
+                    disposalRestoreFromIdx = currIdx - 1;
+                }
+
+                if (lastDisposalMethod === 2) {
+                    // Restore to background color
+                    // Browser implementations historically restore to transparent; we do the same.
+                    // http://www.wizards-toolkit.org/discourse-server/viewtopic.php?f=1&t=21172#p86079
+                    frame.clearRect(lastImg.leftPos, lastImg.topPos, lastImg.width, lastImg.height);
+                }
+            }
+            // else, Undefined/Do not dispose.
+            // frame contains final pixel data from the last frame; do nothing
+
+            //Get existing pixels for img region after applying disposal method
+            var imgData = frame.getImageData(img.leftPos, img.topPos, img.width, img.height);
+
+            //apply color table colors
+            img.pixels.forEach(function (pixel, i) {
+                // imgData.data === [R,G,B,A,R,G,B,A,...]
+                if (pixel !== transparency) {
+                    imgData.data[i * 4 + 0] = ct[pixel][0];
+                    imgData.data[i * 4 + 1] = ct[pixel][1];
+                    imgData.data[i * 4 + 2] = ct[pixel][2];
+                    imgData.data[i * 4 + 3] = 255; // Opaque.
+                }
+            });
+
+            frame.putImageData(imgData, img.leftPos, img.topPos);
+
+            if (!ctx_scaled) {
+                ctx.scale(get_canvas_scale(),get_canvas_scale());
+                ctx_scaled = true;
+            }
+
+            // We could use the on-page canvas directly, except that we draw a progress
+            // bar for each image chunk (not just the final image).
+            if (drawWhileLoading) {
+                ctx.drawImage(tmpCanvas, 0, 0);
+                drawWhileLoading = options.auto_play;
+            }
+
+            lastImg = img;
+        };
+
+        var player = (function () {
+            var i = -1;
+            var iterationCount = 0;
+
+            /**
+             * Gets the index of the frame "up next".
+             * @returns {number}
+             */
+            var getNextFrameNo = function () {
+                var delta = (1 );
+                return (i + delta + frames.length) % frames.length;
+            };
+
+            var stepFrame = function (amount) { // XXX: Name is confusing.
+                i = i + amount;
+
+                putFrame();
+            };
+
+            var step = (function () {
+                var stepping = false;
+
+                var completeLoop = function () {
+                    if (onEndListener !== null)
+                        onEndListener(gif);
+                    iterationCount++;
+
+                    if (overrideLoopMode !== false || iterationCount < 0) {
+                        doStep();
+                    } else {
+                        stepping = false;
+                        playing = false;
+                    }
+                };
+
+                var doStep = function () {
+                    stepping = playing;
+                    if (!stepping) return;
+
+                    stepFrame(1);
+                    var delay = frames[i].delay * 10;
+                    if (!delay) delay = 100; // FIXME: Should this even default at all? What should it be?
+
+                    var nextFrameNo = getNextFrameNo();
+                    if (nextFrameNo === 0) {
+                        delay += loopDelay;
+                        setTimeout(completeLoop, delay);
+                    } else {
+                        setTimeout(doStep, delay);
+                    }
+                };
+
+                return function () {
+                    if (!stepping) setTimeout(doStep, 0);
+                };
+            }());
+
+            var putFrame = function () {
+                var offset;
+                i = parseInt(i, 10);
+
+                if (i > frames.length - 1){
+                    i = 0;
+                }
+
+                if (i < 0){
+                    i = 0;
+                }
+
+                offset = frameOffsets[i];
+
+                tmpCanvas.getContext("2d").putImageData(frames[i].data, offset.x, offset.y);
+                ctx.globalCompositeOperation = "copy";
+                ctx.drawImage(tmpCanvas, 0, 0);
+            };
+
+            var play = function () {
+                playing = true;
+                step();
+            };
+
+            var pause = function () {
+                playing = false;
+            };
+
+
+            return {
+                init: function () {
+                    if (loadError) return;
+
+                    if ( ! (options.c_w && options.c_h) ) {
+                        ctx.scale(get_canvas_scale(),get_canvas_scale());
+                    }
+
+                    if (options.auto_play) {
+                        step();
+                    }
+                    else {
+                        i = 0;
+                        putFrame();
+                    }
+                },
+                step: step,
+                play: play,
+                pause: pause,
+                playing: playing,
+                move_relative: stepFrame,
+                current_frame: function() { return i; },
+                length: function() { return frames.length },
+                move_to: function ( frame_idx ) {
+                    i = frame_idx;
+                    putFrame();
+                }
+            }
+        }());
+
+        var doDecodeProgress = function (draw) {
+            doShowProgress(stream.pos, stream.data.length, draw);
+        };
+
+        var doNothing = function () {};
+        /**
+         * @param{boolean=} draw Whether to draw progress bar or not; this is not idempotent because of translucency.
+         *                       Note that this means that the text will be unsynchronized with the progress bar on non-frames;
+         *                       but those are typically so small (GCE etc.) that it doesn't really matter. TODO: Do this properly.
+         */
+        var withProgress = function (fn, draw) {
+            return function (block) {
+                fn(block);
+                doDecodeProgress(draw);
+            };
+        };
+
+
+        var handler = {
+            hdr: withProgress(doHdr),
+            gce: withProgress(doGCE),
+            com: withProgress(doNothing),
+            // I guess that's all for now.
+            app: {
+                // TODO: Is there much point in actually supporting iterations?
+                NETSCAPE: withProgress(doNothing)
+            },
+            img: withProgress(doImg, true),
+            eof: function (block) {
+                //toolbar.style.display = '';
+                pushFrame();
+                doDecodeProgress(false);
+                if ( ! (options.c_w && options.c_h) ) {
+                    canvas.width = hdr.width * get_canvas_scale();
+                    canvas.height = hdr.height * get_canvas_scale();
+                }
+                player.init();
+                loading = false;
+                if (load_callback) {
+                    load_callback(gif);
+                }
+
+            }
+        };
+
+        var init = function () {
+            var parent = gif.parentNode;
+
+            var div = document.createElement('div');
+            canvas = document.createElement('canvas');
+            ctx = canvas.getContext('2d');
+            toolbar = document.createElement('div');
+
+            tmpCanvas = document.createElement('canvas');
+
+            div.width = canvas.width = gif.width;
+            div.height = canvas.height = gif.height;
+            toolbar.style.minWidth = gif.width + 'px';
+
+            div.className = 'jsgif';
+            toolbar.className = 'jsgif_toolbar';
+            div.appendChild(canvas);
+            div.appendChild(toolbar);
+
+            parent.insertBefore(div, gif);
+            parent.removeChild(gif);
+
+            if (options.c_w && options.c_h) setSizes(options.c_w, options.c_h);
+            initialized=true;
+        };
+
+        var get_canvas_scale = function() {
+            var scale;
+            if (options.max_width && hdr && hdr.width > options.max_width) {
+                scale = options.max_width / hdr.width;
+            }
+            else {
+                scale = 1;
+            }
+            return scale;
+        };
+
+        var canvas, ctx, toolbar, tmpCanvas;
+        var initialized = false;
+        var load_callback = false;
+
+        var load_setup = function(callback) {
+            if (loading) return false;
+            if (callback) load_callback = callback;
+            else load_callback = false;
+
+            loading = true;
+            frames = [];
+            clear();
+            disposalRestoreFromIdx = null;
+            lastDisposalMethod = null;
+            frame = null;
+            lastImg = null;
+
+            return true;
+        };
+
+        var calculateDuration = function() {
+            return frames.reduce(function(duration, frame) {
+                return duration + frame.delay;
+            }, 0);
+        };
+
+        return {
+            // play controls
+            play: player.play,
+            pause: player.pause,
+            move_relative: player.move_relative,
+            move_to: player.move_to,
+
+            // getters for instance vars
+            get_playing      : function() { return playing },
+            get_canvas       : function() { return canvas },
+            get_canvas_scale : function() { return get_canvas_scale() },
+            get_loading      : function() { return loading },
+            get_auto_play    : function() { return options.auto_play },
+            get_length       : function() { return player.length() },
+            get_frames       : function() { return frames },
+            get_duration     : function() { return calculateDuration() },
+            get_duration_ms  : function() { return calculateDuration() * 10 },
+            get_current_frame: function() { return player.current_frame() },
+            load_url: function(src,callback){
+                if (!load_setup(callback)) return;
+
+                var h = new XMLHttpRequest();
+                // new browsers (XMLHttpRequest2-compliant)
+                h.open('GET', src, true);
+
+                if ('overrideMimeType' in h) {
+                    h.overrideMimeType('text/plain; charset=x-user-defined');
+                }
+
+                // old browsers (XMLHttpRequest-compliant)
+                else if ('responseType' in h) {
+                    h.responseType = 'arraybuffer';
+                }
+
+                // IE9 (Microsoft.XMLHTTP-compliant)
+                else {
+                    h.setRequestHeader('Accept-Charset', 'x-user-defined');
+                }
+
+                h.onloadstart = function() {
+                    // Wait until connection is opened to replace the gif element with a canvas to avoid a blank img
+                    if (!initialized) init();
+                };
+                h.onload = function(e) {
+                    if (this.status != 200) {
+                        doLoadError('xhr - response');
+                    }
+                    // emulating response field for IE9
+                    if (!('response' in this)) {
+                        this.response = new VBArray(this.responseText).toArray().map(String.fromCharCode).join('');
+                    }
+                    var data = this.response;
+                    if (data.toString().indexOf("ArrayBuffer") > 0) {
+                        data = new Uint8Array(data);
+                    }
+
+                    stream = new Stream(data);
+                    setTimeout(doParse, 0);
+                };
+                h.onprogress = function (e) {
+                    if (e.lengthComputable) doShowProgress(e.loaded, e.total, true);
+                };
+                h.onerror = function() { doLoadError('xhr'); };
+                h.send();
+            },
+            load: function (callback) {
+                this.load_url(gif.getAttribute('rel:animated_src') || gif.src,callback);
+            },
+            load_raw: function(arr, callback) {
+                if (!load_setup(callback)) return;
+                if (!initialized) init();
+                stream = new Stream(arr);
+                setTimeout(doParse, 0);
+            },
+            set_frame_offset: setFrameOffset
+        };
+    };
+
+    const {
+        BillboardCollection: BillboardCollection$1,
+        VerticalOrigin
+    } = Cesium;
+
+    function loadGif(url, imageArr = [], parser) {
+        const img = document.createElement('img');
+        img.src = url;
+        // gif库需要img标签配置下面两个属性
+        img.setAttribute('rel:animated_src', url);
+        img.setAttribute('rel:auto_play', '0');
+        img.style.cssText = 'position:fixed;zIndex: -1;';
+        document.body.appendChild(img);
+        // 新建gif实例
+        const rub = new SuperGif({ gif: img });
+        return new Promise((resolve) => {
+            rub.load(() => {
+                for (let i = 1; i <= rub.get_length(); i++) {
+                    // 遍历gif实例的每一帧
+                    rub.move_to(i);
+                    const canvas = rub.get_canvas();
+                    if (parser) {
+                        parser(canvas);
+                    }
+                    imageArr.push(canvas.toDataURL());
+                }
+                resolve(imageArr);
+                // document.body.removeChild(img)
+            });
+        })
+
+    }
+    class ImageGraphic extends PointBaseGraphic {
+        /**
+         * 
+         * @param {object} options 具有以下属性
+         * @param {string} options.image gif图片
+         * @param {LonLat|Cesium.Carteisan3} options.position 位置
+         * @param {number} [options.speedFactor = 1.0] 速度因子
+         * @param {function} [options.imageParser] 对图片做后处理
+         */
+        constructor(options) {
+            super(options);
+            this._primitive = new BillboardCollection$1();
+            this._image = options.image;
+            this._speedFactor = defaultValue$9(options.speedFactor, 1.0);
+            this._imageIndex = 0;
+            this._imageParser = options.imageParser;
+            this.createGraphic();
+        }
+        get clampToGround() {
+            return undefined;
+        }
+        set clampToGround(val) {
+            throw new CesiumProError$1('clampToGround is not valid.');
+        }
+        get speedFactor() {
+            return this._speedFactor;
+        }
+        set speedFactor(val) {
+            this._speedFactor = val;
+        }
+        createGraphic() {
+            this._requestImage = loadGif(this._image, [], this._imageParser);
+            this._billboard = this._primitive.add({
+                position: LonLat.toCartesian(this._position),
+                image: this._image,
+                verticalOrigin: VerticalOrigin.BOTTOM
+            });
+        }
+        update() {
+            if (this._speedFactor <= 0) {
+                return;
+            }
+            this._requestImage.then(imageList => {
+                const index = Math.floor((this._imageIndex++) / (this._speedFactor));
+                const image = imageList[index % imageList.length];
+                this._billboard.image = image;
+            });
+        }
+        remove() {
+            super.remove();
+            this._billboard = undefined;
+        }
+    }
+
+    const shader$i = `
 czm_material czm_getMaterial(czm_materialInput materialInput) {
     czm_material material = czm_getDefaultMaterial(materialInput);
     material.diffuse = color.rgb;
@@ -24177,7 +26942,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
     const {
         MaterialAppearance: MaterialAppearance$1,
-        Material: Material$a
+        Material: Material$b
     } = Cesium;
     class RadarScanGraphic extends PointBaseGraphic {
         /**
@@ -24198,7 +26963,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$7(options.speed, 10);
+            this._speed = defaultValue$9(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -24225,14 +26990,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$1({
-                material: new Material$a({
+                material: new Material$b({
                     translucent: true,
                     fabric: {
                         uniforms: {
                             color: this._color,
                             time: 0.0,
                         },
-                        source: shader$h
+                        source: shader$i
                     },
                 })
             });
@@ -24263,12 +27028,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       BillboardCollection,
       MaterialAppearance,
       GeometryInstance,
-      Material: Material$9,
-      Color: Color$d,
+      Material: Material$a,
+      Color: Color$e,
       Primitive
     } = Cesium;
     function transform(satelliteScane, angle, axis) {
-      if (!defined$a(satelliteScane)) {
+      if (!defined$b(satelliteScane)) {
         return;
       }
       angle = Cesium.Math.toRadians(angle);
@@ -24352,14 +27117,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         super(options);
 
         this._clampToGround = false;
-        if (!defined$a(options.position)) {
+        if (!defined$b(options.position)) {
           throw new CesiumProError$1('参数options必须定义position或path属性。')
         }
         const cartographic = LonLat.toCartographic(options.position, viewer);
         this._position = LonLat.toCartesian(options.position);
-        this._thickness = defaultValue$7(options.thickness, 0.3);
-        this._slices = defaultValue$7(options.slices, 20);
-        this.speed = defaultValue$7(options.speed, 0.5);
+        this._thickness = defaultValue$9(options.thickness, 0.3);
+        this._slices = defaultValue$9(options.slices, 20);
+        this.speed = defaultValue$9(options.speed, 0.5);
 
         /**
          * 卫星所在的高度
@@ -24377,8 +27142,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this.radius = options.radius || this._height * 0.5;
 
         this._inverse = options.inverse || false;
-        this._animation = defined$a(options.animation) ? options.animation : true;
-        this._show = defined$a(options.show) ? options.show : true;
+        this._animation = defined$b(options.animation) ? options.animation : true;
+        this._show = defined$b(options.show) ? options.show : true;
 
         this._color = options.color;
         /**
@@ -24467,11 +27232,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           geometry,
         });
         const source = this.getShaderSorce();
-        const material = new Material$9({
+        const material = new Material$a({
           fabric: {
             type: 'satelliteMaterial',
             uniforms: {
-              color: this._color || Color$d.WHITE,
+              color: this._color || Color$e.WHITE,
               repeat: this.slices, //锥体被分成30份
               offset: 0.0,
               thickness: this.thickness,
@@ -24685,8 +27450,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @see {@link http://lbsyun.baidu.com/custom/list.htm|百度个性化地图列表}
          */
         constructor(options) {
-            options = defaultValue$7(options, {});
-            options.url = defaultValue$7(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
+            options = defaultValue$9(options, {});
+            options.url = defaultValue$9(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
             if (options.customid) {
                 options.url = `https://api.map.baidu.com/customimage/tile?customid=${options.customid}`;
             }
@@ -24730,8 +27495,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options = {}) {
             options.url = 'https://dev.virtualearth.net';
-            options.mapStyle = defaultValue$7(options.mapStyle, BingLayer.mapStyle.AERIAL);
-            options.key = defaultValue$7(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
+            options.mapStyle = defaultValue$9(options.mapStyle, BingLayer.mapStyle.AERIAL);
+            options.key = defaultValue$9(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
             super(options);
         }
         /**
@@ -24906,14 +27671,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          *
          */
         constructor(options) {
-            options = defaultValue$7(options, {});
+            options = defaultValue$9(options, {});
 
-            const layer = defaultValue$7(options.layer, 'img');
+            const layer = defaultValue$9(options.layer, 'img');
             const {
                 scl,
                 style
             } = GaoDeLayer.getParametersByLayer(layer);
-            const lang = defaultValue$7(options.lang, 'zh_cn');
+            const lang = defaultValue$9(options.lang, 'zh_cn');
             options.url = `https://webst0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=${lang}&size=1&scl=${scl}&style=${style}`;
             options.subdomains = '1234';
             super(options);
@@ -24988,7 +27753,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 rectangle: Cesium.Rectangle.MAX_VALUE,
                 intervalOfZeorLevel: options.intervalOfZeorLevel
             });
-            this._hasAlphaChannel = defaultValue$7(options.hasAlphaChannel, true);
+            this._hasAlphaChannel = defaultValue$9(options.hasAlphaChannel, true);
             this._tilingScheme = tilingScheme;
             this._image = undefined;
             this._texture = undefined;
@@ -24998,10 +27763,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this._ready = true;
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$7(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$7(options.color, 'white');
-            this._lineColor = defaultValue$7(options.lineColor, 'gold');
-            this._lineWidth = defaultValue$7(options.lineWidth, 2);
+            this._font = defaultValue$9(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$9(options.color, 'white');
+            this._lineColor = defaultValue$9(options.lineColor, 'gold');
+            this._lineWidth = defaultValue$9(options.lineWidth, 2);
         }
         get hasAlphaChannel() {
             return this._hasAlphaChannel;
@@ -25380,24 +28145,24 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        *
        */
       constructor(options) {
-        options = defaultValue$7(options, {});
+        options = defaultValue$9(options, {});
         const key = options.key;
         if (!key) {
           console.warn('未定义key，地图服务将不可用');
           console.warn('请前往http://lbs.tianditu.gov.cn/server/MapService.html获取地图key');
         }
-        const tilingScheme = defaultValue$7(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
+        const tilingScheme = defaultValue$9(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
         let crs = 'w',
           tileMatrixSet = 'w',
           tileMatrixLabels = options.tileMatrixLabels;
         if (tilingScheme instanceof Cesium.GeographicTilingScheme) {
           crs = 'c';
           tileMatrixSet = 'c';
-          if (!defined$a(tileMatrixLabels)) {
+          if (!defined$b(tileMatrixLabels)) {
             tileMatrixLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
           }
         }
-        const layer = defaultValue$7(options.layer, 'img');
+        const layer = defaultValue$9(options.layer, 'img');
         const url = `http://t{s}.tianditu.com/${layer}_${crs}/wmts?service=wmts&tileMatrixSet=${tileMatrixSet}&request=GetTile&version=1.0.0&LAYER=${layer}&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${key}`;
         return new Cesium.WebMapTileServiceImageryProvider({
           url,
@@ -25477,7 +28242,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @extends XYZLayer
          */
         constructor(options = {}) {
-            options.layer = defaultValue$7(options.layer, 'img');
+            options.layer = defaultValue$9(options.layer, 'img');
             options.subdomains = '123';
             options.url = layerMap[options.layer];
             options.customTags = {
@@ -25517,20 +28282,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @param {Cesium.TilingScheme} [options.tilingScheme = proj.get('EPSG:4326')] 瓦片分割坐标系
          */
         constructor(options = {}) {
-            options.tileWidth = defaultValue$7(options.tileWidth, 256);
-            options.tileHeight = defaultValue$7(options.tileHeight, 256);
-            this._tilingScheme = defined$a(options.tilingScheme)
+            options.tileWidth = defaultValue$9(options.tileWidth, 256);
+            options.tileHeight = defaultValue$9(options.tileHeight, 256);
+            this._tilingScheme = defined$b(options.tilingScheme)
                 ? options.tilingScheme
                 : proj.get('EPSG:4326', { ellipsoid: options.ellipsoid });
             this._errorEvent = new Event$8();
-            this._tileWidth = defaultValue$7(options.tileWidth, 256);
-            this._tileHeight = defaultValue$7(options.tileHeight, 256);
+            this._tileWidth = defaultValue$9(options.tileWidth, 256);
+            this._tileHeight = defaultValue$9(options.tileHeight, 256);
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$7(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$7(options.color, new Cesium.Color(1,1,1,1));
-            this._borderColor = defaultValue$7(options.borderColor, Cesium.Color.GOLD);
-            this._borderWidth = defaultValue$7(options.borderWidth, 2);    
+            this._font = defaultValue$9(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$9(options.color, new Cesium.Color(1,1,1,1));
+            this._borderColor = defaultValue$9(options.borderColor, Cesium.Color.GOLD);
+            this._borderWidth = defaultValue$9(options.borderWidth, 2);    
         }
         /**
          * 表示图层是否已准备完成。
@@ -25697,11 +28462,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this._tilingScheme = proj.get('EPSG:4326');        
             this._ready = false;
             this._ready = true;
-            this._minimumLevel = defaultValue$7(options.minimumLevel, 0);
+            this._minimumLevel = defaultValue$9(options.minimumLevel, 0);
             this._maximumLevel = options.maximumLevel;
-            this._tileWidth = defaultValue$7(options.tileWidth, 256);
-            this._tileHeight = defaultValue$7(options.tileHeight, 256);
-            this._rectangle = defaultValue$7(options.rectangle, Rectangle.MAX_VALUE);
+            this._tileWidth = defaultValue$9(options.tileWidth, 256);
+            this._tileHeight = defaultValue$9(options.tileHeight, 256);
+            this._rectangle = defaultValue$9(options.rectangle, Rectangle.MAX_VALUE);
             this._readyPromise = Promise.resolve(true);
             this._errorEvent.addEventListener((x, y, z) => {
                 // 主要是为了不让TileProviderError.handleError打印错误
@@ -26014,10 +28779,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            if (!defined$a(options.parameters)) {
+            if (!defined$b(options.parameters)) {
                 options.parameters = WMSLayer.DefaultParameters;
             }
-            if (!defined$a(options.GetFeatureInfoDefaultParameters)) ;
+            if (!defined$b(options.GetFeatureInfoDefaultParameters)) ;
             super(options);
         }
         /**
@@ -26161,9 +28926,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._type = undefined;
         this._properties = undefined;
         this._show = true;
-        this._id = defaultValue$7(entityOptions.id, guid());
-        this._clampToGround = defaultValue$7(options.clampToGround);
-        this._clampToModel = defaultValue$7(options.clampToModel);
+        this._id = defaultValue$9(entityOptions.id, guid());
+        this._clampToGround = defaultValue$9(options.clampToGround);
+        this._clampToModel = defaultValue$9(options.clampToModel);
 
       }
       /**
@@ -26356,14 +29121,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         abstract();
       }
       static getEntityFromGeoJson(json) {
-        if (!defined$a(json)) {
+        if (!defined$b(json)) {
           return;
         }
 
         if (json.geometry && json.geometry.type.toUpperCase() === 'POLYGON') {
           let hierarchy = [];
           const coordinates = json.geometry.coordinates;
-          if (!defined$a(coordinates) || !Array.isArray(coordinates)) {
+          if (!defined$b(coordinates) || !Array.isArray(coordinates)) {
             return;
           }
           for (let coords of coordinates) {
@@ -26372,7 +29137,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             }
             for (let coor of coords) {
               const ll = Cesium.Cartesian3.fromDegrees(coor[0], coor[1]);
-              if (!defined$a(ll)) return;
+              if (!defined$b(ll)) return;
               hierarchy.push(ll);
             }
           }      return new Cesium.Entity({
@@ -28478,14 +31243,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * },{type:PlotType.BILLBOARD})
        */
       constructor(entityOptions, options = {}) {
-        entityOptions = defaultValue$7(entityOptions, {});
+        entityOptions = defaultValue$9(entityOptions, {});
         super(entityOptions, options);
         this._entityOptions = entityOptions;
         this._options = options;
-        this._positions = defaultValue$7(entityOptions.position, new Cesium.Cartesian3());
-        this._type = defaultValue$7(options.type, PlotType$1.POINT);
+        this._positions = defaultValue$9(entityOptions.position, new Cesium.Cartesian3());
+        this._type = defaultValue$9(options.type, PlotType$1.POINT);
         this._entity = this.createEntity();
-        this._text = defaultValue$7(entityOptions.text, '');
+        this._text = defaultValue$9(entityOptions.text, '');
       }
       /**
        * 该图形的几何描述，包括类型，经纬度等
@@ -28516,7 +31281,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         }
         if (this.type === PlotType$1.BILLBOARD) {
           options.billboard = clone(this._entityOptions);
-          if (!defined$a(options.billboard.image)) {
+          if (!defined$b(options.billboard.image)) {
             options.billboard.image = Url.buildModuleUrl('./assets/marker.png');
           }
         }
@@ -28527,7 +31292,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           options.orientation = this._entityOptions.orientation;
           delete this._entityOptions.orientation;
           options.model = clone(this._entityOptions);
-          if (!defined$a(options.model.uri)) {
+          if (!defined$b(options.model.uri)) {
             options.model.uri = Url.buildModuleUrl('./assets/Wood_Tower.gltf');
           }
         }
@@ -28649,7 +31414,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Bool}
        */
       static equal(left, right) {
-        if (!defined$a(left) || !defined$a(right)) {
+        if (!defined$b(left) || !defined$b(right)) {
           return false;
         }
         if (left instanceof PointPlot) {
@@ -28724,7 +31489,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$a(json.geometry) || !(defined$a(json.properties))) {
+        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -28810,8 +31575,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._entityOptions = defaultValue$7(entityOptions, {});
-        this._positions = defaultValue$7(this._entityOptions.positions, []);
+        this._entityOptions = defaultValue$9(entityOptions, {});
+        this._positions = defaultValue$9(this._entityOptions.positions, []);
         this._nodePositions = this._positions;
         this._type = PlotType$1.POLYLINE;
         this._entity = this.createEntity();
@@ -28881,7 +31646,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$a(index) && index < vertexNumber) {
+        if (defined$b(index) && index < vertexNumber) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
           }
@@ -28896,7 +31661,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$a(index)) {
+        if (!defined$b(index)) {
           return;
         }
         if (index < 0 || index >= this.positions.length) {
@@ -28962,7 +31727,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$a(json.geometry) || !(defined$a(json.properties))) {
+        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -29019,7 +31784,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$7(entityOptions.positions, []);
+        this._positions = defaultValue$9(entityOptions.positions, []);
         this._nodePositions = [...this.positions];
         if (this._nodePositions.length) {
           this._nodePositions[this._nodePositions.length] = this._nodePositions[0];
@@ -29114,7 +31879,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$a(index) && index < vertexNumber && index >= 0) {
+        if (defined$b(index) && index < vertexNumber && index >= 0) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
             this._nodePositions[i] = this._nodePositions[i - 1];
@@ -29135,7 +31900,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$a(index)) {
+        if (!defined$b(index)) {
           return
         }
         if (index < 0 || index >= this.positions.length) {
@@ -29225,7 +31990,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$a(json.geometry) || !(defined$a(json.properties))) {
+        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -29352,6 +32117,699 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
     }
 
+    const formatText = function(value, mode, islast) {
+      if (mode === CartometryType$1.SURFACE_DISTANCE ||
+        mode === CartometryType$1.SPACE_DISTANCE ||
+        mode === CartometryType$1.HEIGHT) {
+        const preText = islast ? '总长度 ' : '';
+        if (value > 10000) {
+          return `${preText}${(value / 1000).toFixed(2)} km`;
+        }
+        return `${preText}${value.toFixed(2)} m`;
+      }
+      if (mode === CartometryType$1.SURFACE_AREA || mode === CartometryType$1.SPACE_AREA) {
+        if (value > 1000 * 1000 * 10) {
+          return `${(value / 1000 / 1000).toFixed(2)} km²`;
+        }
+        return `${value.toFixed(2)} m²`;
+      }
+      if (mode === CartometryType$1.ANGLE) {
+        return `${(value % 360).toFixed(2)}°`;
+      }
+      return undefined;
+    };
+
+    class CartometryManager {
+      /**
+       *
+       * 地图量算管理工具
+       * @alias CartometryManager
+       * @param {Cesium.Viewer} viewer Cesium.Viewer对象
+       * @param {*} options 具有以下属性
+       * @param {Object} [options.labelStyle=PointGraphic.defaultLabelStyle] 定义label样式,和Cesium.LabelGraphic具有相同的参数
+       * @param {Object} [options.polylineStyle=PolylineGraphic.defaultStyle] 定义线样式，和Cesium.PolylineGraphic具有相同的参数
+       * @param {Object} [options.polygonStyle=PolygonGraphic.defaultStyle] 定义多边形样式,和Cesium.PolygonGraphic具有相同的参数
+       * @param {Object} [options.pointStyle=PointGraphic.defaultStyle] 定义点样式,和Cesium.PointGraphic具有相同的参数
+       * @param {CartometryManager~Callback} [options.formatText] 格式化标签内容的函数
+       * @param {Object} [options.nodeMode] 是否添加顶点，具有以下属性
+       * @param {Boolean} [options.nodeMode.distance=true] 是否在距离量算时添加顶点
+       * @param {Boolean} [options.nodeMode.area=false] 是否在面积量算时添加顶点
+       * @param {Boolean} [options.nodeMode.angle=false] 是否在角度量算时添加顶点
+       * @param {Boolean} [options.nodeMode.height=false] 是否在高度量算时添加顶点
+       * @param {Object} [options.auxiliaryGeometry] 是否创建辅助要素，具有以下参数
+       * @param {Boolean} [options.auxiliaryGeometry.distance=true] 是否在距离量算时创建辅助要素
+       * @param {Boolean} [options.auxiliaryGeometry.area=false] 是否在面积量算时创建辅助要素
+       * @param {Boolean} [options.auxiliaryGeometry.angle=false] 是否在角度量算时创建辅助要素
+       * @param {Boolean} [options.auxiliaryGeometry.height=false] 是否在高度量算时创建辅助要素
+       * @param {CartometryType} [options.mode=CartometryType.SURFACE_DISTANCE] 默认量算模式
+       * @param {Object} [options.auxiliaryLineMaterial] 定义辅助线的样式
+       * @param {Object} [options.auxiliaryPolygonMaterial] 定义辅助多边形的样式
+       * @param {Object} [options.autoDepthTest=true] 是否在需要的时候自动开启地形调整
+       */
+      constructor(viewer, options = {}) {
+        const {
+          labelStyle,
+          polylineStyle,
+          polygonStyle,
+          pointStyle,
+        } = options;
+        checkViewer(viewer);
+        this._viewer = viewer;
+        const defaultLabelStyle = PointPlot.defaultLabelStyle;
+        defaultLabelStyle.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+        this._labelStyle = defaultValue$9(labelStyle, defaultLabelStyle);
+        this._polylineStyle = defaultValue$9(polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$9(polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$9(pointStyle, PointPlot.defaultStyle);
+
+        this._startMeasure = new Event$8();
+        this._stopMeasure = new Event$8();
+        this._addNode = new Event$8();
+
+        this.formatText = defaultValue$9(options.formatText, formatText);
+
+        const defaultNode = {
+          distance: true,
+          area: false,
+          height: false,
+          angle: false,
+        };
+        const defaultAuxiliary = {
+          distance: true,
+          area: false,
+          height: true,
+          angle: true,
+        };
+        this._nodeMode = defaultValue$9(options.nodeMode, defaultNode);
+        this._auxiliaryGeometry = defaultValue$9(options.auxiliaryGeometry, defaultAuxiliary);
+
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+        this._handler = handler;
+        this._values = [];
+        this._mode = defaultValue$9(options.mode, CartometryType$1.SURFACE_DISTANCE);
+        this._tip = new CursorTip();
+        this._tip.show = false;
+        this._autoDepthTest = defaultValue$9(options.autoDepthTest, true);
+        this.listening = false;
+        const auxiliarylineMaterial = new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.RED,
+        });
+        this._auxiliarylineMaterial = defaultValue$9(options.auxiliaryLineMaterial, auxiliarylineMaterial);
+        const auxiliarypolygonMaterial = new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.RED,
+        });
+        this._depthTestAgainstTerrain = this._viewer.scene.globe.depthTestAgainstTerrain;
+        this._auxiliaryPolygonMaterial = defaultValue$9(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
+      }
+
+      /**
+       * Cesium Viewer对象，
+       * @type Viewer
+       * @readonly
+       * @return {Cesium.Viewer}
+       */
+      get viewer() {
+        return this.viewer;
+      }
+
+      /**
+       * 定义label样式，同Cesium.LabelGraphic
+       * @return {Object}
+       */
+      get labelStyle() {
+        return this._labelStyle;
+      }
+
+      set labelStyle(v) {
+        this._labelStyle = v;
+      }
+
+      /**
+       * 定义线样式，同Cesium.PolylineGraphic
+       * @return {Object}
+       */
+      get polylineStyle() {
+        return this._polylineStyle;
+      }
+
+      set polylineStyle(v) {
+        this._polylineStyle = v;
+      }
+
+      /**
+       * 定义Polygon样式，同Cesium.PolygonGraphic
+       * @return {Object}
+       */
+      get polygonStyle() {
+        return this._polygonStyle;
+      }
+
+      set polygonStyle(v) {
+        this._polygonStyle = v;
+      }
+
+      /**
+       * 定义Point样式，同Cesium.PointGraphic
+       * @return {Object}
+       */
+      get pointStyle() {
+        return this._pointStyle;
+      }
+
+      set pointStyle(v) {
+        this._pointStyle = v;
+      }
+
+      /**
+       * 开始测量时触发的事件
+       * @type {Event}
+       */
+      get startMeasure() {
+        return this._startMeasure;
+      }
+
+      /**
+       * 结束测量时触发的事件
+       * @type {Event}
+       */
+      get stopMeasure() {
+        return this._stopMeasure;
+      }
+
+      /**
+       * 添加节点时触发的事件
+       * @type {Event}
+       */
+      get addNode() {
+        return this._addNode;
+      }
+
+      /**
+       * 跟随鼠标的文字
+       * @type {CursorTip}
+       */
+      get tip() {
+        return this._tip;
+      }
+
+      /**
+       * 获得或设置地图量算的类型
+       * @type {CartometryType}
+       * @return {}
+       */
+      get mode() {
+        return this._mode;
+      }
+
+      set mode(mode) {
+        if (CartometryType$1.validate(mode)) {
+          this._mode = mode;
+        } else {
+          console.warn('CartometryManaer:无效的测量模式');
+        }
+      }
+
+      /**
+       * 开始监听鼠标事件，并获取鼠标所在的位置，包括单击，移动，右击，不建议直接调用该方法，因为开始量算后系统会自动调用。
+       * @private
+       * @param {CartometryType} mode 量算模式
+       * @param {Array} [positions=[]] 用于存储点位信息
+       */
+      addEventListener(mode, positions = []) {
+        this._listening = true;
+        const modeLabel = CartometryType$1.getKey(mode);
+        const label = /.*_?(distance|area|height|angle)$/.exec(modeLabel.toLowerCase());
+        let showNode = false;
+        let showAuxiliary = false;
+        if (label && label[1]) {
+          showNode = this._nodeMode[label[1]];
+          showAuxiliary = this._auxiliaryGeometry[label[1]];
+        }
+
+        const onClick = (e) => {
+          const cartesian = this.pickPosition(e.position);
+          cartesian && positions.push(cartesian);
+          if (showNode) {
+            this.createNode(cartesian);
+          }
+          if (showAuxiliary) {
+            this.createAuxiliaryGraphic(positions, cartesian, mode);
+          }
+          this.addNode.raise(cartesian);
+          if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
+            if (positions.length === 1) {
+              this.tip.text = '单击地图确定终点.';
+            }
+            if (positions.length === 2) {
+              this.removeEventListener();
+              let labelPosition = positions[0];
+              let value;
+              if (mode === CartometryType$1.HEIGHT) {
+                value = this.getHeight(positions);
+                const startC = LonLat.fromCartesian(positions[0]);
+                const endC = LonLat.fromCartesian(positions[1]);
+                const lowerPoint = startC.alt < endC.alt ? startC : endC;
+                labelPosition = Cesium.Cartesian3.fromDegrees(lowerPoint.lon, lowerPoint.lat, (endC.alt + startC.alt) / 2);
+              } else {
+                value = this.getAngle(positions);
+              }
+              this.createLabel(labelPosition, value);
+            }
+          }
+        };
+        const onrClick = (e) => {
+          const cartesian = this.pickPosition(e.position);
+          if (!cartesian) {
+            return;
+          }
+          if (showNode) {
+            this.createNode(cartesian);
+          }
+          if (mode !== CartometryType$1.HEIGHT || mode !== CartometryType$1.ANGLE) {
+            positions.pop();
+            positions.length && cartesian && positions.push(cartesian);
+            this.removeEventListener();
+            this.addNode.raise(cartesian);
+          }
+          if (mode === CartometryType$1.SURFACE_DISTANCE || mode === CartometryType$1.SPACE_DISTANCE) {
+            const text = this.getDistance(positions, mode);
+            this.createLabel(cartesian, text);
+          }
+          if (mode === CartometryType$1.SURFACE_AREA || mode === CartometryType$1.SPACE_AREA) {
+            const text = this.getArea(positions, mode);
+            this.createLabel(cartesian, text);
+          }
+          this.stopMeasure.raise();
+        };
+        const onMousemove = (e) => {
+          this.tip.position = e.endPosition;
+          if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
+            return;
+          }
+          const cartesian = this.pickPosition(e.endPosition);
+          if (positions.length > 1) {
+            cartesian && positions.pop();
+          }
+          if (positions.length > 0) {
+            cartesian && positions.push(cartesian);
+          }
+        };
+        const handler = this._handler;
+        handler.setInputAction(onClick, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        handler.setInputAction(onMousemove, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+        handler.setInputAction(onrClick, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+      }
+
+      /**
+       * 移除事件监听
+       * @private
+       */
+      removeEventListener() {
+        const handler = this._handler;
+        handler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+        handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+        this._listening = false;
+        this.tip.show = false;
+        if (this._autoDepthTest) {
+          this._viewer.depthTest = this._depthTestAgainstTerrain;
+        }
+      }
+
+      /**
+       * 清除所有量算结果
+       */
+      clear() {
+        const values = this._values;
+        for (const v of values) {
+          this._viewer.entities.remove(v);
+        }
+        this._values = [];
+      }
+
+      /**
+       * 销毁对象
+       */
+      destroy() {
+        this.clear();
+        this.removeEventListener();
+        if (!this._handler.isDestroyed()) {
+          this._handler.destroy();
+        }
+        this._viewer = undefinesd;
+      }
+
+      /**
+       * 根据坐标计算距离。
+       * @param  {Array} position 需要计算距离的点
+       * @param {CartometryType} mode 距离类型，贴地距离/空间距离
+       * @return {Number}          距离,单位:米
+       */
+      getDistance(position, mode) {
+        if (position.length < 2 || !position[0] || !position[1]) {
+          return '起点';
+        }
+        let distance;
+        if (mode === CartometryType$1.SURFACE_DISTANCE) {
+          distance = Cartometry.surfaceDistance(position);
+        } else if (mode === CartometryType$1.SPACE_DISTANCE) {
+          distance = Cartometry.spaceDistance(position);
+        }
+        return this.formatText(distance, mode, !this._listening);
+      }
+
+      /**
+       * 根据坐标计算面积。
+       * @param  {Array} positions 要计算面积的点
+       * @param  {CartometryType} mode      计算模式,贴地面积/空间面积
+       * @return {Number}           面积，单位:平方米
+       */
+      getArea(positions, mode) {
+        let area;
+        if (mode === CartometryType$1.SURFACE_AREA) {
+          area = Cartometry.surfaceArea(positions);
+        } else {
+          area = Cartometry.spaceArea(positions);
+        }
+        return this.formatText(area, mode, !this._listening);
+      }
+
+      /**
+       * 根据坐标计算相邻两个点之间的高度差。
+       * @param  {Cesium.Cartesian3[]} positions 坐标集合
+       * @return {Number}           两点之间的高度差，单位：米
+       */
+      getHeight(positions) {
+        const heights = Cartometry.heightFromCartesianArray(positions);
+        return this.formatText(Math.abs(heights[0]), CartometryType$1.HEIGHT);
+      }
+
+      /**
+       * 计算向量方位角。
+       * @param  {Cesium.Cartesian3[]} positions 构成向量的坐标，第一个点为起点，第二个点为终点，多余的点会被抛弃
+       * @return {Number} 向量与正北方向的夹角，单位：度
+       */
+      getAngle(positions, mode) {
+        const angle = Cartometry.angleBetweenNorth(positions[0], positions[1]);
+        return this.formatText(angle, CartometryType$1.ANGLE);
+      }
+
+      /**
+       * 开始量算,开启鼠标事件监听，包括点击、移动、右击，标绘结束后自动移除事件监听。
+       * @param  {CartometryType} mode 量算模式(类型)
+       * @param {Array} [positions] 通过鼠标拾取的点
+       */
+      do(mode, positions = []) {
+        if (!this._depthTestAgainstTerrain) {
+          if (!this._autoDepthTest) {
+            console.warn('depthTestAgainstTerrain未开启,点位获取可能不准确.');
+          } else {
+            this._viewer.depthTest = true;
+          }
+        }
+
+        this.tip.show = true;
+        mode = defaultValue$9(mode, this.mode);
+        const valid = CartometryType$1.validate(mode);
+        if (!valid) {
+          console.warn('无效的测量模式'); // WARNING: 无效的测量模式
+          return;
+        }
+        if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
+          this.tip.text = '单击地图确定起点.';
+        } else {
+          this.tip.text = '单击地图添加节点，右击地图结束量算';
+        }
+        this.startMeasure.raise(mode);
+        let options;
+        if (mode === CartometryType$1.SPACE_DISTANCE || mode === CartometryType$1.HEIGHT) {
+          options = this.polylineStyle;
+          options.clampToGround = false;
+          options.positions = new Cesium.CallbackProperty(() => positions, false);
+          this.createPolyline(options);
+        } else if (mode === CartometryType$1.SURFACE_DISTANCE ||
+          mode === CartometryType$1.ANGLE) {
+          options = this.polylineStyle;
+          options.clampToGround = true;
+          options.positions = new Cesium.CallbackProperty(() => positions, false);
+          this.createPolyline(options);
+        } else if (mode === CartometryType$1.SPACE_AREA) {
+          options = this.polygonStyle;
+          options.outline = false;
+          options.perPositionHeight = true;
+          options.heightReference = Cesium.HeightReference.NONE;
+          options.hierarchy = new Cesium.CallbackProperty(
+            () => new Cesium.PolygonHierarchy(positions),
+            false,
+          );
+          this.createPolygon(options);
+        } else if (mode === CartometryType$1.SURFACE_AREA) {
+          options = this.polygonStyle;
+          options.perPositionHeight = false;
+          options.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
+          options.hierarchy = new Cesium.CallbackProperty(
+            () => new Cesium.PolygonHierarchy(positions),
+            false,
+          );
+          this.createPolygon(options);
+        }
+        this.addEventListener(mode, positions);
+      }
+
+      /**
+       * 开启地面距离量算，和<code>do(CesiumPro.CartometryType.SURFACE_DISTANCE)</code>效果相同。
+       * @returns {Number} 贴地距离，单位：米
+       */
+      surfaceDistance() {
+        this.do(CartometryType$1.SURFACE_DISTANCE);
+      }
+
+      /**
+       * 开启空间距离量算，和<code>do(CesiumPro.CartometryType.SPACE_DISTANCE)</code>效果相同。
+       * @returns {Number} 空间距离，单位：米
+       */
+      spaceDistance() {
+        this.do(CartometryType$1.SPACE_DISTANCE);
+      }
+
+      /**
+       * 开启贴地面积量算，和<code>do(CesiumPro.CartometryType.SURFACE_AREA)</code>效果相同。
+       * @return {Number} 贴地面积，单位：平方米
+       */
+      surfaceArea() {
+        this.do(CartometryType$1.SURFACE_AREA);
+      }
+
+      /**
+       * 开启空间面积量算，和<code>do(CesiumPro.CartometryType.SPACE_AREA)</code>效果相同。
+       * @return {Number} 空间面积，单位：平方米
+       */
+      spaceArea() {
+        this.do(CartometryType$1.SPACE_AREA);
+      }
+
+      /**
+       * 开启高度量算，和<code>do(CesiumPro.CartometryType.HEIGHT)</code>效果相同。
+       * @return {Number} 高度差，单位：米
+       */
+      height() {
+        this.do(CartometryType$1.HEIGHT);
+      }
+
+      /**
+       * 开启角度量算，和<code>do(CesiumPro.CartometryType.ANGLE)</code>效果相同。
+       * @return {Number} 方位角，单位：度
+       */
+      angle() {
+        this.do(CartometryType$1.ANGLE);
+      }
+
+      /**
+       * @private
+       * 屏幕坐标转笛卡尔坐标。
+       * @param  {Cartesian2} pixel  屏幕坐标
+       * @return {Cartesian3}        笛卡尔坐标
+       */
+      pickPosition(pixel) {
+        const viewer = this._viewer;
+        let cartesian;
+        const ray = viewer.camera.getPickRay(pixel);
+        cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+        const feat = viewer.scene.pick(pixel);
+        if (feat) {
+          if (viewer.scene.pickPositionSupported) {
+            cartesian = viewer.scene.pickPosition(pixel);
+          } else {
+            console.warn('This browser does not support pickPosition.');
+          }
+        }
+        return cartesian;
+      }
+
+      /**
+       * @private
+       * @param  {} options [description]
+       * @return {}         [description]
+       */
+      createNode(cartesian) {
+        if (!cartesian) {
+          return;
+        }
+        const pointOptions = this.pointStyle;
+        const point = this._viewer.entities.add({
+          position: cartesian,
+          point: pointOptions,
+        });
+        this._values.push(point);
+        return point;
+      }
+
+      /**
+       * @private
+       * @param  {} options
+       */
+      createLabel(cartesian, text) {
+        const labelOptions = this.labelStyle;
+        labelOptions.text = text;
+        const coor = LonLat.fromCartesian(cartesian);
+        labelOptions.pixelOffset = new Cesium.Cartesian3(0, 0, coor.height > 0 ? -coor.height : 0);
+        const label = this._viewer.entities.add({
+          position: cartesian,
+          label: labelOptions,
+        });
+        this._values.push(label);
+        return label;
+      }
+
+      /**
+       * @private
+       * @param  {} options [description]
+       * @return {}         [description]
+       */
+      createPolygon(options) {
+        const pg = this._viewer.entities.add({
+          polygon: options,
+        });
+        this._values.push(pg);
+        return pg;
+      }
+
+      /**
+       * @private
+       * @param  {} options [description]
+       * @return {}         [description]
+       */
+      createPolyline(options) {
+        const pl = this._viewer.entities.add({
+          polyline: options,
+        });
+        this._values.push(pl);
+        return pl;
+      }
+
+      /**
+       * @private
+       * 为高度量算创建辅助线
+       * @param  {} potitions [description]
+       * @return {}           [description]
+       */
+      _createAuxiliaryGraphicforHeight(positions) {
+        if (positions.length !== 2) {
+          return;
+        }
+        const startC = LonLat.fromCartesian(positions[0]);
+        const endC = LonLat.fromCartesian(positions[1]);
+        let lowerPoint, higherPoint;
+        if (startC.alt < endC.alt) {
+          lowerPoint = startC;
+          higherPoint = endC;
+        } else {
+          lowerPoint = endC;
+          higherPoint = startC;
+        }
+        const tmp = new LonLat(lowerPoint.lon, lowerPoint.lat, higherPoint.alt);
+        const pts = [positions[0], tmp.toCartesian(), positions[1]];
+        const pl = this._viewer.entities.add({
+          polyline: {
+            positions: pts,
+            material: this._auxiliarylineMaterial,
+            width: this.polylineStyle.width || 3,
+          },
+        });
+        this._values.push(pl);
+      }
+
+      /**
+       * 为距离量算创建辅助要素
+       * @private
+       * @param  {Cesium.Cartesian3} cartesian [description]
+       * @param  {} text      [description]
+       * @return {}           [description]
+       */
+      _createAuxiliaryGraphicforDisgance(cartesian, text) {
+        this.createLabel(cartesian, text);
+      }
+
+      /**
+       * 为角度量算创建辅助要素
+       * @private
+       * @param  {} cartesian [description]
+       * @return {}           [description]
+       */
+      _createAuxiliaryGraphicforAngle(positions) {
+        if (positions.length !== 2) {
+          return;
+        }
+        const distance = Cartometry.spaceDistance(positions);
+        const matrix = new Cesium.Transforms.eastNorthUpToFixedFrame(positions[0]);
+        const inverseMatrix = new Cesium.Matrix4();
+        Cesium.Matrix4.inverseTransformation(matrix, inverseMatrix);
+        // const x = Cesium.Matrix4.multiplyByPoint(matrix, new Cesium.Cartesian3(distance, 0, 0), new Cesium.Cartesian3);
+        const y = Cesium.Matrix4.multiplyByPoint(matrix, new Cesium.Cartesian3(0, distance, 0), new Cesium.Cartesian3());
+        const options = {
+          polyline: {
+            positions: [positions[0], y],
+            material: this._auxiliarylineMaterial,
+            width: this.polylineStyle.width || 3,
+            clampToGround: true,
+          },
+        };
+        const pl = this._viewer.entities.add(options);
+        this._values.push(pl);
+      }
+
+      /**
+       * 创建辅助要素
+       * @private
+       */
+      createAuxiliaryGraphic(position, cartesian, mode) {
+        if (mode === CartometryType$1.SPACE_DISTANCE || mode === CartometryType$1.SURFACE_DISTANCE) {
+          const {
+            length,
+          } = position;
+          const text = this.getDistance([position[length - 3], position[length - 2]], mode);
+          this._createAuxiliaryGraphicforDisgance(cartesian, text);
+        } else if (mode === CartometryType$1.HEIGHT) {
+          this._createAuxiliaryGraphicforHeight(position);
+        } else if (mode === CartometryType$1.ANGLE) {
+          this._createAuxiliaryGraphicforAngle(position);
+        }
+      }
+
+      /**
+       * 处理显示文本的回调函数
+       * @callback CartometryManager~Callback
+       *
+       * @param {Number} value 量算结果，距离、面积或角度
+       * @param {CartometryType} mode 量算模式
+       * @param {Boolean} isLast 是否是最后一个点
+       * @returns {String} 格式化的文本内容
+       */
+      callback(value, mode, isLast) {
+
+      }
+    }
+
     class NodePlot {
       /**
        * 用于创建线面图形的顶点图形
@@ -29359,7 +32817,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions) {
         this._type = PlotType$1.MUTIPOINT;
-        this._positions = defaultValue$7(entityOptions.positions, []);
+        this._positions = defaultValue$9(entityOptions.positions, []);
         this._entityOptions = entityOptions;
         this._values = [];
         this.createEntity();
@@ -29388,7 +32846,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       highlightActiveNode() {
-        const values = this._values.filter(_ => defined$a(_.position));
+        const values = this._values.filter(_ => defined$b(_.position));
         for (let i = 0, length = values.length; i < length; i++) {
           const v = values[i];
           if (i === this.activeIndex) {
@@ -29431,7 +32889,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity} index对应的顶点实体
        */
       get(index) {
-        const values = this._values.filter(_ => defined$a(_.position));
+        const values = this._values.filter(_ => defined$b(_.position));
         return values[index];
       }
       /**
@@ -29496,7 +32954,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity}    被删除的顶点
        */
       removeNode(index) {
-        if (!defined$a(index)) {
+        if (!defined$b(index)) {
           return;
         }
         // const node = this._values[index];
@@ -29576,10 +33034,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     class ArrowPlot extends BasePlot {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._type = defaultValue$7(options.type, PlotType$1.STRAIGHTARROW);
+        this._type = defaultValue$9(options.type, PlotType$1.STRAIGHTARROW);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$7(entityOptions.positions, []);
-        this._arrowType = defaultValue$7(options.type, PlotType$1.STRAIGHTARROW);
+        this._positions = defaultValue$9(entityOptions.positions, []);
+        this._arrowType = defaultValue$9(options.type, PlotType$1.STRAIGHTARROW);
         if (!ArrowType.validate(this._arrowType)) {
           throw new CesiumProError$1('无效的箭头图形.')
         }
@@ -29698,7 +33156,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       updatePositions() {
-        if (!defined$a(this.arrow)) {
+        if (!defined$b(this.arrow)) {
           return;
         }
         const controls = this.arrow.controls;
@@ -29759,8 +33217,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$7(options, {});
-        this._id = defaultValue$7(options.id, guid());
+        options = defaultValue$9(options, {});
+        this._id = defaultValue$9(options.id, guid());
         this._dataSource = new Cesium.CustomDataSource('cesiumpro-graphic_' + this._id);
         this._nodeDataSource = new Cesium.CustomDataSource('cesiumpro-graphic-node_' + this._id);
         this._viewer.dataSources.add(this._dataSource);
@@ -29776,12 +33234,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._postRemove = new Event$8();
         this._values = new Cesium.AssociativeArray();
         this._handler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
-        this._pointStyle = defaultValue$7(options.pointStyle, PointPlot.defaultPointStyle);
-        this._labelStyle = defaultValue$7(options.labelStyle, PointPlot.defaultLabelStyle);
-        this._modelStyle = defaultValue$7(options.modelStyle, PointPlot.defaultModelStyle);
-        this._billboardStyle = defaultValue$7(options.billboardStyle, PointPlot.defaultBillboardStyle);
-        this._polylineStyle = defaultValue$7(options.polylineStyle, PolylinePlot.defaultStyle);
-        this._polygonStyle = defaultValue$7(options.polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$9(options.pointStyle, PointPlot.defaultPointStyle);
+        this._labelStyle = defaultValue$9(options.labelStyle, PointPlot.defaultLabelStyle);
+        this._modelStyle = defaultValue$9(options.modelStyle, PointPlot.defaultModelStyle);
+        this._billboardStyle = defaultValue$9(options.billboardStyle, PointPlot.defaultBillboardStyle);
+        this._polylineStyle = defaultValue$9(options.polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$9(options.polygonStyle, PolygonPlot.defaultStyle);
         this._editEventHandler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
         this._viewer.screenSpaceEventHandler.removeInputAction(LEFT_DOUBLE_CLICK);
 
@@ -29791,7 +33249,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * 右键菜单管理器
          * @type {ContextMenu}
          */
-        options.contextEnabled = defaultValue$7(options.contextEnabled, true);
+        options.contextEnabled = defaultValue$9(options.contextEnabled, true);
         options.contextEnabled && (this.contextMenu = this.createContext());
         /**
          * 跟随鼠标移动的文字
@@ -30014,7 +33472,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       add(graphic) {
         this.preCreate.raise(graphic);
-        if (defined$a(this.viewer && defined$a(graphic.entity))) {
+        if (defined$b(this.viewer && defined$b(graphic.entity))) {
           this.root.add(graphic.entity);
           this._values.set(graphic.id, graphic);
           this.postCreate.raise(graphic);
@@ -30026,11 +33484,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {PolylinePlot|PointPlot|PolygonPlot} graphic 要从场景中删除的图形
        */
       remove(graphic) {
-        if (!defined$a(graphic)) {
+        if (!defined$b(graphic)) {
           return;
         }
         this.preRemove.raise(graphic);
-        if (defined$a(this.viewer) && defined$a(graphic.entity)) {
+        if (defined$b(this.viewer) && defined$b(graphic.entity)) {
           this.root.remove(graphic.entity);
           this.postRemove.raise(graphic);
         }
@@ -30059,7 +33517,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Boolean}  true表示包含
        */
       hasEntity(entity) {
-        if (!defined$a(entity)) {
+        if (!defined$b(entity)) {
           return false;
         }
         return this._root.contains(entity);
@@ -30099,7 +33557,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         } else {
           entities.push(graphic.entity);
         }
-        if (defined$a(this._viewer)) {
+        if (defined$b(this._viewer)) {
           this._viewer.zoomTo(entities);
         }
       }
@@ -30177,7 +33635,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       addEventListener(single = true) {
-        if (!defined$a(this.activeGraphic)) {
+        if (!defined$b(this.activeGraphic)) {
           return;
         }
         const positions = this.activeGraphic.positions;
@@ -30186,13 +33644,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this.activeGraphic.updatePosition.bind(this.activeGraphic) : 
             this.activeGraphic.addNode.bind(this.activeGraphic);
           const position = this.pickPosition(e.position);
-          if (!defined$a(position)) {
+          if (!defined$b(position)) {
             return;
           } 
           // if (this.activeGraphic._arrowType === ArrowType.attackarrow && this.positions.length > 1) {
           //   this.activeGraphic.popNode();
           // }
-          if (defined$a(addNode)) {
+          if (defined$b(addNode)) {
             addNode(position);
           }
           if (single) {
@@ -30200,13 +33658,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             // this.activeGraphic.stopEdit();
             // this._mode = PlotMode.ready;
             this.stopEdit(this.activeGraphic);
-            defined$a(this.contextMenu) && this.addContextEventListener();
+            defined$b(this.contextMenu) && this.addContextEventListener();
           }
-          defined$a(this.contextMenu) && this.removeContextEventListener();
+          defined$b(this.contextMenu) && this.removeContextEventListener();
         };
         const onMouseMove = (e) => {
           const position = this.pickPosition(e.endPosition);
-          if (!defined$a(position)) {
+          if (!defined$b(position)) {
             return;
           }
           if (positions.length < 1) {
@@ -30230,7 +33688,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           // this.activeGraphic = undefined;
           // this._mode = PlotMode.ready;
           this.stopEdit(this.activeGraphic);
-          defined$a(this.contextMenu) && this.addContextEventListener();
+          defined$b(this.contextMenu) && this.addContextEventListener();
         };
         if (!single) {
           this._handler.setInputAction(onMouseMove, MOUSE_MOVE);
@@ -30242,12 +33700,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         const handler = this._editEventHandler;
         let dragging = false;
         const onClick = e => {
-          defined$a(this.contextMenu) && (this.contextMenu.show = false);
-          if (!defined$a(this.activeGraphic)) {
+          defined$b(this.contextMenu) && (this.contextMenu.show = false);
+          if (!defined$b(this.activeGraphic)) {
             return;
           }
           const feature = this._viewer.scene.pick(e.position);
-          if (defined$a(feature) && feature.id instanceof Cesium.Entity) {
+          if (defined$b(feature) && feature.id instanceof Cesium.Entity) {
             if (this.hasEntity(feature.id)) {
               this.activeGraphic.highlightGraphic();
               this._nodeGraphic && (this._nodeGraphic.activeNode = undefined);
@@ -30300,10 +33758,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           }
           const feat = this._viewer.scene.pick(e.position);
           const position = pickPosition(e.position, this._viewer, true);
-          if (defined$a(feat) && this.hasEntity(feat.id)) {
+          if (defined$b(feat) && this.hasEntity(feat.id)) {
             this.contextMenu.position = position;
             this.selectedGraphic = this.getById(feat.id.id);
-            defined$a(this.contextMenu) && (this.contextMenu.show = true);
+            defined$b(this.contextMenu) && (this.contextMenu.show = true);
           }
         }, RIGHT_DOWN);
       }
@@ -30316,20 +33774,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
       updatePosition(cartesian) {
         const graphic = this.activeGraphic;
-        if (!defined$a(graphic)) {
+        if (!defined$b(graphic)) {
           return;
         }
         if (PlotType$1.isPoint(graphic.type)) {
           graphic.updatePosition(cartesian);
         } else {
-          if (!defined$a(this._nodeGraphic) || !defined$a(this._nodeGraphic.activeIndex)) {
+          if (!defined$b(this._nodeGraphic) || !defined$b(this._nodeGraphic.activeIndex)) {
             return;
           }
           graphic.updateNode(this._nodeGraphic.activeIndex, cartesian);
         }
       }
       pickPosition(pixel) {
-        if (!defined$a(this.activeGraphic)) {
+        if (!defined$b(this.activeGraphic)) {
           return;
         }
         const modelPosition = this.activeGraphic.clampToModel;
@@ -30457,8 +33915,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Material: Material$8,
-      Color: Color$c,
+      Material: Material$9,
+      Color: Color$d,
       Property: Property$1
     } = Cesium;
 
@@ -30474,16 +33932,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Number} [options.maximumDistance=0.5] 介于0~1之间的值，当值为0时，整个颜色为fadeOutColor，值为1时，整个颜色为fadeInColor
        */
       constructor(options = {}) {
-        this._fadeInColor = defaultValue$7(options.fadeInColor, Cesium.Color.RED);
-        this._fadeOutColor = defaultValue$7(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
-        this._time = defaultValue$7(options.time, new Cesium.Cartesian2(0, 0));
-        this._repeat = defaultValue$7(options.repeat, false);
-        this._duration = defaultValue$7(options.duration, 3000);
-        this._fadeDirection = defaultValue$7(options.fadeDirection, {
+        this._fadeInColor = defaultValue$9(options.fadeInColor, Cesium.Color.RED);
+        this._fadeOutColor = defaultValue$9(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
+        this._time = defaultValue$9(options.time, new Cesium.Cartesian2(0, 0));
+        this._repeat = defaultValue$9(options.repeat, false);
+        this._duration = defaultValue$9(options.duration, 3000);
+        this._fadeDirection = defaultValue$9(options.fadeDirection, {
           x: true,
           y: false
         });
-        this._maximumDistance = defaultValue$7(options.maximumDistance, 0.5);
+        this._maximumDistance = defaultValue$9(options.maximumDistance, 0.5);
         this._definitionChanged = new Event$8();
       }
 
@@ -30579,7 +34037,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @type {String}
        */
       getType() {
-        return Material$8.FadeType;
+        return Material$9.FadeType;
       }
 
       /**
@@ -30589,7 +34047,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         if (this._time === undefined) {
           this._time = {
             x: time.secondsOfDay,
@@ -30622,7 +34080,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
     }
 
-    const shader$g = `
+    const shader$h = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   vec2 st=materialInput.st*repeat;
@@ -30638,16 +34096,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$7,
-      Color: Color$b
+      Material: Material$8,
+      Color: Color$c
     } = Cesium;
 
-    Material$7.DynamicFlowWallType = 'DynamicFlowWall';
-    Material$7._materialCache.addMaterial(Material$7.DynamicFlowWallType, {
+    Material$8.DynamicFlowWallType = 'DynamicFlowWall';
+    Material$8._materialCache.addMaterial(Material$8.DynamicFlowWallType, {
       fabric: {
-        type: Material$7.DynamicFlowWallType,
+        type: Material$8.DynamicFlowWallType,
         uniforms: {
-          color: new Color$b(1.0, 0.0, 0.0),
+          color: new Color$c(1.0, 0.0, 0.0),
           time: 0,
           gradient: 1,
           image: '',
@@ -30657,7 +34115,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           },
           wrapX: false
         },
-        source: shader$g
+        source: shader$h
       }
     });
 
@@ -30672,13 +34130,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Cesium.Cartesian2} [options.repeat=new Cesium.Cartesian2(1,1)] 图片在x和y方向上重复的次数
        */
       constructor(options = {}) {
-        this._color = defaultValue$7(options.color, Cesium.Color.RED);
+        this._color = defaultValue$9(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$7(options.duration, 1000);
-        this._gradient = defaultValue$7(options.gradient, 1.0);
-        this._image = defaultValue$7(options.image, Url.buildModuleUrl('./assets/images/wall.png'));
-        this._wrapX = defaultValue$7(options.wrapX, false);
-        this._repeat = defaultValue$7(options.repeat, new Cesium.Cartesian2(1, 1));
+        this._duration = defaultValue$9(options.duration, 1000);
+        this._gradient = defaultValue$9(options.gradient, 1.0);
+        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/wall.png'));
+        this._wrapX = defaultValue$9(options.wrapX, false);
+        this._repeat = defaultValue$9(options.repeat, new Cesium.Cartesian2(1, 1));
         this._definitionChanged = new Event$8();
       }
 
@@ -30769,7 +34227,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$7.DynamicFlowWallType;
+        return Material$8.DynamicFlowWallType;
       }
       /**
        * 获取指定时间的属性值。
@@ -30778,7 +34236,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -30803,7 +34261,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       }
     }
 
-    const shader$f = `
+    const shader$g = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   vec2 st=materialInput.st;
@@ -30820,20 +34278,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$6,
-      Color: Color$a,
+      Material: Material$7,
+      Color: Color$b,
     } = Cesium;
 
-    Material$6.DynamicSpreadType = 'DynamicSpread';
-    Material$6._materialCache.addMaterial(Material$6.DynamicSpreadType, {
+    Material$7.DynamicSpreadType = 'DynamicSpread';
+    Material$7._materialCache.addMaterial(Material$7.DynamicSpreadType, {
       fabric: {
-        type: Material$6.DynamicSpreadType,
+        type: Material$7.DynamicSpreadType,
         uniforms: {
-          color: new Color$a(1.0, 0.0, 0.0),
+          color: new Color$b(1.0, 0.0, 0.0),
           time: 0,
           gradient: 0.0
         },
-        source: shader$f
+        source: shader$g
       }
     });
 
@@ -30846,10 +34304,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=4.0] 渐变强度，不小于0的值，值越大渐变越明显，值为0将不会产生渐变效果
        */
       constructor(options = {}) {
-        this._color = defaultValue$7(options.color, Cesium.Color.RED);
+        this._color = defaultValue$9(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$7(options.duration, 1000);
-        this._gradient = defaultValue$7(options.gradient, 4.0);
+        this._duration = defaultValue$9(options.duration, 1000);
+        this._gradient = defaultValue$9(options.gradient, 4.0);
         this._definitionChanged = new Event$8();
       }
 
@@ -30905,7 +34363,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$6.DynamicSpreadType;
+        return Material$7.DynamicSpreadType;
       }
       /**
        * 获取指定时间的属性值。
@@ -30914,7 +34372,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -30934,7 +34392,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       }
     }
 
-    const shader$e = `
+    const shader$f = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   material.diffuse=1.5*color.rgb;
@@ -30967,23 +34425,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$5,
-      Color: Color$9,
+      Material: Material$6,
+      Color: Color$a,
       Property
     } = Cesium;
 
-    Material$5.DynamicWaveType = "DynamicWave";
-    Material$5._materialCache.addMaterial(Material$5.DynamicWaveType, {
+    Material$6.DynamicWaveType = "DynamicWave";
+    Material$6._materialCache.addMaterial(Material$6.DynamicWaveType, {
       fabric: {
-        type: Material$5.DynamicWaveType,
+        type: Material$6.DynamicWaveType,
         uniforms: {
           count: 1,
-          color: Color$9.RED,
+          color: Color$a.RED,
           duration: 1000,
           time: 0,
           gradient: 0.1
         },
-        source: shader$e
+        source: shader$f
       }
     });
     class DynamicWaveMaterialProperty {
@@ -30996,11 +34454,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=1.0] 介于0~1之间的数，表示条纹的宽度，值越大条纹越宽
        */
       constructor(options = {}) {
-        this._color = defaultValue$7(options.color, Cesium.Color.RED);
-        this._time = defaultValue$7(options.time, 0);
-        this._duration = defaultValue$7(options.duration, 1000);
-        this._count = defaultValue$7(options.count, 3);
-        this._gradient = defaultValue$7(options.gradient, 1.0);
+        this._color = defaultValue$9(options.color, Cesium.Color.RED);
+        this._time = defaultValue$9(options.time, 0);
+        this._duration = defaultValue$9(options.duration, 1000);
+        this._count = defaultValue$9(options.count, 3);
+        this._gradient = defaultValue$9(options.gradient, 1.0);
         this._gradient = Cesium.Math.clamp(this._gradient, 0, 1);
         this._definitionChanged = new Event$8();
       }
@@ -31072,7 +34530,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @type {String}
        */
       getType() {
-        return Material$5.DynamicWaveType;
+        return Material$6.DynamicWaveType;
       }
 
       /**
@@ -31082,7 +34540,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -31104,6 +34562,58 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           this.color === other.color && this.gradient === other.gradient);
       }
     }
+
+    const shader$e = `
+    czm_material czm_getMaterial(czm_materialInput materialInput) { \n
+      czm_material material = czm_getDefaultMaterial(materialInput); \n
+      vec2 st = materialInput.st; \n
+      material.diffuse = color.rgb * vec3(2.0); \n
+      float dis = 1.0 - abs(0.5 - st.t) * 2.0;
+      material.alpha = pow(dis * color.a, 3.0); \n
+      return material; \n
+    }
+    `;
+    const {
+        Material: Material$5,
+        Color: Color$9
+    } = Cesium;
+    class PolylineAntialiasingMaterialProperty {
+        constructor(opt = {}) {
+            this._definitionChanged = new Event$8();
+            this._color = undefined;
+            this.color = opt.color;
+        }
+        get isConstant() {
+            return true;
+        }
+        get definitionChanged() {
+            return this._definitionChanged;
+        }
+        getType() {
+            return PolylineAntialiasingMaterialProperty.materialType;
+        }
+        getValue(time, result = {}) {
+            result.color = this.color || Color$9.RED;
+            return result;
+        }
+        equals(other) {
+            return this === other || (
+                other instanceof PolylineAntialiasingMaterialProperty &&
+                other.color === this.color
+            );
+        }
+        static materialType = 'PolylineAntialiasing'
+    }
+    Material$5._materialCache.addMaterial(PolylineAntialiasingMaterialProperty.materialType, {
+        fabric: {
+            type: PolylineAntialiasingMaterialProperty.materialType,
+            uniforms: {
+                color: new Color$9(1, 1, 1, 1)
+            },
+            source: shader$e
+        },
+        translucent: true
+    });
 
     const shader$d =
       `
@@ -31146,10 +34656,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineTrailLinkMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$7(options.color, Cesium.Color.RED);
-        this._time = defaultValue$7(options.time, 0);
-        this._image = defaultValue$7(options.image, Url.buildModuleUrl('./assets/images/flowLine.png'));
-        this._duration = defaultValue$7(options.duration, 1000);
+        this._color = defaultValue$9(options.color, Cesium.Color.RED);
+        this._time = defaultValue$9(options.time, 0);
+        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/flowLine.png'));
+        this._duration = defaultValue$9(options.duration, 1000);
         this._definitionChanged = new Event$8();
       }
 
@@ -31214,7 +34724,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -31274,7 +34784,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     class PolylineODMaterialProperty {
         /**
          * 创建一个点材质，模拟波纹效果。
-         * @param {Object} [options={}] 具有以下属性
+         * @param {object} [options={}] 具有以下属性
          * @param {Cesium.Color} [options.baseColor = Cesium.Color.RED] 基础颜色
          * @param {Cesium.Color} [options.color=Cesium.Color.WHITE] 叠加颜色
          * @param {number} [options.speed=3] 流动速度
@@ -31284,23 +34794,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           /**
            * @type {Cesium.Color}
            */
-          this.baseColor = defaultValue$7(options.baseColor, Cesium.Color.RED);
+          this.baseColor = defaultValue$9(options.baseColor, Cesium.Color.RED);
           /**
            * @type {Cesium.Color}
            */
-          this.color = defaultValue$7(options.color, Cesium.Color.WHITE);
+          this.color = defaultValue$9(options.color, Cesium.Color.WHITE);
           /**
            * @type {number}
            */
-          this.speed = defaultValue$7(options.speed, 3);
+          this.speed = defaultValue$9(options.speed, 3);
           /**
            * @type {number}
            */
-          this.startTime = defaultValue$7(options.startTime, Math.random());
+          this.startTime = defaultValue$9(options.startTime, Math.random());
           /**
            * @type {number}
            */
-          this.bidirectional = defaultValue$7(options.bidirectional, 2);
+          this.bidirectional = defaultValue$9(options.bidirectional, 2);
           this._definitionChanged = new Event();
         }
         /**
@@ -31321,7 +34831,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       
         /**
          * 此属性的类型
-         * @type {String}
+         * @type {string}
          */
         getType() {
           return Material$3.ODLineType;
@@ -31329,12 +34839,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       
         /**
          * 获取指定时间的属性值。
-         * @param  {JulianDate} time  时间
-         * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
-         * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+         * @param  {Cesium.JulianDate} time  时间
+         * @param  {object} [result] 保存新属性的副本，如果没有指定将自动创建。
+         * @returns {object} 修改后的result,如果未提供result参数，则为新实例。
          */
         getValue(time, result) {
-          result = defaultValue$7(result, {});
+          result = defaultValue$9(result, {});
           result.baseColor = this.baseColor;
           result.color = this.color;
           result.speed = this.speed;
@@ -31395,10 +34905,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineFlowMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$7(options.color, Cesium.Color.RED);
-        this._time = defaultValue$7(options.time, 0);
-        this._image = defaultValue$7(options.image, Url.buildModuleUrl('./assets/images/colors.png'));
-        this._duration = defaultValue$7(options.duration, 1000);
+        this._color = defaultValue$9(options.color, Cesium.Color.RED);
+        this._time = defaultValue$9(options.time, 0);
+        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/colors.png'));
+        this._duration = defaultValue$9(options.duration, 1000);
         this._definitionChanged = new Event$8();
       }
 
@@ -31468,7 +34978,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$7(result, {});
+        result = defaultValue$9(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -31500,7 +35010,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             if (!options.element) {
                 throw new CesiumProError$1("parameter element must be provided.");
             }
-            this._show = defaultValue$7(options.show, true);
+            this._show = defaultValue$9(options.show, true);
             this._element = element;
         }
         get show() {
@@ -31926,7 +35436,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(options.objects)) {
+            if (!defined$b(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -31937,13 +35447,13 @@ void main() {
             //     throw new CesiumProError('property scene must be defined.')
             // }
             super(options);
-            this._id = defaultValue$7(options.id, createGuid$3());
+            this._id = defaultValue$9(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$4();
-            this._maxClusterLevel = defaultValue$7(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$7(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
         }
@@ -32139,7 +35649,7 @@ void main() {
             if(tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$7(this._createGeometryFunction, defaultCreateGeometryFunction$1);
+            const createGeometry = defaultValue$9(this._createGeometryFunction, defaultCreateGeometryFunction$1);
             const geometry = createGeometry(object, tile, framestate);
             const keys = Object.keys(object);
             for (let key of keys) {
@@ -32217,8 +35727,8 @@ void main() {
                 id: object.id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$7(object.pixelSize, options.pixelSize),
-                    color: defaultValue$7(object.color, options.color)
+                    pixelSize: defaultValue$9(object.pixelSize, options.pixelSize),
+                    color: defaultValue$9(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -32237,10 +35747,10 @@ void main() {
          * @param {MassiveBillboardLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$7(options.objects, []);
-            options.pixelSize = defaultValue$7(options.pixelSize, 5);
-            options.color = defaultValue$7(options.color, Color$4.fromRandom);
-            options.createGeometryFunction = defaultValue$7(options.createGeometryFunction, defaultCreateFn$1(options));
+            options.objects = defaultValue$9(options.objects, []);
+            options.pixelSize = defaultValue$9(options.pixelSize, 5);
+            options.color = defaultValue$9(options.color, Color$4.fromRandom);
+            options.createGeometryFunction = defaultValue$9(options.createGeometryFunction, defaultCreateFn$1(options));
             super(options);
         }
     }
@@ -32265,13 +35775,13 @@ void main() {
             modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
             object.modelMatrix = modelOption.modelMatrix;
         }
-        modelOption.minimumPixelSize = defaultValue$7(object.minimumPixelSize, options.minimumPixelSize);
-        modelOption.maximumScale = defaultValue$7(object.maximumScale, options.maximumScale);
-        modelOption.scale = defaultValue$7(object.scale, options.scale);
-        modelOption.allowPicking = defaultValue$7(object.allowPicking, options.allowPicking);
-        modelOption.shadows = defaultValue$7(object.shadows, options.shadows);
+        modelOption.minimumPixelSize = defaultValue$9(object.minimumPixelSize, options.minimumPixelSize);
+        modelOption.maximumScale = defaultValue$9(object.maximumScale, options.maximumScale);
+        modelOption.scale = defaultValue$9(object.scale, options.scale);
+        modelOption.allowPicking = defaultValue$9(object.allowPicking, options.allowPicking);
+        modelOption.shadows = defaultValue$9(object.shadows, options.shadows);
         modelOption.id = object._id;
-        modelOption.url = defaultValue$7(object.url, options.url);
+        modelOption.url = defaultValue$9(object.url, options.url);
         return Cesium.Model.fromGltf(modelOption)
     };
     const ZEROLEVELHEIGHT = 31638318;
@@ -32320,7 +35830,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$a(options.objects)) {
+            if (!defined$b(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -32336,13 +35846,13 @@ void main() {
                 delete _.id;
             });
             super(options);
-            this._id = defaultValue$7(options.id, createGuid$3());
+            this._id = defaultValue$9(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$2();
-            this._maxClusterLevel = defaultValue$7(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$7(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
             this._options = options;
@@ -32451,7 +35961,7 @@ void main() {
             if (tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$7(this._createGeometryFunction, defaultCreateGeometryFunction);
+            const createGeometry = defaultValue$9(this._createGeometryFunction, defaultCreateGeometryFunction);
             const geometry = createGeometry(object, this._options);
             this.add(geometry);
             return geometry;
@@ -32520,8 +36030,8 @@ void main() {
                 id: id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$7(object.pixelSize, options.pixelSize),
-                    color: defaultValue$7(object.color, options.color)
+                    pixelSize: defaultValue$9(object.pixelSize, options.pixelSize),
+                    color: defaultValue$9(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -32558,10 +36068,10 @@ void main() {
          * @demo {@link examples/apps/index.html#/5.4.1mag-point|100万点加载示例}
          */
         constructor(options = {}) {
-            options.objects = defaultValue$7(options.objects, []);
-            options.pixelSize = defaultValue$7(options.pixelSize, 5);
-            options.color = defaultValue$7(options.color, Color$3.fromRandom);
-            options.createGeometryFunction = defaultValue$7(options.createGeometryFunction, defaultCreateFn(options));
+            options.objects = defaultValue$9(options.objects, []);
+            options.pixelSize = defaultValue$9(options.pixelSize, 5);
+            options.color = defaultValue$9(options.color, Color$3.fromRandom);
+            options.createGeometryFunction = defaultValue$9(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
     }
@@ -32608,7 +36118,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Object} [options={}]
        */
       constructor(options) {
-        options = defaultValue$7(options, {});
+        options = defaultValue$9(options, {});
         this._options = options;
         this._postProcessStage = undefined;
       }
@@ -32619,7 +36129,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addTo(viewer) {
         checkViewer(viewer);
-        if (!defined$a(this._viewer)) {
+        if (!defined$b(this._viewer)) {
           this._viewer = viewer;
         }
         if (!this._postProcessStage) {
@@ -33100,7 +36610,7 @@ void main()
        * @param {Number} [options.speed=10] 扫描速度，值越大，扫描越快
        */
       constructor(options) {
-        options = defaultValue$7(options, defaultValue$7.EMPTY_OBJECT);
+        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
         const self = this;
         this._createVS = true;
         this._createRS = true;
@@ -33109,10 +36619,10 @@ void main()
          * 是否显示
          * @type {Boolean}
          */
-        this.show = defaultValue$7(options.show, true);
+        this.show = defaultValue$9(options.show, true);
 
         //切分程度
-        this.slice = defaultValue$7(options.slice, 32);
+        this.slice = defaultValue$9(options.slice, 32);
 
         //传感器的模型矩阵
         if (!options.modelMatrix) {
@@ -33128,42 +36638,42 @@ void main()
         this._computedScanPlaneModelMatrix = new Matrix4();
 
         //传感器的半径
-        this._radius = defaultValue$7(options.radius, Number.POSITIVE_INFINITY);
+        this._radius = defaultValue$9(options.radius, Number.POSITIVE_INFINITY);
 
         //传感器水平半角
-        this._xHalfAngle = CesiumMath.toRadians(defaultValue$7(options.xHalfAngle, 0));
+        this._xHalfAngle = CesiumMath.toRadians(defaultValue$9(options.xHalfAngle, 0));
 
         //传感器垂直半角
-        this._yHalfAngle = CesiumMath.toRadians(defaultValue$7(options.yHalfAngle, 0));
+        this._yHalfAngle = CesiumMath.toRadians(defaultValue$9(options.yHalfAngle, 0));
 
-        this._color = defaultValue$7(options._color, Color$1.AQUA.withAlpha(0.4));
+        this._color = defaultValue$9(options._color, Color$1.AQUA.withAlpha(0.4));
 
         /**
          * 线的颜色
          * @type {Cesium.Color}
          */
-        this.lineColor = defaultValue$7(options.lineColor, Color$1.WHITE);
+        this.lineColor = defaultValue$9(options.lineColor, Color$1.WHITE);
 
         /**
          * 是否显示扇面的线
          * @type {Boolean}
          */
-        this.showSectorLines = defaultValue$7(options.showSectorLines, true);
+        this.showSectorLines = defaultValue$9(options.showSectorLines, true);
 
         /**
          * 是否显示扇面和圆顶面连接的线
          * @type {Boolean}
          */
-        this.showSectorSegmentLines = defaultValue$7(options.showSectorSegmentLines, true);
+        this.showSectorSegmentLines = defaultValue$9(options.showSectorSegmentLines, true);
 
         /**
          * 是否显示侧面
          * @type {Boolean}
          */
-        this.showLateralSurfaces = defaultValue$7(options.showLateralSurfaces, true);
+        this.showLateralSurfaces = defaultValue$9(options.showLateralSurfaces, true);
 
         //目前用的统一材质
-        this._material = defined$a(options.material) ? options.material : Material.fromType(Material.ColorType);
+        this._material = defined$b(options.material) ? options.material : Material.fromType(Material.ColorType);
         this._material.uniforms.color = this._color;
         this._translucent = undefined;
 
@@ -33171,7 +36681,7 @@ void main()
          * 侧面材质
          * @type {Material}
          */
-        this.lateralSurfaceMaterial = defined$a(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material.fromType(Material.ColorType);
+        this.lateralSurfaceMaterial = defined$b(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material.fromType(Material.ColorType);
         this._lateralSurfaceMaterial = undefined;
         this._lateralSurfaceTranslucent = undefined;
 
@@ -33179,64 +36689,64 @@ void main()
          * 是否显示圆顶表面
          * @type {Boolean}
          */
-        this.showDomeSurfaces = defaultValue$7(options.showDomeSurfaces, true);
+        this.showDomeSurfaces = defaultValue$9(options.showDomeSurfaces, true);
 
         /**
          * 圆顶表面材质
          * @type {Material}
          */
-        this.domeSurfaceMaterial = defined$a(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material.fromType(Material.ColorType);
+        this.domeSurfaceMaterial = defined$b(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material.fromType(Material.ColorType);
 
         /**
          * 是否显示圆顶面线
          * @type {Boolean}
          */
-        this.showDomeLines = defaultValue$7(options.showDomeLines, true);
+        this.showDomeLines = defaultValue$9(options.showDomeLines, true);
 
         /**
          * 是否显示与地球相交的线
          * @type {Boolean}
          */
-        this.showIntersection = defaultValue$7(options.showIntersection, false);
+        this.showIntersection = defaultValue$9(options.showIntersection, false);
 
         /**
          * 与地球相交的线的颜色
          * @type {Color}
          */
-        this.intersectionColor = defaultValue$7(options.intersectionColor, Color$1.WHITE);
+        this.intersectionColor = defaultValue$9(options.intersectionColor, Color$1.WHITE);
 
         /**
          * 与地球相交的线的宽度（像素）
          * @type {Number}
          */
-        this.intersectionWidth = defaultValue$7(options.intersectionWidth, 5.0);
+        this.intersectionWidth = defaultValue$9(options.intersectionWidth, 5.0);
 
         //是否穿过地球
-        this._showThroughEllipsoid = defaultValue$7(options.showThroughEllipsoid, false);
+        this._showThroughEllipsoid = defaultValue$9(options.showThroughEllipsoid, false);
 
         /**
          * 是否显示扫描面
          * @type {Boolean}
          */
-        this.showScanPlane = defaultValue$7(options.showScanPlane, true);
+        this.showScanPlane = defaultValue$9(options.showScanPlane, true);
 
         /**
          * 扫描面颜色
          * @type {Color}
          */
-        this.scanPlaneColor = defaultValue$7(options.scanPlaneColor, Color$1.AQUA);
+        this.scanPlaneColor = defaultValue$9(options.scanPlaneColor, Color$1.AQUA);
 
         /**
          * 扫描面模式 垂直V/水平H
          * @type {String}
          */
-        this.scanPlaneMode = defaultValue$7(options.scanPlaneMode, 'H');
+        this.scanPlaneMode = defaultValue$9(options.scanPlaneMode, 'H');
 
         /**
          * 扫描速率，值越大，扫描越慢
          * @type {Number}
          */
-        this.speed = defaultValue$7(options.speed, 10);
+        this.speed = defaultValue$9(options.speed, 10);
 
         this._scanePlaneXHalfAngle = 0;
         this._scanePlaneYHalfAngle = 0;
@@ -34170,24 +37680,24 @@ void main()
        * })
        */
       constructor(options) {
-        options = defaultValue$7(options, defaultValue$7.EMPTY_OBJECT);
-        if (!defined$a(options.center)) {
+        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
+        if (!defined$b(options.center)) {
           throw new CesiumProError$1('parameter center is required.')
         }
-        if (!defined$a(options.radius)) {
+        if (!defined$b(options.radius)) {
           throw new CesiumProError$1('parameter radius is required.')
         }
-        if (!defined$a(options.fov)) {
+        if (!defined$b(options.fov)) {
           throw new CesiumProError$1('parameter fov is required.');
         }
         this._center = options.center;
         this._radius = options.radius;
         this._fov = options.fov;
-        this._slices = defaultValue$7(options.slices, this._fov);
-        this._rotation = Cesium.Math.toRadians(defaultValue$7(options.rotation, 0));
-        this._vertexFormat = defaultValue$7(options.vertexFormat, VertexFormat.POSITION_AND_ST);
-        this._extrudedHeight = defaultValue$7(options.extrudedHeight, 0);
-        this._height = defaultValue$7(options.height, 0);
+        this._slices = defaultValue$9(options.slices, this._fov);
+        this._rotation = Cesium.Math.toRadians(defaultValue$9(options.rotation, 0));
+        this._vertexFormat = defaultValue$9(options.vertexFormat, VertexFormat.POSITION_AND_ST);
+        this._extrudedHeight = defaultValue$9(options.extrudedHeight, 0);
+        this._height = defaultValue$9(options.height, 0);
         this._positions = undefined;
         this._workerName = "createSectorGeometry";
         this._rectangle = undefined;
@@ -34373,42 +37883,40 @@ void main(){
   }
   //雪花
   snowColor=(vec3(c));
-  if(depth.r<1.0){
-    vec4 positionEC = czm_p_toEye(gl_FragCoord.xy, czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates)));
-    vec3 dx = dFdx(positionEC.xyz);
-    vec3 dy = dFdy(positionEC.xyz);
-    vec3 nor = normalize(cross(dx,dy));
-    vec4 positionWC = normalize(czm_inverseView * positionEC);
-    vec3 normalWC = normalize(czm_inverseViewRotation * nor);
-    float dotNumWC = dot(positionWC.xyz,normalWC);
-    //雪地
-    if(dotNumWC<=0.3){
-      bgColor = mix(color,vec4(1.0),alpha*0.3);
-    }else{
-      bgColor = mix(color,vec4(1.0),dotNumWC*alpha);
-    }
+  if (depth.r >= 1.0) {
+    gl_FragColor = color;
+    return;
   }
-  gl_FragColor=mix(bgColor,vec4(snowColor,1.0),0.5);
+  vec4 positionEC = czm_p_toEye(gl_FragCoord.xy, czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates)));
+  vec3 dx = dFdx(positionEC.xyz);
+  vec3 dy = dFdy(positionEC.xyz);
+  vec3 nor = normalize(cross(dx,dy));
+  vec4 positionWC = normalize(czm_inverseView * positionEC);
+  vec3 normalWC = normalize(czm_inverseViewRotation * nor);
+  float dotNumWC = dot(positionWC.xyz,normalWC);
+  //雪地
+  bgColor = mix(color,vec4(1.0),alpha * max(dotNumWC, 0.3));
+  gl_FragColor = mix(bgColor,vec4(snowColor,1.0),0.5);
 }`;
 
     class SnowEffect extends PostProcessing {
       /**
        * 模拟雪地的后处理程序。
        * @extends PostProcessing
-       * @param {Object} options 具有以下属性
-       * @param {Number} [options.thickness=0.8] 雪的厚度，介于0~1之间的值
-       * @param {Number} [options.density=10.0] 表示雪大小的变量，值越大，雪越大
-       * @param {Number} [options.speed=350.0] 表示落雪速度，值越大，雪花下降越快
+       * @param {object} options 具有以下属性
+       * @param {number} [options.thickness=0.8] 地面积雪的厚度，介于0~1之间的值, 为0表示地面没有积雪，为1表示地面完成被积雪覆盖
+       * @param {number} [options.density=10.0] 表示雪大小的变量，值越大，雪越大
+       * @param {number} [options.speed=350.0] 表示落雪速度，值越大，雪花下降越快
        *
        * @see {@link https://www.giserdqy.com/gis/opengis/3d/cesium/7311/|Cesium应用篇–添加雨雪天气}
        *
        */
       constructor(options) {
         super(options);
-        this._fragmentShader = defaultValue$7(this._options.fragmentShader, shader$b);
-        this._thickness = defaultValue$7(this._options.thickness, 0.5);
-        this._density = defaultValue$7(this._options.density, 10.0);
-        this._speed = defaultValue$7(this._options.speed, 350);
+        this._fragmentShader = defaultValue$9(this._options.fragmentShader, shader$b);
+        this._thickness = defaultValue$9(this._options.thickness, 0.5);
+        this._density = defaultValue$9(this._options.density, 10.0);
+        this._speed = defaultValue$9(this._options.speed, 350);
         const uniforms = {
           alpha: () => {
             return this.thickness
@@ -34420,12 +37928,12 @@ void main(){
             return this.speed
           }
         };
-        this._uniforms = defaultValue$7(this._options.uniforms, uniforms);
+        this._uniforms = defaultValue$9(this._options.uniforms, uniforms);
 
       }
       /**
        * 介于0~1之间的值，表示雪的厚度，值越大雪越厚
-       * @type {Number} 雪的厚度
+       * @type {number} 雪的厚度
        */
       get thickness() {
         return Cesium.Math.clamp(this._thickness, 0, 1);
@@ -34435,17 +37943,17 @@ void main(){
       }
       /**
        * 表示雪大小的变量，值越大，雪越大，其有效值为2~20
-       * @type {Number}
+       * @type {number} 下雪密度
        */
       get density() {
-        return Cesium.Math.clamp(this._density, 2, 20);
+        return Cesium.Math.clamp(this._density, 0, 20);
       }
       set density(val) {
         this._density = val;
       }
       /**
        * 雪花降落的速度，值越大，降落速度越快
-       * @type {Number}
+       * @type {number} 落雪速度
        */
       get speed() {
         const speed = this._speed;
@@ -34585,1043 +38093,397 @@ void main(){
         }
     }
 
-    /**
-     * netcdfjs - Read and explore NetCDF files
-     * @version v1.0.0
-     * @link https://github.com/cheminfo-js/netcdfjs
-     * @license MIT
-     */
-    var NetCDFReaderExport;
-    (function webpackUniversalModuleDefinition(root, factory) {
-      if (typeof exports === 'object' && typeof module === 'object')
-        module.exports = factory();
-      else if (typeof define === 'function' && define.amd)
-        define([], factory);
-      else if (typeof exports === 'object')
-        exports["netcdfjs"] = factory();
-      else
-        root["netcdfjs"] = factory();
-    })(typeof self !== 'undefined' ? self : undefined, function() {
-      return /******/ (function(modules) { // webpackBootstrap
-        /******/ // The module cache
-        /******/
-        var installedModules = {};
-        /******/
-        /******/ // The require function
-        /******/
-        function __webpack_require__(moduleId) {
-          /******/
-          /******/ // Check if module is in cache
-          /******/
-          if (installedModules[moduleId]) {
-            /******/
-            return installedModules[moduleId].exports;
-            /******/
-          }
-          /******/ // Create a new module (and put it into the cache)
-          /******/
-          var module = installedModules[moduleId] = {
-            /******/
-            i: moduleId,
-            /******/
-            l: false,
-            /******/
-            exports: {}
-            /******/
-          };
-          /******/
-          /******/ // Execute the module function
-          /******/
-          modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-          /******/
-          /******/ // Flag the module as loaded
-          /******/
-          module.l = true;
-          /******/
-          /******/ // Return the exports of the module
-          /******/
-          return module.exports;
-          /******/
-        }
-        /******/
-        /******/
-        /******/ // expose the modules object (__webpack_modules__)
-        /******/
-        __webpack_require__.m = modules;
-        /******/
-        /******/ // expose the module cache
-        /******/
-        __webpack_require__.c = installedModules;
-        /******/
-        /******/ // define getter function for harmony exports
-        /******/
-        __webpack_require__.d = function(exports, name, getter) {
-          /******/
-          if (!__webpack_require__.o(exports, name)) {
-            /******/
-            Object.defineProperty(exports, name, {
-              enumerable: true,
-              get: getter
-            });
-            /******/
-          }
-          /******/
-        };
-        /******/
-        /******/ // define __esModule on exports
-        /******/
-        __webpack_require__.r = function(exports) {
-          /******/
-          if (typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-            /******/
-            Object.defineProperty(exports, Symbol.toStringTag, {
-              value: 'Module'
-            });
-            /******/
-          }
-          /******/
-          Object.defineProperty(exports, '__esModule', {
-            value: true
-          });
-          /******/
-        };
-        /******/
-        /******/ // create a fake namespace object
-        /******/ // mode & 1: value is a module id, require it
-        /******/ // mode & 2: merge all properties of value into the ns
-        /******/ // mode & 4: return value when already ns object
-        /******/ // mode & 8|1: behave like require
-        /******/
-        __webpack_require__.t = function(value, mode) {
-          /******/
-          if (mode & 1) value = __webpack_require__(value);
-          /******/
-          if (mode & 8) return value;
-          /******/
-          if ((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-          /******/
-          var ns = Object.create(null);
-          /******/
-          __webpack_require__.r(ns);
-          /******/
-          Object.defineProperty(ns, 'default', {
-            enumerable: true,
-            value: value
-          });
-          /******/
-          if (mode & 2 && typeof value != 'string')
-            for (var key in value) __webpack_require__.d(ns, key, function(key) {
-              return value[key];
-            }.bind(null, key));
-          /******/
-          return ns;
-          /******/
-        };
-        /******/
-        /******/ // getDefaultExport function for compatibility with non-harmony modules
-        /******/
-        __webpack_require__.n = function(module) {
-          /******/
-          var getter = module && module.__esModule ?
-            /******/
-            function getDefault() {
-              return module['default'];
-            } :
-            /******/
-            function getModuleExports() {
-              return module;
-            };
-          /******/
-          __webpack_require__.d(getter, 'a', getter);
-          /******/
-          return getter;
-          /******/
-        };
-        /******/
-        /******/ // Object.prototype.hasOwnProperty.call
-        /******/
-        __webpack_require__.o = function(object, property) {
-          return Object.prototype.hasOwnProperty.call(object, property);
-        };
-        /******/
-        /******/ // __webpack_public_path__
-        /******/
-        __webpack_require__.p = "";
-        /******/
-        /******/
-        /******/ // Load entry module and return exports
-        /******/
-        return __webpack_require__(__webpack_require__.s = 3);
-        /******/
-      })
-      /************************************************************************/
-      /******/
-      ([
-        /* 0 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-          /**
-           * Throws a non-valid NetCDF exception if the statement it's true
-           * @ignore
-           * @param {boolean} statement - Throws if true
-           * @param {string} reason - Reason to throw
-           */
-
-          function notNetcdf(statement, reason) {
-            if (statement) {
-              throw new TypeError("Not a valid NetCDF v3.x file: ".concat(reason));
-            }
-          }
-          /**
-           * Moves 1, 2, or 3 bytes to next 4-byte boundary
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           */
-
-
-          function padding(buffer) {
-            if (buffer.offset % 4 !== 0) {
-              buffer.skip(4 - buffer.offset % 4);
-            }
-          }
-          /**
-           * Reads the name
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @return {string} - Name
-           */
-
-
-          function readName(buffer) {
-            // Read name
-            var nameLength = buffer.readUint32();
-            var name = buffer.readChars(nameLength); // validate name
-            // TODO
-            // Apply padding
-
-            padding(buffer);
-            return name;
-          }
-
-          module.exports.notNetcdf = notNetcdf;
-          module.exports.padding = padding;
-          module.exports.readName = readName;
-
-          /***/
-        }),
-        /* 1 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-          (function(root) {
-            var stringFromCharCode = String.fromCharCode; // Taken from https://mths.be/punycode
-
-            function ucs2decode(string) {
-              var output = [];
-              var counter = 0;
-              var length = string.length;
-              var value;
-              var extra;
-
-              while (counter < length) {
-                value = string.charCodeAt(counter++);
-
-                if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
-                  // high surrogate, and there is a next character
-                  extra = string.charCodeAt(counter++);
-
-                  if ((extra & 0xFC00) == 0xDC00) {
-                    // low surrogate
-                    output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
-                  } else {
-                    // unmatched surrogate; only append this code unit, in case the next
-                    // code unit is the high surrogate of a surrogate pair
-                    output.push(value);
-                    counter--;
-                  }
-                } else {
-                  output.push(value);
-                }
-              }
-
-              return output;
-            } // Taken from https://mths.be/punycode
-
-
-            function ucs2encode(array) {
-              var length = array.length;
-              var index = -1;
-              var value;
-              var output = '';
-
-              while (++index < length) {
-                value = array[index];
-
-                if (value > 0xFFFF) {
-                  value -= 0x10000;
-                  output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
-                  value = 0xDC00 | value & 0x3FF;
-                }
-
-                output += stringFromCharCode(value);
-              }
-
-              return output;
-            }
-
-            function checkScalarValue(codePoint) {
-              if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
-                throw Error('Lone surrogate U+' + codePoint.toString(16).toUpperCase() + ' is not a scalar value');
-              }
-            }
-            /*--------------------------------------------------------------------------*/
-
-
-            function createByte(codePoint, shift) {
-              return stringFromCharCode(codePoint >> shift & 0x3F | 0x80);
-            }
-
-            function encodeCodePoint(codePoint) {
-              if ((codePoint & 0xFFFFFF80) == 0) {
-                // 1-byte sequence
-                return stringFromCharCode(codePoint);
-              }
-
-              var symbol = '';
-
-              if ((codePoint & 0xFFFFF800) == 0) {
-                // 2-byte sequence
-                symbol = stringFromCharCode(codePoint >> 6 & 0x1F | 0xC0);
-              } else if ((codePoint & 0xFFFF0000) == 0) {
-                // 3-byte sequence
-                checkScalarValue(codePoint);
-                symbol = stringFromCharCode(codePoint >> 12 & 0x0F | 0xE0);
-                symbol += createByte(codePoint, 6);
-              } else if ((codePoint & 0xFFE00000) == 0) {
-                // 4-byte sequence
-                symbol = stringFromCharCode(codePoint >> 18 & 0x07 | 0xF0);
-                symbol += createByte(codePoint, 12);
-                symbol += createByte(codePoint, 6);
-              }
-
-              symbol += stringFromCharCode(codePoint & 0x3F | 0x80);
-              return symbol;
-            }
-
-            function utf8encode(string) {
-              var codePoints = ucs2decode(string);
-              var length = codePoints.length;
-              var index = -1;
-              var codePoint;
-              var byteString = '';
-
-              while (++index < length) {
-                codePoint = codePoints[index];
-                byteString += encodeCodePoint(codePoint);
-              }
-
-              return byteString;
-            }
-            /*--------------------------------------------------------------------------*/
-
-
-            function readContinuationByte() {
-              if (byteIndex >= byteCount) {
-                throw Error('Invalid byte index');
-              }
-
-              var continuationByte = byteArray[byteIndex] & 0xFF;
-              byteIndex++;
-
-              if ((continuationByte & 0xC0) == 0x80) {
-                return continuationByte & 0x3F;
-              } // If we end up here, it’s not a continuation byte
-
-
-              throw Error('Invalid continuation byte');
-            }
-
-            function decodeSymbol() {
-              var byte1;
-              var byte2;
-              var byte3;
-              var byte4;
-              var codePoint;
-
-              if (byteIndex > byteCount) {
-                throw Error('Invalid byte index');
-              }
-
-              if (byteIndex == byteCount) {
-                return false;
-              } // Read first byte
-
-
-              byte1 = byteArray[byteIndex] & 0xFF;
-              byteIndex++; // 1-byte sequence (no continuation bytes)
-
-              if ((byte1 & 0x80) == 0) {
-                return byte1;
-              } // 2-byte sequence
-
-
-              if ((byte1 & 0xE0) == 0xC0) {
-                byte2 = readContinuationByte();
-                codePoint = (byte1 & 0x1F) << 6 | byte2;
-
-                if (codePoint >= 0x80) {
-                  return codePoint;
-                } else {
-                  throw Error('Invalid continuation byte');
-                }
-              } // 3-byte sequence (may include unpaired surrogates)
-
-
-              if ((byte1 & 0xF0) == 0xE0) {
-                byte2 = readContinuationByte();
-                byte3 = readContinuationByte();
-                codePoint = (byte1 & 0x0F) << 12 | byte2 << 6 | byte3;
-
-                if (codePoint >= 0x0800) {
-                  checkScalarValue(codePoint);
-                  return codePoint;
-                } else {
-                  throw Error('Invalid continuation byte');
-                }
-              } // 4-byte sequence
-
-
-              if ((byte1 & 0xF8) == 0xF0) {
-                byte2 = readContinuationByte();
-                byte3 = readContinuationByte();
-                byte4 = readContinuationByte();
-                codePoint = (byte1 & 0x07) << 0x12 | byte2 << 0x0C | byte3 << 0x06 | byte4;
-
-                if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
-                  return codePoint;
-                }
-              }
-
-              throw Error('Invalid UTF-8 detected');
-            }
-
-            var byteArray;
-            var byteCount;
-            var byteIndex;
-
-            function utf8decode(byteString) {
-              byteArray = ucs2decode(byteString);
-              byteCount = byteArray.length;
-              byteIndex = 0;
-              var codePoints = [];
-              var tmp;
-
-              while ((tmp = decodeSymbol()) !== false) {
-                codePoints.push(tmp);
-              }
-
-              return ucs2encode(codePoints);
-            }
-            /*--------------------------------------------------------------------------*/
-
-
-            root.version = '3.0.0';
-            root.encode = utf8encode;
-            root.decode = utf8decode;
-          })(exports);
-
-          /***/
-        }),
-        /* 2 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-
-          const notNetcdf = __webpack_require__(0).notNetcdf;
-
-          const types = {
-            BYTE: 1,
-            CHAR: 2,
-            SHORT: 3,
-            INT: 4,
-            FLOAT: 5,
-            DOUBLE: 6
-          };
-          /**
-           * Parse a number into their respective type
-           * @ignore
-           * @param {number} type - integer that represents the type
-           * @return {string} - parsed value of the type
-           */
-
-          function num2str(type) {
-            switch (Number(type)) {
-              case types.BYTE:
-                return 'byte';
-
-              case types.CHAR:
-                return 'char';
-
-              case types.SHORT:
-                return 'short';
-
-              case types.INT:
-                return 'int';
-
-              case types.FLOAT:
-                return 'float';
-
-              case types.DOUBLE:
-                return 'double';
-
-                /* istanbul ignore next */
-
-              default:
-                return 'undefined';
-            }
-          }
-          /**
-           * Parse a number type identifier to his size in bytes
-           * @ignore
-           * @param {number} type - integer that represents the type
-           * @return {number} -size of the type
-           */
-
-
-          function num2bytes(type) {
-            switch (Number(type)) {
-              case types.BYTE:
-                return 1;
-
-              case types.CHAR:
-                return 1;
-
-              case types.SHORT:
-                return 2;
-
-              case types.INT:
-                return 4;
-
-              case types.FLOAT:
-                return 4;
-
-              case types.DOUBLE:
-                return 8;
-
-                /* istanbul ignore next */
-
-              default:
-                return -1;
-            }
-          }
-          /**
-           * Reverse search of num2str
-           * @ignore
-           * @param {string} type - string that represents the type
-           * @return {number} - parsed value of the type
-           */
-
-
-          function str2num(type) {
-            switch (String(type)) {
-              case 'byte':
-                return types.BYTE;
-
-              case 'char':
-                return types.CHAR;
-
-              case 'short':
-                return types.SHORT;
-
-              case 'int':
-                return types.INT;
-
-              case 'float':
-                return types.FLOAT;
-
-              case 'double':
-                return types.DOUBLE;
-
-                /* istanbul ignore next */
-
-              default:
-                return -1;
-            }
-          }
-          /**
-           * Auxiliary function to read numeric data
-           * @ignore
-           * @param {number} size - Size of the element to read
-           * @param {function} bufferReader - Function to read next value
-           * @return {Array<number>|number}
-           */
-
-
-          function readNumber(size, bufferReader) {
-            if (size !== 1) {
-              var numbers = new Array(size);
-
-              for (var i = 0; i < size; i++) {
-                numbers[i] = bufferReader();
-              }
-
-              return numbers;
-            } else {
-              return bufferReader();
-            }
-          }
-          /**
-           * Given a type and a size reads the next element
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @param {number} type - Type of the data to read
-           * @param {number} size - Size of the element to read
-           * @return {string|Array<number>|number}
-           */
-
-
-          function readType(buffer, type, size) {
-            switch (type) {
-              case types.BYTE:
-                return buffer.readBytes(size);
-
-              case types.CHAR:
-                return trimNull(buffer.readChars(size));
-
-              case types.SHORT:
-                return readNumber(size, buffer.readInt16.bind(buffer));
-
-              case types.INT:
-                return readNumber(size, buffer.readInt32.bind(buffer));
-
-              case types.FLOAT:
-                return readNumber(size, buffer.readFloat32.bind(buffer));
-
-              case types.DOUBLE:
-                return readNumber(size, buffer.readFloat64.bind(buffer));
-
-                /* istanbul ignore next */
-
-              default:
-                notNetcdf(true, "non valid type ".concat(type));
-                return undefined;
-            }
-          }
-          /**
-           * Removes null terminate value
-           * @ignore
-           * @param {string} value - String to trim
-           * @return {string} - Trimmed string
-           */
-
-
-          function trimNull(value) {
-            if (value.charCodeAt(value.length - 1) === 0) {
-              return value.substring(0, value.length - 1);
-            }
-
-            return value;
-          }
-
-          module.exports = types;
-          module.exports.num2str = num2str;
-          module.exports.num2bytes = num2bytes;
-          module.exports.str2num = str2num;
-          module.exports.readType = readType;
-
-          /***/
-        }),
-        /* 3 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-
-          const {
-            IOBuffer
-          } = __webpack_require__(4);
-
-          const utils = __webpack_require__(0);
-
-          const data = __webpack_require__(5);
-
-          const readHeader = __webpack_require__(6);
-
-          const toString = __webpack_require__(7);
-          /**
-           * Reads a NetCDF v3.x file
-           * https://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html
-           * @param {ArrayBuffer} data - ArrayBuffer or any Typed Array (including Node.js' Buffer from v4) with the data
-           * @constructor
-           */
-
-
-          class NetCDFReader {
-            constructor(data) {
-              const buffer = new IOBuffer(data);
-              buffer.setBigEndian(); // Validate that it's a NetCDF file
-
-              utils.notNetcdf(buffer.readChars(3) !== 'CDF', 'should start with CDF'); // Check the NetCDF format
-
-              const version = buffer.readByte();
-              utils.notNetcdf(version > 2, 'unknown version'); // Read the header
-
-              this.header = readHeader(buffer, version);
-              this.buffer = buffer;
-            }
-            /**
-             * @return {string} - Version for the NetCDF format
-             */
-
-
-            get version() {
-              if (this.header.version === 1) {
-                return 'classic format';
-              } else {
-                return '64-bit offset format';
-              }
-            }
-            /**
-             * @return {object} - Metadata for the record dimension
-             *  * `length`: Number of elements in the record dimension
-             *  * `id`: Id number in the list of dimensions for the record dimension
-             *  * `name`: String with the name of the record dimension
-             *  * `recordStep`: Number with the record variables step size
-             */
-
-
-            get recordDimension() {
-              return this.header.recordDimension;
-            }
-            /**
-             * @return {Array<object>} - List of dimensions with:
-             *  * `name`: String with the name of the dimension
-             *  * `size`: Number with the size of the dimension
-             */
-
-
-            get dimensions() {
-              return this.header.dimensions;
-            }
-            /**
-             * @return {Array<object>} - List of global attributes with:
-             *  * `name`: String with the name of the attribute
-             *  * `type`: String with the type of the attribute
-             *  * `value`: A number or string with the value of the attribute
-             */
-
-
-            get globalAttributes() {
-              return this.header.globalAttributes;
-            }
-            /**
-             * Returns the value of an attribute
-             * @param {string} attributeName
-             * @return {string} Value of the attributeName or null
-             */
-
-
-            getAttribute(attributeName) {
-              const attribute = this.globalAttributes.find(val => val.name === attributeName);
-              if (attribute) return attribute.value;
-              return null;
-            }
-            /**
-             * Returns the value of a variable as a string
-             * @param {string} variableName
-             * @return {string} Value of the variable as a string or null
-             */
-
-
-            getDataVariableAsString(variableName) {
-              const variable = this.getDataVariable(variableName);
-              if (variable) return variable.join('');
-              return null;
-            }
-            /**
-             * @return {Array<object>} - List of variables with:
-             *  * `name`: String with the name of the variable
-             *  * `dimensions`: Array with the dimension IDs of the variable
-             *  * `attributes`: Array with the attributes of the variable
-             *  * `type`: String with the type of the variable
-             *  * `size`: Number with the size of the variable
-             *  * `offset`: Number with the offset where of the variable begins
-             *  * `record`: True if is a record variable, false otherwise
-             */
-
-
-            get variables() {
-              return this.header.variables;
-            }
-
-            toString() {
-              return toString.call(this);
-            }
-            /**
-             * Retrieves the data for a given variable
-             * @param {string|object} variableName - Name of the variable to search or variable object
-             * @return {Array} - List with the variable values
-             */
-
-
-            getDataVariable(variableName) {
-              let variable;
-
-              if (typeof variableName === 'string') {
-                // search the variable
-                variable = this.header.variables.find(function(val) {
-                  return val.name === variableName;
-                });
-              } else {
-                variable = variableName;
-              } // throws if variable not found
-
-
-              utils.notNetcdf(variable === undefined, "variable not found: ".concat(variableName)); // go to the offset position
-
-              this.buffer.seek(variable.offset);
-
-              if (variable.record) {
-                // record variable case
-                return data.record(this.buffer, variable, this.header.recordDimension);
-              } else {
-                // non-record variable case
-                return data.nonRecord(this.buffer, variable);
-              }
-            }
-            /**
-             * Check if a dataVariable exists
-             * @param {string} variableName - Name of the variable to find
-             * @return {boolean}
-             */
-
-
-            dataVariableExists(variableName) {
-              const variable = this.header.variables.find(function(val) {
-                return val.name === variableName;
-              });
-              return variable !== undefined;
-            }
-            /**
-             * Check if an attribute exists
-             * @param {string} attributeName - Name of the attribute to find
-             * @return {boolean}
-             */
-
-
-            attributeExists(attributeName) {
-              const attribute = this.globalAttributes.find(val => val.name === attributeName);
-              return attribute !== undefined;
-            }
-
-          }
-
-          module.exports = NetCDFReader;
-          NetCDFReaderExport = NetCDFReader;
-
-          /***/
-        }),
-        /* 4 */
-        /***/
-        (function(module, __webpack_exports__, __webpack_require__) {
-          __webpack_require__.r(__webpack_exports__);
-          /* harmony export (binding) */
-          __webpack_require__.d(__webpack_exports__, "IOBuffer", function() {
-            return IOBuffer;
-          });
-          /* harmony import */
-          var utf8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-
-          const defaultByteLength = 1024 * 8;
-          class IOBuffer {
-            /**
-             * @param data - The data to construct the IOBuffer with.
-             * If data is a number, it will be the new buffer's length<br>
-             * If data is `undefined`, the buffer will be initialized with a default length of 8Kb<br>
-             * If data is an ArrayBuffer, SharedArrayBuffer, an ArrayBufferView (Typed Array), an IOBuffer instance,
-             * or a Node.js Buffer, a view will be created over the underlying ArrayBuffer.
-             * @param options
-             */
-            constructor() {
-              let data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultByteLength;
-              let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-              let dataIsGiven = false;
-
-              if (typeof data === 'number') {
+    function getDefaultExportFromCjs (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
+    function getAugmentedNamespace(n) {
+      if (n.__esModule) return n;
+      var f = n.default;
+    	if (typeof f == "function") {
+    		var a = function a () {
+    			if (this instanceof a) {
+    				var args = [null];
+    				args.push.apply(args, arguments);
+    				var Ctor = Function.bind.apply(f, args);
+    				return new Ctor();
+    			}
+    			return f.apply(this, arguments);
+    		};
+    		a.prototype = f.prototype;
+      } else a = {};
+      Object.defineProperty(a, '__esModule', {value: true});
+    	Object.keys(n).forEach(function (k) {
+    		var d = Object.getOwnPropertyDescriptor(n, k);
+    		Object.defineProperty(a, k, d.get ? d : {
+    			enumerable: true,
+    			get: function () {
+    				return n[k];
+    			}
+    		});
+    	});
+    	return a;
+    }
+
+    var utf8 = {};
+
+    /*! https://mths.be/utf8js v3.0.0 by @mathias */
+
+    (function (exports) {
+    (function(root) {
+
+    		var stringFromCharCode = String.fromCharCode;
+
+    		// Taken from https://mths.be/punycode
+    		function ucs2decode(string) {
+    			var output = [];
+    			var counter = 0;
+    			var length = string.length;
+    			var value;
+    			var extra;
+    			while (counter < length) {
+    				value = string.charCodeAt(counter++);
+    				if (value >= 0xD800 && value <= 0xDBFF && counter < length) {
+    					// high surrogate, and there is a next character
+    					extra = string.charCodeAt(counter++);
+    					if ((extra & 0xFC00) == 0xDC00) { // low surrogate
+    						output.push(((value & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000);
+    					} else {
+    						// unmatched surrogate; only append this code unit, in case the next
+    						// code unit is the high surrogate of a surrogate pair
+    						output.push(value);
+    						counter--;
+    					}
+    				} else {
+    					output.push(value);
+    				}
+    			}
+    			return output;
+    		}
+
+    		// Taken from https://mths.be/punycode
+    		function ucs2encode(array) {
+    			var length = array.length;
+    			var index = -1;
+    			var value;
+    			var output = '';
+    			while (++index < length) {
+    				value = array[index];
+    				if (value > 0xFFFF) {
+    					value -= 0x10000;
+    					output += stringFromCharCode(value >>> 10 & 0x3FF | 0xD800);
+    					value = 0xDC00 | value & 0x3FF;
+    				}
+    				output += stringFromCharCode(value);
+    			}
+    			return output;
+    		}
+
+    		function checkScalarValue(codePoint) {
+    			if (codePoint >= 0xD800 && codePoint <= 0xDFFF) {
+    				throw Error(
+    					'Lone surrogate U+' + codePoint.toString(16).toUpperCase() +
+    					' is not a scalar value'
+    				);
+    			}
+    		}
+    		/*--------------------------------------------------------------------------*/
+
+    		function createByte(codePoint, shift) {
+    			return stringFromCharCode(((codePoint >> shift) & 0x3F) | 0x80);
+    		}
+
+    		function encodeCodePoint(codePoint) {
+    			if ((codePoint & 0xFFFFFF80) == 0) { // 1-byte sequence
+    				return stringFromCharCode(codePoint);
+    			}
+    			var symbol = '';
+    			if ((codePoint & 0xFFFFF800) == 0) { // 2-byte sequence
+    				symbol = stringFromCharCode(((codePoint >> 6) & 0x1F) | 0xC0);
+    			}
+    			else if ((codePoint & 0xFFFF0000) == 0) { // 3-byte sequence
+    				checkScalarValue(codePoint);
+    				symbol = stringFromCharCode(((codePoint >> 12) & 0x0F) | 0xE0);
+    				symbol += createByte(codePoint, 6);
+    			}
+    			else if ((codePoint & 0xFFE00000) == 0) { // 4-byte sequence
+    				symbol = stringFromCharCode(((codePoint >> 18) & 0x07) | 0xF0);
+    				symbol += createByte(codePoint, 12);
+    				symbol += createByte(codePoint, 6);
+    			}
+    			symbol += stringFromCharCode((codePoint & 0x3F) | 0x80);
+    			return symbol;
+    		}
+
+    		function utf8encode(string) {
+    			var codePoints = ucs2decode(string);
+    			var length = codePoints.length;
+    			var index = -1;
+    			var codePoint;
+    			var byteString = '';
+    			while (++index < length) {
+    				codePoint = codePoints[index];
+    				byteString += encodeCodePoint(codePoint);
+    			}
+    			return byteString;
+    		}
+
+    		/*--------------------------------------------------------------------------*/
+
+    		function readContinuationByte() {
+    			if (byteIndex >= byteCount) {
+    				throw Error('Invalid byte index');
+    			}
+
+    			var continuationByte = byteArray[byteIndex] & 0xFF;
+    			byteIndex++;
+
+    			if ((continuationByte & 0xC0) == 0x80) {
+    				return continuationByte & 0x3F;
+    			}
+
+    			// If we end up here, it’s not a continuation byte
+    			throw Error('Invalid continuation byte');
+    		}
+
+    		function decodeSymbol() {
+    			var byte1;
+    			var byte2;
+    			var byte3;
+    			var byte4;
+    			var codePoint;
+
+    			if (byteIndex > byteCount) {
+    				throw Error('Invalid byte index');
+    			}
+
+    			if (byteIndex == byteCount) {
+    				return false;
+    			}
+
+    			// Read first byte
+    			byte1 = byteArray[byteIndex] & 0xFF;
+    			byteIndex++;
+
+    			// 1-byte sequence (no continuation bytes)
+    			if ((byte1 & 0x80) == 0) {
+    				return byte1;
+    			}
+
+    			// 2-byte sequence
+    			if ((byte1 & 0xE0) == 0xC0) {
+    				byte2 = readContinuationByte();
+    				codePoint = ((byte1 & 0x1F) << 6) | byte2;
+    				if (codePoint >= 0x80) {
+    					return codePoint;
+    				} else {
+    					throw Error('Invalid continuation byte');
+    				}
+    			}
+
+    			// 3-byte sequence (may include unpaired surrogates)
+    			if ((byte1 & 0xF0) == 0xE0) {
+    				byte2 = readContinuationByte();
+    				byte3 = readContinuationByte();
+    				codePoint = ((byte1 & 0x0F) << 12) | (byte2 << 6) | byte3;
+    				if (codePoint >= 0x0800) {
+    					checkScalarValue(codePoint);
+    					return codePoint;
+    				} else {
+    					throw Error('Invalid continuation byte');
+    				}
+    			}
+
+    			// 4-byte sequence
+    			if ((byte1 & 0xF8) == 0xF0) {
+    				byte2 = readContinuationByte();
+    				byte3 = readContinuationByte();
+    				byte4 = readContinuationByte();
+    				codePoint = ((byte1 & 0x07) << 0x12) | (byte2 << 0x0C) |
+    					(byte3 << 0x06) | byte4;
+    				if (codePoint >= 0x010000 && codePoint <= 0x10FFFF) {
+    					return codePoint;
+    				}
+    			}
+
+    			throw Error('Invalid UTF-8 detected');
+    		}
+
+    		var byteArray;
+    		var byteCount;
+    		var byteIndex;
+    		function utf8decode(byteString) {
+    			byteArray = ucs2decode(byteString);
+    			byteCount = byteArray.length;
+    			byteIndex = 0;
+    			var codePoints = [];
+    			var tmp;
+    			while ((tmp = decodeSymbol()) !== false) {
+    				codePoints.push(tmp);
+    			}
+    			return ucs2encode(codePoints);
+    		}
+
+    		/*--------------------------------------------------------------------------*/
+
+    		root.version = '3.0.0';
+    		root.encode = utf8encode;
+    		root.decode = utf8decode;
+
+    	}(exports)); 
+    } (utf8));
+
+    const defaultByteLength = 1024 * 8;
+    let IOBuffer$1 = class IOBuffer {
+        /**
+         * @param data - The data to construct the IOBuffer with.
+         * If data is a number, it will be the new buffer's length<br>
+         * If data is `undefined`, the buffer will be initialized with a default length of 8Kb<br>
+         * If data is an ArrayBuffer, SharedArrayBuffer, an ArrayBufferView (Typed Array), an IOBuffer instance,
+         * or a Node.js Buffer, a view will be created over the underlying ArrayBuffer.
+         * @param options
+         */
+        constructor(data = defaultByteLength, options = {}) {
+            let dataIsGiven = false;
+            if (typeof data === 'number') {
                 data = new ArrayBuffer(data);
-              } else {
+            }
+            else {
                 dataIsGiven = true;
                 this.lastWrittenByte = data.byteLength;
-              }
-
-              const offset = options.offset ? options.offset >>> 0 : 0;
-              const byteLength = data.byteLength - offset;
-              let dvOffset = offset;
-
-              if (ArrayBuffer.isView(data) || data instanceof IOBuffer) {
+            }
+            const offset = options.offset ? options.offset >>> 0 : 0;
+            const byteLength = data.byteLength - offset;
+            let dvOffset = offset;
+            if (ArrayBuffer.isView(data) || data instanceof IOBuffer) {
                 if (data.byteLength !== data.buffer.byteLength) {
-                  dvOffset = data.byteOffset + offset;
+                    dvOffset = data.byteOffset + offset;
                 }
-
                 data = data.buffer;
-              }
-
-              if (dataIsGiven) {
+            }
+            if (dataIsGiven) {
                 this.lastWrittenByte = byteLength;
-              } else {
+            }
+            else {
                 this.lastWrittenByte = 0;
-              }
-
-              this.buffer = data;
-              this.length = byteLength;
-              this.byteLength = byteLength;
-              this.byteOffset = dvOffset;
-              this.offset = 0;
-              this.littleEndian = true;
-              this._data = new DataView(this.buffer, dvOffset, byteLength);
-              this._mark = 0;
-              this._marks = [];
             }
-            /**
-             * Checks if the memory allocated to the buffer is sufficient to store more
-             * bytes after the offset.
-             * @param byteLength - The needed memory in bytes.
-             * @returns `true` if there is sufficient space and `false` otherwise.
-             */
-
-
-            available() {
-              let byteLength = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-              return this.offset + byteLength <= this.length;
-            }
-            /**
-             * Check if little-endian mode is used for reading and writing multi-byte
-             * values.
-             * @returns `true` if little-endian mode is used, `false` otherwise.
-             */
-
-
-            isLittleEndian() {
-              return this.littleEndian;
-            }
-            /**
-             * Set little-endian mode for reading and writing multi-byte values.
-             */
-
-
-            setLittleEndian() {
-              this.littleEndian = true;
-              return this;
-            }
-            /**
-             * Check if big-endian mode is used for reading and writing multi-byte values.
-             * @returns `true` if big-endian mode is used, `false` otherwise.
-             */
-
-
-            isBigEndian() {
-              return !this.littleEndian;
-            }
-            /**
-             * Switches to big-endian mode for reading and writing multi-byte values.
-             */
-
-
-            setBigEndian() {
-              this.littleEndian = false;
-              return this;
-            }
-            /**
-             * Move the pointer n bytes forward.
-             * @param n - Number of bytes to skip.
-             */
-
-
-            skip() {
-              let n = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-              this.offset += n;
-              return this;
-            }
-            /**
-             * Move the pointer to the given offset.
-             * @param offset
-             */
-
-
-            seek(offset) {
-              this.offset = offset;
-              return this;
-            }
-            /**
-             * Store the current pointer offset.
-             * @see {@link IOBuffer#reset}
-             */
-
-
-            mark() {
-              this._mark = this.offset;
-              return this;
-            }
-            /**
-             * Move the pointer back to the last pointer offset set by mark.
-             * @see {@link IOBuffer#mark}
-             */
-
-
-            reset() {
-              this.offset = this._mark;
-              return this;
-            }
-            /**
-             * Push the current pointer offset to the mark stack.
-             * @see {@link IOBuffer#popMark}
-             */
-
-
-            pushMark() {
-              this._marks.push(this.offset);
-
-              return this;
-            }
-            /**
-             * Pop the last pointer offset from the mark stack, and set the current
-             * pointer offset to the popped value.
-             * @see {@link IOBuffer#pushMark}
-             */
-
-
-            popMark() {
-              const offset = this._marks.pop();
-
-              if (offset === undefined) {
+            this.buffer = data;
+            this.length = byteLength;
+            this.byteLength = byteLength;
+            this.byteOffset = dvOffset;
+            this.offset = 0;
+            this.littleEndian = true;
+            this._data = new DataView(this.buffer, dvOffset, byteLength);
+            this._mark = 0;
+            this._marks = [];
+        }
+        /**
+         * Checks if the memory allocated to the buffer is sufficient to store more
+         * bytes after the offset.
+         * @param byteLength - The needed memory in bytes.
+         * @returns `true` if there is sufficient space and `false` otherwise.
+         */
+        available(byteLength = 1) {
+            return this.offset + byteLength <= this.length;
+        }
+        /**
+         * Check if little-endian mode is used for reading and writing multi-byte
+         * values.
+         * @returns `true` if little-endian mode is used, `false` otherwise.
+         */
+        isLittleEndian() {
+            return this.littleEndian;
+        }
+        /**
+         * Set little-endian mode for reading and writing multi-byte values.
+         */
+        setLittleEndian() {
+            this.littleEndian = true;
+            return this;
+        }
+        /**
+         * Check if big-endian mode is used for reading and writing multi-byte values.
+         * @returns `true` if big-endian mode is used, `false` otherwise.
+         */
+        isBigEndian() {
+            return !this.littleEndian;
+        }
+        /**
+         * Switches to big-endian mode for reading and writing multi-byte values.
+         */
+        setBigEndian() {
+            this.littleEndian = false;
+            return this;
+        }
+        /**
+         * Move the pointer n bytes forward.
+         * @param n - Number of bytes to skip.
+         */
+        skip(n = 1) {
+            this.offset += n;
+            return this;
+        }
+        /**
+         * Move the pointer to the given offset.
+         * @param offset
+         */
+        seek(offset) {
+            this.offset = offset;
+            return this;
+        }
+        /**
+         * Store the current pointer offset.
+         * @see {@link IOBuffer#reset}
+         */
+        mark() {
+            this._mark = this.offset;
+            return this;
+        }
+        /**
+         * Move the pointer back to the last pointer offset set by mark.
+         * @see {@link IOBuffer#mark}
+         */
+        reset() {
+            this.offset = this._mark;
+            return this;
+        }
+        /**
+         * Push the current pointer offset to the mark stack.
+         * @see {@link IOBuffer#popMark}
+         */
+        pushMark() {
+            this._marks.push(this.offset);
+            return this;
+        }
+        /**
+         * Pop the last pointer offset from the mark stack, and set the current
+         * pointer offset to the popped value.
+         * @see {@link IOBuffer#pushMark}
+         */
+        popMark() {
+            const offset = this._marks.pop();
+            if (offset === undefined) {
                 throw new Error('Mark stack empty');
-              }
-
-              this.seek(offset);
-              return this;
             }
-            /**
-             * Move the pointer offset back to 0.
-             */
-
-
-            rewind() {
-              this.offset = 0;
-              return this;
-            }
-            /**
-             * Make sure the buffer has sufficient memory to write a given byteLength at
-             * the current pointer offset.
-             * If the buffer's memory is insufficient, this method will create a new
-             * buffer (a copy) with a length that is twice (byteLength + current offset).
-             * @param byteLength
-             */
-
-
-            ensureAvailable() {
-              let byteLength = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-
-              if (!this.available(byteLength)) {
+            this.seek(offset);
+            return this;
+        }
+        /**
+         * Move the pointer offset back to 0.
+         */
+        rewind() {
+            this.offset = 0;
+            return this;
+        }
+        /**
+         * Make sure the buffer has sufficient memory to write a given byteLength at
+         * the current pointer offset.
+         * If the buffer's memory is insufficient, this method will create a new
+         * buffer (a copy) with a length that is twice (byteLength + current offset).
+         * @param byteLength
+         */
+        ensureAvailable(byteLength = 1) {
+            if (!this.available(byteLength)) {
                 const lengthNeeded = this.offset + byteLength;
                 const newLength = lengthNeeded * 2;
                 const newArray = new Uint8Array(newLength);
@@ -35629,731 +38491,981 @@ void main(){
                 this.buffer = newArray.buffer;
                 this.length = this.byteLength = newLength;
                 this._data = new DataView(this.buffer);
-              }
-
-              return this;
             }
-            /**
-             * Read a byte and return false if the byte's value is 0, or true otherwise.
-             * Moves pointer forward by one byte.
-             */
-
-
-            readBoolean() {
-              return this.readUint8() !== 0;
-            }
-            /**
-             * Read a signed 8-bit integer and move pointer forward by 1 byte.
-             */
-
-
-            readInt8() {
-              return this._data.getInt8(this.offset++);
-            }
-            /**
-             * Read an unsigned 8-bit integer and move pointer forward by 1 byte.
-             */
-
-
-            readUint8() {
-              return this._data.getUint8(this.offset++);
-            }
-            /**
-             * Alias for {@link IOBuffer#readUint8}.
-             */
-
-
-            readByte() {
-              return this.readUint8();
-            }
-            /**
-             * Read `n` bytes and move pointer forward by `n` bytes.
-             */
-
-
-            readBytes() {
-              let n = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-              const bytes = new Uint8Array(n);
-
-              for (let i = 0; i < n; i++) {
+            return this;
+        }
+        /**
+         * Read a byte and return false if the byte's value is 0, or true otherwise.
+         * Moves pointer forward by one byte.
+         */
+        readBoolean() {
+            return this.readUint8() !== 0;
+        }
+        /**
+         * Read a signed 8-bit integer and move pointer forward by 1 byte.
+         */
+        readInt8() {
+            return this._data.getInt8(this.offset++);
+        }
+        /**
+         * Read an unsigned 8-bit integer and move pointer forward by 1 byte.
+         */
+        readUint8() {
+            return this._data.getUint8(this.offset++);
+        }
+        /**
+         * Alias for {@link IOBuffer#readUint8}.
+         */
+        readByte() {
+            return this.readUint8();
+        }
+        /**
+         * Read `n` bytes and move pointer forward by `n` bytes.
+         */
+        readBytes(n = 1) {
+            const bytes = new Uint8Array(n);
+            for (let i = 0; i < n; i++) {
                 bytes[i] = this.readByte();
-              }
-
-              return bytes;
             }
-            /**
-             * Read a 16-bit signed integer and move pointer forward by 2 bytes.
-             */
-
-
-            readInt16() {
-              const value = this._data.getInt16(this.offset, this.littleEndian);
-
-              this.offset += 2;
-              return value;
-            }
-            /**
-             * Read a 16-bit unsigned integer and move pointer forward by 2 bytes.
-             */
-
-
-            readUint16() {
-              const value = this._data.getUint16(this.offset, this.littleEndian);
-
-              this.offset += 2;
-              return value;
-            }
-            /**
-             * Read a 32-bit signed integer and move pointer forward by 4 bytes.
-             */
-
-
-            readInt32() {
-              const value = this._data.getInt32(this.offset, this.littleEndian);
-
-              this.offset += 4;
-              return value;
-            }
-            /**
-             * Read a 32-bit unsigned integer and move pointer forward by 4 bytes.
-             */
-
-
-            readUint32() {
-              const value = this._data.getUint32(this.offset, this.littleEndian);
-
-              this.offset += 4;
-              return value;
-            }
-            /**
-             * Read a 32-bit floating number and move pointer forward by 4 bytes.
-             */
-
-
-            readFloat32() {
-              const value = this._data.getFloat32(this.offset, this.littleEndian);
-
-              this.offset += 4;
-              return value;
-            }
-            /**
-             * Read a 64-bit floating number and move pointer forward by 8 bytes.
-             */
-
-
-            readFloat64() {
-              const value = this._data.getFloat64(this.offset, this.littleEndian);
-
-              this.offset += 8;
-              return value;
-            }
-            /**
-             * Read a 1-byte ASCII character and move pointer forward by 1 byte.
-             */
-
-
-            readChar() {
-              return String.fromCharCode(this.readInt8());
-            }
-            /**
-             * Read `n` 1-byte ASCII characters and move pointer forward by `n` bytes.
-             */
-
-
-            readChars() {
-              let n = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-              let result = '';
-
-              for (let i = 0; i < n; i++) {
+            return bytes;
+        }
+        /**
+         * Read a 16-bit signed integer and move pointer forward by 2 bytes.
+         */
+        readInt16() {
+            const value = this._data.getInt16(this.offset, this.littleEndian);
+            this.offset += 2;
+            return value;
+        }
+        /**
+         * Read a 16-bit unsigned integer and move pointer forward by 2 bytes.
+         */
+        readUint16() {
+            const value = this._data.getUint16(this.offset, this.littleEndian);
+            this.offset += 2;
+            return value;
+        }
+        /**
+         * Read a 32-bit signed integer and move pointer forward by 4 bytes.
+         */
+        readInt32() {
+            const value = this._data.getInt32(this.offset, this.littleEndian);
+            this.offset += 4;
+            return value;
+        }
+        /**
+         * Read a 32-bit unsigned integer and move pointer forward by 4 bytes.
+         */
+        readUint32() {
+            const value = this._data.getUint32(this.offset, this.littleEndian);
+            this.offset += 4;
+            return value;
+        }
+        /**
+         * Read a 32-bit floating number and move pointer forward by 4 bytes.
+         */
+        readFloat32() {
+            const value = this._data.getFloat32(this.offset, this.littleEndian);
+            this.offset += 4;
+            return value;
+        }
+        /**
+         * Read a 64-bit floating number and move pointer forward by 8 bytes.
+         */
+        readFloat64() {
+            const value = this._data.getFloat64(this.offset, this.littleEndian);
+            this.offset += 8;
+            return value;
+        }
+        /**
+         * Read a 1-byte ASCII character and move pointer forward by 1 byte.
+         */
+        readChar() {
+            return String.fromCharCode(this.readInt8());
+        }
+        /**
+         * Read `n` 1-byte ASCII characters and move pointer forward by `n` bytes.
+         */
+        readChars(n = 1) {
+            let result = '';
+            for (let i = 0; i < n; i++) {
                 result += this.readChar();
-              }
-
-              return result;
             }
-            /**
-             * Read the next `n` bytes, return a UTF-8 decoded string and move pointer
-             * forward by `n` bytes.
-             */
-
-
-            readUtf8() {
-              let n = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-              const bString = this.readChars(n);
-              return Object(utf8__WEBPACK_IMPORTED_MODULE_0__["decode"])(bString);
-            }
-            /**
-             * Write 0xff if the passed value is truthy, 0x00 otherwise and move pointer
-             * forward by 1 byte.
-             */
-
-
-            writeBoolean(value) {
-              this.writeUint8(value ? 0xff : 0x00);
-              return this;
-            }
-            /**
-             * Write `value` as an 8-bit signed integer and move pointer forward by 1 byte.
-             */
-
-
-            writeInt8(value) {
-              this.ensureAvailable(1);
-
-              this._data.setInt8(this.offset++, value);
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as an 8-bit unsigned integer and move pointer forward by 1
-             * byte.
-             */
-
-
-            writeUint8(value) {
-              this.ensureAvailable(1);
-
-              this._data.setUint8(this.offset++, value);
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * An alias for {@link IOBuffer#writeUint8}.
-             */
-
-
-            writeByte(value) {
-              return this.writeUint8(value);
-            }
-            /**
-             * Write all elements of `bytes` as uint8 values and move pointer forward by
-             * `bytes.length` bytes.
-             */
-
-
-            writeBytes(bytes) {
-              this.ensureAvailable(bytes.length);
-
-              for (let i = 0; i < bytes.length; i++) {
+            return result;
+        }
+        /**
+         * Read the next `n` bytes, return a UTF-8 decoded string and move pointer
+         * forward by `n` bytes.
+         */
+        readUtf8(n = 1) {
+            const bString = this.readChars(n);
+            return utf8.decode(bString);
+        }
+        /**
+         * Write 0xff if the passed value is truthy, 0x00 otherwise and move pointer
+         * forward by 1 byte.
+         */
+        writeBoolean(value) {
+            this.writeUint8(value ? 0xff : 0x00);
+            return this;
+        }
+        /**
+         * Write `value` as an 8-bit signed integer and move pointer forward by 1 byte.
+         */
+        writeInt8(value) {
+            this.ensureAvailable(1);
+            this._data.setInt8(this.offset++, value);
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as an 8-bit unsigned integer and move pointer forward by 1
+         * byte.
+         */
+        writeUint8(value) {
+            this.ensureAvailable(1);
+            this._data.setUint8(this.offset++, value);
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * An alias for {@link IOBuffer#writeUint8}.
+         */
+        writeByte(value) {
+            return this.writeUint8(value);
+        }
+        /**
+         * Write all elements of `bytes` as uint8 values and move pointer forward by
+         * `bytes.length` bytes.
+         */
+        writeBytes(bytes) {
+            this.ensureAvailable(bytes.length);
+            for (let i = 0; i < bytes.length; i++) {
                 this._data.setUint8(this.offset++, bytes[i]);
-              }
-
-              this._updateLastWrittenByte();
-
-              return this;
             }
-            /**
-             * Write `value` as a 16-bit signed integer and move pointer forward by 2
-             * bytes.
-             */
-
-
-            writeInt16(value) {
-              this.ensureAvailable(2);
-
-              this._data.setInt16(this.offset, value, this.littleEndian);
-
-              this.offset += 2;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as a 16-bit unsigned integer and move pointer forward by 2
-             * bytes.
-             */
-
-
-            writeUint16(value) {
-              this.ensureAvailable(2);
-
-              this._data.setUint16(this.offset, value, this.littleEndian);
-
-              this.offset += 2;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as a 32-bit signed integer and move pointer forward by 4
-             * bytes.
-             */
-
-
-            writeInt32(value) {
-              this.ensureAvailable(4);
-
-              this._data.setInt32(this.offset, value, this.littleEndian);
-
-              this.offset += 4;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as a 32-bit unsigned integer and move pointer forward by 4
-             * bytes.
-             */
-
-
-            writeUint32(value) {
-              this.ensureAvailable(4);
-
-              this._data.setUint32(this.offset, value, this.littleEndian);
-
-              this.offset += 4;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as a 32-bit floating number and move pointer forward by 4
-             * bytes.
-             */
-
-
-            writeFloat32(value) {
-              this.ensureAvailable(4);
-
-              this._data.setFloat32(this.offset, value, this.littleEndian);
-
-              this.offset += 4;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write `value` as a 64-bit floating number and move pointer forward by 8
-             * bytes.
-             */
-
-
-            writeFloat64(value) {
-              this.ensureAvailable(8);
-
-              this._data.setFloat64(this.offset, value, this.littleEndian);
-
-              this.offset += 8;
-
-              this._updateLastWrittenByte();
-
-              return this;
-            }
-            /**
-             * Write the charCode of `str`'s first character as an 8-bit unsigned integer
-             * and move pointer forward by 1 byte.
-             */
-
-
-            writeChar(str) {
-              return this.writeUint8(str.charCodeAt(0));
-            }
-            /**
-             * Write the charCodes of all `str`'s characters as 8-bit unsigned integers
-             * and move pointer forward by `str.length` bytes.
-             */
-
-
-            writeChars(str) {
-              for (let i = 0; i < str.length; i++) {
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 16-bit signed integer and move pointer forward by 2
+         * bytes.
+         */
+        writeInt16(value) {
+            this.ensureAvailable(2);
+            this._data.setInt16(this.offset, value, this.littleEndian);
+            this.offset += 2;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 16-bit unsigned integer and move pointer forward by 2
+         * bytes.
+         */
+        writeUint16(value) {
+            this.ensureAvailable(2);
+            this._data.setUint16(this.offset, value, this.littleEndian);
+            this.offset += 2;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 32-bit signed integer and move pointer forward by 4
+         * bytes.
+         */
+        writeInt32(value) {
+            this.ensureAvailable(4);
+            this._data.setInt32(this.offset, value, this.littleEndian);
+            this.offset += 4;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 32-bit unsigned integer and move pointer forward by 4
+         * bytes.
+         */
+        writeUint32(value) {
+            this.ensureAvailable(4);
+            this._data.setUint32(this.offset, value, this.littleEndian);
+            this.offset += 4;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 32-bit floating number and move pointer forward by 4
+         * bytes.
+         */
+        writeFloat32(value) {
+            this.ensureAvailable(4);
+            this._data.setFloat32(this.offset, value, this.littleEndian);
+            this.offset += 4;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write `value` as a 64-bit floating number and move pointer forward by 8
+         * bytes.
+         */
+        writeFloat64(value) {
+            this.ensureAvailable(8);
+            this._data.setFloat64(this.offset, value, this.littleEndian);
+            this.offset += 8;
+            this._updateLastWrittenByte();
+            return this;
+        }
+        /**
+         * Write the charCode of `str`'s first character as an 8-bit unsigned integer
+         * and move pointer forward by 1 byte.
+         */
+        writeChar(str) {
+            return this.writeUint8(str.charCodeAt(0));
+        }
+        /**
+         * Write the charCodes of all `str`'s characters as 8-bit unsigned integers
+         * and move pointer forward by `str.length` bytes.
+         */
+        writeChars(str) {
+            for (let i = 0; i < str.length; i++) {
                 this.writeUint8(str.charCodeAt(i));
-              }
-
-              return this;
             }
-            /**
-             * UTF-8 encode and write `str` to the current pointer offset and move pointer
-             * forward according to the encoded length.
-             */
-
-
-            writeUtf8(str) {
-              const bString = Object(utf8__WEBPACK_IMPORTED_MODULE_0__["encode"])(str);
-              return this.writeChars(bString);
-            }
-            /**
-             * Export a Uint8Array view of the internal buffer.
-             * The view starts at the byte offset and its length
-             * is calculated to stop at the last written byte or the original length.
-             */
-
-
-            toArray() {
-              return new Uint8Array(this.buffer, this.byteOffset, this.lastWrittenByte);
-            }
-            /**
-             * Update the last written byte offset
-             * @private
-             */
-
-
-            _updateLastWrittenByte() {
-              if (this.offset > this.lastWrittenByte) {
+            return this;
+        }
+        /**
+         * UTF-8 encode and write `str` to the current pointer offset and move pointer
+         * forward according to the encoded length.
+         */
+        writeUtf8(str) {
+            const bString = utf8.encode(str);
+            return this.writeChars(bString);
+        }
+        /**
+         * Export a Uint8Array view of the internal buffer.
+         * The view starts at the byte offset and its length
+         * is calculated to stop at the last written byte or the original length.
+         */
+        toArray() {
+            return new Uint8Array(this.buffer, this.byteOffset, this.lastWrittenByte);
+        }
+        /**
+         * Update the last written byte offset
+         * @private
+         */
+        _updateLastWrittenByte() {
+            if (this.offset > this.lastWrittenByte) {
                 this.lastWrittenByte = this.offset;
-              }
             }
-
-          }
-
-          /***/
-        }),
-        /* 5 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-
-          const types = __webpack_require__(2); // const STREAMING = 4294967295;
-
-          /**
-           * Read data for the given non-record variable
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @param {object} variable - Variable metadata
-           * @return {Array} - Data of the element
-           */
-
-
-          function nonRecord(buffer, variable) {
-            // variable type
-            const type = types.str2num(variable.type); // size of the data
-
-            var size = variable.size / types.num2bytes(type); // iterates over the data
-
-            var data = new Array(size);
-
-            for (var i = 0; i < size; i++) {
-              data[i] = types.readType(buffer, type, 1);
-            }
-
-            return data;
-          }
-          /**
-           * Read data for the given record variable
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @param {object} variable - Variable metadata
-           * @param {object} recordDimension - Record dimension metadata
-           * @return {Array} - Data of the element
-           */
-
-
-          function record(buffer, variable, recordDimension) {
-            // variable type
-            const type = types.str2num(variable.type);
-            const width = variable.size ? variable.size / types.num2bytes(type) : 1; // size of the data
-            // TODO streaming data
-
-            var size = recordDimension.length; // iterates over the data
-
-            var data = new Array(size);
-            const step = recordDimension.recordStep;
-
-            for (var i = 0; i < size; i++) {
-              var currentOffset = buffer.offset;
-              data[i] = types.readType(buffer, type, width);
-              buffer.seek(currentOffset + step);
-            }
-
-            return data;
-          }
-
-          module.exports.nonRecord = nonRecord;
-          module.exports.record = record;
-
-          /***/
-        }),
-        /* 6 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-
-          const utils = __webpack_require__(0);
-
-          const types = __webpack_require__(2); // Grammar constants
-
-
-          const ZERO = 0;
-          const NC_DIMENSION = 10;
-          const NC_VARIABLE = 11;
-          const NC_ATTRIBUTE = 12;
-          /**
-           * Read the header of the file
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @param {number} version - Version of the file
-           * @return {object} - Object with the fields:
-           *  * `recordDimension`: Number with the length of record dimension
-           *  * `dimensions`: List of dimensions
-           *  * `globalAttributes`: List of global attributes
-           *  * `variables`: List of variables
-           */
-
-          function header(buffer, version) {
-            // Length of record dimension
-            // sum of the varSize's of all the record variables.
-            var header = {
-              recordDimension: {
-                length: buffer.readUint32()
-              }
-            }; // Version
-
-            header.version = version; // List of dimensions
-
-            var dimList = dimensionsList(buffer);
-            header.recordDimension.id = dimList.recordId; // id of the unlimited dimension
-
-            header.recordDimension.name = dimList.recordName; // name of the unlimited dimension
-
-            header.dimensions = dimList.dimensions; // List of global attributes
-
-            header.globalAttributes = attributesList(buffer); // List of variables
-
-            var variables = variablesList(buffer, dimList.recordId, version);
-            header.variables = variables.variables;
-            header.recordDimension.recordStep = variables.recordStep;
-            return header;
-          }
-
-          const NC_UNLIMITED = 0;
-          /**
-           * List of dimensions
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @return {object} - Ojbect containing the following properties:
-           *  * `dimensions` that is an array of dimension object:
-           *  * `name`: String with the name of the dimension
-           *  * `size`: Number with the size of the dimension dimensions: dimensions
-           *  * `recordId`: the id of the dimension that has unlimited size or undefined,
-           *  * `recordName`: name of the dimension that has unlimited size
-           */
-
-          function dimensionsList(buffer) {
-            var recordId, recordName;
-            const dimList = buffer.readUint32();
-
-            if (dimList === ZERO) {
-              utils.notNetcdf(buffer.readUint32() !== ZERO, 'wrong empty tag for list of dimensions');
-              return [];
-            } else {
-              utils.notNetcdf(dimList !== NC_DIMENSION, 'wrong tag for list of dimensions'); // Length of dimensions
-
-              const dimensionSize = buffer.readUint32();
-              var dimensions = new Array(dimensionSize);
-
-              for (var dim = 0; dim < dimensionSize; dim++) {
-                // Read name
-                var name = utils.readName(buffer); // Read dimension size
-
-                const size = buffer.readUint32();
-
-                if (size === NC_UNLIMITED) {
-                  // in netcdf 3 one field can be of size unlimmited
-                  recordId = dim;
-                  recordName = name;
-                }
-
-                dimensions[dim] = {
-                  name: name,
-                  size: size
-                };
-              }
-            }
-
-            return {
-              dimensions: dimensions,
-              recordId: recordId,
-              recordName: recordName
-            };
-          }
-          /**
-           * List of attributes
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @return {Array<object>} - List of attributes with:
-           *  * `name`: String with the name of the attribute
-           *  * `type`: String with the type of the attribute
-           *  * `value`: A number or string with the value of the attribute
-           */
-
-
-          function attributesList(buffer) {
-            const gAttList = buffer.readUint32();
-
-            if (gAttList === ZERO) {
-              utils.notNetcdf(buffer.readUint32() !== ZERO, 'wrong empty tag for list of attributes');
-              return [];
-            } else {
-              utils.notNetcdf(gAttList !== NC_ATTRIBUTE, 'wrong tag for list of attributes'); // Length of attributes
-
-              const attributeSize = buffer.readUint32();
-              var attributes = new Array(attributeSize);
-
-              for (var gAtt = 0; gAtt < attributeSize; gAtt++) {
-                // Read name
-                var name = utils.readName(buffer); // Read type
-
-                var type = buffer.readUint32();
-                utils.notNetcdf(type < 1 || type > 6, "non valid type ".concat(type)); // Read attribute
-
-                var size = buffer.readUint32();
-                var value = types.readType(buffer, type, size); // Apply padding
-
-                utils.padding(buffer);
-                attributes[gAtt] = {
-                  name: name,
-                  type: types.num2str(type),
-                  value: value
-                };
-              }
-            }
-
-            return attributes;
-          }
-          /**
-           * List of variables
-           * @ignore
-           * @param {IOBuffer} buffer - Buffer for the file data
-           * @param {number} recordId - Id of the unlimited dimension (also called record dimension)
-           *                            This value may be undefined if there is no unlimited dimension
-           * @param {number} version - Version of the file
-           * @return {object} - Number of recordStep and list of variables with:
-           *  * `name`: String with the name of the variable
-           *  * `dimensions`: Array with the dimension IDs of the variable
-           *  * `attributes`: Array with the attributes of the variable
-           *  * `type`: String with the type of the variable
-           *  * `size`: Number with the size of the variable
-           *  * `offset`: Number with the offset where of the variable begins
-           *  * `record`: True if is a record variable, false otherwise (unlimited size)
-           */
-
-
-          function variablesList(buffer, recordId, version) {
-            const varList = buffer.readUint32();
-            var recordStep = 0;
-
-            if (varList === ZERO) {
-              utils.notNetcdf(buffer.readUint32() !== ZERO, 'wrong empty tag for list of variables');
-              return [];
-            } else {
-              utils.notNetcdf(varList !== NC_VARIABLE, 'wrong tag for list of variables'); // Length of variables
-
-              const variableSize = buffer.readUint32();
-              var variables = new Array(variableSize);
-
-              for (var v = 0; v < variableSize; v++) {
-                // Read name
-                var name = utils.readName(buffer); // Read dimensionality of the variable
-
-                const dimensionality = buffer.readUint32(); // Index into the list of dimensions
-
-                var dimensionsIds = new Array(dimensionality);
-
-                for (var dim = 0; dim < dimensionality; dim++) {
-                  dimensionsIds[dim] = buffer.readUint32();
-                } // Read variables size
-
-
-                var attributes = attributesList(buffer); // Read type
-
-                var type = buffer.readUint32();
-                utils.notNetcdf(type < 1 && type > 6, "non valid type ".concat(type)); // Read variable size
-                // The 32-bit varSize field is not large enough to contain the size of variables that require
-                // more than 2^32 - 4 bytes, so 2^32 - 1 is used in the varSize field for such variables.
-
-                const varSize = buffer.readUint32(); // Read offset
-
-                var offset = buffer.readUint32();
-
-                if (version === 2) {
-                  utils.notNetcdf(offset > 0, 'offsets larger than 4GB not supported');
-                  offset = buffer.readUint32();
-                }
-
-                let record = false; // Count amount of record variables
-
-                if (typeof recordId !== 'undefined' && dimensionsIds[0] === recordId) {
-                  recordStep += varSize;
-                  record = true;
-                }
-
-                variables[v] = {
-                  name: name,
-                  dimensions: dimensionsIds,
-                  attributes,
-                  type: types.num2str(type),
-                  size: varSize,
-                  offset,
-                  record
-                };
-              }
-            }
-
-            return {
-              variables: variables,
-              recordStep: recordStep
-            };
-          }
-
-          module.exports = header;
-
-          /***/
-        }),
-        /* 7 */
-        /***/
-        (function(module, exports, __webpack_require__) {
-
-
-          function toString() {
-            let result = [];
-            result.push('DIMENSIONS');
-
-            for (let dimension of this.dimensions) {
-              result.push("  ".concat(dimension.name.padEnd(30), " = size: ").concat(dimension.size));
-            }
-
-            result.push('');
-            result.push('GLOBAL ATTRIBUTES');
-
-            for (let attribute of this.globalAttributes) {
-              result.push("  ".concat(attribute.name.padEnd(30), " = ").concat(attribute.value));
-            }
-
-            let variables = JSON.parse(JSON.stringify(this.variables));
-            result.push('');
-            result.push('VARIABLES:');
-
-            for (let variable of variables) {
-              variable.value = this.getDataVariable(variable);
-              let stringify = JSON.stringify(variable.value);
-              if (stringify.length > 50) stringify = stringify.substring(0, 50);
-
-              if (!isNaN(variable.value.length)) {
-                stringify += " (length: ".concat(variable.value.length, ")");
-              }
-
-              result.push("  ".concat(variable.name.padEnd(30), " = ").concat(stringify));
-            }
-
-            return result.join('\n');
-          }
-
-          module.exports = toString;
-
-          /***/
-        })
-        /******/
-      ]);
+        }
+    };
+
+    var IOBuffer$2 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        IOBuffer: IOBuffer$1
     });
 
-    var netcdfjs = NetCDFReaderExport;
+    var require$$0 = /*@__PURE__*/getAugmentedNamespace(IOBuffer$2);
+
+    var utils$2 = {};
+
+    /**
+     * Throws a non-valid NetCDF exception if the statement it's true
+     * @ignore
+     * @param {boolean} statement - Throws if true
+     * @param {string} reason - Reason to throw
+     */
+    function notNetcdf$1(statement, reason) {
+      if (statement) {
+        throw new TypeError(`Not a valid NetCDF v3.x file: ${reason}`);
+      }
+    }
+
+    /**
+     * Moves 1, 2, or 3 bytes to next 4-byte boundary
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     */
+    function padding(buffer) {
+      if ((buffer.offset % 4) !== 0) {
+        buffer.skip(4 - (buffer.offset % 4));
+      }
+    }
+
+
+    /**
+     * Reads the name
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @return {string} - Name
+     */
+    function readName(buffer) {
+      // Read name
+      var nameLength = buffer.readUint32();
+      var name = buffer.readChars(nameLength);
+
+      // validate name
+      // TODO
+
+      // Apply padding
+      padding(buffer);
+      return name;
+    }
+
+    utils$2.notNetcdf = notNetcdf$1;
+    utils$2.padding = padding;
+    utils$2.readName = readName;
+
+    var data$2 = {};
+
+    var types$3 = {exports: {}};
+
+    const notNetcdf = utils$2.notNetcdf;
+
+    const types$2 = {
+      BYTE: 1,
+      CHAR: 2,
+      SHORT: 3,
+      INT: 4,
+      FLOAT: 5,
+      DOUBLE: 6
+    };
+
+    /**
+     * Parse a number into their respective type
+     * @ignore
+     * @param {number} type - integer that represents the type
+     * @return {string} - parsed value of the type
+     */
+    function num2str(type) {
+      switch (Number(type)) {
+        case types$2.BYTE:
+          return 'byte';
+        case types$2.CHAR:
+          return 'char';
+        case types$2.SHORT:
+          return 'short';
+        case types$2.INT:
+          return 'int';
+        case types$2.FLOAT:
+          return 'float';
+        case types$2.DOUBLE:
+          return 'double';
+          /* istanbul ignore next */
+        default:
+          return 'undefined';
+      }
+    }
+
+    /**
+     * Parse a number type identifier to his size in bytes
+     * @ignore
+     * @param {number} type - integer that represents the type
+     * @return {number} -size of the type
+     */
+    function num2bytes(type) {
+      switch (Number(type)) {
+        case types$2.BYTE:
+          return 1;
+        case types$2.CHAR:
+          return 1;
+        case types$2.SHORT:
+          return 2;
+        case types$2.INT:
+          return 4;
+        case types$2.FLOAT:
+          return 4;
+        case types$2.DOUBLE:
+          return 8;
+          /* istanbul ignore next */
+        default:
+          return -1;
+      }
+    }
+
+    /**
+     * Reverse search of num2str
+     * @ignore
+     * @param {string} type - string that represents the type
+     * @return {number} - parsed value of the type
+     */
+    function str2num(type) {
+      switch (String(type)) {
+        case 'byte':
+          return types$2.BYTE;
+        case 'char':
+          return types$2.CHAR;
+        case 'short':
+          return types$2.SHORT;
+        case 'int':
+          return types$2.INT;
+        case 'float':
+          return types$2.FLOAT;
+        case 'double':
+          return types$2.DOUBLE;
+          /* istanbul ignore next */
+        default:
+          return -1;
+      }
+    }
+
+    /**
+     * Auxiliary function to read numeric data
+     * @ignore
+     * @param {number} size - Size of the element to read
+     * @param {function} bufferReader - Function to read next value
+     * @return {Array<number>|number}
+     */
+    function readNumber(size, bufferReader) {
+      if (size !== 1) {
+        var numbers = new Array(size);
+        for (var i = 0; i < size; i++) {
+          numbers[i] = bufferReader();
+        }
+        return numbers;
+      } else {
+        return bufferReader();
+      }
+    }
+
+    /**
+     * Given a type and a size reads the next element
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @param {number} type - Type of the data to read
+     * @param {number} size - Size of the element to read
+     * @return {string|Array<number>|number}
+     */
+    function readType(buffer, type, size) {
+      switch (type) {
+        case types$2.BYTE:
+          return buffer.readBytes(size);
+        case types$2.CHAR:
+          return trimNull(buffer.readChars(size));
+        case types$2.SHORT:
+          return readNumber(size, buffer.readInt16.bind(buffer));
+        case types$2.INT:
+          return readNumber(size, buffer.readInt32.bind(buffer));
+        case types$2.FLOAT:
+          return readNumber(size, buffer.readFloat32.bind(buffer));
+        case types$2.DOUBLE:
+          return readNumber(size, buffer.readFloat64.bind(buffer));
+          /* istanbul ignore next */
+        default:
+          notNetcdf(true, `non valid type ${type}`);
+          return undefined;
+      }
+    }
+
+    /**
+     * Removes null terminate value
+     * @ignore
+     * @param {string} value - String to trim
+     * @return {string} - Trimmed string
+     */
+    function trimNull(value) {
+      if (value.charCodeAt(value.length - 1) === 0) {
+        return value.substring(0, value.length - 1);
+      }
+      return value;
+    }
+
+    types$3.exports = types$2;
+    types$3.exports.num2str = num2str;
+    types$3.exports.num2bytes = num2bytes;
+    types$3.exports.str2num = str2num;
+    types$3.exports.readType = readType;
+
+    var typesExports = types$3.exports;
+
+    const types$1 = typesExports;
+
+    // const STREAMING = 4294967295;
+
+    /**
+     * Read data for the given non-record variable
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @param {object} variable - Variable metadata
+     * @return {Array} - Data of the element
+     */
+    function nonRecord(buffer, variable) {
+      // variable type
+      const type = types$1.str2num(variable.type);
+
+      // size of the data
+      var size = variable.size / types$1.num2bytes(type);
+
+      // iterates over the data
+      var data = new Array(size);
+      for (var i = 0; i < size; i++) {
+        data[i] = types$1.readType(buffer, type, 1);
+      }
+
+      return data;
+    }
+
+    /**
+     * Read data for the given record variable
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @param {object} variable - Variable metadata
+     * @param {object} recordDimension - Record dimension metadata
+     * @return {Array} - Data of the element
+     */
+    function record(buffer, variable, recordDimension) {
+      // variable type
+      const type = types$1.str2num(variable.type);
+      const width = variable.size ? variable.size / types$1.num2bytes(type) : 1;
+
+      // size of the data
+      // TODO streaming data
+      var size = recordDimension.length;
+
+      // iterates over the data
+      var data = new Array(size);
+      const step = recordDimension.recordStep;
+
+      for (var i = 0; i < size; i++) {
+        var currentOffset = buffer.offset;
+        data[i] = types$1.readType(buffer, type, width);
+        buffer.seek(currentOffset + step);
+      }
+
+      return data;
+    }
+
+    data$2.nonRecord = nonRecord;
+    data$2.record = record;
+
+    const utils$1 = utils$2;
+    const types = typesExports;
+
+    // Grammar constants
+    const ZERO = 0;
+    const NC_DIMENSION = 10;
+    const NC_VARIABLE = 11;
+    const NC_ATTRIBUTE = 12;
+
+    /**
+     * Read the header of the file
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @param {number} version - Version of the file
+     * @return {object} - Object with the fields:
+     *  * `recordDimension`: Number with the length of record dimension
+     *  * `dimensions`: List of dimensions
+     *  * `globalAttributes`: List of global attributes
+     *  * `variables`: List of variables
+     */
+    function header(buffer, version) {
+      // Length of record dimension
+      // sum of the varSize's of all the record variables.
+      var header = { recordDimension: { length: buffer.readUint32() } };
+
+      // Version
+      header.version = version;
+
+      // List of dimensions
+      var dimList = dimensionsList(buffer);
+      header.recordDimension.id = dimList.recordId; // id of the unlimited dimension
+      header.recordDimension.name = dimList.recordName; // name of the unlimited dimension
+      header.dimensions = dimList.dimensions;
+
+      // List of global attributes
+      header.globalAttributes = attributesList(buffer);
+
+      // List of variables
+      var variables = variablesList(buffer, dimList.recordId, version);
+      header.variables = variables.variables;
+      header.recordDimension.recordStep = variables.recordStep;
+
+      return header;
+    }
+
+    const NC_UNLIMITED = 0;
+
+    /**
+     * List of dimensions
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @return {object} - Ojbect containing the following properties:
+     *  * `dimensions` that is an array of dimension object:
+      *  * `name`: String with the name of the dimension
+      *  * `size`: Number with the size of the dimension dimensions: dimensions
+     *  * `recordId`: the id of the dimension that has unlimited size or undefined,
+     *  * `recordName`: name of the dimension that has unlimited size
+     */
+    function dimensionsList(buffer) {
+      var recordId, recordName;
+      const dimList = buffer.readUint32();
+      if (dimList === ZERO) {
+        utils$1.notNetcdf((buffer.readUint32() !== ZERO), 'wrong empty tag for list of dimensions');
+        return [];
+      } else {
+        utils$1.notNetcdf((dimList !== NC_DIMENSION), 'wrong tag for list of dimensions');
+
+        // Length of dimensions
+        const dimensionSize = buffer.readUint32();
+        var dimensions = new Array(dimensionSize);
+        for (var dim = 0; dim < dimensionSize; dim++) {
+          // Read name
+          var name = utils$1.readName(buffer);
+
+          // Read dimension size
+          const size = buffer.readUint32();
+          if (size === NC_UNLIMITED) { // in netcdf 3 one field can be of size unlimmited
+            recordId = dim;
+            recordName = name;
+          }
+
+          dimensions[dim] = {
+            name: name,
+            size: size
+          };
+        }
+      }
+      return {
+        dimensions: dimensions,
+        recordId: recordId,
+        recordName: recordName
+      };
+    }
+
+    /**
+     * List of attributes
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @return {Array<object>} - List of attributes with:
+     *  * `name`: String with the name of the attribute
+     *  * `type`: String with the type of the attribute
+     *  * `value`: A number or string with the value of the attribute
+     */
+    function attributesList(buffer) {
+      const gAttList = buffer.readUint32();
+      if (gAttList === ZERO) {
+        utils$1.notNetcdf((buffer.readUint32() !== ZERO), 'wrong empty tag for list of attributes');
+        return [];
+      } else {
+        utils$1.notNetcdf((gAttList !== NC_ATTRIBUTE), 'wrong tag for list of attributes');
+
+        // Length of attributes
+        const attributeSize = buffer.readUint32();
+        var attributes = new Array(attributeSize);
+        for (var gAtt = 0; gAtt < attributeSize; gAtt++) {
+          // Read name
+          var name = utils$1.readName(buffer);
+
+          // Read type
+          var type = buffer.readUint32();
+          utils$1.notNetcdf(((type < 1) || (type > 6)), `non valid type ${type}`);
+
+          // Read attribute
+          var size = buffer.readUint32();
+          var value = types.readType(buffer, type, size);
+
+          // Apply padding
+          utils$1.padding(buffer);
+
+          attributes[gAtt] = {
+            name: name,
+            type: types.num2str(type),
+            value: value
+          };
+        }
+      }
+      return attributes;
+    }
+
+    /**
+     * List of variables
+     * @ignore
+     * @param {IOBuffer} buffer - Buffer for the file data
+     * @param {number} recordId - Id of the unlimited dimension (also called record dimension)
+     *                            This value may be undefined if there is no unlimited dimension
+     * @param {number} version - Version of the file
+     * @return {object} - Number of recordStep and list of variables with:
+     *  * `name`: String with the name of the variable
+     *  * `dimensions`: Array with the dimension IDs of the variable
+     *  * `attributes`: Array with the attributes of the variable
+     *  * `type`: String with the type of the variable
+     *  * `size`: Number with the size of the variable
+     *  * `offset`: Number with the offset where of the variable begins
+     *  * `record`: True if is a record variable, false otherwise (unlimited size)
+     */
+
+    function variablesList(buffer, recordId, version) {
+      const varList = buffer.readUint32();
+      var recordStep = 0;
+      if (varList === ZERO) {
+        utils$1.notNetcdf((buffer.readUint32() !== ZERO), 'wrong empty tag for list of variables');
+        return [];
+      } else {
+        utils$1.notNetcdf((varList !== NC_VARIABLE), 'wrong tag for list of variables');
+
+        // Length of variables
+        const variableSize = buffer.readUint32();
+        var variables = new Array(variableSize);
+        for (var v = 0; v < variableSize; v++) {
+          // Read name
+          var name = utils$1.readName(buffer);
+
+          // Read dimensionality of the variable
+          const dimensionality = buffer.readUint32();
+
+          // Index into the list of dimensions
+          var dimensionsIds = new Array(dimensionality);
+          for (var dim = 0; dim < dimensionality; dim++) {
+            dimensionsIds[dim] = buffer.readUint32();
+          }
+
+          // Read variables size
+          var attributes = attributesList(buffer);
+
+          // Read type
+          var type = buffer.readUint32();
+          utils$1.notNetcdf(((type < 1) && (type > 6)), `non valid type ${type}`);
+
+          // Read variable size
+          // The 32-bit varSize field is not large enough to contain the size of variables that require
+          // more than 2^32 - 4 bytes, so 2^32 - 1 is used in the varSize field for such variables.
+          const varSize = buffer.readUint32();
+
+          // Read offset
+          var offset = buffer.readUint32();
+          if (version === 2) {
+            utils$1.notNetcdf((offset > 0), 'offsets larger than 4GB not supported');
+            offset = buffer.readUint32();
+          }
+
+          let record = false;
+          // Count amount of record variables
+          if ((typeof recordId !== 'undefined') && (dimensionsIds[0] === recordId)) {
+            recordStep += varSize;
+            record = true;
+          }
+          variables[v] = {
+            name: name,
+            dimensions: dimensionsIds,
+            attributes,
+            type: types.num2str(type),
+            size: varSize,
+            offset,
+            record
+          };
+        }
+      }
+
+      return {
+        variables: variables,
+        recordStep: recordStep
+      };
+    }
+
+    var header_1 = header;
+
+    function toString$1() {
+      let result = [];
+
+      result.push('DIMENSIONS');
+      for (let dimension of this.dimensions) {
+        result.push(`  ${dimension.name.padEnd(30)} = size: ${dimension.size}`);
+      }
+
+      result.push('');
+      result.push('GLOBAL ATTRIBUTES');
+      for (let attribute of this.globalAttributes) {
+        result.push(`  ${attribute.name.padEnd(30)} = ${attribute.value}`);
+      }
+
+      let variables = JSON.parse(JSON.stringify(this.variables));
+      result.push('');
+      result.push('VARIABLES:');
+      for (let variable of variables) {
+        variable.value = this.getDataVariable(variable);
+        let stringify = JSON.stringify(variable.value);
+        if (stringify.length > 50) stringify = stringify.substring(0, 50);
+        if (!isNaN(variable.value.length)) {
+          stringify += ` (length: ${variable.value.length})`;
+        }
+        result.push(`  ${variable.name.padEnd(30)} = ${stringify}`);
+      }
+      return result.join('\n');
+    }
+
+    var toString_1 = toString$1;
+
+    const { IOBuffer } = require$$0;
+
+    const utils = utils$2;
+    const data$1 = data$2;
+    const readHeader = header_1;
+    const toString = toString_1;
+
+    /**
+     * Reads a NetCDF v3.x file
+     * https://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html
+     * @param {ArrayBuffer} data - ArrayBuffer or any Typed Array (including Node.js' Buffer from v4) with the data
+     * @constructor
+     */
+    class NetCDFReader {
+      constructor(data) {
+        const buffer = new IOBuffer(data);
+        buffer.setBigEndian();
+
+        // Validate that it's a NetCDF file
+        utils.notNetcdf(buffer.readChars(3) !== 'CDF', 'should start with CDF');
+
+        // Check the NetCDF format
+        const version = buffer.readByte();
+        utils.notNetcdf(version > 2, 'unknown version');
+
+        // Read the header
+        this.header = readHeader(buffer, version);
+        this.buffer = buffer;
+      }
+
+      /**
+       * @return {string} - Version for the NetCDF format
+       */
+      get version() {
+        if (this.header.version === 1) {
+          return 'classic format';
+        } else {
+          return '64-bit offset format';
+        }
+      }
+
+      /**
+       * @return {object} - Metadata for the record dimension
+       *  * `length`: Number of elements in the record dimension
+       *  * `id`: Id number in the list of dimensions for the record dimension
+       *  * `name`: String with the name of the record dimension
+       *  * `recordStep`: Number with the record variables step size
+       */
+      get recordDimension() {
+        return this.header.recordDimension;
+      }
+
+      /**
+       * @return {Array<object>} - List of dimensions with:
+       *  * `name`: String with the name of the dimension
+       *  * `size`: Number with the size of the dimension
+       */
+      get dimensions() {
+        return this.header.dimensions;
+      }
+
+      /**
+       * @return {Array<object>} - List of global attributes with:
+       *  * `name`: String with the name of the attribute
+       *  * `type`: String with the type of the attribute
+       *  * `value`: A number or string with the value of the attribute
+       */
+      get globalAttributes() {
+        return this.header.globalAttributes;
+      }
+
+      /**
+       * Returns the value of an attribute
+       * @param {string} attributeName
+       * @return {string} Value of the attributeName or null
+       */
+      getAttribute(attributeName) {
+        const attribute = this.globalAttributes.find(
+          (val) => val.name === attributeName
+        );
+        if (attribute) return attribute.value;
+        return null;
+      }
+
+      /**
+       * Returns the value of a variable as a string
+       * @param {string} variableName
+       * @return {string} Value of the variable as a string or null
+       */
+      getDataVariableAsString(variableName) {
+        const variable = this.getDataVariable(variableName);
+        if (variable) return variable.join('');
+        return null;
+      }
+
+      /**
+       * @return {Array<object>} - List of variables with:
+       *  * `name`: String with the name of the variable
+       *  * `dimensions`: Array with the dimension IDs of the variable
+       *  * `attributes`: Array with the attributes of the variable
+       *  * `type`: String with the type of the variable
+       *  * `size`: Number with the size of the variable
+       *  * `offset`: Number with the offset where of the variable begins
+       *  * `record`: True if is a record variable, false otherwise
+       */
+      get variables() {
+        return this.header.variables;
+      }
+
+      toString() {
+        return toString.call(this);
+      }
+
+      /**
+       * Retrieves the data for a given variable
+       * @param {string|object} variableName - Name of the variable to search or variable object
+       * @return {Array} - List with the variable values
+       */
+      getDataVariable(variableName) {
+        let variable;
+        if (typeof variableName === 'string') {
+          // search the variable
+          variable = this.header.variables.find(function (val) {
+            return val.name === variableName;
+          });
+        } else {
+          variable = variableName;
+        }
+
+        // throws if variable not found
+        utils.notNetcdf(
+          variable === undefined,
+          `variable not found: ${variableName}`
+        );
+
+        // go to the offset position
+        this.buffer.seek(variable.offset);
+
+        if (variable.record) {
+          // record variable case
+          return data$1.record(this.buffer, variable, this.header.recordDimension);
+        } else {
+          // non-record variable case
+          return data$1.nonRecord(this.buffer, variable);
+        }
+      }
+
+      /**
+       * Check if a dataVariable exists
+       * @param {string} variableName - Name of the variable to find
+       * @return {boolean}
+       */
+      dataVariableExists(variableName) {
+        const variable = this.header.variables.find(function (val) {
+          return val.name === variableName;
+        });
+        return variable !== undefined;
+      }
+
+      /**
+       * Check if an attribute exists
+       * @param {string} attributeName - Name of the attribute to find
+       * @return {boolean}
+       */
+      attributeExists(attributeName) {
+        const attribute = this.globalAttributes.find(
+          (val) => val.name === attributeName
+        );
+        return attribute !== undefined;
+      }
+    }
+
+    var src = NetCDFReader;
+
+    var netcdfjs = /*@__PURE__*/getDefaultExportFromCjs(src);
 
     let data;
 
@@ -37586,21 +40698,20 @@ void main() {
        *   lineWidth: 4.0
        * })
        * wind3D.loadDataFromNC('./wind.nc')
-       * @returns
        */
       constructor(viewer, options) {
         const userInput = {};
-        userInput.speedFactor = defaultValue$7(options.speedFactor, 1.0);
-        userInput.lineWidth = defaultValue$7(options.lineWidth, 4.0);
-        userInput.dropRateBump = defaultValue$7(options.dropRateBump, 0.01);
-        userInput.dropRate = defaultValue$7(options.dropRate,0.003);
-        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$7(options.maxParticles, 64*64)));
+        userInput.speedFactor = defaultValue$9(options.speedFactor, 1.0);
+        userInput.lineWidth = defaultValue$9(options.lineWidth, 4.0);
+        userInput.dropRateBump = defaultValue$9(options.dropRateBump, 0.01);
+        userInput.dropRate = defaultValue$9(options.dropRate,0.003);
+        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$9(options.maxParticles, 64*64)));
         userInput.maxParticles = userInput.particlesTextureSize * userInput.particlesTextureSize;
-        userInput.fadeOpacity = defaultValue$7(options.fadeOpacity, 0.996);
-        userInput.particleHeight = defaultValue$7(options.particleHeight, 100);
-        userInput.color = defaultValue$7(options.color, Color.WHITE);
+        userInput.fadeOpacity = defaultValue$9(options.fadeOpacity, 0.996);
+        userInput.particleHeight = defaultValue$9(options.particleHeight, 100);
+        userInput.color = defaultValue$9(options.color, Color.WHITE);
         this._maxParticles = userInput.maxParticles;
-        this._color = defaultValue$7(options.color, "#FFFFFF");
+        this._color = defaultValue$9(options.color, "#FFFFFF");
         this.viewer = viewer;
         this.scene = this.viewer.scene;
         this.camera = this.viewer.camera;
@@ -38287,12 +41398,16 @@ void main(){
     }
 }`;
 
-    const VERSION = '1.0.3';
+    const VERSION = '1.1.1';
 
     exports.ArrowPlot = ArrowPlot;
+    exports.AxisPlane = AxisPlane;
     exports.BaiDuLayer = BaiDuLayer;
     exports.BasePlot = BasePlot;
     exports.BingLayer = BingLayer;
+    exports.Cartometry = Cartometry;
+    exports.CartometryManager = CartometryManager;
+    exports.CartometryType = CartometryType$1;
     exports.CesiumProError = CesiumProError$1;
     exports.CesiumProTerrainProvider = CesiumTerrainProvider$1;
     exports.CircleScanGraphic = CircleScanGraphic;
@@ -38318,6 +41433,7 @@ void main(){
     exports.GroundSkyBox = GroundSkyBox;
     exports.HtmlGraphicGroup = HtmlGraphicGroup;
     exports.HtmlPointGraphic = HtmlPointGraphic;
+    exports.ImageGraphic = ImageGraphic;
     exports.InfoBox = InfoBox;
     exports.LonLat = LonLat;
     exports.LonLatNetLayer = LonLatNetLayer;
@@ -38338,6 +41454,7 @@ void main(){
     exports.PointBaseGraphic = PointBaseGraphic;
     exports.PointPlot = PointPlot;
     exports.PolygonPlot = PolygonPlot;
+    exports.PolylineAntialiasingMaterialProperty = PolylineAntialiasingMaterialProperty;
     exports.PolylineFlowMaterialProperty = PolylineFlowMaterialProperty;
     exports.PolylineODMaterialProperty = PolylineODMaterialProperty;
     exports.PolylinePlot = PolylinePlot;
@@ -38362,6 +41479,7 @@ void main(){
     exports.TileDebugLayer = TileDebugLayer;
     exports.TileLayer = TileLayer;
     exports.Tileset = Tileset;
+    exports.TransformHelper = TransformHelper;
     exports.Url = Url;
     exports.VERSION = VERSION;
     exports.VectorTileProvider = VectorTileProvider;
@@ -38374,23 +41492,24 @@ void main(){
     exports._shaderBloom = shader$5;
     exports._shaderBuildUniforms = buildShader;
     exports._shaderCircleScan = glsl$2;
-    exports._shaderCircleSpread = shader$i;
+    exports._shaderCircleSpread = shader$j;
     exports._shaderDynamicConeMaterial = glsl$1;
-    exports._shaderDynamicSpreadMaterial = shader$f;
-    exports._shaderDynamicSpreadWallMaterial = shader$g;
-    exports._shaderDynamicWaveMaterial = shader$e;
+    exports._shaderDynamicSpreadMaterial = shader$g;
+    exports._shaderDynamicSpreadWallMaterial = shader$h;
+    exports._shaderDynamicWaveMaterial = shader$f;
     exports._shaderEllipsoid = czm_ellipsoid;
     exports._shaderFlowImage = glsl;
     exports._shaderFog = shader$4;
     exports._shaderGetDepth = shader$9;
     exports._shaderGetWgs84EllipsoidEC = shader$8;
     exports._shaderGlobeFS = GlobeFS;
-    exports._shaderGroundSkyBoxFS = shader$k;
-    exports._shaderGroundSkyBoxVS = shader$j;
+    exports._shaderGroundSkyBoxFS = shader$l;
+    exports._shaderGroundSkyBoxVS = shader$k;
     exports._shaderPhong = shader$6;
+    exports._shaderPolylineAntialiasingMaterial = polylineAntialiasingMaterial;
     exports._shaderPolylineFlowMaterial = shader$d;
     exports._shaderPolylineTrailLinkMaterial = shader$c;
-    exports._shaderRadarScan = shader$h;
+    exports._shaderRadarScan = shader$i;
     exports._shaderRain = shader$3;
     exports._shaderRectangularSensorComm = sensorComm;
     exports._shaderRectangularSensorFS = sensorFS;
@@ -38413,9 +41532,10 @@ void main(){
     exports.customPrimitive = CustomPrimitive;
     exports.dataProcess = DataProcess;
     exports.dateFormat = dateFormat;
-    exports.defaultValue = defaultValue$7;
-    exports.defined = defined$a;
+    exports.defaultValue = defaultValue$9;
+    exports.defined = defined$b;
     exports.destroyObject = destroyObject$6;
+    exports.getParabolaPoints = getParabolaPoints;
     exports.guid = guid;
     exports.index = overrideCesium;
     exports.particleSystem = ParticleSystem;
@@ -38426,8 +41546,6 @@ void main(){
     exports.randomPosition = randomPosition;
     exports.rotateEnabled = rotateEnabled;
     exports.util = Util;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
 //# sourceMappingURL=CesiumPro.js.map

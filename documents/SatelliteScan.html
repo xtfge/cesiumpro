@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      SatelliteScan - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        SatelliteScan
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="SatelliteScan">
+    <a href="#SatelliteScan" class="doc-link"></a>
+    new CesiumPro.SatelliteScan<span class="signature">(options)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L100">geometry/SatelliteScanGraphic.js 100</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  卫星扫描
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  *</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                具有以下属性
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>show</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否可见</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartesian3</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星的位置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Entity</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星运动轨道,该属性将覆盖position</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>radius</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星在地面的扫描半径</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>inverse</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                扫描方向，该值为true卫星将从下向上扫描</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tracked</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否跟踪卫星</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Color</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                扫描波颜色</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>option.image</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星图标，如果定义了model该属性将不生效</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.model</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">false</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星模型</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>option.axis</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cartesian3</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cartesian3(1,0,0)</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                卫星扫描方向偏转的坐标轴</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.rotation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                扫描波在方向偏转角度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>option.animate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Bool</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">true</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                是否动态扫描</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.thickness</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">0.3</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                扫描波每一片的厚度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options.slices</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">20</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                扫描波的分片数量</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="_height">
+    <a href="#_height" class="doc-link"></a>
+    _height<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L117">geometry/SatelliteScanGraphic.js 117</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星所在的高度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="_surface">
+    <a href="#_surface" class="doc-link"></a>
+    _surface<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L121">geometry/SatelliteScanGraphic.js 121</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星在地面的投影位置
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="animation">
+    <a href="#animation" class="doc-link"></a>
+    animation<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L350">geometry/SatelliteScanGraphic.js 350</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否动态扫描
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="axis">
+    <a href="#axis" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> axis<span class="type-signature"> : Cartesian3</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L320">geometry/SatelliteScanGraphic.js 320</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星扫描该向偏转轴
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="color">
+    <a href="#color" class="doc-link"></a>
+    color<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L339">geometry/SatelliteScanGraphic.js 339</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  扫描波颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="image">
+    <a href="#image" class="doc-link"></a>
+    image<span class="type-signature"> : String|Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L157">geometry/SatelliteScanGraphic.js 157</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  表示卫星的图标,false表示不显示图标
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="inverse">
+    <a href="#inverse" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> inverse<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L267">geometry/SatelliteScanGraphic.js 267</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否反方向扫描，true表示从下向上扫描
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="model">
+    <a href="#model" class="doc-link"></a>
+    model<span class="type-signature"> : String|Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L162">geometry/SatelliteScanGraphic.js 162</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  表示卫星的模型,false表示不显示模型
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="path">
+    <a href="#path" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> path<span class="type-signature"> : Entity</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L139">geometry/SatelliteScanGraphic.js 139</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星运动轨迹
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="radius">
+    <a href="#radius" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> radius<span class="type-signature"> : Number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L127">geometry/SatelliteScanGraphic.js 127</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星在地面的扫描半径
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="rotation">
+    <a href="#rotation" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> rotation<span class="type-signature"> : <a href="../cesiumDocumentation/Cartesian3.html" target = '_blank'>Cesium.Cartesian3</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L308">geometry/SatelliteScanGraphic.js 308</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  卫星扫描波在各方向的偏转角度
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="thickness">
+    <a href="#thickness" class="doc-link"></a>
+    thickness<span class="type-signature"> : number</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L289">geometry/SatelliteScanGraphic.js 289</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  厚度,有效值0~1
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="tracked">
+    <a href="#tracked" class="doc-link"></a>
+    tracked<span class="type-signature"> : Bool</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L327">geometry/SatelliteScanGraphic.js 327</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否追踪卫星
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="trackSatellite">
+    <a href="#trackSatellite" class="doc-link"></a>
+    trackSatellite<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L250">geometry/SatelliteScanGraphic.js 250</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  使相视视角一直跟要卫星
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="zoomTo">
+    <a href="#zoomTo" class="doc-link"></a>
+    zoomTo<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L389">geometry/SatelliteScanGraphic.js 389</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  定位到扫描波所在的位置
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BasePlot"><a href="BasePlot.html">BasePlot</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="Cartometry"><a href="Cartometry.html">Cartometry</a></li><li data-name="CartometryManager"><a href="CartometryManager.html">CartometryManager</a></li><li data-name="CartometryType"><a href="CartometryType.html">CartometryType</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="CesiumTerrainProvider"><a href="CesiumTerrainProvider.html">CesiumTerrainProvider</a></li><li data-name="checkViewer"><a href="checkViewer.html">checkViewer</a></li><li data-name="CircleScanGraphic"><a href="CircleScanGraphic.html">CircleScanGraphic</a></li><li data-name="CircleSpreadGraphic"><a href="CircleSpreadGraphic.html">CircleSpreadGraphic</a></li><li data-name="clone"><a href="clone.html">clone</a></li><li data-name="ContextMenu"><a href="ContextMenu.html">ContextMenu</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createDomeLineVertexArray"><a href="global.html#createDomeLineVertexArray">createDomeLineVertexArray</a></li><li data-name="createDomeVertexArray"><a href="global.html#createDomeVertexArray">createDomeVertexArray</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="createScanPlaneVertexArray"><a href="global.html#createScanPlaneVertexArray">createScanPlaneVertexArray</a></li><li data-name="createSectorLineVertexArray"><a href="global.html#createSectorLineVertexArray">createSectorLineVertexArray</a></li><li data-name="CursorTip"><a href="CursorTip.html">CursorTip</a></li><li data-name="CylinderGeometry"><a href="CylinderGeometry.html">CylinderGeometry</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="destroyObject"><a href="destroyObject.html">destroyObject</a></li><li data-name="DivGraphic"><a href="DivGraphic.html">DivGraphic</a></li><li data-name="DynamicConeGraphic"><a href="DynamicConeGraphic.html">DynamicConeGraphic</a></li><li data-name="DynamicFadeMaterialProperty"><a href="DynamicFadeMaterialProperty.html">DynamicFadeMaterialProperty</a></li><li data-name="DynamicFlowWallMaterialProperty"><a href="DynamicFlowWallMaterialProperty.html">DynamicFlowWallMaterialProperty</a></li><li data-name="DynamicSpreadMaterialProperty"><a href="DynamicSpreadMaterialProperty.html">DynamicSpreadMaterialProperty</a></li><li data-name="DynamicWaveMaterialProperty"><a href="DynamicWaveMaterialProperty.html">DynamicWaveMaterialProperty</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="FlattenPolygonCollection"><a href="FlattenPolygonCollection.html">FlattenPolygonCollection</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="getParabolaPoints"><a href="global.html#getParabolaPoints">getParabolaPoints</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GraphicGroup"><a href="GraphicGroup.html">GraphicGroup</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="guid"><a href="guid.html">guid</a></li><li data-name="HtmlGraphicGroup"><a href="HtmlGraphicGroup.html">HtmlGraphicGroup</a></li><li data-name="HtmlPointGraphic"><a href="HtmlPointGraphic.html">HtmlPointGraphic</a></li><li data-name="ImageGraphic"><a href="ImageGraphic.html">ImageGraphic</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NodePlot"><a href="NodePlot.html">NodePlot</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="pickPosition"><a href="pickPosition.html">pickPosition</a></li><li data-name="PlotManager"><a href="PlotManager.html">PlotManager</a></li><li data-name="PlotType"><a href="PlotType.html">PlotType</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="PointPlot"><a href="PointPlot.html">PointPlot</a></li><li data-name="PolygonPlot"><a href="PolygonPlot.html">PolygonPlot</a></li><li data-name="PolylineFlowMaterialProperty"><a href="PolylineFlowMaterialProperty.html">PolylineFlowMaterialProperty</a></li><li data-name="PolylineODMaterialProperty"><a href="PolylineODMaterialProperty.html">PolylineODMaterialProperty</a></li><li data-name="PolylinePlot"><a href="PolylinePlot.html">PolylinePlot</a></li><li data-name="PolylineTrailLinkMaterialProperty"><a href="PolylineTrailLinkMaterialProperty.html">PolylineTrailLinkMaterialProperty</a></li><li data-name="PostProcessing"><a href="PostProcessing.html">PostProcessing</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Properties"><a href="Properties.html">Properties</a></li><li data-name="RadarScanGraphic"><a href="RadarScanGraphic.html">RadarScanGraphic</a></li><li data-name="RectangularSensorPrimitive"><a href="RectangularSensorPrimitive.html">RectangularSensorPrimitive</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="rotateEnabled"><a href="rotateEnabled.html">rotateEnabled</a></li><li data-name="SatelliteScan"><a href="SatelliteScan.html">SatelliteScan</a></li><li data-name="SectorGeometry"><a href="SectorGeometry.html">SectorGeometry</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="SnowEffect"><a href="SnowEffect.html">SnowEffect</a></li><li data-name="SplitDirection"><a href="global.html#SplitDirection">SplitDirection</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="TransformHelper"><a href="TransformHelper.html">TransformHelper</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WindField"><a href="WindField.html">WindField</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

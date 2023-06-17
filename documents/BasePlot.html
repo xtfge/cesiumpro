@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      BasePlot - CesiumPro Documentation
+    </title>
+
+    <!--[if lt IE 9]>
+      <script src="javascript/html5.js"></script>
+    <![endif]-->
+    <link href="styles/jsdoc-default.css" rel="stylesheet">
+    <link href="styles/prism.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <h1 class="page-title">
+        <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
+        BasePlot
+        <div class="titleCenterer"></div>
+      </h1>
+
+      
+
+
+
+
+<section>
+
+  <header>
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+
+      
+      
+<div class="nameContainer">
+  <h4 class="name" id="BasePlot">
+    <a href="#BasePlot" class="doc-link"></a>
+    new CesiumPro.BasePlot<span class="signature">(options, entityOptions)</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L21">plot/BasePlot.js 21</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  可编辑的几何图形基类，定义了可编辑几何图形的公共属性和操作方法，一般做为某种图形的父类使用，不要直接创建它。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>entityOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                描述一个实体对象</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+      
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h3 class="subsection-title">Members</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id=".highlightColor">
+    <a href="#.highlightColor" class="doc-link"></a>
+    <span class="type-signature attribute-static">static</span> CesiumPro.BasePlot.highlightColor<span class="type-signature"> : <a href="../cesiumDocumentation/Color.html" target = '_blank'>Cesium.Color</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L52">plot/BasePlot.js 52</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形高亮时使用的颜色
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clampToGround">
+    <a href="#clampToGround" class="doc-link"></a>
+    clampToGround<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L57">plot/BasePlot.js 57</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否依附地形
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="clampToModel">
+    <a href="#clampToModel" class="doc-link"></a>
+    clampToModel<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L67">plot/BasePlot.js 67</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  是否依附模型
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="entity">
+    <a href="#entity" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> entity<span class="type-signature"> : <a href="../cesiumDocumentation/Entity.html" target = '_blank'>Cesium.Entity</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L124">plot/BasePlot.js 124</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  包含了该图形几何信息的实体，场景将根据它渲染图形，且场景中任何对该图形的操作都直接作用于其实体。
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="id">
+    <a href="#id" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> id<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L79">plot/BasePlot.js 79</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形id
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="positions">
+    <a href="#positions" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> positions<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L87">plot/BasePlot.js 87</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形的顶点位置信息
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="properties">
+    <a href="#properties" class="doc-link"></a>
+    properties<span class="type-signature"> : <a href="Properties.html">Properties</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L112">plot/BasePlot.js 112</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  保存了描述该图形的所有属性信息
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example:</h5>
+        
+    <pre><code class="language-javascript">const point=new CesiumPro.PointGraphic({position:Cesium.Cartesian3.fromDegrees(110,30),pixelSize:15})point.properties={name:'point',color:'red'}</code></pre>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L132">plot/BasePlot.js 132</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形是否可见
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="type">
+    <a href="#type" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> type<span class="type-signature"> : GraphicType</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L96">plot/BasePlot.js 96</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  图形类型
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+    <h3 class="subsection-title">Methods</h3>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L146">plot/BasePlot.js 146</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  销毁对象。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="getGeometry">
+    <a href="#getGeometry" class="doc-link"></a>
+    getGeometry<span class="signature">()</span> &rarr; <span class="type-signature returnType">Object</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L216">plot/BasePlot.js 216</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  返回该图形的几何描述，包括类型，经纬度等，必须在派生类中实现它。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="highlightGraphic">
+    <a href="#highlightGraphic" class="doc-link"></a>
+    highlightGraphic<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L33">plot/BasePlot.js 33</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  图形高亮显示
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="startEdit">
+    <a href="#startEdit" class="doc-link"></a>
+    startEdit<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L161">plot/BasePlot.js 161</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  开始编辑几何信息，此时图形的顶点可以被修改、删除、移动。属性信息的编辑不需要调用该方法。
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Fires:</h5>
+<ul>
+  
+  <li>
+    BasePlot#event:preEdit
+  </li>
+  
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="stopEdit">
+    <a href="#stopEdit" class="doc-link"></a>
+    stopEdit<span class="signature">()</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L174">plot/BasePlot.js 174</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  几何要素编辑完成后调用该方法，以降低性能消耗。<p style='font-weight:bold'>建议在图形编辑完成后调用该方法，因为CallbackProperty对资源消耗比较大，虽然对单个图形来说，不调用此方法并不会有任何影响。</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="toGeoJson">
+    <a href="#toGeoJson" class="doc-link"></a>
+    toGeoJson<span class="signature">()</span> &rarr; <span class="type-signature returnType">Object</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/plot/BasePlot.js#L208">plot/BasePlot.js 208</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+
+<div class="description">
+  将对象转为GeoJson格式
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+  </article>
+
+</section>
+
+
+
+
+      <footer>
+        Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc
+          3.6.7</a>
+      </footer>
+    </div>
+
+    <div class="nav">
+      <div class="menu">
+        <input type="text" class="classFilter" id="ClassFilter" placeholder="Search">
+        <ul id="ClassList"><li data-name="BaiDuLayer"><a href="BaiDuLayer.html">BaiDuLayer</a></li><li data-name="BasePlot"><a href="BasePlot.html">BasePlot</a></li><li data-name="BingLayer"><a href="BingLayer.html">BingLayer</a></li><li data-name="BOTTOM"><a href="global.html#BOTTOM">BOTTOM</a></li><li data-name="Cartometry"><a href="Cartometry.html">Cartometry</a></li><li data-name="CartometryManager"><a href="CartometryManager.html">CartometryManager</a></li><li data-name="CartometryType"><a href="CartometryType.html">CartometryType</a></li><li data-name="CesiumProError"><a href="CesiumProError.html">CesiumProError</a></li><li data-name="CesiumTerrainProvider"><a href="CesiumTerrainProvider.html">CesiumTerrainProvider</a></li><li data-name="checkViewer"><a href="checkViewer.html">checkViewer</a></li><li data-name="CircleScanGraphic"><a href="CircleScanGraphic.html">CircleScanGraphic</a></li><li data-name="CircleSpreadGraphic"><a href="CircleSpreadGraphic.html">CircleSpreadGraphic</a></li><li data-name="clone"><a href="clone.html">clone</a></li><li data-name="ContextMenu"><a href="ContextMenu.html">ContextMenu</a></li><li data-name="createDefaultLayer"><a href="createDefaultLayer.html">createDefaultLayer</a></li><li data-name="createDomeLineVertexArray"><a href="global.html#createDomeLineVertexArray">createDomeLineVertexArray</a></li><li data-name="createDomeVertexArray"><a href="global.html#createDomeVertexArray">createDomeVertexArray</a></li><li data-name="createGuid"><a href="createGuid.html">createGuid</a></li><li data-name="createScanPlaneVertexArray"><a href="global.html#createScanPlaneVertexArray">createScanPlaneVertexArray</a></li><li data-name="createSectorLineVertexArray"><a href="global.html#createSectorLineVertexArray">createSectorLineVertexArray</a></li><li data-name="CursorTip"><a href="CursorTip.html">CursorTip</a></li><li data-name="CylinderGeometry"><a href="CylinderGeometry.html">CylinderGeometry</a></li><li data-name="dateFormat"><a href="dateFormat.html">dateFormat</a></li><li data-name="defaultValue"><a href="defaultValue.html">defaultValue</a></li><li data-name="defined"><a href="defined.html">defined</a></li><li data-name="destroyObject"><a href="destroyObject.html">destroyObject</a></li><li data-name="DivGraphic"><a href="DivGraphic.html">DivGraphic</a></li><li data-name="DynamicConeGraphic"><a href="DynamicConeGraphic.html">DynamicConeGraphic</a></li><li data-name="DynamicFadeMaterialProperty"><a href="DynamicFadeMaterialProperty.html">DynamicFadeMaterialProperty</a></li><li data-name="DynamicFlowWallMaterialProperty"><a href="DynamicFlowWallMaterialProperty.html">DynamicFlowWallMaterialProperty</a></li><li data-name="DynamicSpreadMaterialProperty"><a href="DynamicSpreadMaterialProperty.html">DynamicSpreadMaterialProperty</a></li><li data-name="DynamicWaveMaterialProperty"><a href="DynamicWaveMaterialProperty.html">DynamicWaveMaterialProperty</a></li><li data-name="Event"><a href="Event.html">Event</a></li><li data-name="FlattenPolygonCollection"><a href="FlattenPolygonCollection.html">FlattenPolygonCollection</a></li><li data-name="GaoDeLayer"><a href="GaoDeLayer.html">GaoDeLayer</a></li><li data-name="GeoJsonDataSource"><a href="GeoJsonDataSource.html">GeoJsonDataSource</a></li><li data-name="getParabolaPoints"><a href="global.html#getParabolaPoints">getParabolaPoints</a></li><li data-name="Globe"><a href="Globe.html">Globe</a></li><li data-name="Graphic"><a href="Graphic.html">Graphic</a></li><li data-name="GraphicGroup"><a href="GraphicGroup.html">GraphicGroup</a></li><li data-name="GroundSkyBox"><a href="GroundSkyBox.html">GroundSkyBox</a></li><li data-name="guid"><a href="guid.html">guid</a></li><li data-name="HtmlGraphicGroup"><a href="HtmlGraphicGroup.html">HtmlGraphicGroup</a></li><li data-name="HtmlPointGraphic"><a href="HtmlPointGraphic.html">HtmlPointGraphic</a></li><li data-name="ImageGraphic"><a href="ImageGraphic.html">ImageGraphic</a></li><li data-name="InfoBox"><a href="InfoBox.html">InfoBox</a></li><li data-name="LEFT"><a href="global.html#LEFT">LEFT</a></li><li data-name="LonLat"><a href="LonLat.html">LonLat</a></li><li data-name="LonLatNetLayer"><a href="LonLatNetLayer.html">LonLatNetLayer</a></li><li data-name="MassiveBillboardLayer"><a href="MassiveBillboardLayer.html">MassiveBillboardLayer</a></li><li data-name="MassiveEntityLayer"><a href="MassiveEntityLayer.html">MassiveEntityLayer</a></li><li data-name="MassiveGraphicLayerCollection"><a href="MassiveGraphicLayerCollection.html">MassiveGraphicLayerCollection</a></li><li data-name="MassiveModelLayer"><a href="MassiveModelLayer.html">MassiveModelLayer</a></li><li data-name="MassivePointLayer"><a href="MassivePointLayer.html">MassivePointLayer</a></li><li data-name="Model"><a href="Model.html">Model</a></li><li data-name="MultipleTerrainProvider"><a href="MultipleTerrainProvider.html">MultipleTerrainProvider</a></li><li data-name="NodePlot"><a href="NodePlot.html">NodePlot</a></li><li data-name="NONE"><a href="global.html#NONE">NONE</a></li><li data-name="pickPosition"><a href="pickPosition.html">pickPosition</a></li><li data-name="PlotManager"><a href="PlotManager.html">PlotManager</a></li><li data-name="PlotType"><a href="PlotType.html">PlotType</a></li><li data-name="PointBaseGraphic"><a href="PointBaseGraphic.html">PointBaseGraphic</a></li><li data-name="PointPlot"><a href="PointPlot.html">PointPlot</a></li><li data-name="PolygonPlot"><a href="PolygonPlot.html">PolygonPlot</a></li><li data-name="PolylineFlowMaterialProperty"><a href="PolylineFlowMaterialProperty.html">PolylineFlowMaterialProperty</a></li><li data-name="PolylineODMaterialProperty"><a href="PolylineODMaterialProperty.html">PolylineODMaterialProperty</a></li><li data-name="PolylinePlot"><a href="PolylinePlot.html">PolylinePlot</a></li><li data-name="PolylineTrailLinkMaterialProperty"><a href="PolylineTrailLinkMaterialProperty.html">PolylineTrailLinkMaterialProperty</a></li><li data-name="PostProcessing"><a href="PostProcessing.html">PostProcessing</a></li><li data-name="proj"><a href="proj.html">proj</a></li><li data-name="Properties"><a href="Properties.html">Properties</a></li><li data-name="RadarScanGraphic"><a href="RadarScanGraphic.html">RadarScanGraphic</a></li><li data-name="RectangularSensorPrimitive"><a href="RectangularSensorPrimitive.html">RectangularSensorPrimitive</a></li><li data-name="RIGHT"><a href="global.html#RIGHT">RIGHT</a></li><li data-name="rotateEnabled"><a href="rotateEnabled.html">rotateEnabled</a></li><li data-name="SatelliteScan"><a href="SatelliteScan.html">SatelliteScan</a></li><li data-name="SectorGeometry"><a href="SectorGeometry.html">SectorGeometry</a></li><li data-name="Selection"><a href="Selection.html">Selection</a></li><li data-name="ShapefileDataSource"><a href="ShapefileDataSource.html">ShapefileDataSource</a></li><li data-name="SnowEffect"><a href="SnowEffect.html">SnowEffect</a></li><li data-name="SplitDirection"><a href="global.html#SplitDirection">SplitDirection</a></li><li data-name="TDTLayer"><a href="TDTLayer.html">TDTLayer</a></li><li data-name="TecentLayer"><a href="TecentLayer.html">TecentLayer</a></li><li data-name="TileDebugLayer"><a href="TileDebugLayer.html">TileDebugLayer</a></li><li data-name="TileLayer"><a href="TileLayer.html">TileLayer</a></li><li data-name="Tileset"><a href="Tileset.html">Tileset</a></li><li data-name="TMSLayer"><a href="TMSLayer.html">TMSLayer</a></li><li data-name="TOP"><a href="global.html#TOP">TOP</a></li><li data-name="TransformHelper"><a href="TransformHelper.html">TransformHelper</a></li><li data-name="Url"><a href="Url.html">Url</a></li><li data-name="Viewer"><a href="Viewer.html">Viewer</a></li><li data-name="WFSLayer"><a href="WFSLayer.html">WFSLayer</a></li><li data-name="WindField"><a href="WindField.html">WindField</a></li><li data-name="WMSLayer"><a href="WMSLayer.html">WMSLayer</a></li><li data-name="WMTSLayer"><a href="WMTSLayer.html">WMTSLayer</a></li><li data-name="XYZLayer"><a href="XYZLayer.html">XYZLayer</a></li></ul>
+      </div>
+    </div>
+
+    <script>
+      if (window.frameElement) {
+        document.body.className = 'embedded';
+
+        var ele = document.createElement('a');
+        ele.className = 'popout';
+        ele.target = '_blank';
+        ele.href = window.location.href;
+        ele.title = 'Pop out';
+        document.getElementById('main').appendChild(ele);
+      }
+
+      // Set targets on external links.  Sandcastle and GitHub shouldn't be embedded in any iframe.
+      Array.prototype.forEach.call(document.getElementsByTagName('a'), function(a) {
+        if (/^https?:/i.test(a.getAttribute('href'))) {
+          a.target = '_blank';
+        }
+      });
+    </script>
+
+    <script src="javascript/prism.js"></script>
+    <script src="javascript/cesiumDoc.js"></script>
+
+  </body>
+
+</html>

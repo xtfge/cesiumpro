@@ -188,25 +188,9 @@
     "status": false,
     "children": [
       {
-        "label": "Entity要素",
+        "label": "常规要素",
         "value": "entity",
         "children": []        
-      },
-      {
-        "label": "Primitive要素",
-        "value": "primitive",
-        "children": [
-          {
-            "label": "点",
-            "value": "5.2.1point",
-            "thumb": "./assets/images/5.2.1point.gif"
-          },
-          {
-            "label": "线",
-            "value": "5.2.2-polyline",
-            "thumb": "./assets/images/5.2.1point.gif"
-          }
-        ]
       },
       {
         "label": "特殊要素",
@@ -274,8 +258,23 @@
           }, 
           {
             "label": "HTML要素",
-            "value": "5.3.12htmlGraphic",
-            "thumb" : "./images/5.3.12htmlGraphic.png"
+            "value": "5.3.13htmlGraphic",
+            "thumb" : "./images/5.3.13htmlGraphic.png"
+          }, 
+          {
+            "label": "Gif图片",
+            "value": "5.3.14gif",
+            "thumb" : "./images/5.3.14gif.png"
+          }, 
+          {
+            "label": "线要素抗锯齿",
+            "value": "5.3.15polylineAnt",
+            "thumb" : "./images/5.3.15polylineAnt.png"
+          }, 
+          {
+            "label": "迁徙效果",
+            "value": "5.3.16parabolic",
+            "thumb" : "./images/5.3.16parabolic.png"
           }
         ]
       },
@@ -296,78 +295,6 @@
           "value": "5.4.3customPoint",
           "thumb": "./images/5.4.3customPoint.png"
         }]
-      }
-    ]
-  },
-  {
-    "label": "视图控件",
-    "value": "view",
-    "icon": "glyphicon glyphicon-search",
-    "status": false,
-    "children": [
-      {
-        "label": "视图",
-        "value": "view",
-        "icon": "",
-        "children": [
-          {
-            "label": "自转模拟",
-            "value": "2.1.1rotation",
-            "thumb": "./images/2.1.1selfrotation.gif"
-          },
-          {
-            "label": "双球同步",
-            "value": "2.1.2viewlink",
-            "thumb": "./images/2.1.2viewlink.gif"
-          },
-          {
-            "label": "绕点观察",
-            "value": "2.1.3rotatebypoint",
-            "thumb": "./images/2.1.3rotatebypoint.gif"
-          },
-          {
-            "label": "开场动画",
-            "value": "2.1.4stepfly",
-            "thumb": "./images/2.1.4stepfly.png"
-          },
-          {
-            "label": "近地天空盒",
-            "value": "2.1.5groundskybox",
-            "thumb": "./images/2.1.5groundskybox.png"
-          },
-          {
-            "label": "巻帘",
-            "value": "2.1.6imagerySplit",
-            "thumb": "./images/2.1.6imagerySplit.png"
-          },
-          {
-            "label": "kml漫游",
-            "value": "2.1.7kmltour",
-            "thumb": "./images/2.1.7kmltour.png"
-          },
-          {
-            "label": "判断点是否在球的正面",
-            "value": "2.1.8pointVisible",
-            "thumb": "./images/2.1.8pointVisible.png"
-          }
-        ]
-      },
-      {
-        "label": "小部件",
-        "value": "widgets",
-        "icon": "",
-        "children": [
-          {
-            "label": "漫游",
-            "value": "1.1.1tianditu",
-            "thumb": "./images/tdt.gif"
-          },
-          {
-            "label": "kml漫游",
-            "value": "1.1.1tianditu",
-            "thumb": "./images/tdt.gif"
-          }
-        ]
       }
     ]
   },
@@ -460,6 +387,78 @@
     ]
   },
   {
+    "label": "视图控件",
+    "value": "view",
+    "icon": "glyphicon glyphicon-search",
+    "status": false,
+    "children": [
+      {
+        "label": "视图",
+        "value": "view",
+        "icon": "",
+        "children": [
+          {
+            "label": "自转模拟",
+            "value": "2.1.1rotation",
+            "thumb": "./images/2.1.1selfrotation.gif"
+          },
+          {
+            "label": "双球同步",
+            "value": "2.1.2viewlink",
+            "thumb": "./images/2.1.2viewlink.gif"
+          },
+          {
+            "label": "绕点观察",
+            "value": "2.1.3rotatebypoint",
+            "thumb": "./images/2.1.3rotatebypoint.gif"
+          },
+          {
+            "label": "开场动画",
+            "value": "2.1.4stepfly",
+            "thumb": "./images/2.1.4stepfly.png"
+          },
+          {
+            "label": "近地天空盒",
+            "value": "2.1.5groundskybox",
+            "thumb": "./images/2.1.5groundskybox.png"
+          },
+          {
+            "label": "巻帘",
+            "value": "2.1.6imagerySplit",
+            "thumb": "./images/2.1.6imagerySplit.png"
+          },
+          {
+            "label": "kml漫游",
+            "value": "2.1.7kmltour",
+            "thumb": "./images/2.1.7kmltour.png"
+          },
+          {
+            "label": "判断点是否在球的正面",
+            "value": "2.1.8pointVisible",
+            "thumb": "./images/2.1.8pointVisible.png"
+          }
+        ]
+      },
+      {
+        "label": "小部件",
+        "value": "widgets",
+        "icon": "",
+        "children": [
+          {
+            "label": "漫游",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          },
+          {
+            "label": "kml漫游",
+            "value": "1.1.1tianditu",
+            "thumb": "./images/tdt.gif"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "label": "分析工具",
     "value": "analysis",
     "icon": "glyphicon glyphicon-asterisk",
@@ -492,6 +491,16 @@
             "label": "标绘",
             "value": "6.3.1plot",
             "thumb": "./images/6.3.1plot.png"
+          },
+          {
+            "label": "地图量算",
+            "value": "6.3.2cartometry",
+            "thumb": "./images/6.3.2cartometry.png"
+          },
+          {
+            "label": "位置编辑",
+            "value": "6.3.3transformHelper",
+            "thumb": "./images/6.3.3transformHelper.png"
           }
         ]
       }

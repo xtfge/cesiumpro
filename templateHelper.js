@@ -15,7 +15,7 @@
  
  const files = {};
  const ids = {};
- 
+ console.log('xxxxxxxxxxxxxx')
  // each container gets its own html file
  const containers = ['class', 'module', 'external', 'namespace', 'mixin', 'interface'];
  
@@ -322,7 +322,6 @@
      let text;
  
      let parsedType;
- 
      // handle cases like:
      // @see <http://example.org>
      // @see http://example.org

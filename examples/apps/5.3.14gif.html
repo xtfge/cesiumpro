@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+
+        const gif = new CesiumPro.ImageGraphic({
+            position: new CesiumPro.LonLat(110, 30),
+            image: '../data/img/alarm.gif',
+            speedFactor: 10,
+            imageParser: function (canvas) {
+                const imageData = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    // 如果背景是白色，设置为透明
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    if (r === 255 && g === 255 && b === 255) {
+                        imageData.data[i + 3] = 0;
+                    }
+                }
+                canvas.getContext("2d").putImageData(imageData, 0, 0);
+            }
+        })
+        gif._billboard.distanceDisplayCondition = new Cesium.DistanceDisplayCondition(0, 10000)
+        gif.addTo(viewer);
+        gif.zoomTo();
+    </script>
+</body>
+
+</html>

@@ -38,7 +38,9 @@
             height: -420
         })
         viewer.addModel(tileset);
-        viewer.flyTo(tileset)
+        viewer.flyTo(tileset, {
+            duration: 0
+        })
 
         const thickness = 0.8;
         const speed = 300;
@@ -49,24 +51,28 @@
             density,
         })
         snow.addTo(viewer);
-
-        function setSpeed(value) {
-            snow.speed = value
+        viewer.depthTest = true;
+    </script>
+    <script>
+        const gui = new GUI();
+        const object = {
+            speed: 300,
+            density: 10,
+            thickness: 0.8,
+            enable: true
         }
-
-        function setThickness(value) {
-            snow.thickness = value
-        }
-
-        function setDensity(value) {
-            snow.density = value
-        }
-    //   Sandcastle.addCheckbox('下雪特效', true, function(value) {
-    //     snow.enabled = value;
-    //   }, 'checkbox')
-    //   Sandcastle.addSlider('速度', speed, 0, 400, 10, setSpeed, "speed");
-    //   Sandcastle.addSlider('厚度', thickness, 0, 1, 0.1, setThickness, "thickness");
-    //   Sandcastle.addSlider('密度', density, 2, 20, 1, setDensity, "density");
+        gui.add(object, 'speed', 100, 500, 10).name('速度').onChange(function (val) {
+            snow.speed = val
+        })
+        gui.add(object, 'density', 2, 20, 1).name('落雪大小').onChange(function (val) {
+            snow.density = val
+        })
+        gui.add(object, 'thickness', 0, 1, 0.1).name('积雪厚度').onChange(function (val) {
+            snow.thickness = val
+        })
+        gui.add(object, 'enable').name('可用').onChange(function (val) {
+            snow.enabled = val
+        })
     </script>
 </body>
 

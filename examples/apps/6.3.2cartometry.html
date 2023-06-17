@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        var lat = 34.548;
+        var lon = 107.766
+        const viewer = new CesiumPro.Viewer('map', {
+            terrainProvider: new Cesium.CesiumTerrainProvider({
+                url: '../data/terrain'
+            }),
+            imageryProvider: new CesiumPro.TDTLayer({
+                key: 'ac7f26daf5b1a54c746e93a414dd9c6a'
+            })
+        });
+        viewer.terrainExaggeration = 2.0;
+        viewer.flyTo(Cesium.Cartesian3.fromDegrees(lon, lat, 5000), {
+            duration: 0,
+            offset: new Cesium.HeadingPitchRange(0, -0.65554, 0)
+        })
+        const manager = new CesiumPro.CartometryManager(viewer);
+
+    </script>
+    <script>
+        const gui = new GUI();
+        const object = {
+            'surfaceDistance': function () {
+                manager.do(CesiumPro.CartometryType.SURFACE_DISTANCE)
+            },
+            'SPACE_DISTANCE': function() {
+                manager.do(CesiumPro.CartometryType.SPACE_DISTANCE);
+            },
+            'SPACE_AREA': function() {
+                manager.do(CesiumPro.CartometryType.SPACE_AREA)
+            },
+            'SURFACE_AREA': function() {
+                manager.do(CesiumPro.CartometryType.SURFACE_AREA)
+            },
+            'HEIGHT': function() {
+                manager.do(CesiumPro.CartometryType.HEIGHT)
+            },
+            ANGLE: function() {
+                manager.do(CesiumPro.CartometryType.ANGLE)
+            },
+            clear: function() {
+                manager.clear()
+            }
+        }
+        gui.add(object, 'surfaceDistance').name('贴地距离')
+        gui.add(object, 'SPACE_DISTANCE').name('空间距离')
+        gui.add(object, 'SPACE_AREA').name('空间面积')
+        gui.add(object, 'SURFACE_AREA').name('贴地面积')
+        gui.add(object, 'HEIGHT').name('高度')
+        gui.add(object, 'ANGLE').name('方位角')
+        gui.add(object, 'clear').name('清空')
+    </script>
+</body>
+
+</html>

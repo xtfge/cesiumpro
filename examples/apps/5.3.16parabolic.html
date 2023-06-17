@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const from = new CesiumPro.LonLat(117.257436, 31.838742)
+        const cities = [
+            { lon: 116.3123, lat: 31.8329 },
+            { lon: 116.7517, lat: 30.5255 },
+            { lon: 118.1909, lat: 32.536 },
+            { lon: 118.8062, lat: 30.6244 },
+            { lon: 115.7629, lat: 32.9919 },
+            { lon: 117.5208, lat: 33.6841 },
+            { lon: 118.0481, lat: 29.9542 },
+            { lon: 117.7734, lat: 31.4978 },
+            { lon: 116.1914, lat: 33.4698 },
+            { lon: 117.3889, lat: 30.2014 },
+            { lon: 117.4109, lat: 33.1073 },
+            { lon: 118.3557, lat: 31.0858 },
+            { lon: 116.6968, lat: 33.6896 },
+            { lon: 116.7847, lat: 32.7722 },
+            { lon: 118.6304, lat: 31.5363 },
+            { lon: 117.9382, lat: 30.9375 }
+        ]
+        const material = new CesiumPro.PolylineTrailLinkMaterialProperty({
+            color: Cesium.Color.GOLD,
+            image: '../data/img/line1.png'
+        })
+        for (let to of cities) {
+            const points = CesiumPro.getParabolaPoints(from, to, 50000);
+            viewer.entities.add({
+                polyline: {
+                    positions: Cesium.Cartesian3.fromDegreesArrayHeights(points.flat()),
+                    width: 3,
+                    material: material
+                }
+            })
+        }
+        viewer.entities.add({
+            position: from.toCartesian(),
+            ellipse: {
+                semiMajorAxis: 30000,
+                semiMinorAxis: 30000,
+                material: new CesiumPro.DynamicSpreadMaterialProperty({
+                    color: Cesium.Color.RED,
+                    duration: 1000
+                })
+            }
+        });
+        viewer.flyTo(viewer.entities)
+    </script>
+</body>
+
+</html>

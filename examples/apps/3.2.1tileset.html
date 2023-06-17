@@ -37,7 +37,8 @@
         const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position)
         const tileset = new CesiumPro.Tileset({
             url: "../data/tileset/dayanta/tileset.json",
-            debug: true
+            debug: true,
+            height: -420
             // modelMatrix
         }, {
             // position: Cesium.Cartesian3.fromDegrees(110, 30),
