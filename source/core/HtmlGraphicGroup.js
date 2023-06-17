@@ -5,6 +5,7 @@ import LonLat from "./LonLat";
 import destroyObject from './destroyObject'
 import defaultValue from "./defaultValue";
 import Event from "./Event";
+import Graphic from "./Graphic";
 
 class HtmlGraphicGroup extends GraphicGroup {
     /**
@@ -88,6 +89,10 @@ class HtmlGraphicGroup extends GraphicGroup {
             self.root.removeEventListener('click', listenClick);
         }
     }
+    /**
+     * 添加HTML图形对象
+     * @param {HtmlPointGraphic} object 
+     */
     add(object) {
         if (object instanceof HtmlPointGraphic) {
             this.values.set(object.id, object);
@@ -111,7 +116,7 @@ class HtmlGraphicGroup extends GraphicGroup {
     /**
      * 根据id返回要素
      * @param {string} graphicId 
-     * @returns 
+     * @returns {HtmlPointGraphic} id对应的图形对象
      */
     getById(graphicId) {
         return this.values.get(graphicId);

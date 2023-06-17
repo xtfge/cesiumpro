@@ -349,6 +349,7 @@ class Viewer extends Cesium.Viewer {
      * @param {Number} [options.maximumRenderTimeChange=0.0] 如果requestRenderMode为 true，则此值定义在请求渲染之前允许的模拟时间的最大更改。即模拟时间超maximumRenderTimeChange，将自动调用{@link Cesium.Scene#requestRender}
      */
     constructor(container, options = {}) {
+        overrideCesium();
         //>>includeStart('debug', pragmas.debug);
         options = options || {}
         //>>includeEnd('debug')
@@ -974,5 +975,4 @@ class Viewer extends Cesium.Viewer {
 
 }
 // 生写Cesium中的部分函数
-overrideCesium();
 export default Viewer;

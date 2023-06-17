@@ -7,7 +7,7 @@ class Graphic {
      * 所有CesiumPro自定义图形基类
     */
     constructor(options) {
-        this._options = options;
+        this._options = defaultValue(options, {});
         this._id = defaultValue(options.id, createGuid());
         this._primitive = null;
         this._oldPrimitive = null;

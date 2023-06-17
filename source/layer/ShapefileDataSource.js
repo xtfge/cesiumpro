@@ -1,11 +1,3 @@
-/*
- * @Author: zhangbo
- * @E-mail: zhangb@geovis.com.cn
- * @Date: 2020-02-25 15:57:44
- * @LastEditors: zhangbo
- * @LastEditTime: 2020-02-25 18:00:16
- * @Desc: 
- */
 import shp from '../../thirdParty/shapefile.js'
 import CesiumProError from '../core/CesiumProError.js';
 import GeoJsonDataSource from './GeoJsonDataSource.js';

@@ -37,7 +37,6 @@ class WindField {
    *   lineWidth: 4.0
    * })
    * wind3D.loadDataFromNC('./wind.nc')
-   * @returns
    */
   constructor(viewer, options) {
     const userInput = {}

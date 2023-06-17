@@ -39,7 +39,7 @@ Material._materialCache.addMaterial(Material.ODLineType, {
 class PolylineODMaterialProperty {
     /**
      * 创建一个点材质，模拟波纹效果。
-     * @param {Object} [options={}] 具有以下属性
+     * @param {object} [options={}] 具有以下属性
      * @param {Cesium.Color} [options.baseColor = Cesium.Color.RED] 基础颜色
      * @param {Cesium.Color} [options.color=Cesium.Color.WHITE] 叠加颜色
      * @param {number} [options.speed=3] 流动速度
@@ -86,7 +86,7 @@ class PolylineODMaterialProperty {
   
     /**
      * 此属性的类型
-     * @type {String}
+     * @type {string}
      */
     getType() {
       return Material.ODLineType;
@@ -94,9 +94,9 @@ class PolylineODMaterialProperty {
   
     /**
      * 获取指定时间的属性值。
-     * @param  {JulianDate} time  时间
-     * @param  {Object} [result] 保存新属性的副本，如果没有指定将自动创建。
-     * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
+     * @param  {Cesium.JulianDate} time  时间
+     * @param  {object} [result] 保存新属性的副本，如果没有指定将自动创建。
+     * @returns {object} 修改后的result,如果未提供result参数，则为新实例。
      */
     getValue(time, result) {
       result = defaultValue(result, {});

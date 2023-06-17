@@ -40,6 +40,10 @@ class HtmlPointGraphic extends Graphic{
     set color(val) {
         throw new CesiumProError('HtmlPointGraphic is not support color.')
     }
+    /**
+     * @type {boolean}
+     * 获得或设置要素是否显示
+     */
     set show(val) {
         if (this.el) {
             this.display = val ? 'block': 'none' 
@@ -95,7 +99,7 @@ class HtmlPointGraphic extends Graphic{
     /**
      * 从场景移除对象
      * @param {*} graphic 
-     * @returns 
+     * @returns {HtmlPointGraphic} 被删除的对象
      */
     remove() {
         if(this.group) {
@@ -105,7 +109,7 @@ class HtmlPointGraphic extends Graphic{
     }
     /**
      * 定位到对象
-     * @returns {Promise}
+     * @returns {Promise} 返回一个Promise, resolve表示飞行完成, reject表示飞行被取消
      */
     zoomTo() {
         if (!this._viewer) {
@@ -113,9 +117,16 @@ class HtmlPointGraphic extends Graphic{
         }
         return this._viewer.flyTo(this.position);
     }
+    /**
+     * 更新要素的style样式
+     */
     updateStyle(styleKey, styleValue) {
         this.el.style[styleKey] = styleValue;
     }
+    /**
+     * 为dom元素添加css样式
+     * @param {*} cls 
+     */
     addClass(cls) {
         this.el.classList.add(cls)
     }

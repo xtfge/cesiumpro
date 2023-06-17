@@ -6,10 +6,10 @@ class SnowEffect extends PostProcessing {
   /**
    * 模拟雪地的后处理程序。
    * @extends PostProcessing
-   * @param {Object} options 具有以下属性
-   * @param {Number} [options.thickness=0.8] 雪的厚度，介于0~1之间的值
-   * @param {Number} [options.density=10.0] 表示雪大小的变量，值越大，雪越大
-   * @param {Number} [options.speed=350.0] 表示落雪速度，值越大，雪花下降越快
+   * @param {object} options 具有以下属性
+   * @param {number} [options.thickness=0.8] 地面积雪的厚度，介于0~1之间的值, 为0表示地面没有积雪，为1表示地面完成被积雪覆盖
+   * @param {number} [options.density=10.0] 表示雪大小的变量，值越大，雪越大
+   * @param {number} [options.speed=350.0] 表示落雪速度，值越大，雪花下降越快
    *
    * @see {@link https://www.giserdqy.com/gis/opengis/3d/cesium/7311/|Cesium应用篇–添加雨雪天气}
    *
@@ -36,7 +36,7 @@ class SnowEffect extends PostProcessing {
   }
   /**
    * 介于0~1之间的值，表示雪的厚度，值越大雪越厚
-   * @type {Number} 雪的厚度
+   * @type {number} 雪的厚度
    */
   get thickness() {
     return Cesium.Math.clamp(this._thickness, 0, 1);
@@ -46,17 +46,17 @@ class SnowEffect extends PostProcessing {
   }
   /**
    * 表示雪大小的变量，值越大，雪越大，其有效值为2~20
-   * @type {Number}
+   * @type {number} 下雪密度
    */
   get density() {
-    return Cesium.Math.clamp(this._density, 2, 20);
+    return Cesium.Math.clamp(this._density, 0, 20);
   }
   set density(val) {
     this._density = val;
   }
   /**
    * 雪花降落的速度，值越大，降落速度越快
-   * @type {Number}
+   * @type {number} 落雪速度
    */
   get speed() {
     const speed = this._speed;

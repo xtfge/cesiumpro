@@ -39,21 +39,19 @@ void main(){
   }
   //雪花
   snowColor=(vec3(c));
-  if(depth.r<1.0){
-    vec4 positionEC = czm_p_toEye(gl_FragCoord.xy, czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates)));
-    vec3 dx = dFdx(positionEC.xyz);
-    vec3 dy = dFdy(positionEC.xyz);
-    vec3 nor = normalize(cross(dx,dy));
-    vec4 positionWC = normalize(czm_inverseView * positionEC);
-    vec3 normalWC = normalize(czm_inverseViewRotation * nor);
-    float dotNumWC = dot(positionWC.xyz,normalWC);
-    //雪地
-    if(dotNumWC<=0.3){
-      bgColor = mix(color,vec4(1.0),alpha*0.3);
-    }else{
-      bgColor = mix(color,vec4(1.0),dotNumWC*alpha);
-    }
+  if (depth.r >= 1.0) {
+    gl_FragColor = color;
+    return;
   }
-  gl_FragColor=mix(bgColor,vec4(snowColor,1.0),0.5);
+  vec4 positionEC = czm_p_toEye(gl_FragCoord.xy, czm_unpackDepth(texture2D(depthTexture, v_textureCoordinates)));
+  vec3 dx = dFdx(positionEC.xyz);
+  vec3 dy = dFdy(positionEC.xyz);
+  vec3 nor = normalize(cross(dx,dy));
+  vec4 positionWC = normalize(czm_inverseView * positionEC);
+  vec3 normalWC = normalize(czm_inverseViewRotation * nor);
+  float dotNumWC = dot(positionWC.xyz,normalWC);
+  //雪地
+  bgColor = mix(color,vec4(1.0),alpha * max(dotNumWC, 0.3));
+  gl_FragColor = mix(bgColor,vec4(snowColor,1.0),0.5);
 }`
-export default shader;
+export default shader

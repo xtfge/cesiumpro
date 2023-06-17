@@ -1,4 +1,4 @@
-import netcdfjs from '../../../thirdParty/netcdfjs'
+import netcdfjs from 'netcdfjs'
 let data;
 
 function loadNetCDF(filePath) {

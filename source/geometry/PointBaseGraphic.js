@@ -215,7 +215,7 @@ class PointBaseGraphic extends Graphic {
         this._viewer.camera.flyToBoundingSphere(boundingSphere, options)
     }
     get boundingSphere() {
-        return new Cesium.BoundingSphere(LonLat.toCartesian(_.position, 1000))
+        return new Cesium.BoundingSphere(LonLat.toCartesian(this.position, this.radius || 1000))
     }
 }
 

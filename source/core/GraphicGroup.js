@@ -41,7 +41,7 @@ class GraphicGroup {
     /**
      * 根据id获得图形对象
      * @param {string} id 
-     * @returns 
+     * @returns {Graphic} id对应的图形对象
      */
     getById(id) {
         return this.get(id);
@@ -71,7 +71,7 @@ class GraphicGroup {
     /**
      * 判断该集合是否包含指定对象
      * @param {*} object 
-     * @returns 
+     * @returns {boolean} true表示包含
      */
     has(object) {
         return this.values.contains(object);
