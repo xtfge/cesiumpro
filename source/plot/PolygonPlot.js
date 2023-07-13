@@ -258,8 +258,9 @@ class PolygonPlot extends BasePlot {
     material: Cesium.Color.fromCssColorString('rgba(247,224,32,0.5)'),
     outlineColor: Cesium.Color.RED,
     outlineWidth: 2,
-    outline: true,
+    outline: false,
     perPositionHeight: false,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
   }
 
   static highlightStyle = {

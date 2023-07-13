@@ -276,13 +276,41 @@ class LonLat {
         return new LonLat(lon, lat, height);
     }
     /**
+     * 获得一个经纬度数组
+     * @param {*} positions 
+     * @returns {LonLat[]} 经纬度数组
+     * @example
+     * LonLat.fromDegreesArray([110, 30, 111, 31])
+     */
+    static fromDegreesArray(positions) {
+        const ps = []
+        for (let i = 0, n = positions.length; i < n; i+=2) {
+            ps.push(new LonLat(positions[i], positions[i+1]));
+        }
+        return ps;
+    }
+    /**
+     * 获得一个经纬度数组
+     * @param {*} positions 
+     * @returns {LonLat[]} 经纬度数组
+     * @example
+     * LonLat.fromDegreesArrayHeights([110, 30,1000, 111, 31, 1000])
+     */
+     static fromDegreesArrayHeights(positions) {
+        const ps = []
+        for (let i = 0, n = positions.length; i < n; i+=3) {
+            ps.push(new LonLat(positions[i], positions[i+1], positions[i+2]));
+        }
+        return ps;
+    }
+    /**
      * 从经纬度创建点
      * @param {Number} lon 经度(弧度)
      * @param {Number} lat 纬度(弧度)
      * @param {Number} height 海拔(米)
      * @returns {LonLat}
      */
-     static fromRadians(lon, lat, height) {
+    static fromRadians(lon, lat, height) {
         return new LonLat(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
     }
     /**
@@ -349,6 +377,18 @@ class LonLat {
         }
         return false;
     }
+    // /**
+    //  * 经纬度转CGCS2000平面坐标
+    //  * @param {LonLat|Cesium.Cartesian3} position 
+    //  */
+    // static toCGCS2000(position) {
+    //     if (position instanceof Cesium.Cartesian3) {
+    //         position = LonLat.fromCartesian(position);
+    //     }
+    //     if (position instanceof LonLat === false) {
+    //         throw new CesiumProError(position + 'is invalid position.')
+    //     }
+    // }
 }
 /**
  * 经纬度数组，经度在前，纬度在后。

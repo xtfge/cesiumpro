@@ -8,6 +8,7 @@ import Cartometry from '../core/Cartometry';
 import CartometryType from '../core/CartometryType';
 import Event from '../core/Event';
 import LonLat from '../core/LonLat';
+import guid from '../core/guid';
 
 const formatText = function(value, mode, islast) {
   if (mode === CartometryType.SURFACE_DISTANCE ||
@@ -97,10 +98,13 @@ class CartometryManager {
 
     const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
     this._handler = handler;
-    this._values = [];
+    this._values = {};
     this._mode = defaultValue(options.mode, CartometryType.SURFACE_DISTANCE);
-    this._tip = new CursorTip();
-    this._tip.show = false;
+    this._showTip = defaultValue(options.showTip, true);
+    if (this._showTip) {
+      this._tip = new CursorTip();
+      this._tip.show = false;
+    }    
     this._autoDepthTest = defaultValue(options.autoDepthTest, true);
     this.listening = false;
     const auxiliarylineMaterial = new Cesium.PolylineDashMaterialProperty({
@@ -247,9 +251,13 @@ class CartometryManager {
       if (showAuxiliary) {
         this.createAuxiliaryGraphic(positions, cartesian, mode);
       }
-      this.addNode.raise(cartesian);
+      this.addNode.raise({
+        mode,
+        position: cartesian,
+        id: this.gid
+      });
       if (mode === CartometryType.HEIGHT || mode === CartometryType.ANGLE) {
-        if (positions.length === 1) {
+        if (this.tip && positions.length === 1) {
           this.tip.text = '单击地图确定终点.';
         }
         if (positions.length === 2) {
@@ -266,35 +274,50 @@ class CartometryManager {
             value = this.getAngle(positions);
           }
           this.createLabel(labelPosition, value);
+          this.stopMeasure.raise({
+            mode,
+            label: value,
+            graphic: this._values[this.gid],
+            id: this.gid
+          });
         }
       }
     };
     const onrClick = (e) => {
       const cartesian = this.pickPosition(e.position);
-      if (!cartesian) {
-        return;
-      }
-      if (showNode) {
+      this.removeEventListener();
+      if (showNode && cartesian) {
         this.createNode(cartesian);
       }
-      if (mode !== CartometryType.HEIGHT || mode !== CartometryType.ANGLE) {
+      let text;
+      if (cartesian && (mode !== CartometryType.HEIGHT || mode !== CartometryType.ANGLE)) {
         positions.pop();
         positions.length && cartesian && positions.push(cartesian);
-        this.removeEventListener();
-        this.addNode.raise(cartesian);
+        this.addNode.raise({
+          mode,
+          position: cartesian,
+          id: this.gid
+        });
       }
       if (mode === CartometryType.SURFACE_DISTANCE || mode === CartometryType.SPACE_DISTANCE) {
-        const text = this.getDistance(positions, mode);
-        this.createLabel(cartesian, text);
+        text = this.getDistance(positions, mode);
+        this.createLabel(cartesian || positions[positions.length - 1], text);
       }
       if (mode === CartometryType.SURFACE_AREA || mode === CartometryType.SPACE_AREA) {
-        const text = this.getArea(positions, mode);
-        this.createLabel(cartesian, text);
+        text = this.getArea(positions, mode);
+        this.createLabel(cartesian || positions[positions.length - 1], text);
       }
-      this.stopMeasure.raise();
+      this.stopMeasure.raise({
+        mode,
+        label: text,
+        graphic: this._values[this.gid],
+        id: this.gid
+      });
     };
     const onMousemove = (e) => {
-      this.tip.position = e.endPosition;
+      if (this.tip) {
+        this.tip.position = e.endPosition;
+      }
       if (mode === CartometryType.HEIGHT || mode === CartometryType.ANGLE) {
         return;
       }
@@ -322,7 +345,9 @@ class CartometryManager {
     handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
     this._listening = false;
-    this.tip.show = false;
+    if (this.tip) {
+      this.tip.show = false;
+    }
     if (this._autoDepthTest) {
       this._viewer.depthTest = this._depthTestAgainstTerrain;
     }
@@ -332,11 +357,13 @@ class CartometryManager {
    * 清除所有量算结果
    */
   clear() {
-    const values = this._values;
-    for (const v of values) {
-      this._viewer.entities.remove(v);
+    const values = Object.values(this._values);
+    for (const vs of values) {
+      for (let v of vs) {
+        this._viewer.entities.remove(v);
+      }
     }
-    this._values = [];
+    this._values = {};
   }
 
   /**
@@ -420,19 +447,25 @@ class CartometryManager {
       }
     }
 
-    this.tip.show = true;
+    if (this.tip) {
+      this.tip.show = true;
+    }
     mode = defaultValue(mode, this.mode);
     const valid = CartometryType.validate(mode);
     if (!valid) {
       console.warn('无效的测量模式'); // WARNING: 无效的测量模式
       return;
     }
-    if (mode === CartometryType.HEIGHT || mode === CartometryType.ANGLE) {
-      this.tip.text = '单击地图确定起点.';
-    } else {
-      this.tip.text = '单击地图添加节点，右击地图结束量算';
+    this.gid = guid();
+    this._values[this.gid] = [];
+    if (this.tip) {
+      if (mode === CartometryType.HEIGHT || mode === CartometryType.ANGLE) {
+        this.tip.text = '单击地图确定起点.';
+      } else {
+        this.tip.text = '单击地图添加节点，右击地图结束量算';
+      }
     }
-    this.startMeasure.raise(mode);
+    this.startMeasure.raise({mode, id: this.gid});
     let options;
     if (mode === CartometryType.SPACE_DISTANCE || mode === CartometryType.HEIGHT) {
       options = this.polylineStyle;
@@ -552,7 +585,7 @@ class CartometryManager {
       position: cartesian,
       point: pointOptions,
     });
-    this._values.push(point);
+    this._values[this.gid].push(point);
     return point;
   }
 
@@ -569,7 +602,7 @@ class CartometryManager {
       position: cartesian,
       label: labelOptions,
     });
-    this._values.push(label);
+    this._values[this.gid].push(label);
     return label;
   }
 
@@ -582,7 +615,7 @@ class CartometryManager {
     const pg = this._viewer.entities.add({
       polygon: options,
     });
-    this._values.push(pg);
+    this._values[this.gid].push(pg);
     return pg;
   }
 
@@ -595,7 +628,7 @@ class CartometryManager {
     const pl = this._viewer.entities.add({
       polyline: options,
     });
-    this._values.push(pl);
+    this._values[this.gid].push(pl);
     return pl;
   }
 
@@ -628,7 +661,7 @@ class CartometryManager {
         width: this.polylineStyle.width || 3,
       },
     });
-    this._values.push(pl);
+    this._values[this.gid].push(pl);
   }
 
   /**
@@ -667,7 +700,7 @@ class CartometryManager {
       },
     };
     const pl = this._viewer.entities.add(options);
-    this._values.push(pl);
+    this._values[this.gid].push(pl);
   }
 
   /**

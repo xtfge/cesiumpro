@@ -71,6 +71,7 @@ class PlotManager {
     this._polygonStyle = defaultValue(options.polygonStyle, PolygonPlot.defaultStyle);
     this._editEventHandler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
     this._viewer.screenSpaceEventHandler.removeInputAction(LEFT_DOUBLE_CLICK);
+    this.showTip = defaultValue(options.showTip, true)
 
     this._mode = PlotMode.ready;
 
@@ -79,7 +80,10 @@ class PlotManager {
      * @type {ContextMenu}
      */
     options.contextEnabled = defaultValue(options.contextEnabled, true);
-    options.contextEnabled && (this.contextMenu = this.createContext());
+    if (options.contextEnabled) {
+      this.contextMenu = this.createContext();
+      this.addContextEventListener();
+    }
     /**
      * 跟随鼠标移动的文字
      * @type {CursorTip}
@@ -364,7 +368,8 @@ class PlotManager {
    */
   destroy() {
     this.removeAll();
-    this.contextMenu.destroy();
+    this.contextMenu && this.contextMenu.destroy();
+    this.removeContextEventListener();
     this._viewer.dataSources.remove(this._dataSource)
     this._viewer.dataSources.remove(this._nodeDataSource);
     this.cursorTip.destroy();
@@ -487,21 +492,23 @@ class PlotManager {
         // this.activeGraphic.stopEdit();
         // this._mode = PlotMode.ready;
         this.stopEdit(this.activeGraphic);
-        defined(this.contextMenu) && this.addContextEventListener();
       }
-      defined(this.contextMenu) && this.removeContextEventListener();
     }
     const onMouseMove = (e) => {
       const position = this.pickPosition(e.endPosition);
       if (!defined(position)) {
         return;
       }
+      if (this.showTip) {
+        this.cursorTip.show = true;
+        this.cursorTip.text = "左键单击添加节点，右键结束。"
+      }
       if (positions.length < 1) {
         return;
       }
       if (positions.length > 1) {
         this.activeGraphic.popNode();
-      }      
+      }
       this.activeGraphic.addNode(position);
     }
     const onRUp = () => {
@@ -620,7 +627,7 @@ class PlotManager {
       return;
     }
     const modelPosition = this.activeGraphic.clampToModel;
-    return pickPosition(pixel, this._viewer, modelPosition);
+    return pickPosition(pixel, this._viewer);
   }
   /**
    * 为图形添加顶点

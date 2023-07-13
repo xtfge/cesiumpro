@@ -1,45 +1,65 @@
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
     <meta charset='UTF-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Cesium Pro</title>
-   <script src='./editor/Sandcastle.js'></script>
-   <link href='./editor/Sandcastle.css' rel='stylesheet'/>
+    <script src='./editor/Sandcastle.js'></script>
+    <link href='./editor/Sandcastle.css' rel='stylesheet' />
     <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
-    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
     <script src='/build/CesiumPro.js'></script>
     <style>
         #map {
             width: 100%;
-            height:100%;
+            height: 100%;
             overflow: hidden;
         }
-        body,html {
+
+        body,
+        html {
             margin: 0;
             width: 100%;
-            height:100%;
+            height: 100%;
             overflow: hidden;
         }
     </style>
 </head>
+
 <body>
     <div id='map'></div>
-   <div id='toolbar'></div>
+    <div id='toolbar'></div>
     <script>
         const viewer = new CesiumPro.Viewer('map');
-        const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp', {
-            fill:Cesium.Color.WHITE.withAlpha(0)
+        const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp', undefined, {
+            fill: false,
+            outline: true,
+            outlineWidth: 4
         })
-        const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp', {
-            clampToGround:true,
+        const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp', '../data/shp/city1.dbf', {
+            clampToGround: true,
             pointSize: 6,
-            pointColor: Cesium.Color.WHITE
+            pointColor: Cesium.Color.WHITE,
+            encoding: 'utf-8'
         })
         viewer.addLayer(province)
         viewer.addLayer(city)
         parent.viewer = viewer;
+
+        // fetch('../data/shp/province.shp').then(res => {
+        //     return res.arrayBuffer();
+        // }).then(buffer => {
+        //     const p = CesiumPro.ShapefileDataSource.loadArrayBuffer(buffer, undefined, {
+        //         fill: false,
+        //         outline: true,
+        //         outlineWidth: 4
+        //     })
+        //     viewer.addLayer(p)
+        // })
+
     </script>
 </body>
+
 </html>

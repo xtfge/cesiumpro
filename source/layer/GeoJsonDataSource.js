@@ -310,6 +310,15 @@ function processMultiLineString(dataSource, geoJson, geometry, crsFunction, opti
 }
 
 function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
+    if (options.outline) {
+        const lineOptions = Cesium.clone(options);
+        lineOptions.width = options.outlineWidth;
+        lineOptions.lineColor = options.outlineColor;
+        return createLineString(dataSource, geoJson, crsFunction, coordinates[0], lineOptions)
+    }
+    if (options.fill.getValue().color === false) {
+        return;
+    }
     if (coordinates.length === 0 || coordinates[0].length === 0) {
         return;
     }
@@ -360,7 +369,7 @@ function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
     }
 
     const polygon = new PolygonGraphics();
-    polygon.outline = new ConstantProperty(options.outline);
+    polygon.outline = false; //new ConstantProperty(options.outline);
     polygon.outlineColor = outlineColor;
     polygon.outlineWidth = outlineWidth;
     polygon.material = material;

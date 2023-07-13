@@ -18,7 +18,7 @@ function pickPosition(pixel, viewer, modelPosition = true) {
   const ray = viewer.camera.getPickRay(pixel);
   cartesian = viewer.scene.globe.pick(ray, viewer.scene);
   const feat = viewer.scene.pick(pixel);
-  if (isModel(feat) && modelPosition) {
+  if (feat && viewer.scene.globe.depthTestAgainstTerrain) {
     if (viewer.scene.pickPositionSupported) {
       cartesian = viewer.scene.pickPosition(pixel) || cartesian;
     } else {

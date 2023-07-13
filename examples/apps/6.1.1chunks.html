@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+   <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+        body,html {
+            margin: 0;
+            width: 100%;
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id='map'></div>
+   <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map');
+        const positions = [new CesiumPro.LonLat(110, 30), new CesiumPro.LonLat(111, 31), new CesiumPro.LonLat(112, 31)]
+        viewer.dds.addPolyline(positions);
+        const chunks = CesiumPro.AnalysisUtil.lineChunk(positions, 10, {units: 'miles'});
+        for (let chunk of [].slice.call(chunks.features, 0)) {
+            const geometry = chunk.geometry;
+            const coordinates = geometry.coordinates[0];
+            viewer.dds.addPoint(...coordinates)
+        }
+        // 第一个坐标和最后一个坐标必须相等
+        const positions1 = [new CesiumPro.LonLat(111, 31), new CesiumPro.LonLat(111, 32), 
+        new CesiumPro.LonLat(111.5, 31.5), new CesiumPro.LonLat(112, 32), 
+        new CesiumPro.LonLat(112, 31), new CesiumPro.LonLat(111, 31)]
+        viewer.dds.addPolygon(positions1)
+        const grid = CesiumPro.AnalysisUtil.polygonToGrid(positions1, 10, {units: 'miles'})
+        for (let chunk of [].slice.call(grid.features, 0)) {
+            const geometry = chunk.geometry;
+            const coordinates = geometry.coordinates;
+            viewer.dds.addPoint(...coordinates)
+        }
+        viewer.flyTo(viewer.dds.ds)
+    </script>
+</body>
+</html>

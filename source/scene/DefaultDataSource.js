@@ -5,9 +5,26 @@ const {
     Color,
     HeightReference,
     HorizontalOrigin,
-    VerticalOrigin
+    VerticalOrigin,
+    Cartesian3,
+    Cartographic
 } = Cesium;
-
+function getCartesians(positions) {
+    const first = positions[0];
+    if (first instanceof LonLat) {
+        return positions.map(_ => _.toCartesian());
+    }
+    if (first instanceof Cartesian3) {
+        return positions
+    }
+    if (first instanceof Cartographic) {
+        return positions.map(_ => Cartographic.toCartesian(_));
+    }
+    if (typeof first === 'number') {
+        return Cartesian3.fromDegreesArray(positions);
+    }
+    return positions;
+}
 class DefaultDataSource {
     constructor(viewer, options = {}) {
         this.viewer = viewer;
@@ -59,17 +76,17 @@ class DefaultDataSource {
     }
     addPolyline(positions) {
         const options = Object.assign({
-            positions,
-        }, this.labelStyle);
+            positions: getCartesians(positions),
+        }, this.lineStyle);
         return this.ds.entities.add({
             polyline: options
         });
     }
-    addPolygon(positions, height) {
+    addPolygon(positions, height, opts = {}) {
         const options = Object.assign({
-            hierarchy: positions,
+            hierarchy: getCartesians(positions),
             height,
-        }, this.labelStyle);
+        }, this.polygonStyle, opts);
         return this.ds.entities.add({
             polygon: options
         });

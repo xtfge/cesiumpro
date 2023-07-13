@@ -52,6 +52,33 @@
         
         helper.addTo(viewer);
         helper.bind(model);
+
+        // attach a point
+        const point = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(110.0002, 30.00001),
+            point: {
+                pixelSize: 10,
+                color: Cesium.Color.RED
+            }
+        })
+        const helper1 = new CesiumPro.TransformHelper({
+            rotateEnabled: true,
+            translateEnabled: true,
+            scaleEnabled: true,
+            xAxisLength: 10,
+            yAxisLength: 10,
+            zAxisLength: 10,
+            scaleAxisLength: 10,
+            rotatePlaneRadius: 8
+        })
+        helper1.addTo(viewer);
+        helper1.bindPosition(point.position);
+        // 如果绑定的是一个点位，需要手动更新
+        helper1.postTransformEvent.addEventListener(modelMatrix => {
+            const position = new Cesium.Cartesian3();
+            Cesium.Matrix4.getTranslation(modelMatrix, position);
+            point.position = position
+        })
     </script>
 </body>
 

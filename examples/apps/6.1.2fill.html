@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Cesium Pro</title>
+    <script src='./editor/lil-gui.module.min.js'></script>
+    <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+    <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+    <link href="/build/assets/core.css" rel="stylesheet" />
+    <script src='/build/CesiumPro.js'></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body,
+        html {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='toolbar'></div>
+    <script>
+        const viewer = new CesiumPro.Viewer('map', {
+            imageryProvider: new CesiumPro.GaoDeLayer()
+        });
+        viewer.terrain = new Cesium.CesiumTerrainProvider({
+            url: '../data/terrain/terrain1'
+        })
+        viewer.terrainExaggeration = 2;
+        const positions = [108.5, 33.2, 108.6, 33.2, 108.6, 33.3, 108.5, 33.3];
+        const pg = viewer.dds.addPolygon(positions, undefined, {
+            material: Cesium.Color.GOLD.withAlpha(0.1)
+        });
+        const analysis = new CesiumPro.HeightAnalysis(viewer, {
+            mask: positions
+        })
+        viewer.depthTest = true;
+        viewer.flyTo(pg)
+        const manager = new CesiumPro.PlotManager(viewer);
+        const gui = new GUI();
+        let fill;
+        const obj = {
+            draw: function () {
+                manager.pick(CesiumPro.PlotType.POLYGON);
+
+                manager.postEdit.addEventListener((graphic) => {
+                    fill = new CesiumPro.FillAnalysis(viewer, {
+                        height: 2000,
+                        mask: graphic.positions
+                    })
+                    fill.postDo.addEventListener(result => {
+                        obj.fillVolume = result.fillVolume;
+                        obj.excavaVolume = result.excavaVolume
+                        gui.add(obj, 'fillVolume').name('填充体积')
+                        gui.add(obj, 'excavaVolume').name('挖方体积')
+                    });
+                    manager.remove(graphic);
+                    // 开始分析
+                    fill.do();
+                })
+            },
+            fillVolume: 0,
+            excavaVolume: 0
+        }
+
+        gui.add(obj, 'draw').name('绘制分析区域');
+
+    </script>
+</body>
+
+</html>

@@ -45,7 +45,7 @@ const CartometryType = {
 /**
  * 验证是否是合法类型
  * @param {CartometryType}
- * @returns {Number}
+ * @returns {Number} true表示有效
  */
 CartometryType.validate = function (type) {
   return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE
@@ -56,7 +56,7 @@ CartometryType.validate = function (type) {
 /**
  * 从枚举值获得枚举标签
  * @param  {CartometryType} value 枚举值
- * @returns {String}
+ * @returns {String} 枚举值对应的类型
  */
 CartometryType.getKey = function (value) {
   let key;
@@ -78,6 +78,37 @@ CartometryType.getKey = function (value) {
       break;
     case 6:
       key = 'ANGLE';
+      break;
+    default:
+      key = undefined;
+  }
+  return key;
+};
+/**
+ * 根据key获得中文名
+ * @param {*} value 
+ * @returns {String} 枚举值对应的类型
+ */
+CartometryType.getValue = function (value) {
+  let key;
+  switch (value) {
+    case 1:
+      key = '贴地距离';
+      break;
+    case 2:
+      key = '空间距离';
+      break;
+    case 3:
+      key = '空间面积';
+      break;
+    case 4:
+      key = '贴地面积';
+      break;
+    case 5:
+      key = '高度';
+      break;
+    case 6:
+      key = '方位角';
       break;
     default:
       key = undefined;

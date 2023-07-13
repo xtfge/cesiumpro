@@ -34,25 +34,41 @@
         const tms = new CesiumPro.XYZLayer({
             url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
         })
-        viewer.addLayer(tms)
+        // viewer.addLayer(tms)
         //arcgis默认瓦片规则生成的瓦片层级为L+两位层级数，行号为R+6位十六进制的数，列号为C+6们十六进制数，所有编号位数不足补0
         // 如L01R000000C000001
         // 这种瓦片依然属性arcgis标准的瓦片，只是定义了特殊的标签，可以使用customTags处理
         const arcgisTile = new CesiumPro.XYZLayer({
             url: './{L}/{R}/{C}.png',
             customTags: {
-                L: function(imageryProvider, level, x, y) {
+                L: function(imageryProvider, x, y, level) {
                     return 'L' + ('' + level).padStart(2, '0')
                 },
-                R: function(imageryProvider, level, x, y) {
+                R: function(imageryProvider, x, y, level) {
                     return 'R' + y.toString(16).padStart(6, '0')
                 },
-                C: function(imageryProvider, level, x, y) {
+                C: function(imageryProvider, x, y, level) {
                     return 'C' + x.toString(16).padStart(6, '0')
                 }
             }
         })
         viewer.addLayer(arcgisTile)
+        const opts = {
+            // tilingScheme: new Cesium.GeographicTilingScheme(),
+            tilingScheme: new CesiumPro.Geographic4490TilingScheme({
+                numberOfLevelZeroTilesX: 4,
+                numberOfLevelZeroTilesY: 4,
+                rectangle: Cesium.Rectangle.fromDegrees(-400, -320, 320, 400),
+            }),
+            token: 'GAQzvX0nT2rEz6SMcYkRqZVoDRJoCP0DvF4iafZi-YE.',
+            url: 'http://220.180.219.148:8007/arcgis/rest/services/C3402002009097220036616/juta202111/MapServer/'
+        };
+        const layer4490 = new CesiumPro.ArcGisLayer(opts)
+        const l = viewer.imageryLayers.addImageryProvider(layer4490);
+        viewer.flyTo(l)
+        viewer.addClickEvent(e => {
+            console.log(CesiumPro.LonLat.fromPixel(e.position, viewer))
+        })
         parent.viewer = viewer;
     </script>
 </body>

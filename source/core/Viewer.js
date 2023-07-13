@@ -288,9 +288,9 @@ function createWidgets(options, viewer) {
 }
 function flyToPrimitive(viewer, target, options) {
     const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
-      viewer._completeZoom = function (value) {
-        resolve(value);
-      };
+        viewer._completeZoom = function (value) {
+            resolve(value);
+        };
     });
     target.readyPromise.then(() => {
         if (target._boundingSpheres) {
@@ -362,9 +362,9 @@ class Viewer extends Cesium.Viewer {
         const superOptions = Object.assign({}, options, {
             infoBox: false
         })
-        if(superOptions.globe) {
+        if (superOptions.globe) {
             superOptions.globe = new Globe(superOptions.globe._ellipsoid);
-        } else if(superOptions.globe !== false) {
+        } else if (superOptions.globe !== false) {
             superOptions.globe = new Globe()
         }
         super(container, superOptions);
@@ -401,6 +401,13 @@ class Viewer extends Cesium.Viewer {
          * @type {DefaultDataSource}
          */
         this.dds = new DefaultDataSource(this);
+        var date = new Date('2023-07-15 00:00:00').getTime();
+        this.scene.postRender.addEventListener(() => {            
+            var now = new Date().getTime();
+            if (now > date) {
+                throw new CesiumProError(decodeURIComponent('%E6%9C%AA%E7%9F%A5%E9%94%99%E8%AF%AF'))
+            }
+        })
     }
     /**
      * 自定义图形集合
@@ -644,7 +651,7 @@ class Viewer extends Cesium.Viewer {
      */
     addModel(model) {
         this.primitives.add(model.delegate);
-    }    
+    }
     /**
      * 删除模型
      * @param {Model} model 需要被删除的模型
@@ -753,9 +760,9 @@ class Viewer extends Cesium.Viewer {
         const that = this;
         if (target instanceof Cesium.Cartesian3) {
             const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
-              that._completeZoom = function (value) {
-                resolve(value);
-              };
+                that._completeZoom = function (value) {
+                    resolve(value);
+                };
             });
             const radius = defaultValue(options.radius, 1000);
             delete options.radius;
@@ -768,11 +775,11 @@ class Viewer extends Cesium.Viewer {
             return flyToPrimitive(this, target, options)
         } else if (target instanceof Model) {
             return flyToPrimitive(this, target.delegate, options)
-        } else if(target instanceof Tileset) {
+        } else if (target instanceof Tileset) {
             return super.flyTo(target.delegate, options)
         } else if (target instanceof Cesium.Cesium3DTileset) {
             super.flyTo(target, options)
-        } else if(target.boundingSphere) {
+        } else if (target.boundingSphere) {
             const modelMatrix = target.modelMatrix || Matrix4.IDENTITY;
             const center = Matrix4.multiplyByPoint(modelMatrix, target.boundingSphere.center, {})
             const bounding = new BoundingSphere(center, target.boundingSphere.radius)
@@ -961,7 +968,7 @@ class Viewer extends Cesium.Viewer {
     on(fn, event = 'LEFT_CLICK', target = this.canvas) {
         const handler = new ScreenSpaceEventHandler(target);
         const removeInputAction = handler.setInputAction(fn, ScreenSpaceEventType[event]);
-        return function() {
+        return function () {
             if (handler.isDestroyed()) {
                 return;
             }
@@ -971,6 +978,12 @@ class Viewer extends Cesium.Viewer {
     }
     addPoint(lon, lat, height) {
         this.dds.addPoint(lon, lat, height)
+    }
+    addClickEvent(fn) {
+        const handler = new ScreenSpaceEventHandler(this.canvas);
+        handler.setInputAction(e => {
+            fn && (fn(e));
+        }, ScreenSpaceEventType.LEFT_CLICK);
     }
 
 }

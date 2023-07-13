@@ -14,6 +14,7 @@
   min-width:  140px;
   font-size: $font-size;
   line-height: 32px;
+  pointer-events: none;
 }
 .context-root{
   position: absolute;

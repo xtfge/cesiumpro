@@ -381,6 +381,11 @@
             "label": "雾",
             "value": "4.2.3fog",
             "thumb": "./images/4.2.3fog.png"
+          },
+          {
+            "label": "水面模拟",
+            "value": "4.2.4waterMaterial",
+            "thumb": "./images/4.2.4waterMaterial"
           }
         ]
       }
@@ -467,6 +472,15 @@
         "label": "空间分析",
         "value": "spatial",
         "children": [
+          {
+            "label": "要素分割",
+            "value": "6.1.1chunks",
+            "thumb": "./images/6.1.1chunks.png"
+          },{
+            "label": "挖填方分析",
+            "value": "6.1.2fill",
+            "thumb": "./images/6.1.2fill.png"
+          },
           {
             "label": "缓冲区分析",
             "value": "buffer",

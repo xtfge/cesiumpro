@@ -6,8 +6,8 @@ const RADIUS = 6378245.0
 const EE = 0.00669342162296594323
 
 function delta(lon, lat) {
-    let dLng = this.transformLng(lon - 105, lat - 35)
-    let dLat = this.transformLat(lon - 105, lat - 35)
+    let dLng = transformLng(lon - 105, lat - 35)
+    let dLat = transformLat(lon - 105, lat - 35)
     const radLat = (lat / 180) * PI
     let magic = Math.sin(radLat)
     magic = 1 - EE * magic * magic

@@ -1,4 +1,4 @@
-import shp from '../../thirdParty/shapefile.js'
+import * as shp from 'shapefile'
 import CesiumProError from '../core/CesiumProError.js';
 import GeoJsonDataSource from './GeoJsonDataSource.js';
 const {
@@ -262,7 +262,18 @@ function processMultiLineString(dataSource, geoJson, geometry, crsFunction, opti
     }
 }
 
-function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
+function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {   
+    if (options.outline) {
+        const lineOptions = Cesium.clone(options);
+        lineOptions.width = options.outlineWidth;
+        lineOptions.lineColor = options.outlineColor
+        for (let coor of coordinates) {
+            createLineString(dataSource, geoJson, crsFunction, coor, lineOptions)
+        }
+    }
+    if (options.fill.getValue().color === false) {
+        return;
+    }
     if (coordinates.length === 0 || coordinates[0].length === 0) {
         return;
     }
@@ -313,7 +324,7 @@ function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
     }
 
     const polygon = new PolygonGraphics();
-    polygon.outline = new ConstantProperty(options.outline);
+    polygon.outline = false;
     polygon.outlineColor = outlineColor;
     polygon.outlineWidth = outlineWidth;
     polygon.material = material;
@@ -603,14 +614,15 @@ class ShapefileDataSource extends GeoJsonDataSource {
     }
     /**
       * 加载Shapefile数据
-      * @param {String} data shapefile文件路径
+      * @param {string}  shpfile 文件路径
+      * @param {string} [dbfile] dbf文件路径, 如果未定义，将使用和shp相同的路径，如shpfile路径为city.shp， dbf路径将自动使用city.dbf
       * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
       * @returns {Promise<ShapefileDataSource>}
      */
-    load(data, options = { encoding: 'utf-8' }) {
+    load(shpfile, dbfile, options = { encoding: 'utf-8' }) {
+        let data = shpfile;
         if (!defined(data)) {
-            throw new CesiumProError('data is required.');
-        }
+            throw new CesiumProError('shpfile is required.');        }
 
         Cesium.DataSource.setLoading(this, true);
 
@@ -625,7 +637,87 @@ class ShapefileDataSource extends GeoJsonDataSource {
         let sourceUri = options.sourceUri;
         if (typeof data === 'string' || (data instanceof Resource)) {
             promise = new Promise((resolve, reject) => {
-                shp.open(data, undefined, { encoding: options.encoding })
+                shp.open(data, dbfile, { encoding: options.encoding })
+                    .then(source =>
+                        source.read().then(function load(result) {
+                            if (result.done) {
+                                resolve(that.geoJson)
+                                return
+                            };
+                            that.geoJson = result.value
+                            return source.read().then(load);
+                        })
+                    )
+                    .catch(error => reject(error.stack));
+            })
+            sourceUri = defaultValue(sourceUri, '');
+
+            // Add resource credits to our list of credits to display
+            var resourceCredits = this._resourceCredits;
+            var credits = data.credits;
+            if (defined(credits)) {
+                var length = credits.length;
+                for (var i = 0; i < length; i++) {
+                    resourceCredits.push(credits[i]);
+                }
+            }
+        }
+
+        options = {
+            describe: defaultValue(options.describe, defaultDescribeProperty),
+            pointSize: defaultValue(options.pointSize, ShapefileDataSource.pointSize),
+            pointColor: defaultValue(options.pointColor, ShapefileDataSource.pointColor),
+            lineWidth: new ConstantProperty(
+                defaultValue(options.lineWidth, ShapefileDataSource.lineWidth)
+            ),
+            outlineColor: new ColorMaterialProperty(
+                defaultValue(options.outlineColor, ShapefileDataSource.outlineColor)
+            ),
+            lineColor: new ColorMaterialProperty(defaultValue(options.lineColor, ShapefileDataSource.lineColor)),
+            outlineWidth: defaultValue(options.outlineWidth, ShapefileDataSource.outlineWidth),
+            fill: new ColorMaterialProperty(
+                defaultValue(options.fill, ShapefileDataSource.fill)
+            ),
+            outline: defaultValue(options.outline, ShapefileDataSource.outline),
+            clampToGround: defaultValue(options.clampToGround, ShapefileDataSource.clampToGround),
+            extrudedHeight: options.extrudedHeight
+        };
+        return Promise.resolve(promise)
+        .then(function (geoJson) {
+            return load(that, geoJson, options, sourceUri);
+        })
+        .catch(function (error) {
+            DataSource.setLoading(that, false);
+            that._error.raiseEvent(that, error);
+            throw error;
+        });
+    }
+    /**
+      * 从arrayBuffer加载Shapefile数据
+      * @param {string}  shpfile shp
+      * @param {string} [dbfile] dbf
+      * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+      * @returns {Promise<ShapefileDataSource>}
+     */
+     loadArrayBuffer(shpfile, dbfile, options = { encoding: 'utf-8' }) {
+        let data = shpfile;
+        if (!defined(data)) {
+            throw new CesiumProError('shpfile is required.');        }
+
+        Cesium.DataSource.setLoading(this, true);
+
+        const credit = options.credit;
+        if (typeof credit === 'string') {
+            credit = new Cesium.Credit(credit);
+        }
+        this._credit = credit;
+        const that = this;
+
+        let promise = data;
+        let sourceUri = options.sourceUri;
+        if (data instanceof ArrayBuffer) {
+            promise = new Promise((resolve, reject) => {
+                shp.open(data, dbfile, { encoding: options.encoding })
                     .then(source =>
                         source.read().then(function load(result) {
                             if (result.done) {
@@ -685,12 +777,29 @@ class ShapefileDataSource extends GeoJsonDataSource {
 }
 /**
  * 加载Shapefile数据
- * @param {String} data shapefile文件路径
+ *  @param {string}  shpfile 文件路径
+ * @param {string} [dbfile] dbf文件路径, 如果未定义，将使用和shp相同的路径，如shpfile路径为city.shp， dbf路径将自动使用city.dbf
  * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
  * @returns {Promise<ShapefileDataSource>}
+ * @example
+ * 
+ * const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp', undefined, {
+ *     fill:Cesium.Color.WHITE.withAlpha(0)
+ * })
+ * viewer.addLayer(province)
+ * const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp', '../data/shp/city1.dbf', {
+ *     clampToGround:true,
+ *     pointSize: 6,
+ *     pointColor: Cesium.Color.WHITE,
+ *     encoding: 'utf-8' // 属性表编码
+ * })
+ * viewer.addLayer(city)
  */
-ShapefileDataSource.load = function (data, options) {
-    return new ShapefileDataSource().load(data, options)
+ShapefileDataSource.load = function (shpfile, dbfile, options) {
+    return new ShapefileDataSource().load(shpfile, dbfile, options)
+}
+ShapefileDataSource.loadArrayBuffer = function (shpfile, dbfile, options) {
+    return new ShapefileDataSource().loadArrayBuffer(shpfile, dbfile, options)
 }
 /**
  * @typedef {Object} ShapefileDataSource.LoadOptions

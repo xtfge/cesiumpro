@@ -492,6 +492,7 @@ class TransformHelper {
   }
   /**
    * 创建缩放轴
+   * @private
    */
   createScaleAxis() {
     const lineLength = this._radius * 1.1;    
@@ -536,11 +537,11 @@ class TransformHelper {
   }
   /**
    * 为控制器绑定一个点
-   * @private
-   * @param {*} position 
+   * @param {Cesium.Property|Cesium.Cartesian3} position 
    */
   bindPosition(position) {
-    if (position instanceof Cesium.Property) {
+    // position instanceof Cesium.Property
+    if (typeof position.getValue === 'function') {
       position = position.getValue(this._viewer.clock.currentTime);
     }
     if (position instanceof Cartesian3 === false) {
@@ -550,7 +551,9 @@ class TransformHelper {
     this._center = new Cartesian3();
     Cartesian3.clone(this.originOffset, this._center);
     this._radius = 10;
-    this.createPrimitive()
+    this.rotateEnabled = false;
+    this.scaleEnabled = false;
+    this.createPrimitive(false)
   }
   /**
    * @private

@@ -2,588 +2,13 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-06-17
+ * @datetime 2023-07-13
  */
-
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.CesiumPro = {}));
 })(this, (function (exports) { 'use strict';
-
-    let CesiumProError$1 = class CesiumProError extends Error {
-        /**
-         * 定义CesiumPro抛出的错误
-         * @extends Error
-         * @param {String} message 描述错误消息的内容
-         * @example
-         * function flyTo(viewer,entity){
-         *    if(!viewer){
-         *      throw(new CesiumPro.CesiumProError("viewer未定义"))
-         *    }
-         *    viewer.flyTo(entity)
-         * }
-         *
-         */
-        constructor(message) {
-            super(message);
-            this.name = 'CesiumProError';
-        }
-    };
-    CesiumProError$1.throwInstantiationError = function () {
-        throw new DeveloperError(
-            "This function defines an interface and should not be called directly."
-        );
-    };
-    CesiumProError$1.throwNoInstance = function () {
-        throw new CesiumProError$1('它的定义了一个接口，不能被以直接调用.')
-    };
-
-    function abstract() {
-      throw new CesiumProError$1('抽象方法无法被调用。');
-    }
-
-    const {
-      Cartesian3: Cartesian3$h,
-      Primitive: Primitive$6,
-      Material: Material$h,
-      Geometry: Geometry$1,
-      MaterialAppearance: MaterialAppearance$6,
-      GeometryAttribute: GeometryAttribute$1,
-      ComponentDatatype: ComponentDatatype$2,
-      PrimitiveType: PrimitiveType$3,
-      BoundingSphere: BoundingSphere$8,
-      VertexFormat: VertexFormat$4,
-      defaultValue: defaultValue$a,
-      GeometryAttributes: GeometryAttributes$1,
-      Check,
-    } = Cesium;
-    const scratchVertexFormat$1 = new VertexFormat$4();
-    const scratchNormal = new Cartesian3$h();
-    class AxisPlaneGeometry {
-      constructor(options = {}) {
-        this._normal = options.normal;
-        this._radius = options.radius;
-        this._center = options.center;
-        const vertexFormat = defaultValue$a(
-          options.vertexFormat,
-          VertexFormat$4.DEFAULT
-        );
-        this._vertexFormat = vertexFormat;
-      }
-      static packedLength = VertexFormat$4.packedLength + Cartesian3$h.packedLength + 1;
-      static pack(value, array, startingIndex) {
-        //>>includeStart('debug', pragmas.debug);
-        Check.typeOf.object("value", value);
-        Check.defined("array", array);
-        //>>includeEnd('debug');
-
-        startingIndex = defaultValue$a(startingIndex, 0);
-
-        VertexFormat$4.pack(value._vertexFormat, array, startingIndex);
-        startingIndex += VertexFormat$4.packedLength;
-        Cartesian3$h.pack(value._normal, array, startingIndex);
-        startingIndex += Cartesian3$h.packedLength;
-        array[startingIndex++] = value._radius;
-        return array;
-      }
-      static unpack(array, startingIndex, result) {
-        //>>includeStart('debug', pragmas.debug);
-        Check.defined("array", array);
-        //>>includeEnd('debug');
-
-        startingIndex = defaultValue$a(startingIndex, 0);
-
-        const vertexFormat = VertexFormat$4.unpack(
-          array,
-          startingIndex,
-          scratchVertexFormat$1
-        );
-        startingIndex += VertexFormat$4.packedLength;
-        const normal = Cartesian3$h.unpack(array, startingIndex, scratchNormal);
-        startingIndex += Cartesian3$h.packedLength;
-        const radius = array[startingIndex];
-
-        if (!defined(result)) {
-          return new PlaneGeometry({
-            vertexFormat,
-            normal,
-            radius,
-          });
-        }
-
-        result._vertexFormat = VertexFormat$4.clone(
-          vertexFormat,
-          result._vertexFormat
-        );
-        result._normal = Cartesian3$h.clone(normal, result._normal);
-        result._radius = radius;
-
-        return result;
-      }
-      static createGeometry(planeGeometry) {
-        const v1 = Math.max(1, planeGeometry._radius * 0.02);
-        const v2 = Math.max(planeGeometry._radius * 0.2, v1 * 2);
-        let positions = [];
-        let normal = [];
-        const { x, y, z } = planeGeometry._center;
-        let center;
-        if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_X)) {
-          positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
-          center = new Cartesian3$h(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
-          normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
-        } else if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_Y)) {
-          positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
-          center = new Cartesian3$h((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
-          normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
-        } else if (Cartesian3$h.equals(planeGeometry._normal, Cartesian3$h.UNIT_Z)) {
-          positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
-          center = new Cartesian3$h((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
-          normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
-        }
-        positions = new Float32Array([...positions]);
-        const sts = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]);
-        const indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
-        return new Geometry$1({
-          attributes: new GeometryAttributes$1({
-            position: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.DOUBLE,
-              componentsPerAttribute: 3,
-              values: positions,
-            }),
-            normal: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.FLOAT,
-              componentsPerAttribute: 3,
-              values: normal,
-            }),
-            st: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.FLOAT,
-              componentsPerAttribute: 2,
-              values: sts,
-            }),
-          }),
-          indices: indices,
-          primitiveType: PrimitiveType$3.TRIANGLES,
-          boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
-        });
-      }
-    }
-    class AxisPlane {
-      /**
-       * 坐标轴平面
-       * @private
-       * @param {*} options
-       */
-      constructor(options = {}) {
-        this._center = options.center;
-        this._modelMatrix = options.modelMatrix;
-        this._color = options.color;
-        const radius = options.radius;    this._normal = options.normal;
-        const planeGeometry = new AxisPlaneGeometry({
-          normal: this._normal,
-          radius: radius,
-          vertexFormat: VertexFormat$4.DEFAULT,
-          center: this._center,
-        });
-        const instance = new Cesium.GeometryInstance({
-          geometry: AxisPlaneGeometry.createGeometry(planeGeometry),
-        });
-        const primitive = new Primitive$6({
-          asynchronous: false,
-          geometryInstances: instance,
-          modelMatrix: this._modelMatrix,
-          appearance: new MaterialAppearance$6({
-            material: Material$h.fromType("Color", {
-              color: this._color,
-            }),
-          }),
-        });
-        primitive.isAxisPlane = true;
-        primitive.normal = this._normal;
-        primitive.axis = options.axis;
-        primitive.color = this._color;
-        return primitive;
-      }
-    }
-
-    /**
-     * 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
-     *
-     * @exports defaultValue
-     *
-     * @param {*} a
-     * @param {*} b
-     * @returns {*} 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
-     *
-     * @example
-     * param = CesiumPro.defaultValue(param, 'default');
-     */
-    function defaultValue$9(a, b) {
-        if (a !== undefined && a !== null) {
-            return a;
-        }
-        return b;
-    }
-
-    /**
-     * 判断一个变量是否被定义
-     * @param value
-     * @exports defined
-     * @returns {Boolean} value是否被定义
-     */
-     function defined$b(value) {
-        return value !== undefined && value !== null;
-      }
-
-    class LonLat {
-        /**
-         * 用经纬度（度）和海拔（米）描述一个地理位置。
-         * @param {Number} lon 经度，单位：度
-         * @param {Number} lat 经度，单位：度
-         * @param {Number} alt 海拔，单位：米
-         */
-        constructor(lon, lat, alt) {
-            if (!defined$b(lon)) {
-                throw new CesiumProError$1('longitude is required.')
-            }
-            if (!defined$b(lat)) {
-                throw new CesiumProError$1('latitude is required.')
-            }
-            this.lon = lon;
-            this.lat = lat;
-            this.alt = defaultValue$9(alt, 0);
-        }
-        get height() {
-            return this.alt;
-        }
-        /**
-         * 转为屏幕坐标
-         * @param {Cesium.Scene} scene 
-         * @returns {Cesium.Cartesian2} 屏幕坐标
-         */
-        toPixel(scene) {
-            return LonLat.toPixel(this, scene);
-        }
-        /**
-         * 转为笛卡尔坐标
-         * @returns {Cesium.Cartesian3} 笛卡尔坐标
-         */
-        toCartesian() {
-            return LonLat.toCartesian(this);
-        }
-        /**
-         * 转为地理坐标
-         * @returns {Cesium.Cartographic} 地理坐标
-         */
-        toCartographic() {
-            return LonLat.toCartographic(this)
-        }
-        /**
-         * 获得该点的弧度形式
-         * @returns 弧度表示的点
-         */
-        getRadias() {
-            return {
-                lon: Cesium.Math.toRadians(this.lon),
-                lat: Cesium.Math.toRadians(this.lat),
-                alt
-            }
-        }
-        /**
-         * 判断该点是否在场景内，且在球的正面
-         * @returns {Boolean} 可见性
-         */
-        isVisible(viewer) {
-            return LonLat.isVisible(this, viewer)
-        }
-        /**
-         * 转为字符串
-         * @returns 表示该点位置的字符串
-         */
-        toString() {
-            return `{lon: ${this.lon}, lat: ${this.lat}, alt: ${this.alt}}`
-        }
-        /**
-         * 转为JSON对象
-         * @returns 表示该点位置的对象
-         */
-        toJson() {
-            return {
-                lon: this.lon,
-                lat: this.lat,
-                alt: this.alt
-            }
-        }
-        /**
-         * 从地理点坐标转换成数组
-         * @returns 表示该点位置的数组
-         */
-        toArray() {
-            return [this.lon, this.lat, this.alt];
-        }
-        /**
-         * 判断一个点在当前场景是否可见。这里的可见指的是是否在屏幕范围内且在球的正面。
-         * @param {LonLat} point 点
-         * @param {Cesium.Viewer} viewer Viewer对象
-         * @returns {Boolean} 可见性
-         */
-        static isVisible(point, viewer) {
-            if (viewer instanceof Cesium.Viewer === false) {
-                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
-            }
-            if (!defined$b(point)) {
-                return false;
-            }
-            const position = LonLat.toCartesian(point);
-            if (!position) {
-                return false;
-            }
-            if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
-                const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
-                    .isPointVisible(position);
-                if (!visibility) {
-                    return false;
-                }
-                const windowPosition = LonLat.toPixel(point, viewer.scene);
-                if (!defined$b(windowPosition)) {
-                    return false;
-                }
-                const width = viewer.canvas.width || viewer.canvas.clientWidth;
-                const height = viewer.canvas.height || viewer.canvas.clientHeight;
-                return (windowPosition.x > 0 && windowPosition.x < width) && (windowPosition.y > 0 && windowPosition.y < height);
-            } else if (viewer.scene.mode === Cesium.SceneMode.SCENE2D) {
-                const frustum = viewer.scene.camera.frustum;
-                const {
-                    positionWC,
-                    directionWC,
-                    upWC
-                } = viewer.scene.camera;
-                const cullingVolume = frustum.computeCullingVolume(positionWC, directionWC, upWC);
-                const bounding = Cesium.BoundingSphere.projectTo2D(new BoundingSphere(position, 1));
-                const visibility = cullingVolume.computeVisibility(bounding);
-                return visibility === Cesium.Intersect.INSIDE || visibility === Cesium.Intersect.INERSECTING
-            }
-        }
-        /**
-         * 转屏幕坐标
-         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic} point 
-         * @param {Cesium.Scene} scene 
-         * @returns 对应的屏幕坐标
-         */
-        static toPixel(point, scene) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(scene)) {
-                throw new CesiumProError$1('scene未定义。')
-            }        
-            //>>includeEnd('debug', pragmas.debug);
-            if (!defined$b(point)) {
-                return undefined
-            }
-            const cartesian = LonLat.toCartesian(point);
-            if (!defined$b(cartesian)) {
-                return undefined;
-            }
-            return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
-                scene,
-                cartesian,
-            );
-        }
-        /**
-         * 转弧度坐标
-         * @param {LonLat} point 
-         * @returns 用弧度表示的坐标点
-         */
-        static toCartographic(point, viewer) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(point)) {
-                throw new CesiumProError$1('point is not defined.')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            if (point instanceof LonLat) {
-                return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
-            } else if (point instanceof Cesium.Cartesian3) {
-                return Cesium.Cartographic.fromCartesian(point);
-            } else if (point instanceof Cesium.Cartographic) {
-                return point;
-            } else if (point instanceof Cesium.Cartesian2) {
-                const cartesian = LonLat.toCartesian(point, viewer);
-                return LonLat.toCartographic(cartesian)
-            }
-        }
-        /**
-         * 转笛卡尔坐标
-         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic|Cesium.Cartesian2} point 
-         * @param {Viewer} [viewer] viewer对象， 如果point是Cesium.Cartesian2类型，该参数需要被提供
-         * @returns 用笛卡尔坐标表示的点
-         */
-        static toCartesian(point, viewer) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(point)) {
-                return undefined;
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            if (point instanceof Cesium.Cartesian3) {
-                return point;
-            }
-            if (point instanceof Cesium.Cartographic) {
-                return Cesium.Cartographic.toCartesian(point)
-            }
-            if (point instanceof LonLat) {
-                return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
-            }
-            if (point instanceof Cesium.Cartesian2) {
-                if(!viewer) {
-                    return;
-                }
-                const ray = viewer.scene.camera.getPickRay(point);
-                return viewer.scene.globe.pick(ray, viewer.scene);
-            }
-
-        }
-        /**
-         * 从一个笛卡尔坐标创建点
-         * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标点
-         * @returns GeoPoint点
-         */
-        static fromCartesian(cartesian) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(cartesian)) {
-                return undefined
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-            if (!defined$b(cartographic)) {
-                return undefined;
-            }
-            return LonLat.fromCartographic(cartographic)
-        }
-        /**
-         * 从一个地理坐标点创建点
-         * @param {Cesium.Cartographic} cartographic 地理坐标点
-         * @returns GeoPoint点
-         */
-        static fromCartographic(cartographic) {
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(cartographic)) {
-                throw new CesiumProError$1('cartographic is not defined.')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            return new LonLat(
-                Cesium.Math.toDegrees(cartographic.longitude),
-                Cesium.Math.toDegrees(cartographic.latitude),
-                cartographic.height
-            )
-        }
-        /**
-         * 从一个窗口坐标创建点
-         * @param {Cesium.Cartesian2} pixel 窗口坐标
-         * @param {Cesium.Viewer} viewer Viewer对象
-         * @returns {LonLat} GeoPoint点
-         */
-        static fromPixel(pixel, viewer) {
-            if (!viewer.scene.globe) {
-                return undefined;
-            }
-            //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(pixel)) {
-                throw new CesiumProError$1('pixel is not defined.')
-            }
-            if (viewer instanceof Cesium.Viewer === false) {
-                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
-            }
-            //>>includeEnd('debug', pragmas.debug);
-            const ray = viewer.scene.camera.getPickRay(pixel);
-            const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-            if (!defined$b(cartesian)) {
-                return undefined;
-            }
-            return LonLat.fromCartesian(cartesian);
-        }
-        /**
-         * 从经纬度创建点
-         * @param {Number} lon 经度(度)
-         * @param {Number} lat 纬度(度)
-         * @param {Number} height 海拔(米)
-         * @returns {LonLat}
-         */
-        static fromDegrees(lon, lat, height) {
-            return new LonLat(lon, lat, height);
-        }
-        /**
-         * 从经纬度创建点
-         * @param {Number} lon 经度(弧度)
-         * @param {Number} lat 纬度(弧度)
-         * @param {Number} height 海拔(米)
-         * @returns {LonLat}
-         */
-         static fromRadians(lon, lat, height) {
-            return new LonLat(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
-        }
-        /**
-         * 判断一个点或经纬度是否在中国范围内（粗略）
-         * @param  {LonLat|Number[]} args 
-         * @returns 如果在中国范围内，返回true
-         */
-        static inChina(...args) {
-            if (args.length === 1) {
-                const p = args[0];
-                if (args[0] instanceof LonLat) {
-                    return LonLat.inChina(p.lon, p.lat)
-                }
-            } else {
-                const lon = +args[0];
-                const lat = +args[1];
-                return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat < 53.55
-            }
-        }
-        /**
-         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
-         * @param {Array} lonlat 
-         * @returns {LonLat}
-         */
-        static fromArray(lonlat) {
-            return new LonLat(...lonlat)
-        }
-        /**
-         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
-         * @param {Object} lonlat 
-         * @returns {LonLat}
-         */
-         static fromJson(lonlat) {
-            return new LonLat(lonlat.lon, lonlat.lat, lonlat.alt)
-        }
-        /**
-         * 判断对象是不是一个有效的点
-         * @param {any} v 
-         */
-        static isValid(v) {
-            if (v instanceof LonLat) {
-                if (!defined$b(v.lon)) {
-                    return false;
-                }
-                if (!defined$b(v.lat)) {
-                    return false;
-                }
-                if (!defined$b(v.alt)) {
-                    return false;
-                }
-                return true
-            }
-            if (v instanceof Cesium.Cartesian3) {
-                if (!defined$b(v.x)) {
-                    return false;
-                }
-                if (!defined$b(v.y)) {
-                    return false;
-                }
-                if (!defined$b(v.z)) {
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        }
-    }
 
     /**
      * @module helpers
@@ -594,6 +19,30 @@
      * @memberof helpers
      * @type {number}
      */
+    var earthRadius = 6371008.8;
+    /**
+     * Unit of measurement factors using a spherical (non-ellipsoid) earth radius.
+     *
+     * @memberof helpers
+     * @type {Object}
+     */
+    var factors = {
+        centimeters: earthRadius * 100,
+        centimetres: earthRadius * 100,
+        degrees: earthRadius / 111325,
+        feet: earthRadius * 3.28084,
+        inches: earthRadius * 39.37,
+        kilometers: earthRadius / 1000,
+        kilometres: earthRadius / 1000,
+        meters: earthRadius,
+        metres: earthRadius,
+        miles: earthRadius / 1609.344,
+        millimeters: earthRadius * 1000,
+        millimetres: earthRadius * 1000,
+        nauticalmiles: earthRadius / 1852,
+        radians: 1,
+        yards: earthRadius * 1.0936,
+    };
     /**
      * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
      *
@@ -626,6 +75,41 @@
         feat.properties = properties || {};
         feat.geometry = geom;
         return feat;
+    }
+    /**
+     * Creates a {@link Point} {@link Feature} from a Position.
+     *
+     * @name point
+     * @param {Array<number>} coordinates longitude, latitude position (each in decimal degrees)
+     * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {Feature<Point>} a Point feature
+     * @example
+     * var point = turf.point([-75.343, 39.984]);
+     *
+     * //=point
+     */
+    function point(coordinates, properties, options) {
+        if (options === void 0) { options = {}; }
+        if (!coordinates) {
+            throw new Error("coordinates is required");
+        }
+        if (!Array.isArray(coordinates)) {
+            throw new Error("coordinates must be an Array");
+        }
+        if (coordinates.length < 2) {
+            throw new Error("coordinates must be at least 2 numbers long");
+        }
+        if (!isNumber(coordinates[0]) || !isNumber(coordinates[1])) {
+            throw new Error("coordinates must contain numbers");
+        }
+        var geom = {
+            type: "Point",
+            coordinates: coordinates,
+        };
+        return feature(geom, properties, options);
     }
     /**
      * Creates a {@link Polygon} {@link Feature} from an Array of LinearRings.
@@ -661,6 +145,493 @@
             coordinates: coordinates,
         };
         return feature(geom, properties, options);
+    }
+    /**
+     * Creates a {@link LineString} {@link Feature} from an Array of Positions.
+     *
+     * @name lineString
+     * @param {Array<Array<number>>} coordinates an array of Positions
+     * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {Feature<LineString>} LineString Feature
+     * @example
+     * var linestring1 = turf.lineString([[-24, 63], [-23, 60], [-25, 65], [-20, 69]], {name: 'line 1'});
+     * var linestring2 = turf.lineString([[-14, 43], [-13, 40], [-15, 45], [-10, 49]], {name: 'line 2'});
+     *
+     * //=linestring1
+     * //=linestring2
+     */
+    function lineString(coordinates, properties, options) {
+        if (options === void 0) { options = {}; }
+        if (coordinates.length < 2) {
+            throw new Error("coordinates must be an array of two or more positions");
+        }
+        var geom = {
+            type: "LineString",
+            coordinates: coordinates,
+        };
+        return feature(geom, properties, options);
+    }
+    /**
+     * Takes one or more {@link Feature|Features} and creates a {@link FeatureCollection}.
+     *
+     * @name featureCollection
+     * @param {Feature[]} features input features
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {FeatureCollection} FeatureCollection of Features
+     * @example
+     * var locationA = turf.point([-75.343, 39.984], {name: 'Location A'});
+     * var locationB = turf.point([-75.833, 39.284], {name: 'Location B'});
+     * var locationC = turf.point([-75.534, 39.123], {name: 'Location C'});
+     *
+     * var collection = turf.featureCollection([
+     *   locationA,
+     *   locationB,
+     *   locationC
+     * ]);
+     *
+     * //=collection
+     */
+    function featureCollection(features, options) {
+        if (options === void 0) { options = {}; }
+        var fc = { type: "FeatureCollection" };
+        if (options.id) {
+            fc.id = options.id;
+        }
+        if (options.bbox) {
+            fc.bbox = options.bbox;
+        }
+        fc.features = features;
+        return fc;
+    }
+    /**
+     * Creates a {@link Feature<MultiPolygon>} based on a
+     * coordinate array. Properties can be added optionally.
+     *
+     * @name multiPolygon
+     * @param {Array<Array<Array<Array<number>>>>} coordinates an array of Polygons
+     * @param {Object} [properties={}] an Object of key-value pairs to add as properties
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Array<number>} [options.bbox] Bounding Box Array [west, south, east, north] associated with the Feature
+     * @param {string|number} [options.id] Identifier associated with the Feature
+     * @returns {Feature<MultiPolygon>} a multipolygon feature
+     * @throws {Error} if no coordinates are passed
+     * @example
+     * var multiPoly = turf.multiPolygon([[[[0,0],[0,10],[10,10],[10,0],[0,0]]]]);
+     *
+     * //=multiPoly
+     *
+     */
+    function multiPolygon(coordinates, properties, options) {
+        if (options === void 0) { options = {}; }
+        var geom = {
+            type: "MultiPolygon",
+            coordinates: coordinates,
+        };
+        return feature(geom, properties, options);
+    }
+    /**
+     * Convert a distance measurement (assuming a spherical Earth) from radians to a more friendly unit.
+     * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
+     *
+     * @name radiansToLength
+     * @param {number} radians in radians across the sphere
+     * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
+     * meters, kilometres, kilometers.
+     * @returns {number} distance
+     */
+    function radiansToLength(radians, units) {
+        if (units === void 0) { units = "kilometers"; }
+        var factor = factors[units];
+        if (!factor) {
+            throw new Error(units + " units is invalid");
+        }
+        return radians * factor;
+    }
+    /**
+     * Convert a distance measurement (assuming a spherical Earth) from a real-world unit into radians
+     * Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
+     *
+     * @name lengthToRadians
+     * @param {number} distance in real units
+     * @param {string} [units="kilometers"] can be degrees, radians, miles, inches, yards, metres,
+     * meters, kilometres, kilometers.
+     * @returns {number} radians
+     */
+    function lengthToRadians(distance, units) {
+        if (units === void 0) { units = "kilometers"; }
+        var factor = factors[units];
+        if (!factor) {
+            throw new Error(units + " units is invalid");
+        }
+        return distance / factor;
+    }
+    /**
+     * Converts an angle in radians to degrees
+     *
+     * @name radiansToDegrees
+     * @param {number} radians angle in radians
+     * @returns {number} degrees between 0 and 360 degrees
+     */
+    function radiansToDegrees(radians) {
+        var degrees = radians % (2 * Math.PI);
+        return (degrees * 180) / Math.PI;
+    }
+    /**
+     * Converts an angle in degrees to radians
+     *
+     * @name degreesToRadians
+     * @param {number} degrees angle between 0 and 360 degrees
+     * @returns {number} angle in radians
+     */
+    function degreesToRadians(degrees) {
+        var radians = degrees % 360;
+        return (radians * Math.PI) / 180;
+    }
+    /**
+     * isNumber
+     *
+     * @param {*} num Number to validate
+     * @returns {boolean} true/false
+     * @example
+     * turf.isNumber(123)
+     * //=true
+     * turf.isNumber('foo')
+     * //=false
+     */
+    function isNumber(num) {
+        return !isNaN(num) && num !== null && !Array.isArray(num);
+    }
+    /**
+     * isObject
+     *
+     * @param {*} input variable to validate
+     * @returns {boolean} true/false
+     * @example
+     * turf.isObject({elevation: 10})
+     * //=true
+     * turf.isObject('foo')
+     * //=false
+     */
+    function isObject(input) {
+        return !!input && input.constructor === Object;
+    }
+
+    /**
+     * Unwrap a coordinate from a Point Feature, Geometry or a single coordinate.
+     *
+     * @name getCoord
+     * @param {Array<number>|Geometry<Point>|Feature<Point>} coord GeoJSON Point or an Array of numbers
+     * @returns {Array<number>} coordinates
+     * @example
+     * var pt = turf.point([10, 10]);
+     *
+     * var coord = turf.getCoord(pt);
+     * //= [10, 10]
+     */
+    function getCoord(coord) {
+        if (!coord) {
+            throw new Error("coord is required");
+        }
+        if (!Array.isArray(coord)) {
+            if (coord.type === "Feature" &&
+                coord.geometry !== null &&
+                coord.geometry.type === "Point") {
+                return coord.geometry.coordinates;
+            }
+            if (coord.type === "Point") {
+                return coord.coordinates;
+            }
+        }
+        if (Array.isArray(coord) &&
+            coord.length >= 2 &&
+            !Array.isArray(coord[0]) &&
+            !Array.isArray(coord[1])) {
+            return coord;
+        }
+        throw new Error("coord must be GeoJSON Point or an Array of numbers");
+    }
+    /**
+     * Unwrap coordinates from a Feature, Geometry Object or an Array
+     *
+     * @name getCoords
+     * @param {Array<any>|Geometry|Feature} coords Feature, Geometry Object or an Array
+     * @returns {Array<any>} coordinates
+     * @example
+     * var poly = turf.polygon([[[119.32, -8.7], [119.55, -8.69], [119.51, -8.54], [119.32, -8.7]]]);
+     *
+     * var coords = turf.getCoords(poly);
+     * //= [[[119.32, -8.7], [119.55, -8.69], [119.51, -8.54], [119.32, -8.7]]]
+     */
+    function getCoords(coords) {
+        if (Array.isArray(coords)) {
+            return coords;
+        }
+        // Feature
+        if (coords.type === "Feature") {
+            if (coords.geometry !== null) {
+                return coords.geometry.coordinates;
+            }
+        }
+        else {
+            // Geometry
+            if (coords.coordinates) {
+                return coords.coordinates;
+            }
+        }
+        throw new Error("coords must be GeoJSON Feature, Geometry Object or an Array");
+    }
+    /**
+     * Get Geometry from Feature or Geometry Object
+     *
+     * @param {Feature|Geometry} geojson GeoJSON Feature or Geometry Object
+     * @returns {Geometry|null} GeoJSON Geometry Object
+     * @throws {Error} if geojson is not a Feature or Geometry Object
+     * @example
+     * var point = {
+     *   "type": "Feature",
+     *   "properties": {},
+     *   "geometry": {
+     *     "type": "Point",
+     *     "coordinates": [110, 40]
+     *   }
+     * }
+     * var geom = turf.getGeom(point)
+     * //={"type": "Point", "coordinates": [110, 40]}
+     */
+    function getGeom(geojson) {
+        if (geojson.type === "Feature") {
+            return geojson.geometry;
+        }
+        return geojson;
+    }
+
+    //http://en.wikipedia.org/wiki/Haversine_formula
+    //http://www.movable-type.co.uk/scripts/latlong.html
+    /**
+     * Calculates the distance between two {@link Point|points} in degrees, radians, miles, or kilometers.
+     * This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
+     *
+     * @name distance
+     * @param {Coord | Point} from origin point or coordinate
+     * @param {Coord | Point} to destination point or coordinate
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] can be degrees, radians, miles, or kilometers
+     * @returns {number} distance between the two points
+     * @example
+     * var from = turf.point([-75.343, 39.984]);
+     * var to = turf.point([-75.534, 39.123]);
+     * var options = {units: 'miles'};
+     *
+     * var distance = turf.distance(from, to, options);
+     *
+     * //addToMap
+     * var addToMap = [from, to];
+     * from.properties.distance = distance;
+     * to.properties.distance = distance;
+     */
+    function distance(from, to, options) {
+        if (options === void 0) { options = {}; }
+        var coordinates1 = getCoord(from);
+        var coordinates2 = getCoord(to);
+        var dLat = degreesToRadians(coordinates2[1] - coordinates1[1]);
+        var dLon = degreesToRadians(coordinates2[0] - coordinates1[0]);
+        var lat1 = degreesToRadians(coordinates1[1]);
+        var lat2 = degreesToRadians(coordinates2[1]);
+        var a = Math.pow(Math.sin(dLat / 2), 2) +
+            Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
+        return radiansToLength(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), options.units);
+    }
+
+    /**
+     * Callback for coordEach
+     *
+     * @callback coordEachCallback
+     * @param {Array<number>} currentCoord The current coordinate being processed.
+     * @param {number} coordIndex The current index of the coordinate being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {number} multiFeatureIndex The current index of the Multi-Feature being processed.
+     * @param {number} geometryIndex The current index of the Geometry being processed.
+     */
+
+    /**
+     * Iterate over coordinates in any GeoJSON object, similar to Array.forEach()
+     *
+     * @name coordEach
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (currentCoord, coordIndex, featureIndex, multiFeatureIndex)
+     * @param {boolean} [excludeWrapCoord=false] whether or not to include the final coordinate of LinearRings that wraps the ring in its iteration.
+     * @returns {void}
+     * @example
+     * var features = turf.featureCollection([
+     *   turf.point([26, 37], {"foo": "bar"}),
+     *   turf.point([36, 53], {"hello": "world"})
+     * ]);
+     *
+     * turf.coordEach(features, function (currentCoord, coordIndex, featureIndex, multiFeatureIndex, geometryIndex) {
+     *   //=currentCoord
+     *   //=coordIndex
+     *   //=featureIndex
+     *   //=multiFeatureIndex
+     *   //=geometryIndex
+     * });
+     */
+    function coordEach(geojson, callback, excludeWrapCoord) {
+      // Handles null Geometry -- Skips this GeoJSON
+      if (geojson === null) return;
+      var j,
+        k,
+        l,
+        geometry,
+        stopG,
+        coords,
+        geometryMaybeCollection,
+        wrapShrink = 0,
+        coordIndex = 0,
+        isGeometryCollection,
+        type = geojson.type,
+        isFeatureCollection = type === "FeatureCollection",
+        isFeature = type === "Feature",
+        stop = isFeatureCollection ? geojson.features.length : 1;
+
+      // This logic may look a little weird. The reason why it is that way
+      // is because it's trying to be fast. GeoJSON supports multiple kinds
+      // of objects at its root: FeatureCollection, Features, Geometries.
+      // This function has the responsibility of handling all of them, and that
+      // means that some of the `for` loops you see below actually just don't apply
+      // to certain inputs. For instance, if you give this just a
+      // Point geometry, then both loops are short-circuited and all we do
+      // is gradually rename the input until it's called 'geometry'.
+      //
+      // This also aims to allocate as few resources as possible: just a
+      // few numbers and booleans, rather than any temporary arrays as would
+      // be required with the normalization approach.
+      for (var featureIndex = 0; featureIndex < stop; featureIndex++) {
+        geometryMaybeCollection = isFeatureCollection
+          ? geojson.features[featureIndex].geometry
+          : isFeature
+          ? geojson.geometry
+          : geojson;
+        isGeometryCollection = geometryMaybeCollection
+          ? geometryMaybeCollection.type === "GeometryCollection"
+          : false;
+        stopG = isGeometryCollection
+          ? geometryMaybeCollection.geometries.length
+          : 1;
+
+        for (var geomIndex = 0; geomIndex < stopG; geomIndex++) {
+          var multiFeatureIndex = 0;
+          var geometryIndex = 0;
+          geometry = isGeometryCollection
+            ? geometryMaybeCollection.geometries[geomIndex]
+            : geometryMaybeCollection;
+
+          // Handles null Geometry -- Skips this geometry
+          if (geometry === null) continue;
+          coords = geometry.coordinates;
+          var geomType = geometry.type;
+
+          wrapShrink =
+            excludeWrapCoord &&
+            (geomType === "Polygon" || geomType === "MultiPolygon")
+              ? 1
+              : 0;
+
+          switch (geomType) {
+            case null:
+              break;
+            case "Point":
+              if (
+                callback(
+                  coords,
+                  coordIndex,
+                  featureIndex,
+                  multiFeatureIndex,
+                  geometryIndex
+                ) === false
+              )
+                return false;
+              coordIndex++;
+              multiFeatureIndex++;
+              break;
+            case "LineString":
+            case "MultiPoint":
+              for (j = 0; j < coords.length; j++) {
+                if (
+                  callback(
+                    coords[j],
+                    coordIndex,
+                    featureIndex,
+                    multiFeatureIndex,
+                    geometryIndex
+                  ) === false
+                )
+                  return false;
+                coordIndex++;
+                if (geomType === "MultiPoint") multiFeatureIndex++;
+              }
+              if (geomType === "LineString") multiFeatureIndex++;
+              break;
+            case "Polygon":
+            case "MultiLineString":
+              for (j = 0; j < coords.length; j++) {
+                for (k = 0; k < coords[j].length - wrapShrink; k++) {
+                  if (
+                    callback(
+                      coords[j][k],
+                      coordIndex,
+                      featureIndex,
+                      multiFeatureIndex,
+                      geometryIndex
+                    ) === false
+                  )
+                    return false;
+                  coordIndex++;
+                }
+                if (geomType === "MultiLineString") multiFeatureIndex++;
+                if (geomType === "Polygon") geometryIndex++;
+              }
+              if (geomType === "Polygon") multiFeatureIndex++;
+              break;
+            case "MultiPolygon":
+              for (j = 0; j < coords.length; j++) {
+                geometryIndex = 0;
+                for (k = 0; k < coords[j].length; k++) {
+                  for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
+                    if (
+                      callback(
+                        coords[j][k][l],
+                        coordIndex,
+                        featureIndex,
+                        multiFeatureIndex,
+                        geometryIndex
+                      ) === false
+                    )
+                      return false;
+                    coordIndex++;
+                  }
+                  geometryIndex++;
+                }
+                multiFeatureIndex++;
+              }
+              break;
+            case "GeometryCollection":
+              for (j = 0; j < geometry.geometries.length; j++)
+                if (
+                  coordEach(geometry.geometries[j], callback, excludeWrapCoord) ===
+                  false
+                )
+                  return false;
+              break;
+            default:
+              throw new Error("Unknown Geometry Type");
+          }
+        }
+      }
     }
 
     /**
@@ -888,6 +859,739 @@
       return previousValue;
     }
 
+    /**
+     * Callback for flattenEach
+     *
+     * @callback flattenEachCallback
+     * @param {Feature} currentFeature The current flattened feature being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {number} multiFeatureIndex The current index of the Multi-Feature being processed.
+     */
+
+    /**
+     * Iterate over flattened features in any GeoJSON object, similar to
+     * Array.forEach.
+     *
+     * @name flattenEach
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON object
+     * @param {Function} callback a method that takes (currentFeature, featureIndex, multiFeatureIndex)
+     * @example
+     * var features = turf.featureCollection([
+     *     turf.point([26, 37], {foo: 'bar'}),
+     *     turf.multiPoint([[40, 30], [36, 53]], {hello: 'world'})
+     * ]);
+     *
+     * turf.flattenEach(features, function (currentFeature, featureIndex, multiFeatureIndex) {
+     *   //=currentFeature
+     *   //=featureIndex
+     *   //=multiFeatureIndex
+     * });
+     */
+    function flattenEach(geojson, callback) {
+      geomEach(geojson, function (geometry, featureIndex, properties, bbox, id) {
+        // Callback for single geometry
+        var type = geometry === null ? null : geometry.type;
+        switch (type) {
+          case null:
+          case "Point":
+          case "LineString":
+          case "Polygon":
+            if (
+              callback(
+                feature(geometry, properties, { bbox: bbox, id: id }),
+                featureIndex,
+                0
+              ) === false
+            )
+              return false;
+            return;
+        }
+
+        var geomType;
+
+        // Callback for multi-geometry
+        switch (type) {
+          case "MultiPoint":
+            geomType = "Point";
+            break;
+          case "MultiLineString":
+            geomType = "LineString";
+            break;
+          case "MultiPolygon":
+            geomType = "Polygon";
+            break;
+        }
+
+        for (
+          var multiFeatureIndex = 0;
+          multiFeatureIndex < geometry.coordinates.length;
+          multiFeatureIndex++
+        ) {
+          var coordinate = geometry.coordinates[multiFeatureIndex];
+          var geom = {
+            type: geomType,
+            coordinates: coordinate,
+          };
+          if (
+            callback(feature(geom, properties), featureIndex, multiFeatureIndex) ===
+            false
+          )
+            return false;
+        }
+      });
+    }
+
+    /**
+     * Callback for segmentEach
+     *
+     * @callback segmentEachCallback
+     * @param {Feature<LineString>} currentSegment The current Segment being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {number} multiFeatureIndex The current index of the Multi-Feature being processed.
+     * @param {number} geometryIndex The current index of the Geometry being processed.
+     * @param {number} segmentIndex The current index of the Segment being processed.
+     * @returns {void}
+     */
+
+    /**
+     * Iterate over 2-vertex line segment in any GeoJSON object, similar to Array.forEach()
+     * (Multi)Point geometries do not contain segments therefore they are ignored during this operation.
+     *
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON
+     * @param {Function} callback a method that takes (currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex)
+     * @returns {void}
+     * @example
+     * var polygon = turf.polygon([[[-50, 5], [-40, -10], [-50, -10], [-40, 5], [-50, 5]]]);
+     *
+     * // Iterate over GeoJSON by 2-vertex segments
+     * turf.segmentEach(polygon, function (currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex) {
+     *   //=currentSegment
+     *   //=featureIndex
+     *   //=multiFeatureIndex
+     *   //=geometryIndex
+     *   //=segmentIndex
+     * });
+     *
+     * // Calculate the total number of segments
+     * var total = 0;
+     * turf.segmentEach(polygon, function () {
+     *     total++;
+     * });
+     */
+    function segmentEach(geojson, callback) {
+      flattenEach(geojson, function (feature, featureIndex, multiFeatureIndex) {
+        var segmentIndex = 0;
+
+        // Exclude null Geometries
+        if (!feature.geometry) return;
+        // (Multi)Point geometries do not contain segments therefore they are ignored during this operation.
+        var type = feature.geometry.type;
+        if (type === "Point" || type === "MultiPoint") return;
+
+        // Generate 2-vertex line segments
+        var previousCoords;
+        var previousFeatureIndex = 0;
+        var previousMultiIndex = 0;
+        var prevGeomIndex = 0;
+        if (
+          coordEach(
+            feature,
+            function (
+              currentCoord,
+              coordIndex,
+              featureIndexCoord,
+              multiPartIndexCoord,
+              geometryIndex
+            ) {
+              // Simulating a meta.coordReduce() since `reduce` operations cannot be stopped by returning `false`
+              if (
+                previousCoords === undefined ||
+                featureIndex > previousFeatureIndex ||
+                multiPartIndexCoord > previousMultiIndex ||
+                geometryIndex > prevGeomIndex
+              ) {
+                previousCoords = currentCoord;
+                previousFeatureIndex = featureIndex;
+                previousMultiIndex = multiPartIndexCoord;
+                prevGeomIndex = geometryIndex;
+                segmentIndex = 0;
+                return;
+              }
+              var currentSegment = lineString(
+                [previousCoords, currentCoord],
+                feature.properties
+              );
+              if (
+                callback(
+                  currentSegment,
+                  featureIndex,
+                  multiFeatureIndex,
+                  geometryIndex,
+                  segmentIndex
+                ) === false
+              )
+                return false;
+              segmentIndex++;
+              previousCoords = currentCoord;
+            }
+          ) === false
+        )
+          return false;
+      });
+    }
+
+    /**
+     * Callback for segmentReduce
+     *
+     * The first time the callback function is called, the values provided as arguments depend
+     * on whether the reduce method has an initialValue argument.
+     *
+     * If an initialValue is provided to the reduce method:
+     *  - The previousValue argument is initialValue.
+     *  - The currentValue argument is the value of the first element present in the array.
+     *
+     * If an initialValue is not provided:
+     *  - The previousValue argument is the value of the first element present in the array.
+     *  - The currentValue argument is the value of the second element present in the array.
+     *
+     * @callback segmentReduceCallback
+     * @param {*} previousValue The accumulated value previously returned in the last invocation
+     * of the callback, or initialValue, if supplied.
+     * @param {Feature<LineString>} currentSegment The current Segment being processed.
+     * @param {number} featureIndex The current index of the Feature being processed.
+     * @param {number} multiFeatureIndex The current index of the Multi-Feature being processed.
+     * @param {number} geometryIndex The current index of the Geometry being processed.
+     * @param {number} segmentIndex The current index of the Segment being processed.
+     */
+
+    /**
+     * Reduce 2-vertex line segment in any GeoJSON object, similar to Array.reduce()
+     * (Multi)Point geometries do not contain segments therefore they are ignored during this operation.
+     *
+     * @param {FeatureCollection|Feature|Geometry} geojson any GeoJSON
+     * @param {Function} callback a method that takes (previousValue, currentSegment, currentIndex)
+     * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
+     * @returns {void}
+     * @example
+     * var polygon = turf.polygon([[[-50, 5], [-40, -10], [-50, -10], [-40, 5], [-50, 5]]]);
+     *
+     * // Iterate over GeoJSON by 2-vertex segments
+     * turf.segmentReduce(polygon, function (previousSegment, currentSegment, featureIndex, multiFeatureIndex, geometryIndex, segmentIndex) {
+     *   //= previousSegment
+     *   //= currentSegment
+     *   //= featureIndex
+     *   //= multiFeatureIndex
+     *   //= geometryIndex
+     *   //= segmentIndex
+     *   return currentSegment
+     * });
+     *
+     * // Calculate the total number of segments
+     * var initialValue = 0
+     * var total = turf.segmentReduce(polygon, function (previousValue) {
+     *     previousValue++;
+     *     return previousValue;
+     * }, initialValue);
+     */
+    function segmentReduce(geojson, callback, initialValue) {
+      var previousValue = initialValue;
+      var started = false;
+      segmentEach(
+        geojson,
+        function (
+          currentSegment,
+          featureIndex,
+          multiFeatureIndex,
+          geometryIndex,
+          segmentIndex
+        ) {
+          if (started === false && initialValue === undefined)
+            previousValue = currentSegment;
+          else
+            previousValue = callback(
+              previousValue,
+              currentSegment,
+              featureIndex,
+              multiFeatureIndex,
+              geometryIndex,
+              segmentIndex
+            );
+          started = true;
+        }
+      );
+      return previousValue;
+    }
+
+    /**
+     * Takes a {@link GeoJSON} and measures its length in the specified units, {@link (Multi)Point}'s distance are ignored.
+     *
+     * @name length
+     * @param {Feature<LineString|MultiLineString>} geojson GeoJSON to measure
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units=kilometers] can be degrees, radians, miles, or kilometers
+     * @returns {number} length of GeoJSON
+     * @example
+     * var line = turf.lineString([[115, -32], [131, -22], [143, -25], [150, -34]]);
+     * var length = turf.length(line, {units: 'miles'});
+     *
+     * //addToMap
+     * var addToMap = [line];
+     * line.properties.distance = length;
+     */
+    function length$1(geojson, options) {
+        if (options === void 0) { options = {}; }
+        // Calculate distance from 2-vertex line segments
+        return segmentReduce(geojson, function (previousValue, segment) {
+            var coords = segment.geometry.coordinates;
+            return previousValue + distance(coords[0], coords[1], options);
+        }, 0);
+    }
+
+    // http://en.wikipedia.org/wiki/Haversine_formula
+    // http://www.movable-type.co.uk/scripts/latlong.html
+    /**
+     * Takes two {@link Point|points} and finds the geographic bearing between them,
+     * i.e. the angle measured in degrees from the north line (0 degrees)
+     *
+     * @name bearing
+     * @param {Coord} start starting Point
+     * @param {Coord} end ending Point
+     * @param {Object} [options={}] Optional parameters
+     * @param {boolean} [options.final=false] calculates the final bearing if true
+     * @returns {number} bearing in decimal degrees, between -180 and 180 degrees (positive clockwise)
+     * @example
+     * var point1 = turf.point([-75.343, 39.984]);
+     * var point2 = turf.point([-75.534, 39.123]);
+     *
+     * var bearing = turf.bearing(point1, point2);
+     *
+     * //addToMap
+     * var addToMap = [point1, point2]
+     * point1.properties['marker-color'] = '#f00'
+     * point2.properties['marker-color'] = '#0f0'
+     * point1.properties.bearing = bearing
+     */
+    function bearing(start, end, options) {
+        if (options === void 0) { options = {}; }
+        // Reverse calculation
+        if (options.final === true) {
+            return calculateFinalBearing(start, end);
+        }
+        var coordinates1 = getCoord(start);
+        var coordinates2 = getCoord(end);
+        var lon1 = degreesToRadians(coordinates1[0]);
+        var lon2 = degreesToRadians(coordinates2[0]);
+        var lat1 = degreesToRadians(coordinates1[1]);
+        var lat2 = degreesToRadians(coordinates2[1]);
+        var a = Math.sin(lon2 - lon1) * Math.cos(lat2);
+        var b = Math.cos(lat1) * Math.sin(lat2) -
+            Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+        return radiansToDegrees(Math.atan2(a, b));
+    }
+    /**
+     * Calculates Final Bearing
+     *
+     * @private
+     * @param {Coord} start starting Point
+     * @param {Coord} end ending Point
+     * @returns {number} bearing
+     */
+    function calculateFinalBearing(start, end) {
+        // Swap start & end
+        var bear = bearing(end, start);
+        bear = (bear + 180) % 360;
+        return bear;
+    }
+
+    // http://en.wikipedia.org/wiki/Haversine_formula
+    // http://www.movable-type.co.uk/scripts/latlong.html
+    /**
+     * Takes a {@link Point} and calculates the location of a destination point given a distance in
+     * degrees, radians, miles, or kilometers; and bearing in degrees.
+     * This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
+     *
+     * @name destination
+     * @param {Coord} origin starting point
+     * @param {number} distance distance from the origin point
+     * @param {number} bearing ranging from -180 to 180
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] miles, kilometers, degrees, or radians
+     * @param {Object} [options.properties={}] Translate properties to Point
+     * @returns {Feature<Point>} destination point
+     * @example
+     * var point = turf.point([-75.343, 39.984]);
+     * var distance = 50;
+     * var bearing = 90;
+     * var options = {units: 'miles'};
+     *
+     * var destination = turf.destination(point, distance, bearing, options);
+     *
+     * //addToMap
+     * var addToMap = [point, destination]
+     * destination.properties['marker-color'] = '#f00';
+     * point.properties['marker-color'] = '#0f0';
+     */
+    function destination(origin, distance, bearing, options) {
+        if (options === void 0) { options = {}; }
+        // Handle input
+        var coordinates1 = getCoord(origin);
+        var longitude1 = degreesToRadians(coordinates1[0]);
+        var latitude1 = degreesToRadians(coordinates1[1]);
+        var bearingRad = degreesToRadians(bearing);
+        var radians = lengthToRadians(distance, options.units);
+        // Main
+        var latitude2 = Math.asin(Math.sin(latitude1) * Math.cos(radians) +
+            Math.cos(latitude1) * Math.sin(radians) * Math.cos(bearingRad));
+        var longitude2 = longitude1 +
+            Math.atan2(Math.sin(bearingRad) * Math.sin(radians) * Math.cos(latitude1), Math.cos(radians) - Math.sin(latitude1) * Math.sin(latitude2));
+        var lng = radiansToDegrees(longitude2);
+        var lat = radiansToDegrees(latitude2);
+        return point([lng, lat], options.properties);
+    }
+
+    /**
+     * Takes a {@link LineString|line}, a specified distance along the line to a start {@link Point},
+     * and a specified  distance along the line to a stop point
+     * and returns a subsection of the line in-between those points.
+     *
+     * This can be useful for extracting only the part of a route between two distances.
+     *
+     * @name lineSliceAlong
+     * @param {Feature<LineString>|LineString} line input line
+     * @param {number} startDist distance along the line to starting point
+     * @param {number} stopDist distance along the line to ending point
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] can be degrees, radians, miles, or kilometers
+     * @returns {Feature<LineString>} sliced line
+     * @example
+     * var line = turf.lineString([[7, 45], [9, 45], [14, 40], [14, 41]]);
+     * var start = 12.5;
+     * var stop = 25;
+     * var sliced = turf.lineSliceAlong(line, start, stop, {units: 'miles'});
+     *
+     * //addToMap
+     * var addToMap = [line, start, stop, sliced]
+     */
+    function lineSliceAlong(line, startDist, stopDist, options) {
+      // Optional parameters
+      options = options || {};
+      if (!isObject(options)) throw new Error("options is invalid");
+
+      var coords;
+      var slice = [];
+
+      // Validation
+      if (line.type === "Feature") coords = line.geometry.coordinates;
+      else if (line.type === "LineString") coords = line.coordinates;
+      else throw new Error("input must be a LineString Feature or Geometry");
+      var origCoordsLength = coords.length;
+      var travelled = 0;
+      var overshot, direction, interpolated;
+      for (var i = 0; i < coords.length; i++) {
+        if (startDist >= travelled && i === coords.length - 1) break;
+        else if (travelled > startDist && slice.length === 0) {
+          overshot = startDist - travelled;
+          if (!overshot) {
+            slice.push(coords[i]);
+            return lineString(slice);
+          }
+          direction = bearing(coords[i], coords[i - 1]) - 180;
+          interpolated = destination(coords[i], overshot, direction, options);
+          slice.push(interpolated.geometry.coordinates);
+        }
+
+        if (travelled >= stopDist) {
+          overshot = stopDist - travelled;
+          if (!overshot) {
+            slice.push(coords[i]);
+            return lineString(slice);
+          }
+          direction = bearing(coords[i], coords[i - 1]) - 180;
+          interpolated = destination(coords[i], overshot, direction, options);
+          slice.push(interpolated.geometry.coordinates);
+          return lineString(slice);
+        }
+
+        if (travelled >= startDist) {
+          slice.push(coords[i]);
+        }
+
+        if (i === coords.length - 1) {
+          return lineString(slice);
+        }
+
+        travelled += distance(coords[i], coords[i + 1], options);
+      }
+
+      if (travelled < startDist && coords.length === origCoordsLength)
+        throw new Error("Start position is beyond line");
+
+      var last = coords[coords.length - 1];
+      return lineString([last, last]);
+    }
+
+    /**
+     * Divides a {@link LineString} into chunks of a specified length.
+     * If the line is shorter than the segment length then the original line is returned.
+     *
+     * @name lineChunk
+     * @param {FeatureCollection|Geometry|Feature<LineString|MultiLineString>} geojson the lines to split
+     * @param {number} segmentLength how long to make each segment
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] units can be degrees, radians, miles, or kilometers
+     * @param {boolean} [options.reverse=false] reverses coordinates to start the first chunked segment at the end
+     * @returns {FeatureCollection<LineString>} collection of line segments
+     * @example
+     * var line = turf.lineString([[-95, 40], [-93, 45], [-85, 50]]);
+     *
+     * var chunk = turf.lineChunk(line, 15, {units: 'miles'});
+     *
+     * //addToMap
+     * var addToMap = [chunk];
+     */
+    function lineChunk(geojson, segmentLength, options) {
+      // Optional parameters
+      options = options || {};
+      if (!isObject(options)) throw new Error("options is invalid");
+      var units = options.units;
+      var reverse = options.reverse;
+
+      // Validation
+      if (!geojson) throw new Error("geojson is required");
+      if (segmentLength <= 0)
+        throw new Error("segmentLength must be greater than 0");
+
+      // Container
+      var results = [];
+
+      // Flatten each feature to simple LineString
+      flattenEach(geojson, function (feature) {
+        // reverses coordinates to start the first chunked segment at the end
+        if (reverse)
+          feature.geometry.coordinates = feature.geometry.coordinates.reverse();
+
+        sliceLineSegments(feature, segmentLength, units, function (segment) {
+          results.push(segment);
+        });
+      });
+      return featureCollection(results);
+    }
+
+    /**
+     * Slice Line Segments
+     *
+     * @private
+     * @param {Feature<LineString>} line GeoJSON LineString
+     * @param {number} segmentLength how long to make each segment
+     * @param {string}[units='kilometers'] units can be degrees, radians, miles, or kilometers
+     * @param {Function} callback iterate over sliced line segments
+     * @returns {void}
+     */
+    function sliceLineSegments(line, segmentLength, units, callback) {
+      var lineLength = length$1(line, { units: units });
+
+      // If the line is shorter than the segment length then the orginal line is returned.
+      if (lineLength <= segmentLength) return callback(line);
+
+      var numberOfSegments = lineLength / segmentLength;
+
+      // If numberOfSegments is integer, no need to plus 1
+      if (!Number.isInteger(numberOfSegments)) {
+        numberOfSegments = Math.floor(numberOfSegments) + 1;
+      }
+
+      for (var i = 0; i < numberOfSegments; i++) {
+        var outline = lineSliceAlong(
+          line,
+          segmentLength * i,
+          segmentLength * (i + 1),
+          { units: units }
+        );
+        callback(outline, i);
+      }
+    }
+
+    /**
+     * Takes a set of features, calculates the bbox of all input features, and returns a bounding box.
+     *
+     * @name bbox
+     * @param {GeoJSON} geojson any GeoJSON object
+     * @returns {BBox} bbox extent in [minX, minY, maxX, maxY] order
+     * @example
+     * var line = turf.lineString([[-74, 40], [-78, 42], [-82, 35]]);
+     * var bbox = turf.bbox(line);
+     * var bboxPolygon = turf.bboxPolygon(bbox);
+     *
+     * //addToMap
+     * var addToMap = [line, bboxPolygon]
+     */
+    function bbox(geojson) {
+        var result = [Infinity, Infinity, -Infinity, -Infinity];
+        coordEach(geojson, function (coord) {
+            if (result[0] > coord[0]) {
+                result[0] = coord[0];
+            }
+            if (result[1] > coord[1]) {
+                result[1] = coord[1];
+            }
+            if (result[2] < coord[0]) {
+                result[2] = coord[0];
+            }
+            if (result[3] < coord[1]) {
+                result[3] = coord[1];
+            }
+        });
+        return result;
+    }
+    bbox["default"] = bbox;
+
+    function getDefaultExportFromCjs (x) {
+    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+    }
+
+    function getAugmentedNamespace(n) {
+      if (n.__esModule) return n;
+      var f = n.default;
+    	if (typeof f == "function") {
+    		var a = function a () {
+    			if (this instanceof a) {
+    				var args = [null];
+    				args.push.apply(args, arguments);
+    				var Ctor = Function.bind.apply(f, args);
+    				return new Ctor();
+    			}
+    			return f.apply(this, arguments);
+    		};
+    		a.prototype = f.prototype;
+      } else a = {};
+      Object.defineProperty(a, '__esModule', {value: true});
+    	Object.keys(n).forEach(function (k) {
+    		var d = Object.getOwnPropertyDescriptor(n, k);
+    		Object.defineProperty(a, k, d.get ? d : {
+    			enumerable: true,
+    			get: function () {
+    				return n[k];
+    			}
+    		});
+    	});
+    	return a;
+    }
+
+    // http://en.wikipedia.org/wiki/Even%E2%80%93odd_rule
+    // modified from: https://github.com/substack/point-in-polygon/blob/master/index.js
+    // which was modified from http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+    /**
+     * Takes a {@link Point} and a {@link Polygon} or {@link MultiPolygon} and determines if the point
+     * resides inside the polygon. The polygon can be convex or concave. The function accounts for holes.
+     *
+     * @name booleanPointInPolygon
+     * @param {Coord} point input point
+     * @param {Feature<Polygon|MultiPolygon>} polygon input polygon or multipolygon
+     * @param {Object} [options={}] Optional parameters
+     * @param {boolean} [options.ignoreBoundary=false] True if polygon boundary should be ignored when determining if
+     * the point is inside the polygon otherwise false.
+     * @returns {boolean} `true` if the Point is inside the Polygon; `false` if the Point is not inside the Polygon
+     * @example
+     * var pt = turf.point([-77, 44]);
+     * var poly = turf.polygon([[
+     *   [-81, 41],
+     *   [-81, 47],
+     *   [-72, 47],
+     *   [-72, 41],
+     *   [-81, 41]
+     * ]]);
+     *
+     * turf.booleanPointInPolygon(pt, poly);
+     * //= true
+     */
+    function booleanPointInPolygon(point, polygon, options) {
+        if (options === void 0) { options = {}; }
+        // validation
+        if (!point) {
+            throw new Error("point is required");
+        }
+        if (!polygon) {
+            throw new Error("polygon is required");
+        }
+        var pt = getCoord(point);
+        var geom = getGeom(polygon);
+        var type = geom.type;
+        var bbox = polygon.bbox;
+        var polys = geom.coordinates;
+        // Quick elimination if point is not inside bbox
+        if (bbox && inBBox(pt, bbox) === false) {
+            return false;
+        }
+        // normalize to multipolygon
+        if (type === "Polygon") {
+            polys = [polys];
+        }
+        var insidePoly = false;
+        for (var i = 0; i < polys.length && !insidePoly; i++) {
+            // check if it is in the outer ring first
+            if (inRing(pt, polys[i][0], options.ignoreBoundary)) {
+                var inHole = false;
+                var k = 1;
+                // check for the point in any of the holes
+                while (k < polys[i].length && !inHole) {
+                    if (inRing(pt, polys[i][k], !options.ignoreBoundary)) {
+                        inHole = true;
+                    }
+                    k++;
+                }
+                if (!inHole) {
+                    insidePoly = true;
+                }
+            }
+        }
+        return insidePoly;
+    }
+    /**
+     * inRing
+     *
+     * @private
+     * @param {Array<number>} pt [x,y]
+     * @param {Array<Array<number>>} ring [[x,y], [x,y],..]
+     * @param {boolean} ignoreBoundary ignoreBoundary
+     * @returns {boolean} inRing
+     */
+    function inRing(pt, ring, ignoreBoundary) {
+        var isInside = false;
+        if (ring[0][0] === ring[ring.length - 1][0] &&
+            ring[0][1] === ring[ring.length - 1][1]) {
+            ring = ring.slice(0, ring.length - 1);
+        }
+        for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            var xi = ring[i][0];
+            var yi = ring[i][1];
+            var xj = ring[j][0];
+            var yj = ring[j][1];
+            var onBoundary = pt[1] * (xi - xj) + yi * (xj - pt[0]) + yj * (pt[0] - xi) === 0 &&
+                (xi - pt[0]) * (xj - pt[0]) <= 0 &&
+                (yi - pt[1]) * (yj - pt[1]) <= 0;
+            if (onBoundary) {
+                return !ignoreBoundary;
+            }
+            var intersect = yi > pt[1] !== yj > pt[1] &&
+                pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi;
+            if (intersect) {
+                isInside = !isInside;
+            }
+        }
+        return isInside;
+    }
+    /**
+     * inBBox
+     *
+     * @private
+     * @param {Position} pt point [x,y]
+     * @param {BBox} bbox BBox [west, south, east, north]
+     * @returns {boolean} true/false if point is inside BBox
+     */
+    function inBBox(pt, bbox) {
+        return (bbox[0] <= pt[0] && bbox[1] <= pt[1] && bbox[2] >= pt[0] && bbox[3] >= pt[1]);
+    }
+
     // Note: change RADIUS => earthRadius
     var RADIUS$1 = 6378137;
     /**
@@ -1003,243 +1707,3626 @@
     }
 
     /**
-     * 地图量算工具,包括距离量算、面积量算、角度量算、高度量算
-     * @namespace Cartometry
-     */
-    const Cartometry = {};
-    /**
-     * 贴地距离
-     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
-     * @return {Number} 长度，单位米
-     */
-    Cartometry.surfaceDistance = function(positions) {
-      let distance = 0;
-      for (let i = 0; i < positions.length - 1; i += 1) {
-        const point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
-        const point2cartographic = Cesium.Cartographic.fromCartesian(positions[i + 1]);
-        /** 根据经纬度计算出距离* */
-        const geodesic = new Cesium.EllipsoidGeodesic();
-        geodesic.setEndPoints(point1cartographic, point2cartographic);
-        const s = geodesic.surfaceDistance;
-        distance += s;
-      }
-      return distance;
-    };
-
-    /**
-     * 空间距离
-     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
-     * @return {Number} 长度，单位米
-     */
-    Cartometry.spaceDistance = function(positions) {
-      let dis = 0;
-      for (let i = 1; i < positions.length; i++) {
-        const s = positions[i - 1];
-        const e = positions[i];
-        dis += Cesium.Cartesian3.distance(s, e);
-      }
-      return dis;
-    };
-
-    /**
+     * Returns true if a point is on a line. Accepts a optional parameter to ignore the
+     * start and end vertices of the linestring.
      *
-     * 计算两个向量之间的夹角，两个向量必须拥有相同的起点。
-     * @param {Cesium.Cartesian3} p1 向量起点
-     * @param {Cesium.Cartesian3} p2 向量1终点
-     * @param {Cesium.Cartesian3} p3 向量2终点
-     * @return {Number} 返回p1p2和p1p3之间的夹角，单位：度
-     */
-    Cartometry.angle = function(p1, p2, p3) {
-      // 以任意一点为原点建立局部坐标系
-      const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(p1);
-      const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
-      // 将其它两个点坐标转换到局部坐标
-      const localp2 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p2, new Cesium.Cartesian3());
-      const localp3 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p3, new Cesium.Cartesian3());
-      // 归一化
-      const normalizep2 = Cesium.Cartesian3.normalize(localp2, new Cesium.Cartesian3());
-      const normalizep3 = Cesium.Cartesian3.normalize(localp3, new Cesium.Cartesian3());
-      // 计算两点夹角
-      const cos = Cesium.Cartesian3.dot(normalizep2, normalizep3);
-      const angle = Cesium.Math.acosClamped(cos);
-      return Cesium.Math.toDegrees(angle);
-    };
-
-    /**
-     * 计算向量的方位角
-     * @param  {Cesium.Cartesian3} center 向量起点
-     * @param  {Cesium.Cartesian3} point  向量终点
-     * @return {Number}        角度，单位：度
+     * @name booleanPointOnLine
+     * @param {Coord} pt GeoJSON Point
+     * @param {Feature<LineString>} line GeoJSON LineString
+     * @param {Object} [options={}] Optional parameters
+     * @param {boolean} [options.ignoreEndVertices=false] whether to ignore the start and end vertices.
+     * @param {number} [options.epsilon] Fractional number to compare with the cross product result. Useful for dealing with floating points such as lng/lat points
+     * @returns {boolean} true/false
      * @example
+     * var pt = turf.point([0, 0]);
+     * var line = turf.lineString([[-1, -1],[1, 1],[1.5, 2.2]]);
+     * var isPointOnLine = turf.booleanPointOnLine(pt, line);
+     * //=true
+     */
+    function booleanPointOnLine(pt, line, options) {
+        if (options === void 0) { options = {}; }
+        // Normalize inputs
+        var ptCoords = getCoord(pt);
+        var lineCoords = getCoords(line);
+        // Main
+        for (var i = 0; i < lineCoords.length - 1; i++) {
+            var ignoreBoundary = false;
+            if (options.ignoreEndVertices) {
+                if (i === 0) {
+                    ignoreBoundary = "start";
+                }
+                if (i === lineCoords.length - 2) {
+                    ignoreBoundary = "end";
+                }
+                if (i === 0 && i + 1 === lineCoords.length - 1) {
+                    ignoreBoundary = "both";
+                }
+            }
+            if (isPointOnLineSegment(lineCoords[i], lineCoords[i + 1], ptCoords, ignoreBoundary, typeof options.epsilon === "undefined" ? null : options.epsilon)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // See http://stackoverflow.com/a/4833823/1979085
+    // See https://stackoverflow.com/a/328122/1048847
+    /**
+     * @private
+     * @param {Position} lineSegmentStart coord pair of start of line
+     * @param {Position} lineSegmentEnd coord pair of end of line
+     * @param {Position} pt coord pair of point to check
+     * @param {boolean|string} excludeBoundary whether the point is allowed to fall on the line ends.
+     * @param {number} epsilon Fractional number to compare with the cross product result. Useful for dealing with floating points such as lng/lat points
+     * If true which end to ignore.
+     * @returns {boolean} true/false
+     */
+    function isPointOnLineSegment(lineSegmentStart, lineSegmentEnd, pt, excludeBoundary, epsilon) {
+        var x = pt[0];
+        var y = pt[1];
+        var x1 = lineSegmentStart[0];
+        var y1 = lineSegmentStart[1];
+        var x2 = lineSegmentEnd[0];
+        var y2 = lineSegmentEnd[1];
+        var dxc = pt[0] - x1;
+        var dyc = pt[1] - y1;
+        var dxl = x2 - x1;
+        var dyl = y2 - y1;
+        var cross = dxc * dyl - dyc * dxl;
+        if (epsilon !== null) {
+            if (Math.abs(cross) > epsilon) {
+                return false;
+            }
+        }
+        else if (cross !== 0) {
+            return false;
+        }
+        if (!excludeBoundary) {
+            if (Math.abs(dxl) >= Math.abs(dyl)) {
+                return dxl > 0 ? x1 <= x && x <= x2 : x2 <= x && x <= x1;
+            }
+            return dyl > 0 ? y1 <= y && y <= y2 : y2 <= y && y <= y1;
+        }
+        else if (excludeBoundary === "start") {
+            if (Math.abs(dxl) >= Math.abs(dyl)) {
+                return dxl > 0 ? x1 < x && x <= x2 : x2 <= x && x < x1;
+            }
+            return dyl > 0 ? y1 < y && y <= y2 : y2 <= y && y < y1;
+        }
+        else if (excludeBoundary === "end") {
+            if (Math.abs(dxl) >= Math.abs(dyl)) {
+                return dxl > 0 ? x1 <= x && x < x2 : x2 < x && x <= x1;
+            }
+            return dyl > 0 ? y1 <= y && y < y2 : y2 < y && y <= y1;
+        }
+        else if (excludeBoundary === "both") {
+            if (Math.abs(dxl) >= Math.abs(dyl)) {
+                return dxl > 0 ? x1 < x && x < x2 : x2 < x && x < x1;
+            }
+            return dyl > 0 ? y1 < y && y < y2 : y2 < y && y < y1;
+        }
+        return false;
+    }
+
+    /**
+     * Boolean-within returns true if the first geometry is completely within the second geometry.
+     * The interiors of both geometries must intersect and, the interior and boundary of the primary (geometry a)
+     * must not intersect the exterior of the secondary (geometry b).
+     * Boolean-within returns the exact opposite result of the `@turf/boolean-contains`.
      *
-     * const start=Cesium.Cartesian3.fromDegrees(110,30);
-     * const end=Cesium.Cartesian3.fromDegrees(110,40)
-     * const angle = CesiumPro.Cartometry.angleBetweenNorth(start,end);
+     * @name booleanWithin
+     * @param {Geometry|Feature<any>} feature1 GeoJSON Feature or Geometry
+     * @param {Geometry|Feature<any>} feature2 GeoJSON Feature or Geometry
+     * @returns {boolean} true/false
+     * @example
+     * var line = turf.lineString([[1, 1], [1, 2], [1, 3], [1, 4]]);
+     * var point = turf.point([1, 2]);
+     *
+     * turf.booleanWithin(point, line);
+     * //=true
      */
-    Cartometry.angleBetweenNorth = function(center, point) {
-      const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
-      const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
-      const localp = Cesium.Matrix4.multiplyByPoint(inverseMatrix, point, new Cesium.Cartesian3());
-      const normalize = Cesium.Cartesian3.normalize(localp, new Cesium.Cartesian3());
-      const north = new Cesium.Cartesian3(0, 1, 0);
-      const cos = Cesium.Cartesian3.dot(normalize, north);
-      let angle = Cesium.Math.acosClamped(cos);
-      angle = Cesium.Math.toDegrees(angle);
-
-      const east = new Cesium.Cartesian3(1, 0, 0);
-      const arceast = Cesium.Cartesian3.dot(east, normalize);
-      if (arceast < 0) {
-        angle = 360 - angle;
-      }
-
-      return angle;
-    };
+    function booleanWithin(feature1, feature2) {
+        var geom1 = getGeom(feature1);
+        var geom2 = getGeom(feature2);
+        var type1 = geom1.type;
+        var type2 = geom2.type;
+        switch (type1) {
+            case "Point":
+                switch (type2) {
+                    case "MultiPoint":
+                        return isPointInMultiPoint(geom1, geom2);
+                    case "LineString":
+                        return booleanPointOnLine(geom1, geom2, { ignoreEndVertices: true });
+                    case "Polygon":
+                    case "MultiPolygon":
+                        return booleanPointInPolygon(geom1, geom2, { ignoreBoundary: true });
+                    default:
+                        throw new Error("feature2 " + type2 + " geometry not supported");
+                }
+            case "MultiPoint":
+                switch (type2) {
+                    case "MultiPoint":
+                        return isMultiPointInMultiPoint(geom1, geom2);
+                    case "LineString":
+                        return isMultiPointOnLine(geom1, geom2);
+                    case "Polygon":
+                    case "MultiPolygon":
+                        return isMultiPointInPoly(geom1, geom2);
+                    default:
+                        throw new Error("feature2 " + type2 + " geometry not supported");
+                }
+            case "LineString":
+                switch (type2) {
+                    case "LineString":
+                        return isLineOnLine(geom1, geom2);
+                    case "Polygon":
+                    case "MultiPolygon":
+                        return isLineInPoly(geom1, geom2);
+                    default:
+                        throw new Error("feature2 " + type2 + " geometry not supported");
+                }
+            case "Polygon":
+                switch (type2) {
+                    case "Polygon":
+                    case "MultiPolygon":
+                        return isPolyInPoly(geom1, geom2);
+                    default:
+                        throw new Error("feature2 " + type2 + " geometry not supported");
+                }
+            default:
+                throw new Error("feature1 " + type1 + " geometry not supported");
+        }
+    }
+    function isPointInMultiPoint(point, multiPoint) {
+        var i;
+        var output = false;
+        for (i = 0; i < multiPoint.coordinates.length; i++) {
+            if (compareCoords(multiPoint.coordinates[i], point.coordinates)) {
+                output = true;
+                break;
+            }
+        }
+        return output;
+    }
+    function isMultiPointInMultiPoint(multiPoint1, multiPoint2) {
+        for (var i = 0; i < multiPoint1.coordinates.length; i++) {
+            var anyMatch = false;
+            for (var i2 = 0; i2 < multiPoint2.coordinates.length; i2++) {
+                if (compareCoords(multiPoint1.coordinates[i], multiPoint2.coordinates[i2])) {
+                    anyMatch = true;
+                }
+            }
+            if (!anyMatch) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function isMultiPointOnLine(multiPoint, lineString) {
+        var foundInsidePoint = false;
+        for (var i = 0; i < multiPoint.coordinates.length; i++) {
+            if (!booleanPointOnLine(multiPoint.coordinates[i], lineString)) {
+                return false;
+            }
+            if (!foundInsidePoint) {
+                foundInsidePoint = booleanPointOnLine(multiPoint.coordinates[i], lineString, { ignoreEndVertices: true });
+            }
+        }
+        return foundInsidePoint;
+    }
+    function isMultiPointInPoly(multiPoint, polygon) {
+        var output = true;
+        var isInside = false;
+        for (var i = 0; i < multiPoint.coordinates.length; i++) {
+            isInside = booleanPointInPolygon(multiPoint.coordinates[1], polygon);
+            if (!isInside) {
+                output = false;
+                break;
+            }
+            {
+                isInside = booleanPointInPolygon(multiPoint.coordinates[1], polygon, {
+                    ignoreBoundary: true,
+                });
+            }
+        }
+        return output && isInside;
+    }
+    function isLineOnLine(lineString1, lineString2) {
+        for (var i = 0; i < lineString1.coordinates.length; i++) {
+            if (!booleanPointOnLine(lineString1.coordinates[i], lineString2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function isLineInPoly(linestring, polygon) {
+        var polyBbox = bbox(polygon);
+        var lineBbox = bbox(linestring);
+        if (!doBBoxOverlap(polyBbox, lineBbox)) {
+            return false;
+        }
+        var foundInsidePoint = false;
+        for (var i = 0; i < linestring.coordinates.length - 1; i++) {
+            if (!booleanPointInPolygon(linestring.coordinates[i], polygon)) {
+                return false;
+            }
+            if (!foundInsidePoint) {
+                foundInsidePoint = booleanPointInPolygon(linestring.coordinates[i], polygon, { ignoreBoundary: true });
+            }
+            if (!foundInsidePoint) {
+                var midpoint = getMidpoint(linestring.coordinates[i], linestring.coordinates[i + 1]);
+                foundInsidePoint = booleanPointInPolygon(midpoint, polygon, {
+                    ignoreBoundary: true,
+                });
+            }
+        }
+        return foundInsidePoint;
+    }
     /**
-     * 贴地面积
-     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
-     * @return {Number} 面积，单位：平方米
+     * Is Polygon2 in Polygon1
+     * Only takes into account outer rings
+     *
+     * @private
+     * @param {Polygon} geometry1
+     * @param {Polygon|MultiPolygon} geometry2
+     * @returns {boolean} true/false
      */
-    Cartometry.surfaceArea = function(positions) {
-      // TODO:计算方法有问题
-      let res = 0;
-      // 拆分三角曲面
-
-      for (let i = 0; i < positions.length - 2; i += 1) {
-        const j = (i + 1) % positions.length;
-        const k = (i + 2) % positions.length;
-        const totalAngle = Cartometry.angle(positions[i], positions[j], positions[k]);
-        const distemp1 = Cartometry.spaceDistance([positions[i], positions[j]]);
-        const distemp2 = Cartometry.spaceDistance([positions[j], positions[k]]);
-        res += distemp1 * distemp2 * Math.abs(Math.sin(Cesium.Math.toRadians(totalAngle)));
-      }
-      return res;
-    };
+    function isPolyInPoly(geometry1, geometry2) {
+        var poly1Bbox = bbox(geometry1);
+        var poly2Bbox = bbox(geometry2);
+        if (!doBBoxOverlap(poly2Bbox, poly1Bbox)) {
+            return false;
+        }
+        for (var i = 0; i < geometry1.coordinates[0].length; i++) {
+            if (!booleanPointInPolygon(geometry1.coordinates[0][i], geometry2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function doBBoxOverlap(bbox1, bbox2) {
+        if (bbox1[0] > bbox2[0])
+            return false;
+        if (bbox1[2] < bbox2[2])
+            return false;
+        if (bbox1[1] > bbox2[1])
+            return false;
+        if (bbox1[3] < bbox2[3])
+            return false;
+        return true;
+    }
+    /**
+     * compareCoords
+     *
+     * @private
+     * @param {Position} pair1 point [x,y]
+     * @param {Position} pair2 point [x,y]
+     * @returns {boolean} true/false if coord pairs match
+     */
+    function compareCoords(pair1, pair2) {
+        return pair1[0] === pair2[0] && pair1[1] === pair2[1];
+    }
+    /**
+     * getMidpoint
+     *
+     * @private
+     * @param {Position} pair1 point [x,y]
+     * @param {Position} pair2 point [x,y]
+     * @returns {Position} midpoint of pair1 and pair2
+     */
+    function getMidpoint(pair1, pair2) {
+        return [(pair1[0] + pair2[0]) / 2, (pair1[1] + pair2[1]) / 2];
+    }
 
     /**
-     * 空间面积
-     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
-     * @return {Number} 面积，单位：平方米
+     * Creates a {@link Point} grid from a bounding box, {@link FeatureCollection} or {@link Feature}.
+     *
+     * @name pointGrid
+     * @param {Array<number>} bbox extent in [minX, minY, maxX, maxY] order
+     * @param {number} cellSide the distance between points, in units
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] used in calculating cellSide, can be degrees, radians, miles, or kilometers
+     * @param {Feature<Polygon|MultiPolygon>} [options.mask] if passed a Polygon or MultiPolygon, the grid Points will be created only inside it
+     * @param {Object} [options.properties={}] passed to each point of the grid
+     * @returns {FeatureCollection<Point>} grid of points
+     * @example
+     * var extent = [-70.823364, -33.553984, -70.473175, -33.302986];
+     * var cellSide = 3;
+     * var options = {units: 'miles'};
+     *
+     * var grid = turf.pointGrid(extent, cellSide, options);
+     *
+     * //addToMap
+     * var addToMap = [grid];
      */
-    Cartometry.spaceArea = function(positions) {
-      const points = [];
-      for (let position of positions) {
-        const coord = LonLat.fromCartesian(position);
-        points.push([coord.lon, coord.lat]);
-      }
-      points.push(points[0]);
-      const polygon$1 = polygon([points]);
-      return area(polygon$1);
-    };
+    function pointGrid(bbox, cellSide, options) {
+        if (options === void 0) { options = {}; }
+        // Default parameters
+        if (options.mask && !options.units)
+            options.units = "kilometers";
+        // Containers
+        var results = [];
+        // Typescript handles the Type Validation
+        // if (cellSide === null || cellSide === undefined) throw new Error('cellSide is required');
+        // if (!isNumber(cellSide)) throw new Error('cellSide is invalid');
+        // if (!bbox) throw new Error('bbox is required');
+        // if (!Array.isArray(bbox)) throw new Error('bbox must be array');
+        // if (bbox.length !== 4) throw new Error('bbox must contain 4 numbers');
+        // if (mask && ['Polygon', 'MultiPolygon'].indexOf(getType(mask)) === -1) throw new Error('options.mask must be a (Multi)Polygon');
+        var west = bbox[0];
+        var south = bbox[1];
+        var east = bbox[2];
+        var north = bbox[3];
+        var xFraction = cellSide / distance([west, south], [east, south], options);
+        var cellWidth = xFraction * (east - west);
+        var yFraction = cellSide / distance([west, south], [west, north], options);
+        var cellHeight = yFraction * (north - south);
+        var bboxWidth = east - west;
+        var bboxHeight = north - south;
+        var columns = Math.floor(bboxWidth / cellWidth);
+        var rows = Math.floor(bboxHeight / cellHeight);
+        // adjust origin of the grid
+        var deltaX = (bboxWidth - columns * cellWidth) / 2;
+        var deltaY = (bboxHeight - rows * cellHeight) / 2;
+        var currentX = west + deltaX;
+        while (currentX <= east) {
+            var currentY = south + deltaY;
+            while (currentY <= north) {
+                var cellPt = point([currentX, currentY], options.properties);
+                if (options.mask) {
+                    if (booleanWithin(cellPt, options.mask))
+                        results.push(cellPt);
+                }
+                else {
+                    results.push(cellPt);
+                }
+                currentY += cellHeight;
+            }
+            currentX += cellWidth;
+        }
+        return featureCollection(results);
+    }
 
     /**
-     * 计算相邻两个点之间的高度差
-     * @param  {} positions
-     * @return {} 相信两个顶点之间的高度差，单位m
+     * splaytree v3.1.2
+     * Fast Splay tree for Node and browser
+     *
+     * @author Alexander Milevski <info@w8r.name>
+     * @license MIT
+     * @preserve
      */
-    Cartometry.heightFromCartesianArray = function(positions) {
-      if (positions.length < 2) {
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+    function __generator(thisArg, body) {
+        var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+        function verb(n) { return function (v) { return step([n, v]); }; }
+        function step(op) {
+            if (f) throw new TypeError("Generator is already executing.");
+            while (_) try {
+                if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+                if (y = 0, t) op = [op[0] & 2, t.value];
+                switch (op[0]) {
+                    case 0: case 1: t = op; break;
+                    case 4: _.label++; return { value: op[1], done: false };
+                    case 5: _.label++; y = op[1]; op = [0]; continue;
+                    case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                    default:
+                        if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                        if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                        if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                        if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                        if (t[2]) _.ops.pop();
+                        _.trys.pop(); continue;
+                }
+                op = body.call(thisArg, _);
+            } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+            if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        }
+    }
+
+    var Node = /** @class */ (function () {
+        function Node(key, data) {
+            this.next = null;
+            this.key = key;
+            this.data = data;
+            this.left = null;
+            this.right = null;
+        }
+        return Node;
+    }());
+
+    /* follows "An implementation of top-down splaying"
+     * by D. Sleator <sleator@cs.cmu.edu> March 1992
+     */
+    function DEFAULT_COMPARE(a, b) {
+        return a > b ? 1 : a < b ? -1 : 0;
+    }
+    /**
+     * Simple top down splay, not requiring i to be in the tree t.
+     */
+    function splay(i, t, comparator) {
+        var N = new Node(null, null);
+        var l = N;
+        var r = N;
+        while (true) {
+            var cmp = comparator(i, t.key);
+            //if (i < t.key) {
+            if (cmp < 0) {
+                if (t.left === null)
+                    break;
+                //if (i < t.left.key) {
+                if (comparator(i, t.left.key) < 0) {
+                    var y = t.left; /* rotate right */
+                    t.left = y.right;
+                    y.right = t;
+                    t = y;
+                    if (t.left === null)
+                        break;
+                }
+                r.left = t; /* link right */
+                r = t;
+                t = t.left;
+                //} else if (i > t.key) {
+            }
+            else if (cmp > 0) {
+                if (t.right === null)
+                    break;
+                //if (i > t.right.key) {
+                if (comparator(i, t.right.key) > 0) {
+                    var y = t.right; /* rotate left */
+                    t.right = y.left;
+                    y.left = t;
+                    t = y;
+                    if (t.right === null)
+                        break;
+                }
+                l.right = t; /* link left */
+                l = t;
+                t = t.right;
+            }
+            else
+                break;
+        }
+        /* assemble */
+        l.right = t.left;
+        r.left = t.right;
+        t.left = N.right;
+        t.right = N.left;
+        return t;
+    }
+    function insert(i, data, t, comparator) {
+        var node = new Node(i, data);
+        if (t === null) {
+            node.left = node.right = null;
+            return node;
+        }
+        t = splay(i, t, comparator);
+        var cmp = comparator(i, t.key);
+        if (cmp < 0) {
+            node.left = t.left;
+            node.right = t;
+            t.left = null;
+        }
+        else if (cmp >= 0) {
+            node.right = t.right;
+            node.left = t;
+            t.right = null;
+        }
+        return node;
+    }
+    function split(key, v, comparator) {
+        var left = null;
+        var right = null;
+        if (v) {
+            v = splay(key, v, comparator);
+            var cmp = comparator(v.key, key);
+            if (cmp === 0) {
+                left = v.left;
+                right = v.right;
+            }
+            else if (cmp < 0) {
+                right = v.right;
+                v.right = null;
+                left = v;
+            }
+            else {
+                left = v.left;
+                v.left = null;
+                right = v;
+            }
+        }
+        return { left: left, right: right };
+    }
+    function merge(left, right, comparator) {
+        if (right === null)
+            return left;
+        if (left === null)
+            return right;
+        right = splay(left.key, right, comparator);
+        right.left = left;
+        return right;
+    }
+    /**
+     * Prints level of the tree
+     */
+    function printRow(root, prefix, isTail, out, printNode) {
+        if (root) {
+            out("" + prefix + (isTail ? '└── ' : '├── ') + printNode(root) + "\n");
+            var indent = prefix + (isTail ? '    ' : '│   ');
+            if (root.left)
+                printRow(root.left, indent, false, out, printNode);
+            if (root.right)
+                printRow(root.right, indent, true, out, printNode);
+        }
+    }
+    var Tree = /** @class */ (function () {
+        function Tree(comparator) {
+            if (comparator === void 0) { comparator = DEFAULT_COMPARE; }
+            this._root = null;
+            this._size = 0;
+            this._comparator = comparator;
+        }
+        /**
+         * Inserts a key, allows duplicates
+         */
+        Tree.prototype.insert = function (key, data) {
+            this._size++;
+            return this._root = insert(key, data, this._root, this._comparator);
+        };
+        /**
+         * Adds a key, if it is not present in the tree
+         */
+        Tree.prototype.add = function (key, data) {
+            var node = new Node(key, data);
+            if (this._root === null) {
+                node.left = node.right = null;
+                this._size++;
+                this._root = node;
+            }
+            var comparator = this._comparator;
+            var t = splay(key, this._root, comparator);
+            var cmp = comparator(key, t.key);
+            if (cmp === 0)
+                this._root = t;
+            else {
+                if (cmp < 0) {
+                    node.left = t.left;
+                    node.right = t;
+                    t.left = null;
+                }
+                else if (cmp > 0) {
+                    node.right = t.right;
+                    node.left = t;
+                    t.right = null;
+                }
+                this._size++;
+                this._root = node;
+            }
+            return this._root;
+        };
+        /**
+         * @param  {Key} key
+         * @return {Node|null}
+         */
+        Tree.prototype.remove = function (key) {
+            this._root = this._remove(key, this._root, this._comparator);
+        };
+        /**
+         * Deletes i from the tree if it's there
+         */
+        Tree.prototype._remove = function (i, t, comparator) {
+            var x;
+            if (t === null)
+                return null;
+            t = splay(i, t, comparator);
+            var cmp = comparator(i, t.key);
+            if (cmp === 0) { /* found it */
+                if (t.left === null) {
+                    x = t.right;
+                }
+                else {
+                    x = splay(i, t.left, comparator);
+                    x.right = t.right;
+                }
+                this._size--;
+                return x;
+            }
+            return t; /* It wasn't there */
+        };
+        /**
+         * Removes and returns the node with smallest key
+         */
+        Tree.prototype.pop = function () {
+            var node = this._root;
+            if (node) {
+                while (node.left)
+                    node = node.left;
+                this._root = splay(node.key, this._root, this._comparator);
+                this._root = this._remove(node.key, this._root, this._comparator);
+                return { key: node.key, data: node.data };
+            }
+            return null;
+        };
+        /**
+         * Find without splaying
+         */
+        Tree.prototype.findStatic = function (key) {
+            var current = this._root;
+            var compare = this._comparator;
+            while (current) {
+                var cmp = compare(key, current.key);
+                if (cmp === 0)
+                    return current;
+                else if (cmp < 0)
+                    current = current.left;
+                else
+                    current = current.right;
+            }
+            return null;
+        };
+        Tree.prototype.find = function (key) {
+            if (this._root) {
+                this._root = splay(key, this._root, this._comparator);
+                if (this._comparator(key, this._root.key) !== 0)
+                    return null;
+            }
+            return this._root;
+        };
+        Tree.prototype.contains = function (key) {
+            var current = this._root;
+            var compare = this._comparator;
+            while (current) {
+                var cmp = compare(key, current.key);
+                if (cmp === 0)
+                    return true;
+                else if (cmp < 0)
+                    current = current.left;
+                else
+                    current = current.right;
+            }
+            return false;
+        };
+        Tree.prototype.forEach = function (visitor, ctx) {
+            var current = this._root;
+            var Q = []; /* Initialize stack s */
+            var done = false;
+            while (!done) {
+                if (current !== null) {
+                    Q.push(current);
+                    current = current.left;
+                }
+                else {
+                    if (Q.length !== 0) {
+                        current = Q.pop();
+                        visitor.call(ctx, current);
+                        current = current.right;
+                    }
+                    else
+                        done = true;
+                }
+            }
+            return this;
+        };
+        /**
+         * Walk key range from `low` to `high`. Stops if `fn` returns a value.
+         */
+        Tree.prototype.range = function (low, high, fn, ctx) {
+            var Q = [];
+            var compare = this._comparator;
+            var node = this._root;
+            var cmp;
+            while (Q.length !== 0 || node) {
+                if (node) {
+                    Q.push(node);
+                    node = node.left;
+                }
+                else {
+                    node = Q.pop();
+                    cmp = compare(node.key, high);
+                    if (cmp > 0) {
+                        break;
+                    }
+                    else if (compare(node.key, low) >= 0) {
+                        if (fn.call(ctx, node))
+                            return this; // stop if smth is returned
+                    }
+                    node = node.right;
+                }
+            }
+            return this;
+        };
+        /**
+         * Returns array of keys
+         */
+        Tree.prototype.keys = function () {
+            var keys = [];
+            this.forEach(function (_a) {
+                var key = _a.key;
+                return keys.push(key);
+            });
+            return keys;
+        };
+        /**
+         * Returns array of all the data in the nodes
+         */
+        Tree.prototype.values = function () {
+            var values = [];
+            this.forEach(function (_a) {
+                var data = _a.data;
+                return values.push(data);
+            });
+            return values;
+        };
+        Tree.prototype.min = function () {
+            if (this._root)
+                return this.minNode(this._root).key;
+            return null;
+        };
+        Tree.prototype.max = function () {
+            if (this._root)
+                return this.maxNode(this._root).key;
+            return null;
+        };
+        Tree.prototype.minNode = function (t) {
+            if (t === void 0) { t = this._root; }
+            if (t)
+                while (t.left)
+                    t = t.left;
+            return t;
+        };
+        Tree.prototype.maxNode = function (t) {
+            if (t === void 0) { t = this._root; }
+            if (t)
+                while (t.right)
+                    t = t.right;
+            return t;
+        };
+        /**
+         * Returns node at given index
+         */
+        Tree.prototype.at = function (index) {
+            var current = this._root;
+            var done = false;
+            var i = 0;
+            var Q = [];
+            while (!done) {
+                if (current) {
+                    Q.push(current);
+                    current = current.left;
+                }
+                else {
+                    if (Q.length > 0) {
+                        current = Q.pop();
+                        if (i === index)
+                            return current;
+                        i++;
+                        current = current.right;
+                    }
+                    else
+                        done = true;
+                }
+            }
+            return null;
+        };
+        Tree.prototype.next = function (d) {
+            var root = this._root;
+            var successor = null;
+            if (d.right) {
+                successor = d.right;
+                while (successor.left)
+                    successor = successor.left;
+                return successor;
+            }
+            var comparator = this._comparator;
+            while (root) {
+                var cmp = comparator(d.key, root.key);
+                if (cmp === 0)
+                    break;
+                else if (cmp < 0) {
+                    successor = root;
+                    root = root.left;
+                }
+                else
+                    root = root.right;
+            }
+            return successor;
+        };
+        Tree.prototype.prev = function (d) {
+            var root = this._root;
+            var predecessor = null;
+            if (d.left !== null) {
+                predecessor = d.left;
+                while (predecessor.right)
+                    predecessor = predecessor.right;
+                return predecessor;
+            }
+            var comparator = this._comparator;
+            while (root) {
+                var cmp = comparator(d.key, root.key);
+                if (cmp === 0)
+                    break;
+                else if (cmp < 0)
+                    root = root.left;
+                else {
+                    predecessor = root;
+                    root = root.right;
+                }
+            }
+            return predecessor;
+        };
+        Tree.prototype.clear = function () {
+            this._root = null;
+            this._size = 0;
+            return this;
+        };
+        Tree.prototype.toList = function () {
+            return toList(this._root);
+        };
+        /**
+         * Bulk-load items. Both array have to be same size
+         */
+        Tree.prototype.load = function (keys, values, presort) {
+            if (values === void 0) { values = []; }
+            if (presort === void 0) { presort = false; }
+            var size = keys.length;
+            var comparator = this._comparator;
+            // sort if needed
+            if (presort)
+                sort(keys, values, 0, size - 1, comparator);
+            if (this._root === null) { // empty tree
+                this._root = loadRecursive(keys, values, 0, size);
+                this._size = size;
+            }
+            else { // that re-builds the whole tree from two in-order traversals
+                var mergedList = mergeLists(this.toList(), createList(keys, values), comparator);
+                size = this._size + size;
+                this._root = sortedListToBST({ head: mergedList }, 0, size);
+            }
+            return this;
+        };
+        Tree.prototype.isEmpty = function () { return this._root === null; };
+        Object.defineProperty(Tree.prototype, "size", {
+            get: function () { return this._size; },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Tree.prototype, "root", {
+            get: function () { return this._root; },
+            enumerable: true,
+            configurable: true
+        });
+        Tree.prototype.toString = function (printNode) {
+            if (printNode === void 0) { printNode = function (n) { return String(n.key); }; }
+            var out = [];
+            printRow(this._root, '', true, function (v) { return out.push(v); }, printNode);
+            return out.join('');
+        };
+        Tree.prototype.update = function (key, newKey, newData) {
+            var comparator = this._comparator;
+            var _a = split(key, this._root, comparator), left = _a.left, right = _a.right;
+            if (comparator(key, newKey) < 0) {
+                right = insert(newKey, newData, right, comparator);
+            }
+            else {
+                left = insert(newKey, newData, left, comparator);
+            }
+            this._root = merge(left, right, comparator);
+        };
+        Tree.prototype.split = function (key) {
+            return split(key, this._root, this._comparator);
+        };
+        Tree.prototype[Symbol.iterator] = function () {
+            var current, Q, done;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        current = this._root;
+                        Q = [];
+                        done = false;
+                        _a.label = 1;
+                    case 1:
+                        if (!!done) return [3 /*break*/, 6];
+                        if (!(current !== null)) return [3 /*break*/, 2];
+                        Q.push(current);
+                        current = current.left;
+                        return [3 /*break*/, 5];
+                    case 2:
+                        if (!(Q.length !== 0)) return [3 /*break*/, 4];
+                        current = Q.pop();
+                        return [4 /*yield*/, current];
+                    case 3:
+                        _a.sent();
+                        current = current.right;
+                        return [3 /*break*/, 5];
+                    case 4:
+                        done = true;
+                        _a.label = 5;
+                    case 5: return [3 /*break*/, 1];
+                    case 6: return [2 /*return*/];
+                }
+            });
+        };
+        return Tree;
+    }());
+    function loadRecursive(keys, values, start, end) {
+        var size = end - start;
+        if (size > 0) {
+            var middle = start + Math.floor(size / 2);
+            var key = keys[middle];
+            var data = values[middle];
+            var node = new Node(key, data);
+            node.left = loadRecursive(keys, values, start, middle);
+            node.right = loadRecursive(keys, values, middle + 1, end);
+            return node;
+        }
+        return null;
+    }
+    function createList(keys, values) {
+        var head = new Node(null, null);
+        var p = head;
+        for (var i = 0; i < keys.length; i++) {
+            p = p.next = new Node(keys[i], values[i]);
+        }
+        p.next = null;
+        return head.next;
+    }
+    function toList(root) {
+        var current = root;
+        var Q = [];
+        var done = false;
+        var head = new Node(null, null);
+        var p = head;
+        while (!done) {
+            if (current) {
+                Q.push(current);
+                current = current.left;
+            }
+            else {
+                if (Q.length > 0) {
+                    current = p = p.next = Q.pop();
+                    current = current.right;
+                }
+                else
+                    done = true;
+            }
+        }
+        p.next = null; // that'll work even if the tree was empty
+        return head.next;
+    }
+    function sortedListToBST(list, start, end) {
+        var size = end - start;
+        if (size > 0) {
+            var middle = start + Math.floor(size / 2);
+            var left = sortedListToBST(list, start, middle);
+            var root = list.head;
+            root.left = left;
+            list.head = list.head.next;
+            root.right = sortedListToBST(list, middle + 1, end);
+            return root;
+        }
+        return null;
+    }
+    function mergeLists(l1, l2, compare) {
+        var head = new Node(null, null); // dummy
+        var p = head;
+        var p1 = l1;
+        var p2 = l2;
+        while (p1 !== null && p2 !== null) {
+            if (compare(p1.key, p2.key) < 0) {
+                p.next = p1;
+                p1 = p1.next;
+            }
+            else {
+                p.next = p2;
+                p2 = p2.next;
+            }
+            p = p.next;
+        }
+        if (p1 !== null) {
+            p.next = p1;
+        }
+        else if (p2 !== null) {
+            p.next = p2;
+        }
+        return head.next;
+    }
+    function sort(keys, values, left, right, compare) {
+        if (left >= right)
+            return;
+        var pivot = keys[(left + right) >> 1];
+        var i = left - 1;
+        var j = right + 1;
+        while (true) {
+            do
+                i++;
+            while (compare(keys[i], pivot) < 0);
+            do
+                j--;
+            while (compare(keys[j], pivot) > 0);
+            if (i >= j)
+                break;
+            var tmp = keys[i];
+            keys[i] = keys[j];
+            keys[j] = tmp;
+            tmp = values[i];
+            values[i] = values[j];
+            values[j] = tmp;
+        }
+        sort(keys, values, left, j, compare);
+        sort(keys, values, j + 1, right, compare);
+    }
+
+    function _classCallCheck$1(instance, Constructor) {
+      if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+      }
+    }
+
+    function _defineProperties$1(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    function _createClass$1(Constructor, protoProps, staticProps) {
+      if (protoProps) _defineProperties$1(Constructor.prototype, protoProps);
+      if (staticProps) _defineProperties$1(Constructor, staticProps);
+      return Constructor;
+    }
+
+    /**
+     * A bounding box has the format:
+     *
+     *  { ll: { x: xmin, y: ymin }, ur: { x: xmax, y: ymax } }
+     *
+     */
+    var isInBbox = function isInBbox(bbox, point) {
+      return bbox.ll.x <= point.x && point.x <= bbox.ur.x && bbox.ll.y <= point.y && point.y <= bbox.ur.y;
+    };
+    /* Returns either null, or a bbox (aka an ordered pair of points)
+     * If there is only one point of overlap, a bbox with identical points
+     * will be returned */
+
+    var getBboxOverlap = function getBboxOverlap(b1, b2) {
+      // check if the bboxes overlap at all
+      if (b2.ur.x < b1.ll.x || b1.ur.x < b2.ll.x || b2.ur.y < b1.ll.y || b1.ur.y < b2.ll.y) return null; // find the middle two X values
+
+      var lowerX = b1.ll.x < b2.ll.x ? b2.ll.x : b1.ll.x;
+      var upperX = b1.ur.x < b2.ur.x ? b1.ur.x : b2.ur.x; // find the middle two Y values
+
+      var lowerY = b1.ll.y < b2.ll.y ? b2.ll.y : b1.ll.y;
+      var upperY = b1.ur.y < b2.ur.y ? b1.ur.y : b2.ur.y; // put those middle values together to get the overlap
+
+      return {
+        ll: {
+          x: lowerX,
+          y: lowerY
+        },
+        ur: {
+          x: upperX,
+          y: upperY
+        }
+      };
+    };
+
+    /* Javascript doesn't do integer math. Everything is
+     * floating point with percision Number.EPSILON.
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON
+     */
+    var epsilon = Number.EPSILON; // IE Polyfill
+
+    if (epsilon === undefined) epsilon = Math.pow(2, -52);
+    var EPSILON_SQ = epsilon * epsilon;
+    /* FLP comparator */
+
+    var cmp = function cmp(a, b) {
+      // check if they're both 0
+      if (-epsilon < a && a < epsilon) {
+        if (-epsilon < b && b < epsilon) {
+          return 0;
+        }
+      } // check if they're flp equal
+
+
+      var ab = a - b;
+
+      if (ab * ab < EPSILON_SQ * a * b) {
         return 0;
+      } // normal comparison
+
+
+      return a < b ? -1 : 1;
+    };
+
+    /**
+     * This class rounds incoming values sufficiently so that
+     * floating points problems are, for the most part, avoided.
+     *
+     * Incoming points are have their x & y values tested against
+     * all previously seen x & y values. If either is 'too close'
+     * to a previously seen value, it's value is 'snapped' to the
+     * previously seen value.
+     *
+     * All points should be rounded by this class before being
+     * stored in any data structures in the rest of this algorithm.
+     */
+
+    var PtRounder = /*#__PURE__*/function () {
+      function PtRounder() {
+        _classCallCheck$1(this, PtRounder);
+
+        this.reset();
       }
-      const rst = [];
-      for (let i = 1; i < positions.length; i++) {
-        const startC = Cesium.Cartographic.fromCartesian(positions[i - 1]);
-        const endC = Cesium.Cartographic.fromCartesian(positions[i]);
-        if (startC && endC) {
-          rst.push(endC.height - startC.height);
-        } else {
-          rst.push('NaN');
+
+      _createClass$1(PtRounder, [{
+        key: "reset",
+        value: function reset() {
+          this.xRounder = new CoordRounder();
+          this.yRounder = new CoordRounder();
+        }
+      }, {
+        key: "round",
+        value: function round(x, y) {
+          return {
+            x: this.xRounder.round(x),
+            y: this.yRounder.round(y)
+          };
+        }
+      }]);
+
+      return PtRounder;
+    }();
+
+    var CoordRounder = /*#__PURE__*/function () {
+      function CoordRounder() {
+        _classCallCheck$1(this, CoordRounder);
+
+        this.tree = new Tree(); // preseed with 0 so we don't end up with values < Number.EPSILON
+
+        this.round(0);
+      } // Note: this can rounds input values backwards or forwards.
+      //       You might ask, why not restrict this to just rounding
+      //       forwards? Wouldn't that allow left endpoints to always
+      //       remain left endpoints during splitting (never change to
+      //       right). No - it wouldn't, because we snap intersections
+      //       to endpoints (to establish independence from the segment
+      //       angle for t-intersections).
+
+
+      _createClass$1(CoordRounder, [{
+        key: "round",
+        value: function round(coord) {
+          var node = this.tree.add(coord);
+          var prevNode = this.tree.prev(node);
+
+          if (prevNode !== null && cmp(node.key, prevNode.key) === 0) {
+            this.tree.remove(coord);
+            return prevNode.key;
+          }
+
+          var nextNode = this.tree.next(node);
+
+          if (nextNode !== null && cmp(node.key, nextNode.key) === 0) {
+            this.tree.remove(coord);
+            return nextNode.key;
+          }
+
+          return coord;
+        }
+      }]);
+
+      return CoordRounder;
+    }(); // singleton available by import
+
+
+    var rounder = new PtRounder();
+
+    /* Cross Product of two vectors with first point at origin */
+
+    var crossProduct = function crossProduct(a, b) {
+      return a.x * b.y - a.y * b.x;
+    };
+    /* Dot Product of two vectors with first point at origin */
+
+    var dotProduct = function dotProduct(a, b) {
+      return a.x * b.x + a.y * b.y;
+    };
+    /* Comparator for two vectors with same starting point */
+
+    var compareVectorAngles = function compareVectorAngles(basePt, endPt1, endPt2) {
+      var v1 = {
+        x: endPt1.x - basePt.x,
+        y: endPt1.y - basePt.y
+      };
+      var v2 = {
+        x: endPt2.x - basePt.x,
+        y: endPt2.y - basePt.y
+      };
+      var kross = crossProduct(v1, v2);
+      return cmp(kross, 0);
+    };
+    var length = function length(v) {
+      return Math.sqrt(dotProduct(v, v));
+    };
+    /* Get the sine of the angle from pShared -> pAngle to pShaed -> pBase */
+
+    var sineOfAngle = function sineOfAngle(pShared, pBase, pAngle) {
+      var vBase = {
+        x: pBase.x - pShared.x,
+        y: pBase.y - pShared.y
+      };
+      var vAngle = {
+        x: pAngle.x - pShared.x,
+        y: pAngle.y - pShared.y
+      };
+      return crossProduct(vAngle, vBase) / length(vAngle) / length(vBase);
+    };
+    /* Get the cosine of the angle from pShared -> pAngle to pShaed -> pBase */
+
+    var cosineOfAngle = function cosineOfAngle(pShared, pBase, pAngle) {
+      var vBase = {
+        x: pBase.x - pShared.x,
+        y: pBase.y - pShared.y
+      };
+      var vAngle = {
+        x: pAngle.x - pShared.x,
+        y: pAngle.y - pShared.y
+      };
+      return dotProduct(vAngle, vBase) / length(vAngle) / length(vBase);
+    };
+    /* Get the x coordinate where the given line (defined by a point and vector)
+     * crosses the horizontal line with the given y coordiante.
+     * In the case of parrallel lines (including overlapping ones) returns null. */
+
+    var horizontalIntersection = function horizontalIntersection(pt, v, y) {
+      if (v.y === 0) return null;
+      return {
+        x: pt.x + v.x / v.y * (y - pt.y),
+        y: y
+      };
+    };
+    /* Get the y coordinate where the given line (defined by a point and vector)
+     * crosses the vertical line with the given x coordiante.
+     * In the case of parrallel lines (including overlapping ones) returns null. */
+
+    var verticalIntersection = function verticalIntersection(pt, v, x) {
+      if (v.x === 0) return null;
+      return {
+        x: x,
+        y: pt.y + v.y / v.x * (x - pt.x)
+      };
+    };
+    /* Get the intersection of two lines, each defined by a base point and a vector.
+     * In the case of parrallel lines (including overlapping ones) returns null. */
+
+    var intersection = function intersection(pt1, v1, pt2, v2) {
+      // take some shortcuts for vertical and horizontal lines
+      // this also ensures we don't calculate an intersection and then discover
+      // it's actually outside the bounding box of the line
+      if (v1.x === 0) return verticalIntersection(pt2, v2, pt1.x);
+      if (v2.x === 0) return verticalIntersection(pt1, v1, pt2.x);
+      if (v1.y === 0) return horizontalIntersection(pt2, v2, pt1.y);
+      if (v2.y === 0) return horizontalIntersection(pt1, v1, pt2.y); // General case for non-overlapping segments.
+      // This algorithm is based on Schneider and Eberly.
+      // http://www.cimec.org.ar/~ncalvo/Schneider_Eberly.pdf - pg 244
+
+      var kross = crossProduct(v1, v2);
+      if (kross == 0) return null;
+      var ve = {
+        x: pt2.x - pt1.x,
+        y: pt2.y - pt1.y
+      };
+      var d1 = crossProduct(ve, v1) / kross;
+      var d2 = crossProduct(ve, v2) / kross; // take the average of the two calculations to minimize rounding error
+
+      var x1 = pt1.x + d2 * v1.x,
+          x2 = pt2.x + d1 * v2.x;
+      var y1 = pt1.y + d2 * v1.y,
+          y2 = pt2.y + d1 * v2.y;
+      var x = (x1 + x2) / 2;
+      var y = (y1 + y2) / 2;
+      return {
+        x: x,
+        y: y
+      };
+    };
+
+    var SweepEvent = /*#__PURE__*/function () {
+      _createClass$1(SweepEvent, null, [{
+        key: "compare",
+        // for ordering sweep events in the sweep event queue
+        value: function compare(a, b) {
+          // favor event with a point that the sweep line hits first
+          var ptCmp = SweepEvent.comparePoints(a.point, b.point);
+          if (ptCmp !== 0) return ptCmp; // the points are the same, so link them if needed
+
+          if (a.point !== b.point) a.link(b); // favor right events over left
+
+          if (a.isLeft !== b.isLeft) return a.isLeft ? 1 : -1; // we have two matching left or right endpoints
+          // ordering of this case is the same as for their segments
+
+          return Segment.compare(a.segment, b.segment);
+        } // for ordering points in sweep line order
+
+      }, {
+        key: "comparePoints",
+        value: function comparePoints(aPt, bPt) {
+          if (aPt.x < bPt.x) return -1;
+          if (aPt.x > bPt.x) return 1;
+          if (aPt.y < bPt.y) return -1;
+          if (aPt.y > bPt.y) return 1;
+          return 0;
+        } // Warning: 'point' input will be modified and re-used (for performance)
+
+      }]);
+
+      function SweepEvent(point, isLeft) {
+        _classCallCheck$1(this, SweepEvent);
+
+        if (point.events === undefined) point.events = [this];else point.events.push(this);
+        this.point = point;
+        this.isLeft = isLeft; // this.segment, this.otherSE set by factory
+      }
+
+      _createClass$1(SweepEvent, [{
+        key: "link",
+        value: function link(other) {
+          if (other.point === this.point) {
+            throw new Error('Tried to link already linked events');
+          }
+
+          var otherEvents = other.point.events;
+
+          for (var i = 0, iMax = otherEvents.length; i < iMax; i++) {
+            var evt = otherEvents[i];
+            this.point.events.push(evt);
+            evt.point = this.point;
+          }
+
+          this.checkForConsuming();
+        }
+        /* Do a pass over our linked events and check to see if any pair
+         * of segments match, and should be consumed. */
+
+      }, {
+        key: "checkForConsuming",
+        value: function checkForConsuming() {
+          // FIXME: The loops in this method run O(n^2) => no good.
+          //        Maintain little ordered sweep event trees?
+          //        Can we maintaining an ordering that avoids the need
+          //        for the re-sorting with getLeftmostComparator in geom-out?
+          // Compare each pair of events to see if other events also match
+          var numEvents = this.point.events.length;
+
+          for (var i = 0; i < numEvents; i++) {
+            var evt1 = this.point.events[i];
+            if (evt1.segment.consumedBy !== undefined) continue;
+
+            for (var j = i + 1; j < numEvents; j++) {
+              var evt2 = this.point.events[j];
+              if (evt2.consumedBy !== undefined) continue;
+              if (evt1.otherSE.point.events !== evt2.otherSE.point.events) continue;
+              evt1.segment.consume(evt2.segment);
+            }
+          }
+        }
+      }, {
+        key: "getAvailableLinkedEvents",
+        value: function getAvailableLinkedEvents() {
+          // point.events is always of length 2 or greater
+          var events = [];
+
+          for (var i = 0, iMax = this.point.events.length; i < iMax; i++) {
+            var evt = this.point.events[i];
+
+            if (evt !== this && !evt.segment.ringOut && evt.segment.isInResult()) {
+              events.push(evt);
+            }
+          }
+
+          return events;
+        }
+        /**
+         * Returns a comparator function for sorting linked events that will
+         * favor the event that will give us the smallest left-side angle.
+         * All ring construction starts as low as possible heading to the right,
+         * so by always turning left as sharp as possible we'll get polygons
+         * without uncessary loops & holes.
+         *
+         * The comparator function has a compute cache such that it avoids
+         * re-computing already-computed values.
+         */
+
+      }, {
+        key: "getLeftmostComparator",
+        value: function getLeftmostComparator(baseEvent) {
+          var _this = this;
+
+          var cache = new Map();
+
+          var fillCache = function fillCache(linkedEvent) {
+            var nextEvent = linkedEvent.otherSE;
+            cache.set(linkedEvent, {
+              sine: sineOfAngle(_this.point, baseEvent.point, nextEvent.point),
+              cosine: cosineOfAngle(_this.point, baseEvent.point, nextEvent.point)
+            });
+          };
+
+          return function (a, b) {
+            if (!cache.has(a)) fillCache(a);
+            if (!cache.has(b)) fillCache(b);
+
+            var _cache$get = cache.get(a),
+                asine = _cache$get.sine,
+                acosine = _cache$get.cosine;
+
+            var _cache$get2 = cache.get(b),
+                bsine = _cache$get2.sine,
+                bcosine = _cache$get2.cosine; // both on or above x-axis
+
+
+            if (asine >= 0 && bsine >= 0) {
+              if (acosine < bcosine) return 1;
+              if (acosine > bcosine) return -1;
+              return 0;
+            } // both below x-axis
+
+
+            if (asine < 0 && bsine < 0) {
+              if (acosine < bcosine) return -1;
+              if (acosine > bcosine) return 1;
+              return 0;
+            } // one above x-axis, one below
+
+
+            if (bsine < asine) return -1;
+            if (bsine > asine) return 1;
+            return 0;
+          };
+        }
+      }]);
+
+      return SweepEvent;
+    }();
+
+    // segments and sweep events when all else is identical
+
+    var segmentId = 0;
+
+    var Segment = /*#__PURE__*/function () {
+      _createClass$1(Segment, null, [{
+        key: "compare",
+
+        /* This compare() function is for ordering segments in the sweep
+         * line tree, and does so according to the following criteria:
+         *
+         * Consider the vertical line that lies an infinestimal step to the
+         * right of the right-more of the two left endpoints of the input
+         * segments. Imagine slowly moving a point up from negative infinity
+         * in the increasing y direction. Which of the two segments will that
+         * point intersect first? That segment comes 'before' the other one.
+         *
+         * If neither segment would be intersected by such a line, (if one
+         * or more of the segments are vertical) then the line to be considered
+         * is directly on the right-more of the two left inputs.
+         */
+        value: function compare(a, b) {
+          var alx = a.leftSE.point.x;
+          var blx = b.leftSE.point.x;
+          var arx = a.rightSE.point.x;
+          var brx = b.rightSE.point.x; // check if they're even in the same vertical plane
+
+          if (brx < alx) return 1;
+          if (arx < blx) return -1;
+          var aly = a.leftSE.point.y;
+          var bly = b.leftSE.point.y;
+          var ary = a.rightSE.point.y;
+          var bry = b.rightSE.point.y; // is left endpoint of segment B the right-more?
+
+          if (alx < blx) {
+            // are the two segments in the same horizontal plane?
+            if (bly < aly && bly < ary) return 1;
+            if (bly > aly && bly > ary) return -1; // is the B left endpoint colinear to segment A?
+
+            var aCmpBLeft = a.comparePoint(b.leftSE.point);
+            if (aCmpBLeft < 0) return 1;
+            if (aCmpBLeft > 0) return -1; // is the A right endpoint colinear to segment B ?
+
+            var bCmpARight = b.comparePoint(a.rightSE.point);
+            if (bCmpARight !== 0) return bCmpARight; // colinear segments, consider the one with left-more
+            // left endpoint to be first (arbitrary?)
+
+            return -1;
+          } // is left endpoint of segment A the right-more?
+
+
+          if (alx > blx) {
+            if (aly < bly && aly < bry) return -1;
+            if (aly > bly && aly > bry) return 1; // is the A left endpoint colinear to segment B?
+
+            var bCmpALeft = b.comparePoint(a.leftSE.point);
+            if (bCmpALeft !== 0) return bCmpALeft; // is the B right endpoint colinear to segment A?
+
+            var aCmpBRight = a.comparePoint(b.rightSE.point);
+            if (aCmpBRight < 0) return 1;
+            if (aCmpBRight > 0) return -1; // colinear segments, consider the one with left-more
+            // left endpoint to be first (arbitrary?)
+
+            return 1;
+          } // if we get here, the two left endpoints are in the same
+          // vertical plane, ie alx === blx
+          // consider the lower left-endpoint to come first
+
+
+          if (aly < bly) return -1;
+          if (aly > bly) return 1; // left endpoints are identical
+          // check for colinearity by using the left-more right endpoint
+          // is the A right endpoint more left-more?
+
+          if (arx < brx) {
+            var _bCmpARight = b.comparePoint(a.rightSE.point);
+
+            if (_bCmpARight !== 0) return _bCmpARight;
+          } // is the B right endpoint more left-more?
+
+
+          if (arx > brx) {
+            var _aCmpBRight = a.comparePoint(b.rightSE.point);
+
+            if (_aCmpBRight < 0) return 1;
+            if (_aCmpBRight > 0) return -1;
+          }
+
+          if (arx !== brx) {
+            // are these two [almost] vertical segments with opposite orientation?
+            // if so, the one with the lower right endpoint comes first
+            var ay = ary - aly;
+            var ax = arx - alx;
+            var by = bry - bly;
+            var bx = brx - blx;
+            if (ay > ax && by < bx) return 1;
+            if (ay < ax && by > bx) return -1;
+          } // we have colinear segments with matching orientation
+          // consider the one with more left-more right endpoint to be first
+
+
+          if (arx > brx) return 1;
+          if (arx < brx) return -1; // if we get here, two two right endpoints are in the same
+          // vertical plane, ie arx === brx
+          // consider the lower right-endpoint to come first
+
+          if (ary < bry) return -1;
+          if (ary > bry) return 1; // right endpoints identical as well, so the segments are idential
+          // fall back on creation order as consistent tie-breaker
+
+          if (a.id < b.id) return -1;
+          if (a.id > b.id) return 1; // identical segment, ie a === b
+
+          return 0;
+        }
+        /* Warning: a reference to ringWindings input will be stored,
+         *  and possibly will be later modified */
+
+      }]);
+
+      function Segment(leftSE, rightSE, rings, windings) {
+        _classCallCheck$1(this, Segment);
+
+        this.id = ++segmentId;
+        this.leftSE = leftSE;
+        leftSE.segment = this;
+        leftSE.otherSE = rightSE;
+        this.rightSE = rightSE;
+        rightSE.segment = this;
+        rightSE.otherSE = leftSE;
+        this.rings = rings;
+        this.windings = windings; // left unset for performance, set later in algorithm
+        // this.ringOut, this.consumedBy, this.prev
+      }
+
+      _createClass$1(Segment, [{
+        key: "replaceRightSE",
+
+        /* When a segment is split, the rightSE is replaced with a new sweep event */
+        value: function replaceRightSE(newRightSE) {
+          this.rightSE = newRightSE;
+          this.rightSE.segment = this;
+          this.rightSE.otherSE = this.leftSE;
+          this.leftSE.otherSE = this.rightSE;
+        }
+      }, {
+        key: "bbox",
+        value: function bbox() {
+          var y1 = this.leftSE.point.y;
+          var y2 = this.rightSE.point.y;
+          return {
+            ll: {
+              x: this.leftSE.point.x,
+              y: y1 < y2 ? y1 : y2
+            },
+            ur: {
+              x: this.rightSE.point.x,
+              y: y1 > y2 ? y1 : y2
+            }
+          };
+        }
+        /* A vector from the left point to the right */
+
+      }, {
+        key: "vector",
+        value: function vector() {
+          return {
+            x: this.rightSE.point.x - this.leftSE.point.x,
+            y: this.rightSE.point.y - this.leftSE.point.y
+          };
+        }
+      }, {
+        key: "isAnEndpoint",
+        value: function isAnEndpoint(pt) {
+          return pt.x === this.leftSE.point.x && pt.y === this.leftSE.point.y || pt.x === this.rightSE.point.x && pt.y === this.rightSE.point.y;
+        }
+        /* Compare this segment with a point.
+         *
+         * A point P is considered to be colinear to a segment if there
+         * exists a distance D such that if we travel along the segment
+         * from one * endpoint towards the other a distance D, we find
+         * ourselves at point P.
+         *
+         * Return value indicates:
+         *
+         *   1: point lies above the segment (to the left of vertical)
+         *   0: point is colinear to segment
+         *  -1: point lies below the segment (to the right of vertical)
+         */
+
+      }, {
+        key: "comparePoint",
+        value: function comparePoint(point) {
+          if (this.isAnEndpoint(point)) return 0;
+          var lPt = this.leftSE.point;
+          var rPt = this.rightSE.point;
+          var v = this.vector(); // Exactly vertical segments.
+
+          if (lPt.x === rPt.x) {
+            if (point.x === lPt.x) return 0;
+            return point.x < lPt.x ? 1 : -1;
+          } // Nearly vertical segments with an intersection.
+          // Check to see where a point on the line with matching Y coordinate is.
+
+
+          var yDist = (point.y - lPt.y) / v.y;
+          var xFromYDist = lPt.x + yDist * v.x;
+          if (point.x === xFromYDist) return 0; // General case.
+          // Check to see where a point on the line with matching X coordinate is.
+
+          var xDist = (point.x - lPt.x) / v.x;
+          var yFromXDist = lPt.y + xDist * v.y;
+          if (point.y === yFromXDist) return 0;
+          return point.y < yFromXDist ? -1 : 1;
+        }
+        /**
+         * Given another segment, returns the first non-trivial intersection
+         * between the two segments (in terms of sweep line ordering), if it exists.
+         *
+         * A 'non-trivial' intersection is one that will cause one or both of the
+         * segments to be split(). As such, 'trivial' vs. 'non-trivial' intersection:
+         *
+         *   * endpoint of segA with endpoint of segB --> trivial
+         *   * endpoint of segA with point along segB --> non-trivial
+         *   * endpoint of segB with point along segA --> non-trivial
+         *   * point along segA with point along segB --> non-trivial
+         *
+         * If no non-trivial intersection exists, return null
+         * Else, return null.
+         */
+
+      }, {
+        key: "getIntersection",
+        value: function getIntersection(other) {
+          // If bboxes don't overlap, there can't be any intersections
+          var tBbox = this.bbox();
+          var oBbox = other.bbox();
+          var bboxOverlap = getBboxOverlap(tBbox, oBbox);
+          if (bboxOverlap === null) return null; // We first check to see if the endpoints can be considered intersections.
+          // This will 'snap' intersections to endpoints if possible, and will
+          // handle cases of colinearity.
+
+          var tlp = this.leftSE.point;
+          var trp = this.rightSE.point;
+          var olp = other.leftSE.point;
+          var orp = other.rightSE.point; // does each endpoint touch the other segment?
+          // note that we restrict the 'touching' definition to only allow segments
+          // to touch endpoints that lie forward from where we are in the sweep line pass
+
+          var touchesOtherLSE = isInBbox(tBbox, olp) && this.comparePoint(olp) === 0;
+          var touchesThisLSE = isInBbox(oBbox, tlp) && other.comparePoint(tlp) === 0;
+          var touchesOtherRSE = isInBbox(tBbox, orp) && this.comparePoint(orp) === 0;
+          var touchesThisRSE = isInBbox(oBbox, trp) && other.comparePoint(trp) === 0; // do left endpoints match?
+
+          if (touchesThisLSE && touchesOtherLSE) {
+            // these two cases are for colinear segments with matching left
+            // endpoints, and one segment being longer than the other
+            if (touchesThisRSE && !touchesOtherRSE) return trp;
+            if (!touchesThisRSE && touchesOtherRSE) return orp; // either the two segments match exactly (two trival intersections)
+            // or just on their left endpoint (one trivial intersection
+
+            return null;
+          } // does this left endpoint matches (other doesn't)
+
+
+          if (touchesThisLSE) {
+            // check for segments that just intersect on opposing endpoints
+            if (touchesOtherRSE) {
+              if (tlp.x === orp.x && tlp.y === orp.y) return null;
+            } // t-intersection on left endpoint
+
+
+            return tlp;
+          } // does other left endpoint matches (this doesn't)
+
+
+          if (touchesOtherLSE) {
+            // check for segments that just intersect on opposing endpoints
+            if (touchesThisRSE) {
+              if (trp.x === olp.x && trp.y === olp.y) return null;
+            } // t-intersection on left endpoint
+
+
+            return olp;
+          } // trivial intersection on right endpoints
+
+
+          if (touchesThisRSE && touchesOtherRSE) return null; // t-intersections on just one right endpoint
+
+          if (touchesThisRSE) return trp;
+          if (touchesOtherRSE) return orp; // None of our endpoints intersect. Look for a general intersection between
+          // infinite lines laid over the segments
+
+          var pt = intersection(tlp, this.vector(), olp, other.vector()); // are the segments parrallel? Note that if they were colinear with overlap,
+          // they would have an endpoint intersection and that case was already handled above
+
+          if (pt === null) return null; // is the intersection found between the lines not on the segments?
+
+          if (!isInBbox(bboxOverlap, pt)) return null; // round the the computed point if needed
+
+          return rounder.round(pt.x, pt.y);
+        }
+        /**
+         * Split the given segment into multiple segments on the given points.
+         *  * Each existing segment will retain its leftSE and a new rightSE will be
+         *    generated for it.
+         *  * A new segment will be generated which will adopt the original segment's
+         *    rightSE, and a new leftSE will be generated for it.
+         *  * If there are more than two points given to split on, new segments
+         *    in the middle will be generated with new leftSE and rightSE's.
+         *  * An array of the newly generated SweepEvents will be returned.
+         *
+         * Warning: input array of points is modified
+         */
+
+      }, {
+        key: "split",
+        value: function split(point) {
+          var newEvents = [];
+          var alreadyLinked = point.events !== undefined;
+          var newLeftSE = new SweepEvent(point, true);
+          var newRightSE = new SweepEvent(point, false);
+          var oldRightSE = this.rightSE;
+          this.replaceRightSE(newRightSE);
+          newEvents.push(newRightSE);
+          newEvents.push(newLeftSE);
+          var newSeg = new Segment(newLeftSE, oldRightSE, this.rings.slice(), this.windings.slice()); // when splitting a nearly vertical downward-facing segment,
+          // sometimes one of the resulting new segments is vertical, in which
+          // case its left and right events may need to be swapped
+
+          if (SweepEvent.comparePoints(newSeg.leftSE.point, newSeg.rightSE.point) > 0) {
+            newSeg.swapEvents();
+          }
+
+          if (SweepEvent.comparePoints(this.leftSE.point, this.rightSE.point) > 0) {
+            this.swapEvents();
+          } // in the point we just used to create new sweep events with was already
+          // linked to other events, we need to check if either of the affected
+          // segments should be consumed
+
+
+          if (alreadyLinked) {
+            newLeftSE.checkForConsuming();
+            newRightSE.checkForConsuming();
+          }
+
+          return newEvents;
+        }
+        /* Swap which event is left and right */
+
+      }, {
+        key: "swapEvents",
+        value: function swapEvents() {
+          var tmpEvt = this.rightSE;
+          this.rightSE = this.leftSE;
+          this.leftSE = tmpEvt;
+          this.leftSE.isLeft = true;
+          this.rightSE.isLeft = false;
+
+          for (var i = 0, iMax = this.windings.length; i < iMax; i++) {
+            this.windings[i] *= -1;
+          }
+        }
+        /* Consume another segment. We take their rings under our wing
+         * and mark them as consumed. Use for perfectly overlapping segments */
+
+      }, {
+        key: "consume",
+        value: function consume(other) {
+          var consumer = this;
+          var consumee = other;
+
+          while (consumer.consumedBy) {
+            consumer = consumer.consumedBy;
+          }
+
+          while (consumee.consumedBy) {
+            consumee = consumee.consumedBy;
+          }
+
+          var cmp = Segment.compare(consumer, consumee);
+          if (cmp === 0) return; // already consumed
+          // the winner of the consumption is the earlier segment
+          // according to sweep line ordering
+
+          if (cmp > 0) {
+            var tmp = consumer;
+            consumer = consumee;
+            consumee = tmp;
+          } // make sure a segment doesn't consume it's prev
+
+
+          if (consumer.prev === consumee) {
+            var _tmp = consumer;
+            consumer = consumee;
+            consumee = _tmp;
+          }
+
+          for (var i = 0, iMax = consumee.rings.length; i < iMax; i++) {
+            var ring = consumee.rings[i];
+            var winding = consumee.windings[i];
+            var index = consumer.rings.indexOf(ring);
+
+            if (index === -1) {
+              consumer.rings.push(ring);
+              consumer.windings.push(winding);
+            } else consumer.windings[index] += winding;
+          }
+
+          consumee.rings = null;
+          consumee.windings = null;
+          consumee.consumedBy = consumer; // mark sweep events consumed as to maintain ordering in sweep event queue
+
+          consumee.leftSE.consumedBy = consumer.leftSE;
+          consumee.rightSE.consumedBy = consumer.rightSE;
+        }
+        /* The first segment previous segment chain that is in the result */
+
+      }, {
+        key: "prevInResult",
+        value: function prevInResult() {
+          if (this._prevInResult !== undefined) return this._prevInResult;
+          if (!this.prev) this._prevInResult = null;else if (this.prev.isInResult()) this._prevInResult = this.prev;else this._prevInResult = this.prev.prevInResult();
+          return this._prevInResult;
+        }
+      }, {
+        key: "beforeState",
+        value: function beforeState() {
+          if (this._beforeState !== undefined) return this._beforeState;
+          if (!this.prev) this._beforeState = {
+            rings: [],
+            windings: [],
+            multiPolys: []
+          };else {
+            var seg = this.prev.consumedBy || this.prev;
+            this._beforeState = seg.afterState();
+          }
+          return this._beforeState;
+        }
+      }, {
+        key: "afterState",
+        value: function afterState() {
+          if (this._afterState !== undefined) return this._afterState;
+          var beforeState = this.beforeState();
+          this._afterState = {
+            rings: beforeState.rings.slice(0),
+            windings: beforeState.windings.slice(0),
+            multiPolys: []
+          };
+          var ringsAfter = this._afterState.rings;
+          var windingsAfter = this._afterState.windings;
+          var mpsAfter = this._afterState.multiPolys; // calculate ringsAfter, windingsAfter
+
+          for (var i = 0, iMax = this.rings.length; i < iMax; i++) {
+            var ring = this.rings[i];
+            var winding = this.windings[i];
+            var index = ringsAfter.indexOf(ring);
+
+            if (index === -1) {
+              ringsAfter.push(ring);
+              windingsAfter.push(winding);
+            } else windingsAfter[index] += winding;
+          } // calcualte polysAfter
+
+
+          var polysAfter = [];
+          var polysExclude = [];
+
+          for (var _i = 0, _iMax = ringsAfter.length; _i < _iMax; _i++) {
+            if (windingsAfter[_i] === 0) continue; // non-zero rule
+
+            var _ring = ringsAfter[_i];
+            var poly = _ring.poly;
+            if (polysExclude.indexOf(poly) !== -1) continue;
+            if (_ring.isExterior) polysAfter.push(poly);else {
+              if (polysExclude.indexOf(poly) === -1) polysExclude.push(poly);
+
+              var _index = polysAfter.indexOf(_ring.poly);
+
+              if (_index !== -1) polysAfter.splice(_index, 1);
+            }
+          } // calculate multiPolysAfter
+
+
+          for (var _i2 = 0, _iMax2 = polysAfter.length; _i2 < _iMax2; _i2++) {
+            var mp = polysAfter[_i2].multiPoly;
+            if (mpsAfter.indexOf(mp) === -1) mpsAfter.push(mp);
+          }
+
+          return this._afterState;
+        }
+        /* Is this segment part of the final result? */
+
+      }, {
+        key: "isInResult",
+        value: function isInResult() {
+          // if we've been consumed, we're not in the result
+          if (this.consumedBy) return false;
+          if (this._isInResult !== undefined) return this._isInResult;
+          var mpsBefore = this.beforeState().multiPolys;
+          var mpsAfter = this.afterState().multiPolys;
+
+          switch (operation.type) {
+            case 'union':
+              {
+                // UNION - included iff:
+                //  * On one side of us there is 0 poly interiors AND
+                //  * On the other side there is 1 or more.
+                var noBefores = mpsBefore.length === 0;
+                var noAfters = mpsAfter.length === 0;
+                this._isInResult = noBefores !== noAfters;
+                break;
+              }
+
+            case 'intersection':
+              {
+                // INTERSECTION - included iff:
+                //  * on one side of us all multipolys are rep. with poly interiors AND
+                //  * on the other side of us, not all multipolys are repsented
+                //    with poly interiors
+                var least;
+                var most;
+
+                if (mpsBefore.length < mpsAfter.length) {
+                  least = mpsBefore.length;
+                  most = mpsAfter.length;
+                } else {
+                  least = mpsAfter.length;
+                  most = mpsBefore.length;
+                }
+
+                this._isInResult = most === operation.numMultiPolys && least < most;
+                break;
+              }
+
+            case 'xor':
+              {
+                // XOR - included iff:
+                //  * the difference between the number of multipolys represented
+                //    with poly interiors on our two sides is an odd number
+                var diff = Math.abs(mpsBefore.length - mpsAfter.length);
+                this._isInResult = diff % 2 === 1;
+                break;
+              }
+
+            case 'difference':
+              {
+                // DIFFERENCE included iff:
+                //  * on exactly one side, we have just the subject
+                var isJustSubject = function isJustSubject(mps) {
+                  return mps.length === 1 && mps[0].isSubject;
+                };
+
+                this._isInResult = isJustSubject(mpsBefore) !== isJustSubject(mpsAfter);
+                break;
+              }
+
+            default:
+              throw new Error("Unrecognized operation type found ".concat(operation.type));
+          }
+
+          return this._isInResult;
+        }
+      }], [{
+        key: "fromRing",
+        value: function fromRing(pt1, pt2, ring) {
+          var leftPt, rightPt, winding; // ordering the two points according to sweep line ordering
+
+          var cmpPts = SweepEvent.comparePoints(pt1, pt2);
+
+          if (cmpPts < 0) {
+            leftPt = pt1;
+            rightPt = pt2;
+            winding = 1;
+          } else if (cmpPts > 0) {
+            leftPt = pt2;
+            rightPt = pt1;
+            winding = -1;
+          } else throw new Error("Tried to create degenerate segment at [".concat(pt1.x, ", ").concat(pt1.y, "]"));
+
+          var leftSE = new SweepEvent(leftPt, true);
+          var rightSE = new SweepEvent(rightPt, false);
+          return new Segment(leftSE, rightSE, [ring], [winding]);
+        }
+      }]);
+
+      return Segment;
+    }();
+
+    var RingIn = /*#__PURE__*/function () {
+      function RingIn(geomRing, poly, isExterior) {
+        _classCallCheck$1(this, RingIn);
+
+        if (!Array.isArray(geomRing) || geomRing.length === 0) {
+          throw new Error('Input geometry is not a valid Polygon or MultiPolygon');
+        }
+
+        this.poly = poly;
+        this.isExterior = isExterior;
+        this.segments = [];
+
+        if (typeof geomRing[0][0] !== 'number' || typeof geomRing[0][1] !== 'number') {
+          throw new Error('Input geometry is not a valid Polygon or MultiPolygon');
+        }
+
+        var firstPoint = rounder.round(geomRing[0][0], geomRing[0][1]);
+        this.bbox = {
+          ll: {
+            x: firstPoint.x,
+            y: firstPoint.y
+          },
+          ur: {
+            x: firstPoint.x,
+            y: firstPoint.y
+          }
+        };
+        var prevPoint = firstPoint;
+
+        for (var i = 1, iMax = geomRing.length; i < iMax; i++) {
+          if (typeof geomRing[i][0] !== 'number' || typeof geomRing[i][1] !== 'number') {
+            throw new Error('Input geometry is not a valid Polygon or MultiPolygon');
+          }
+
+          var point = rounder.round(geomRing[i][0], geomRing[i][1]); // skip repeated points
+
+          if (point.x === prevPoint.x && point.y === prevPoint.y) continue;
+          this.segments.push(Segment.fromRing(prevPoint, point, this));
+          if (point.x < this.bbox.ll.x) this.bbox.ll.x = point.x;
+          if (point.y < this.bbox.ll.y) this.bbox.ll.y = point.y;
+          if (point.x > this.bbox.ur.x) this.bbox.ur.x = point.x;
+          if (point.y > this.bbox.ur.y) this.bbox.ur.y = point.y;
+          prevPoint = point;
+        } // add segment from last to first if last is not the same as first
+
+
+        if (firstPoint.x !== prevPoint.x || firstPoint.y !== prevPoint.y) {
+          this.segments.push(Segment.fromRing(prevPoint, firstPoint, this));
         }
       }
-      return rst;
-    };
 
-    /**
-     * 地图量算类型
-     * @exports CartometryType
-     * @enum {Number}
-     */
-    const CartometryType = {
-      /**
-       * 贴地距离
-       * @type {Number}
-       * @constant
-       */
-      SURFACE_DISTANCE: 1,
-      /**
-       * 空间距离
-       * @type {Number}
-       * @constant
-       */
-      SPACE_DISTANCE: 2,
-      /**
-       * 空间面积
-       * @type {Number}
-       * @constant
-       */
-      SPACE_AREA: 3,
-      /**
-       * 贴地面积
-       * @type {Number}
-       * @constant
-       */
-      SURFACE_AREA: 4,
-      /**
-       * 高度
-       * @type {Number}
-       * @constant
-       */
-      HEIGHT: 5,
-      /**
-       * 方位角
-       * @type {Number}
-       * @constant
-       */
-      ANGLE: 6,
-    };
+      _createClass$1(RingIn, [{
+        key: "getSweepEvents",
+        value: function getSweepEvents() {
+          var sweepEvents = [];
 
-    /**
-     * 验证是否是合法类型
-     * @param {CartometryType}
-     * @returns {Number}
-     */
-    CartometryType.validate = function (type) {
-      return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE
-        || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE
-        || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
-    };
+          for (var i = 0, iMax = this.segments.length; i < iMax; i++) {
+            var segment = this.segments[i];
+            sweepEvents.push(segment.leftSE);
+            sweepEvents.push(segment.rightSE);
+          }
 
-    /**
-     * 从枚举值获得枚举标签
-     * @param  {CartometryType} value 枚举值
-     * @returns {String}
-     */
-    CartometryType.getKey = function (value) {
-      let key;
-      switch (value) {
-        case 1:
-          key = 'SURFACE_DISTANCE';
-          break;
-        case 2:
-          key = 'SPACE_DISTANCE';
-          break;
-        case 3:
-          key = 'SPACE_AREA';
-          break;
-        case 4:
-          key = 'SURFACE_AREA';
-          break;
-        case 5:
-          key = 'HEIGHT';
-          break;
-        case 6:
-          key = 'ANGLE';
-          break;
-        default:
-          key = undefined;
+          return sweepEvents;
+        }
+      }]);
+
+      return RingIn;
+    }();
+    var PolyIn = /*#__PURE__*/function () {
+      function PolyIn(geomPoly, multiPoly) {
+        _classCallCheck$1(this, PolyIn);
+
+        if (!Array.isArray(geomPoly)) {
+          throw new Error('Input geometry is not a valid Polygon or MultiPolygon');
+        }
+
+        this.exteriorRing = new RingIn(geomPoly[0], this, true); // copy by value
+
+        this.bbox = {
+          ll: {
+            x: this.exteriorRing.bbox.ll.x,
+            y: this.exteriorRing.bbox.ll.y
+          },
+          ur: {
+            x: this.exteriorRing.bbox.ur.x,
+            y: this.exteriorRing.bbox.ur.y
+          }
+        };
+        this.interiorRings = [];
+
+        for (var i = 1, iMax = geomPoly.length; i < iMax; i++) {
+          var ring = new RingIn(geomPoly[i], this, false);
+          if (ring.bbox.ll.x < this.bbox.ll.x) this.bbox.ll.x = ring.bbox.ll.x;
+          if (ring.bbox.ll.y < this.bbox.ll.y) this.bbox.ll.y = ring.bbox.ll.y;
+          if (ring.bbox.ur.x > this.bbox.ur.x) this.bbox.ur.x = ring.bbox.ur.x;
+          if (ring.bbox.ur.y > this.bbox.ur.y) this.bbox.ur.y = ring.bbox.ur.y;
+          this.interiorRings.push(ring);
+        }
+
+        this.multiPoly = multiPoly;
       }
-      return key;
+
+      _createClass$1(PolyIn, [{
+        key: "getSweepEvents",
+        value: function getSweepEvents() {
+          var sweepEvents = this.exteriorRing.getSweepEvents();
+
+          for (var i = 0, iMax = this.interiorRings.length; i < iMax; i++) {
+            var ringSweepEvents = this.interiorRings[i].getSweepEvents();
+
+            for (var j = 0, jMax = ringSweepEvents.length; j < jMax; j++) {
+              sweepEvents.push(ringSweepEvents[j]);
+            }
+          }
+
+          return sweepEvents;
+        }
+      }]);
+
+      return PolyIn;
+    }();
+    var MultiPolyIn = /*#__PURE__*/function () {
+      function MultiPolyIn(geom, isSubject) {
+        _classCallCheck$1(this, MultiPolyIn);
+
+        if (!Array.isArray(geom)) {
+          throw new Error('Input geometry is not a valid Polygon or MultiPolygon');
+        }
+
+        try {
+          // if the input looks like a polygon, convert it to a multipolygon
+          if (typeof geom[0][0][0] === 'number') geom = [geom];
+        } catch (ex) {// The input is either malformed or has empty arrays.
+          // In either case, it will be handled later on.
+        }
+
+        this.polys = [];
+        this.bbox = {
+          ll: {
+            x: Number.POSITIVE_INFINITY,
+            y: Number.POSITIVE_INFINITY
+          },
+          ur: {
+            x: Number.NEGATIVE_INFINITY,
+            y: Number.NEGATIVE_INFINITY
+          }
+        };
+
+        for (var i = 0, iMax = geom.length; i < iMax; i++) {
+          var poly = new PolyIn(geom[i], this);
+          if (poly.bbox.ll.x < this.bbox.ll.x) this.bbox.ll.x = poly.bbox.ll.x;
+          if (poly.bbox.ll.y < this.bbox.ll.y) this.bbox.ll.y = poly.bbox.ll.y;
+          if (poly.bbox.ur.x > this.bbox.ur.x) this.bbox.ur.x = poly.bbox.ur.x;
+          if (poly.bbox.ur.y > this.bbox.ur.y) this.bbox.ur.y = poly.bbox.ur.y;
+          this.polys.push(poly);
+        }
+
+        this.isSubject = isSubject;
+      }
+
+      _createClass$1(MultiPolyIn, [{
+        key: "getSweepEvents",
+        value: function getSweepEvents() {
+          var sweepEvents = [];
+
+          for (var i = 0, iMax = this.polys.length; i < iMax; i++) {
+            var polySweepEvents = this.polys[i].getSweepEvents();
+
+            for (var j = 0, jMax = polySweepEvents.length; j < jMax; j++) {
+              sweepEvents.push(polySweepEvents[j]);
+            }
+          }
+
+          return sweepEvents;
+        }
+      }]);
+
+      return MultiPolyIn;
+    }();
+
+    var RingOut = /*#__PURE__*/function () {
+      _createClass$1(RingOut, null, [{
+        key: "factory",
+
+        /* Given the segments from the sweep line pass, compute & return a series
+         * of closed rings from all the segments marked to be part of the result */
+        value: function factory(allSegments) {
+          var ringsOut = [];
+
+          for (var i = 0, iMax = allSegments.length; i < iMax; i++) {
+            var segment = allSegments[i];
+            if (!segment.isInResult() || segment.ringOut) continue;
+            var prevEvent = null;
+            var event = segment.leftSE;
+            var nextEvent = segment.rightSE;
+            var events = [event];
+            var startingPoint = event.point;
+            var intersectionLEs = [];
+            /* Walk the chain of linked events to form a closed ring */
+
+            while (true) {
+              prevEvent = event;
+              event = nextEvent;
+              events.push(event);
+              /* Is the ring complete? */
+
+              if (event.point === startingPoint) break;
+
+              while (true) {
+                var availableLEs = event.getAvailableLinkedEvents();
+                /* Did we hit a dead end? This shouldn't happen. Indicates some earlier
+                 * part of the algorithm malfunctioned... please file a bug report. */
+
+                if (availableLEs.length === 0) {
+                  var firstPt = events[0].point;
+                  var lastPt = events[events.length - 1].point;
+                  throw new Error("Unable to complete output ring starting at [".concat(firstPt.x, ",") + " ".concat(firstPt.y, "]. Last matching segment found ends at") + " [".concat(lastPt.x, ", ").concat(lastPt.y, "]."));
+                }
+                /* Only one way to go, so cotinue on the path */
+
+
+                if (availableLEs.length === 1) {
+                  nextEvent = availableLEs[0].otherSE;
+                  break;
+                }
+                /* We must have an intersection. Check for a completed loop */
+
+
+                var indexLE = null;
+
+                for (var j = 0, jMax = intersectionLEs.length; j < jMax; j++) {
+                  if (intersectionLEs[j].point === event.point) {
+                    indexLE = j;
+                    break;
+                  }
+                }
+                /* Found a completed loop. Cut that off and make a ring */
+
+
+                if (indexLE !== null) {
+                  var intersectionLE = intersectionLEs.splice(indexLE)[0];
+                  var ringEvents = events.splice(intersectionLE.index);
+                  ringEvents.unshift(ringEvents[0].otherSE);
+                  ringsOut.push(new RingOut(ringEvents.reverse()));
+                  continue;
+                }
+                /* register the intersection */
+
+
+                intersectionLEs.push({
+                  index: events.length,
+                  point: event.point
+                });
+                /* Choose the left-most option to continue the walk */
+
+                var comparator = event.getLeftmostComparator(prevEvent);
+                nextEvent = availableLEs.sort(comparator)[0].otherSE;
+                break;
+              }
+            }
+
+            ringsOut.push(new RingOut(events));
+          }
+
+          return ringsOut;
+        }
+      }]);
+
+      function RingOut(events) {
+        _classCallCheck$1(this, RingOut);
+
+        this.events = events;
+
+        for (var i = 0, iMax = events.length; i < iMax; i++) {
+          events[i].segment.ringOut = this;
+        }
+
+        this.poly = null;
+      }
+
+      _createClass$1(RingOut, [{
+        key: "getGeom",
+        value: function getGeom() {
+          // Remove superfluous points (ie extra points along a straight line),
+          var prevPt = this.events[0].point;
+          var points = [prevPt];
+
+          for (var i = 1, iMax = this.events.length - 1; i < iMax; i++) {
+            var _pt = this.events[i].point;
+            var _nextPt = this.events[i + 1].point;
+            if (compareVectorAngles(_pt, prevPt, _nextPt) === 0) continue;
+            points.push(_pt);
+            prevPt = _pt;
+          } // ring was all (within rounding error of angle calc) colinear points
+
+
+          if (points.length === 1) return null; // check if the starting point is necessary
+
+          var pt = points[0];
+          var nextPt = points[1];
+          if (compareVectorAngles(pt, prevPt, nextPt) === 0) points.shift();
+          points.push(points[0]);
+          var step = this.isExteriorRing() ? 1 : -1;
+          var iStart = this.isExteriorRing() ? 0 : points.length - 1;
+          var iEnd = this.isExteriorRing() ? points.length : -1;
+          var orderedPoints = [];
+
+          for (var _i = iStart; _i != iEnd; _i += step) {
+            orderedPoints.push([points[_i].x, points[_i].y]);
+          }
+
+          return orderedPoints;
+        }
+      }, {
+        key: "isExteriorRing",
+        value: function isExteriorRing() {
+          if (this._isExteriorRing === undefined) {
+            var enclosing = this.enclosingRing();
+            this._isExteriorRing = enclosing ? !enclosing.isExteriorRing() : true;
+          }
+
+          return this._isExteriorRing;
+        }
+      }, {
+        key: "enclosingRing",
+        value: function enclosingRing() {
+          if (this._enclosingRing === undefined) {
+            this._enclosingRing = this._calcEnclosingRing();
+          }
+
+          return this._enclosingRing;
+        }
+        /* Returns the ring that encloses this one, if any */
+
+      }, {
+        key: "_calcEnclosingRing",
+        value: function _calcEnclosingRing() {
+          // start with the ealier sweep line event so that the prevSeg
+          // chain doesn't lead us inside of a loop of ours
+          var leftMostEvt = this.events[0];
+
+          for (var i = 1, iMax = this.events.length; i < iMax; i++) {
+            var evt = this.events[i];
+            if (SweepEvent.compare(leftMostEvt, evt) > 0) leftMostEvt = evt;
+          }
+
+          var prevSeg = leftMostEvt.segment.prevInResult();
+          var prevPrevSeg = prevSeg ? prevSeg.prevInResult() : null;
+
+          while (true) {
+            // no segment found, thus no ring can enclose us
+            if (!prevSeg) return null; // no segments below prev segment found, thus the ring of the prev
+            // segment must loop back around and enclose us
+
+            if (!prevPrevSeg) return prevSeg.ringOut; // if the two segments are of different rings, the ring of the prev
+            // segment must either loop around us or the ring of the prev prev
+            // seg, which would make us and the ring of the prev peers
+
+            if (prevPrevSeg.ringOut !== prevSeg.ringOut) {
+              if (prevPrevSeg.ringOut.enclosingRing() !== prevSeg.ringOut) {
+                return prevSeg.ringOut;
+              } else return prevSeg.ringOut.enclosingRing();
+            } // two segments are from the same ring, so this was a penisula
+            // of that ring. iterate downward, keep searching
+
+
+            prevSeg = prevPrevSeg.prevInResult();
+            prevPrevSeg = prevSeg ? prevSeg.prevInResult() : null;
+          }
+        }
+      }]);
+
+      return RingOut;
+    }();
+    var PolyOut = /*#__PURE__*/function () {
+      function PolyOut(exteriorRing) {
+        _classCallCheck$1(this, PolyOut);
+
+        this.exteriorRing = exteriorRing;
+        exteriorRing.poly = this;
+        this.interiorRings = [];
+      }
+
+      _createClass$1(PolyOut, [{
+        key: "addInterior",
+        value: function addInterior(ring) {
+          this.interiorRings.push(ring);
+          ring.poly = this;
+        }
+      }, {
+        key: "getGeom",
+        value: function getGeom() {
+          var geom = [this.exteriorRing.getGeom()]; // exterior ring was all (within rounding error of angle calc) colinear points
+
+          if (geom[0] === null) return null;
+
+          for (var i = 0, iMax = this.interiorRings.length; i < iMax; i++) {
+            var ringGeom = this.interiorRings[i].getGeom(); // interior ring was all (within rounding error of angle calc) colinear points
+
+            if (ringGeom === null) continue;
+            geom.push(ringGeom);
+          }
+
+          return geom;
+        }
+      }]);
+
+      return PolyOut;
+    }();
+    var MultiPolyOut = /*#__PURE__*/function () {
+      function MultiPolyOut(rings) {
+        _classCallCheck$1(this, MultiPolyOut);
+
+        this.rings = rings;
+        this.polys = this._composePolys(rings);
+      }
+
+      _createClass$1(MultiPolyOut, [{
+        key: "getGeom",
+        value: function getGeom() {
+          var geom = [];
+
+          for (var i = 0, iMax = this.polys.length; i < iMax; i++) {
+            var polyGeom = this.polys[i].getGeom(); // exterior ring was all (within rounding error of angle calc) colinear points
+
+            if (polyGeom === null) continue;
+            geom.push(polyGeom);
+          }
+
+          return geom;
+        }
+      }, {
+        key: "_composePolys",
+        value: function _composePolys(rings) {
+          var polys = [];
+
+          for (var i = 0, iMax = rings.length; i < iMax; i++) {
+            var ring = rings[i];
+            if (ring.poly) continue;
+            if (ring.isExteriorRing()) polys.push(new PolyOut(ring));else {
+              var enclosingRing = ring.enclosingRing();
+              if (!enclosingRing.poly) polys.push(new PolyOut(enclosingRing));
+              enclosingRing.poly.addInterior(ring);
+            }
+          }
+
+          return polys;
+        }
+      }]);
+
+      return MultiPolyOut;
+    }();
+
+    /**
+     * NOTE:  We must be careful not to change any segments while
+     *        they are in the SplayTree. AFAIK, there's no way to tell
+     *        the tree to rebalance itself - thus before splitting
+     *        a segment that's in the tree, we remove it from the tree,
+     *        do the split, then re-insert it. (Even though splitting a
+     *        segment *shouldn't* change its correct position in the
+     *        sweep line tree, the reality is because of rounding errors,
+     *        it sometimes does.)
+     */
+
+    var SweepLine = /*#__PURE__*/function () {
+      function SweepLine(queue) {
+        var comparator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Segment.compare;
+
+        _classCallCheck$1(this, SweepLine);
+
+        this.queue = queue;
+        this.tree = new Tree(comparator);
+        this.segments = [];
+      }
+
+      _createClass$1(SweepLine, [{
+        key: "process",
+        value: function process(event) {
+          var segment = event.segment;
+          var newEvents = []; // if we've already been consumed by another segment,
+          // clean up our body parts and get out
+
+          if (event.consumedBy) {
+            if (event.isLeft) this.queue.remove(event.otherSE);else this.tree.remove(segment);
+            return newEvents;
+          }
+
+          var node = event.isLeft ? this.tree.insert(segment) : this.tree.find(segment);
+          if (!node) throw new Error("Unable to find segment #".concat(segment.id, " ") + "[".concat(segment.leftSE.point.x, ", ").concat(segment.leftSE.point.y, "] -> ") + "[".concat(segment.rightSE.point.x, ", ").concat(segment.rightSE.point.y, "] ") + 'in SweepLine tree. Please submit a bug report.');
+          var prevNode = node;
+          var nextNode = node;
+          var prevSeg = undefined;
+          var nextSeg = undefined; // skip consumed segments still in tree
+
+          while (prevSeg === undefined) {
+            prevNode = this.tree.prev(prevNode);
+            if (prevNode === null) prevSeg = null;else if (prevNode.key.consumedBy === undefined) prevSeg = prevNode.key;
+          } // skip consumed segments still in tree
+
+
+          while (nextSeg === undefined) {
+            nextNode = this.tree.next(nextNode);
+            if (nextNode === null) nextSeg = null;else if (nextNode.key.consumedBy === undefined) nextSeg = nextNode.key;
+          }
+
+          if (event.isLeft) {
+            // Check for intersections against the previous segment in the sweep line
+            var prevMySplitter = null;
+
+            if (prevSeg) {
+              var prevInter = prevSeg.getIntersection(segment);
+
+              if (prevInter !== null) {
+                if (!segment.isAnEndpoint(prevInter)) prevMySplitter = prevInter;
+
+                if (!prevSeg.isAnEndpoint(prevInter)) {
+                  var newEventsFromSplit = this._splitSafely(prevSeg, prevInter);
+
+                  for (var i = 0, iMax = newEventsFromSplit.length; i < iMax; i++) {
+                    newEvents.push(newEventsFromSplit[i]);
+                  }
+                }
+              }
+            } // Check for intersections against the next segment in the sweep line
+
+
+            var nextMySplitter = null;
+
+            if (nextSeg) {
+              var nextInter = nextSeg.getIntersection(segment);
+
+              if (nextInter !== null) {
+                if (!segment.isAnEndpoint(nextInter)) nextMySplitter = nextInter;
+
+                if (!nextSeg.isAnEndpoint(nextInter)) {
+                  var _newEventsFromSplit = this._splitSafely(nextSeg, nextInter);
+
+                  for (var _i = 0, _iMax = _newEventsFromSplit.length; _i < _iMax; _i++) {
+                    newEvents.push(_newEventsFromSplit[_i]);
+                  }
+                }
+              }
+            } // For simplicity, even if we find more than one intersection we only
+            // spilt on the 'earliest' (sweep-line style) of the intersections.
+            // The other intersection will be handled in a future process().
+
+
+            if (prevMySplitter !== null || nextMySplitter !== null) {
+              var mySplitter = null;
+              if (prevMySplitter === null) mySplitter = nextMySplitter;else if (nextMySplitter === null) mySplitter = prevMySplitter;else {
+                var cmpSplitters = SweepEvent.comparePoints(prevMySplitter, nextMySplitter);
+                mySplitter = cmpSplitters <= 0 ? prevMySplitter : nextMySplitter;
+              } // Rounding errors can cause changes in ordering,
+              // so remove afected segments and right sweep events before splitting
+
+              this.queue.remove(segment.rightSE);
+              newEvents.push(segment.rightSE);
+
+              var _newEventsFromSplit2 = segment.split(mySplitter);
+
+              for (var _i2 = 0, _iMax2 = _newEventsFromSplit2.length; _i2 < _iMax2; _i2++) {
+                newEvents.push(_newEventsFromSplit2[_i2]);
+              }
+            }
+
+            if (newEvents.length > 0) {
+              // We found some intersections, so re-do the current event to
+              // make sure sweep line ordering is totally consistent for later
+              // use with the segment 'prev' pointers
+              this.tree.remove(segment);
+              newEvents.push(event);
+            } else {
+              // done with left event
+              this.segments.push(segment);
+              segment.prev = prevSeg;
+            }
+          } else {
+            // event.isRight
+            // since we're about to be removed from the sweep line, check for
+            // intersections between our previous and next segments
+            if (prevSeg && nextSeg) {
+              var inter = prevSeg.getIntersection(nextSeg);
+
+              if (inter !== null) {
+                if (!prevSeg.isAnEndpoint(inter)) {
+                  var _newEventsFromSplit3 = this._splitSafely(prevSeg, inter);
+
+                  for (var _i3 = 0, _iMax3 = _newEventsFromSplit3.length; _i3 < _iMax3; _i3++) {
+                    newEvents.push(_newEventsFromSplit3[_i3]);
+                  }
+                }
+
+                if (!nextSeg.isAnEndpoint(inter)) {
+                  var _newEventsFromSplit4 = this._splitSafely(nextSeg, inter);
+
+                  for (var _i4 = 0, _iMax4 = _newEventsFromSplit4.length; _i4 < _iMax4; _i4++) {
+                    newEvents.push(_newEventsFromSplit4[_i4]);
+                  }
+                }
+              }
+            }
+
+            this.tree.remove(segment);
+          }
+
+          return newEvents;
+        }
+        /* Safely split a segment that is currently in the datastructures
+         * IE - a segment other than the one that is currently being processed. */
+
+      }, {
+        key: "_splitSafely",
+        value: function _splitSafely(seg, pt) {
+          // Rounding errors can cause changes in ordering,
+          // so remove afected segments and right sweep events before splitting
+          // removeNode() doesn't work, so have re-find the seg
+          // https://github.com/w8r/splay-tree/pull/5
+          this.tree.remove(seg);
+          var rightSE = seg.rightSE;
+          this.queue.remove(rightSE);
+          var newEvents = seg.split(pt);
+          newEvents.push(rightSE); // splitting can trigger consumption
+
+          if (seg.consumedBy === undefined) this.tree.insert(seg);
+          return newEvents;
+        }
+      }]);
+
+      return SweepLine;
+    }();
+
+    var POLYGON_CLIPPING_MAX_QUEUE_SIZE = typeof process !== 'undefined' && process.env.POLYGON_CLIPPING_MAX_QUEUE_SIZE || 1000000;
+    var POLYGON_CLIPPING_MAX_SWEEPLINE_SEGMENTS = typeof process !== 'undefined' && process.env.POLYGON_CLIPPING_MAX_SWEEPLINE_SEGMENTS || 1000000;
+    var Operation = /*#__PURE__*/function () {
+      function Operation() {
+        _classCallCheck$1(this, Operation);
+      }
+
+      _createClass$1(Operation, [{
+        key: "run",
+        value: function run(type, geom, moreGeoms) {
+          operation.type = type;
+          rounder.reset();
+          /* Convert inputs to MultiPoly objects */
+
+          var multipolys = [new MultiPolyIn(geom, true)];
+
+          for (var i = 0, iMax = moreGeoms.length; i < iMax; i++) {
+            multipolys.push(new MultiPolyIn(moreGeoms[i], false));
+          }
+
+          operation.numMultiPolys = multipolys.length;
+          /* BBox optimization for difference operation
+           * If the bbox of a multipolygon that's part of the clipping doesn't
+           * intersect the bbox of the subject at all, we can just drop that
+           * multiploygon. */
+
+          if (operation.type === 'difference') {
+            // in place removal
+            var subject = multipolys[0];
+            var _i = 1;
+
+            while (_i < multipolys.length) {
+              if (getBboxOverlap(multipolys[_i].bbox, subject.bbox) !== null) _i++;else multipolys.splice(_i, 1);
+            }
+          }
+          /* BBox optimization for intersection operation
+           * If we can find any pair of multipolygons whose bbox does not overlap,
+           * then the result will be empty. */
+
+
+          if (operation.type === 'intersection') {
+            // TODO: this is O(n^2) in number of polygons. By sorting the bboxes,
+            //       it could be optimized to O(n * ln(n))
+            for (var _i2 = 0, _iMax = multipolys.length; _i2 < _iMax; _i2++) {
+              var mpA = multipolys[_i2];
+
+              for (var j = _i2 + 1, jMax = multipolys.length; j < jMax; j++) {
+                if (getBboxOverlap(mpA.bbox, multipolys[j].bbox) === null) return [];
+              }
+            }
+          }
+          /* Put segment endpoints in a priority queue */
+
+
+          var queue = new Tree(SweepEvent.compare);
+
+          for (var _i3 = 0, _iMax2 = multipolys.length; _i3 < _iMax2; _i3++) {
+            var sweepEvents = multipolys[_i3].getSweepEvents();
+
+            for (var _j = 0, _jMax = sweepEvents.length; _j < _jMax; _j++) {
+              queue.insert(sweepEvents[_j]);
+
+              if (queue.size > POLYGON_CLIPPING_MAX_QUEUE_SIZE) {
+                // prevents an infinite loop, an otherwise common manifestation of bugs
+                throw new Error('Infinite loop when putting segment endpoints in a priority queue ' + '(queue size too big). Please file a bug report.');
+              }
+            }
+          }
+          /* Pass the sweep line over those endpoints */
+
+
+          var sweepLine = new SweepLine(queue);
+          var prevQueueSize = queue.size;
+          var node = queue.pop();
+
+          while (node) {
+            var evt = node.key;
+
+            if (queue.size === prevQueueSize) {
+              // prevents an infinite loop, an otherwise common manifestation of bugs
+              var seg = evt.segment;
+              throw new Error("Unable to pop() ".concat(evt.isLeft ? 'left' : 'right', " SweepEvent ") + "[".concat(evt.point.x, ", ").concat(evt.point.y, "] from segment #").concat(seg.id, " ") + "[".concat(seg.leftSE.point.x, ", ").concat(seg.leftSE.point.y, "] -> ") + "[".concat(seg.rightSE.point.x, ", ").concat(seg.rightSE.point.y, "] from queue. ") + 'Please file a bug report.');
+            }
+
+            if (queue.size > POLYGON_CLIPPING_MAX_QUEUE_SIZE) {
+              // prevents an infinite loop, an otherwise common manifestation of bugs
+              throw new Error('Infinite loop when passing sweep line over endpoints ' + '(queue size too big). Please file a bug report.');
+            }
+
+            if (sweepLine.segments.length > POLYGON_CLIPPING_MAX_SWEEPLINE_SEGMENTS) {
+              // prevents an infinite loop, an otherwise common manifestation of bugs
+              throw new Error('Infinite loop when passing sweep line over endpoints ' + '(too many sweep line segments). Please file a bug report.');
+            }
+
+            var newEvents = sweepLine.process(evt);
+
+            for (var _i4 = 0, _iMax3 = newEvents.length; _i4 < _iMax3; _i4++) {
+              var _evt = newEvents[_i4];
+              if (_evt.consumedBy === undefined) queue.insert(_evt);
+            }
+
+            prevQueueSize = queue.size;
+            node = queue.pop();
+          } // free some memory we don't need anymore
+
+
+          rounder.reset();
+          /* Collect and compile segments we're keeping into a multipolygon */
+
+          var ringsOut = RingOut.factory(sweepLine.segments);
+          var result = new MultiPolyOut(ringsOut);
+          return result.getGeom();
+        }
+      }]);
+
+      return Operation;
+    }(); // singleton available by import
+
+    var operation = new Operation();
+
+    var union = function union(geom) {
+      for (var _len = arguments.length, moreGeoms = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        moreGeoms[_key - 1] = arguments[_key];
+      }
+
+      return operation.run('union', geom, moreGeoms);
     };
-    var CartometryType$1 = Object.freeze(CartometryType);
+
+    var intersection$1 = function intersection(geom) {
+      for (var _len2 = arguments.length, moreGeoms = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        moreGeoms[_key2 - 1] = arguments[_key2];
+      }
+
+      return operation.run('intersection', geom, moreGeoms);
+    };
+
+    var xor = function xor(geom) {
+      for (var _len3 = arguments.length, moreGeoms = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        moreGeoms[_key3 - 1] = arguments[_key3];
+      }
+
+      return operation.run('xor', geom, moreGeoms);
+    };
+
+    var difference = function difference(subjectGeom) {
+      for (var _len4 = arguments.length, clippingGeoms = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        clippingGeoms[_key4 - 1] = arguments[_key4];
+      }
+
+      return operation.run('difference', subjectGeom, clippingGeoms);
+    };
+
+    var index = {
+      union: union,
+      intersection: intersection$1,
+      xor: xor,
+      difference: difference
+    };
+
+    var polygonClipping = index;
+
+    /**
+     * Takes two {@link Polygon|polygon} or {@link MultiPolygon|multi-polygon} geometries and
+     * finds their polygonal intersection. If they don't intersect, returns null.
+     *
+     * @name intersect
+     * @param {Feature<Polygon | MultiPolygon>} poly1 the first polygon or multipolygon
+     * @param {Feature<Polygon | MultiPolygon>} poly2 the second polygon or multipolygon
+     * @param {Object} [options={}] Optional Parameters
+     * @param {Object} [options.properties={}] Translate GeoJSON Properties to Feature
+     * @returns {Feature|null} returns a feature representing the area they share (either a {@link Polygon} or
+     * {@link MultiPolygon}). If they do not share any area, returns `null`.
+     * @example
+     * var poly1 = turf.polygon([[
+     *   [-122.801742, 45.48565],
+     *   [-122.801742, 45.60491],
+     *   [-122.584762, 45.60491],
+     *   [-122.584762, 45.48565],
+     *   [-122.801742, 45.48565]
+     * ]]);
+     *
+     * var poly2 = turf.polygon([[
+     *   [-122.520217, 45.535693],
+     *   [-122.64038, 45.553967],
+     *   [-122.720031, 45.526554],
+     *   [-122.669906, 45.507309],
+     *   [-122.723464, 45.446643],
+     *   [-122.532577, 45.408574],
+     *   [-122.487258, 45.477466],
+     *   [-122.520217, 45.535693]
+     * ]]);
+     *
+     * var intersection = turf.intersect(poly1, poly2);
+     *
+     * //addToMap
+     * var addToMap = [poly1, poly2, intersection];
+     */
+    function intersect(poly1, poly2, options) {
+        if (options === void 0) { options = {}; }
+        var geom1 = getGeom(poly1);
+        var geom2 = getGeom(poly2);
+        var intersection = polygonClipping.intersection(geom1.coordinates, geom2.coordinates);
+        if (intersection.length === 0)
+            return null;
+        if (intersection.length === 1)
+            return polygon(intersection[0], options.properties);
+        return multiPolygon(intersection, options.properties);
+    }
+
+    /**
+     * Takes a bounding box and a cell depth and returns a set of triangular {@link Polygon|polygons} in a grid.
+     *
+     * @name triangleGrid
+     * @param {Array<number>} bbox extent in [minX, minY, maxX, maxY] order
+     * @param {number} cellSide dimension of each cell
+     * @param {Object} [options={}] Optional parameters
+     * @param {string} [options.units='kilometers'] used in calculating cellSide, can be degrees, radians, miles, or kilometers
+     * @param {Feature<Polygon>} [options.mask] if passed a Polygon or MultiPolygon, the grid Points will be created only inside it
+     * @param {Object} [options.properties={}] passed to each point of the grid
+     * @returns {FeatureCollection<Polygon>} grid of polygons
+     * @example
+     * var bbox = [-95, 30 ,-85, 40];
+     * var cellSide = 50;
+     * var options = {units: 'miles'};
+     *
+     * var triangleGrid = turf.triangleGrid(bbox, cellSide, options);
+     *
+     * //addToMap
+     * var addToMap = [triangleGrid];
+     */
+    function triangleGrid(bbox, cellSide, options) {
+        if (options === void 0) { options = {}; }
+        // Containers
+        var results = [];
+        // Input Validation is being handled by Typescript
+        // if (cellSide === null || cellSide === undefined) throw new Error('cellSide is required');
+        // if (!isNumber(cellSide)) throw new Error('cellSide is invalid');
+        // if (!bbox) throw new Error('bbox is required');
+        // if (!Array.isArray(bbox)) throw new Error('bbox must be array');
+        // if (bbox.length !== 4) throw new Error('bbox must contain 4 numbers');
+        // if (mask && ['Polygon', 'MultiPolygon'].indexOf(getType(mask)) === -1) throw new Error('options.mask must be a (Multi)Polygon');
+        // Main
+        var xFraction = cellSide / distance([bbox[0], bbox[1]], [bbox[2], bbox[1]], options);
+        var cellWidth = xFraction * (bbox[2] - bbox[0]);
+        var yFraction = cellSide / distance([bbox[0], bbox[1]], [bbox[0], bbox[3]], options);
+        var cellHeight = yFraction * (bbox[3] - bbox[1]);
+        var xi = 0;
+        var currentX = bbox[0];
+        while (currentX <= bbox[2]) {
+            var yi = 0;
+            var currentY = bbox[1];
+            while (currentY <= bbox[3]) {
+                var cellTriangle1 = null;
+                var cellTriangle2 = null;
+                if (xi % 2 === 0 && yi % 2 === 0) {
+                    cellTriangle1 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                    cellTriangle2 = polygon([
+                        [
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY + cellHeight],
+                        ],
+                    ], options.properties);
+                }
+                else if (xi % 2 === 0 && yi % 2 === 1) {
+                    cellTriangle1 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                    cellTriangle2 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                }
+                else if (yi % 2 === 0 && xi % 2 === 1) {
+                    cellTriangle1 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                    cellTriangle2 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                }
+                else if (yi % 2 === 1 && xi % 2 === 1) {
+                    cellTriangle1 = polygon([
+                        [
+                            [currentX, currentY],
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY],
+                        ],
+                    ], options.properties);
+                    cellTriangle2 = polygon([
+                        [
+                            [currentX, currentY + cellHeight],
+                            [currentX + cellWidth, currentY + cellHeight],
+                            [currentX + cellWidth, currentY],
+                            [currentX, currentY + cellHeight],
+                        ],
+                    ], options.properties);
+                }
+                if (options.mask) {
+                    if (intersect(options.mask, cellTriangle1))
+                        results.push(cellTriangle1);
+                    if (intersect(options.mask, cellTriangle2))
+                        results.push(cellTriangle2);
+                }
+                else {
+                    results.push(cellTriangle1);
+                    results.push(cellTriangle2);
+                }
+                currentY += cellHeight;
+                yi++;
+            }
+            xi++;
+            currentX += cellWidth;
+        }
+        return featureCollection(results);
+    }
+
+    let CesiumProError$1 = class CesiumProError extends Error {
+        /**
+         * 定义CesiumPro抛出的错误
+         * @extends Error
+         * @param {String} message 描述错误消息的内容
+         * @example
+         * function flyTo(viewer,entity){
+         *    if(!viewer){
+         *      throw(new CesiumPro.CesiumProError("viewer未定义"))
+         *    }
+         *    viewer.flyTo(entity)
+         * }
+         *
+         */
+        constructor(message) {
+            super(message);
+            this.name = 'CesiumProError';
+        }
+    };
+    CesiumProError$1.throwInstantiationError = function () {
+        throw new DeveloperError(
+            "This function defines an interface and should not be called directly."
+        );
+    };
+    CesiumProError$1.throwNoInstance = function () {
+        throw new CesiumProError$1('它的定义了一个接口，不能被以直接调用.')
+    };
+
+    /**
+     * 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
+     *
+     * @exports defaultValue
+     *
+     * @param {*} a
+     * @param {*} b
+     * @returns {*} 如果第一个参数未定义，返回第二个参数，否则返回第一个参数，用于设置默认值。
+     *
+     * @example
+     * param = CesiumPro.defaultValue(param, 'default');
+     */
+    function defaultValue$b(a, b) {
+        if (a !== undefined && a !== null) {
+            return a;
+        }
+        return b;
+    }
+
+    /**
+     * 判断一个变量是否被定义
+     * @param value
+     * @exports defined
+     * @returns {Boolean} value是否被定义
+     */
+     function defined$c(value) {
+        return value !== undefined && value !== null;
+      }
+
+    class LonLat {
+        /**
+         * 用经纬度（度）和海拔（米）描述一个地理位置。
+         * @param {Number} lon 经度，单位：度
+         * @param {Number} lat 经度，单位：度
+         * @param {Number} alt 海拔，单位：米
+         */
+        constructor(lon, lat, alt) {
+            if (!defined$c(lon)) {
+                throw new CesiumProError$1('longitude is required.')
+            }
+            if (!defined$c(lat)) {
+                throw new CesiumProError$1('latitude is required.')
+            }
+            this.lon = lon;
+            this.lat = lat;
+            this.alt = defaultValue$b(alt, 0);
+        }
+        get height() {
+            return this.alt;
+        }
+        /**
+         * 转为屏幕坐标
+         * @param {Cesium.Scene} scene 
+         * @returns {Cesium.Cartesian2} 屏幕坐标
+         */
+        toPixel(scene) {
+            return LonLat.toPixel(this, scene);
+        }
+        /**
+         * 转为笛卡尔坐标
+         * @returns {Cesium.Cartesian3} 笛卡尔坐标
+         */
+        toCartesian() {
+            return LonLat.toCartesian(this);
+        }
+        /**
+         * 转为地理坐标
+         * @returns {Cesium.Cartographic} 地理坐标
+         */
+        toCartographic() {
+            return LonLat.toCartographic(this)
+        }
+        /**
+         * 获得该点的弧度形式
+         * @returns 弧度表示的点
+         */
+        getRadias() {
+            return {
+                lon: Cesium.Math.toRadians(this.lon),
+                lat: Cesium.Math.toRadians(this.lat),
+                alt
+            }
+        }
+        /**
+         * 判断该点是否在场景内，且在球的正面
+         * @returns {Boolean} 可见性
+         */
+        isVisible(viewer) {
+            return LonLat.isVisible(this, viewer)
+        }
+        /**
+         * 转为字符串
+         * @returns 表示该点位置的字符串
+         */
+        toString() {
+            return `{lon: ${this.lon}, lat: ${this.lat}, alt: ${this.alt}}`
+        }
+        /**
+         * 转为JSON对象
+         * @returns 表示该点位置的对象
+         */
+        toJson() {
+            return {
+                lon: this.lon,
+                lat: this.lat,
+                alt: this.alt
+            }
+        }
+        /**
+         * 从地理点坐标转换成数组
+         * @returns 表示该点位置的数组
+         */
+        toArray() {
+            return [this.lon, this.lat, this.alt];
+        }
+        /**
+         * 判断一个点在当前场景是否可见。这里的可见指的是是否在屏幕范围内且在球的正面。
+         * @param {LonLat} point 点
+         * @param {Cesium.Viewer} viewer Viewer对象
+         * @returns {Boolean} 可见性
+         */
+        static isVisible(point, viewer) {
+            if (viewer instanceof Cesium.Viewer === false) {
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
+            }
+            if (!defined$c(point)) {
+                return false;
+            }
+            const position = LonLat.toCartesian(point);
+            if (!position) {
+                return false;
+            }
+            if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
+                const visibility = new Cesium.EllipsoidalOccluder(Cesium.Ellipsoid.WGS84, viewer.camera.position)
+                    .isPointVisible(position);
+                if (!visibility) {
+                    return false;
+                }
+                const windowPosition = LonLat.toPixel(point, viewer.scene);
+                if (!defined$c(windowPosition)) {
+                    return false;
+                }
+                const width = viewer.canvas.width || viewer.canvas.clientWidth;
+                const height = viewer.canvas.height || viewer.canvas.clientHeight;
+                return (windowPosition.x > 0 && windowPosition.x < width) && (windowPosition.y > 0 && windowPosition.y < height);
+            } else if (viewer.scene.mode === Cesium.SceneMode.SCENE2D) {
+                const frustum = viewer.scene.camera.frustum;
+                const {
+                    positionWC,
+                    directionWC,
+                    upWC
+                } = viewer.scene.camera;
+                const cullingVolume = frustum.computeCullingVolume(positionWC, directionWC, upWC);
+                const bounding = Cesium.BoundingSphere.projectTo2D(new BoundingSphere(position, 1));
+                const visibility = cullingVolume.computeVisibility(bounding);
+                return visibility === Cesium.Intersect.INSIDE || visibility === Cesium.Intersect.INERSECTING
+            }
+        }
+        /**
+         * 转屏幕坐标
+         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic} point 
+         * @param {Cesium.Scene} scene 
+         * @returns 对应的屏幕坐标
+         */
+        static toPixel(point, scene) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(scene)) {
+                throw new CesiumProError$1('scene未定义。')
+            }        
+            //>>includeEnd('debug', pragmas.debug);
+            if (!defined$c(point)) {
+                return undefined
+            }
+            const cartesian = LonLat.toCartesian(point);
+            if (!defined$c(cartesian)) {
+                return undefined;
+            }
+            return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
+                scene,
+                cartesian,
+            );
+        }
+        /**
+         * 转弧度坐标
+         * @param {LonLat} point 
+         * @returns 用弧度表示的坐标点
+         */
+        static toCartographic(point, viewer) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(point)) {
+                throw new CesiumProError$1('point is not defined.')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            if (point instanceof LonLat) {
+                return Cesium.Cartographic.fromDegrees(point.lon, point.lat, point.alt);
+            } else if (point instanceof Cesium.Cartesian3) {
+                return Cesium.Cartographic.fromCartesian(point);
+            } else if (point instanceof Cesium.Cartographic) {
+                return point;
+            } else if (point instanceof Cesium.Cartesian2) {
+                const cartesian = LonLat.toCartesian(point, viewer);
+                return LonLat.toCartographic(cartesian)
+            }
+        }
+        /**
+         * 转笛卡尔坐标
+         * @param {LonLat|Cesium.Cartesian3|Cesium.Cartographic|Cesium.Cartesian2} point 
+         * @param {Viewer} [viewer] viewer对象， 如果point是Cesium.Cartesian2类型，该参数需要被提供
+         * @returns 用笛卡尔坐标表示的点
+         */
+        static toCartesian(point, viewer) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(point)) {
+                return undefined;
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            if (point instanceof Cesium.Cartesian3) {
+                return point;
+            }
+            if (point instanceof Cesium.Cartographic) {
+                return Cesium.Cartographic.toCartesian(point)
+            }
+            if (point instanceof LonLat) {
+                return Cesium.Cartesian3.fromDegrees(point.lon, point.lat, point.alt)
+            }
+            if (point instanceof Cesium.Cartesian2) {
+                if(!viewer) {
+                    return;
+                }
+                const ray = viewer.scene.camera.getPickRay(point);
+                return viewer.scene.globe.pick(ray, viewer.scene);
+            }
+
+        }
+        /**
+         * 从一个笛卡尔坐标创建点
+         * @param {Cesium.Cartesian3} cartesian 笛卡尔坐标点
+         * @returns GeoPoint点
+         */
+        static fromCartesian(cartesian) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(cartesian)) {
+                return undefined
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+            if (!defined$c(cartographic)) {
+                return undefined;
+            }
+            return LonLat.fromCartographic(cartographic)
+        }
+        /**
+         * 从一个地理坐标点创建点
+         * @param {Cesium.Cartographic} cartographic 地理坐标点
+         * @returns GeoPoint点
+         */
+        static fromCartographic(cartographic) {
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(cartographic)) {
+                throw new CesiumProError$1('cartographic is not defined.')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            return new LonLat(
+                Cesium.Math.toDegrees(cartographic.longitude),
+                Cesium.Math.toDegrees(cartographic.latitude),
+                cartographic.height
+            )
+        }
+        /**
+         * 从一个窗口坐标创建点
+         * @param {Cesium.Cartesian2} pixel 窗口坐标
+         * @param {Cesium.Viewer} viewer Viewer对象
+         * @returns {LonLat} GeoPoint点
+         */
+        static fromPixel(pixel, viewer) {
+            if (!viewer.scene.globe) {
+                return undefined;
+            }
+            //>>includeStart('debug', pragmas.debug);
+            if (!defined$c(pixel)) {
+                throw new CesiumProError$1('pixel is not defined.')
+            }
+            if (viewer instanceof Cesium.Viewer === false) {
+                throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
+            }
+            //>>includeEnd('debug', pragmas.debug);
+            const ray = viewer.scene.camera.getPickRay(pixel);
+            const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+            if (!defined$c(cartesian)) {
+                return undefined;
+            }
+            return LonLat.fromCartesian(cartesian);
+        }
+        /**
+         * 从经纬度创建点
+         * @param {Number} lon 经度(度)
+         * @param {Number} lat 纬度(度)
+         * @param {Number} height 海拔(米)
+         * @returns {LonLat}
+         */
+        static fromDegrees(lon, lat, height) {
+            return new LonLat(lon, lat, height);
+        }
+        /**
+         * 获得一个经纬度数组
+         * @param {*} positions 
+         * @returns {LonLat[]} 经纬度数组
+         * @example
+         * LonLat.fromDegreesArray([110, 30, 111, 31])
+         */
+        static fromDegreesArray(positions) {
+            const ps = [];
+            for (let i = 0, n = positions.length; i < n; i+=2) {
+                ps.push(new LonLat(positions[i], positions[i+1]));
+            }
+            return ps;
+        }
+        /**
+         * 获得一个经纬度数组
+         * @param {*} positions 
+         * @returns {LonLat[]} 经纬度数组
+         * @example
+         * LonLat.fromDegreesArrayHeights([110, 30,1000, 111, 31, 1000])
+         */
+         static fromDegreesArrayHeights(positions) {
+            const ps = [];
+            for (let i = 0, n = positions.length; i < n; i+=3) {
+                ps.push(new LonLat(positions[i], positions[i+1], positions[i+2]));
+            }
+            return ps;
+        }
+        /**
+         * 从经纬度创建点
+         * @param {Number} lon 经度(弧度)
+         * @param {Number} lat 纬度(弧度)
+         * @param {Number} height 海拔(米)
+         * @returns {LonLat}
+         */
+        static fromRadians(lon, lat, height) {
+            return new LonLat(Cesium.Math.toDegrees(lon), Cesium.Math.toDegrees(lat), height);
+        }
+        /**
+         * 判断一个点或经纬度是否在中国范围内（粗略）
+         * @param  {LonLat|Number[]} args 
+         * @returns 如果在中国范围内，返回true
+         */
+        static inChina(...args) {
+            if (args.length === 1) {
+                const p = args[0];
+                if (args[0] instanceof LonLat) {
+                    return LonLat.inChina(p.lon, p.lat)
+                }
+            } else {
+                const lon = +args[0];
+                const lat = +args[1];
+                return lon > 73.66 && lon < 135.05 && lat > 3.86 && lat < 53.55
+            }
+        }
+        /**
+         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
+         * @param {Array} lonlat 
+         * @returns {LonLat}
+         */
+        static fromArray(lonlat) {
+            return new LonLat(...lonlat)
+        }
+        /**
+         * 从经纬度数组创建点, 经纬度数组，经度在前，纬度在后
+         * @param {Object} lonlat 
+         * @returns {LonLat}
+         */
+         static fromJson(lonlat) {
+            return new LonLat(lonlat.lon, lonlat.lat, lonlat.alt)
+        }
+        /**
+         * 判断对象是不是一个有效的点
+         * @param {any} v 
+         */
+        static isValid(v) {
+            if (v instanceof LonLat) {
+                if (!defined$c(v.lon)) {
+                    return false;
+                }
+                if (!defined$c(v.lat)) {
+                    return false;
+                }
+                if (!defined$c(v.alt)) {
+                    return false;
+                }
+                return true
+            }
+            if (v instanceof Cesium.Cartesian3) {
+                if (!defined$c(v.x)) {
+                    return false;
+                }
+                if (!defined$c(v.y)) {
+                    return false;
+                }
+                if (!defined$c(v.z)) {
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+        // /**
+        //  * 经纬度转CGCS2000平面坐标
+        //  * @param {LonLat|Cesium.Cartesian3} position 
+        //  */
+        // static toCGCS2000(position) {
+        //     if (position instanceof Cesium.Cartesian3) {
+        //         position = LonLat.fromCartesian(position);
+        //     }
+        //     if (position instanceof LonLat === false) {
+        //         throw new CesiumProError(position + 'is invalid position.')
+        //     }
+        // }
+    }
+
+    const {
+        Cartographic: Cartographic$a,
+        Cartesian3: Cartesian3$l
+    } = Cesium;
+    /**
+     * 空间分析工具集
+     * @exports AnalysisUtil
+     */
+    const AnalysisUtil = {};
+    /**
+     * 直线分段
+     * @param {LonLat[]} positions 直线顶点 
+     * @param {number} segmentLength 分段长度
+     * @param {object} options 具有以下属性
+     * @param {string} [options.units = 'kilometers'] 长度单位,有效值为degrees、radians、miles、kilometers
+     * @param {boolean} [options.reverse = false] 是否反向分割
+     * @returns {LineString[]}
+     * 
+     * @example
+     * const positions = [new CesiumPro.LonLat(110, 30), new CesiumPro.LonLat(111, 31), new CesiumPro.LonLat(112, 31)]
+     * const chunks = CesiumPro.AnalysisUtil.lineChunk(positions, 10, {units: 'meter'});
+     */
+    AnalysisUtil.lineChunk = function (positions, segmentLength, options = {}) {
+        try {
+            const line = lineString(positions.map(_ => [_.lon, _.lat]));
+            return lineChunk(line, segmentLength, options)
+        } catch (e) {
+            throw new CesiumProError$1('计算错误', e)
+        }
+    };
+    /**
+     * 将多边形分割成点集
+     * @param {LonLat[]} positions 多边形顶点坐标
+     * @param {number} cellSide 网格大小
+     * @param {object} options 具有以下属性
+     * @param {string} [options.units = 'kilometers'] cellSize的单位， 有效值为degrees, radians, miles, 或 kilometers
+     * @param {object} [options.properties = {}] 附加的属性信息
+     */
+    AnalysisUtil.polygonToGrid = function(positions, cellSize, options = {}) {
+        const pg = polygon([positions.map(_ => [_.lon, _.lat])]);
+        const box = bbox(pg);
+        options.mask = pg;
+        return pointGrid(box, cellSize, options);
+    };
+    /**
+     * 将多边形分割三角形
+     * @param {LonLat[]} positions 多边形顶点坐标
+     * @param {number} cellSide 网格大小
+     * @param {object} options 具有以下属性
+     * @param {string} [options.units = 'kilometers'] cellSize的单位， 有效值为degrees, radians, miles, 或 kilometers
+     * @param {object} [options.properties = {}] 附加的属性信息
+     */
+    AnalysisUtil.triangleGrid = function(positions, cellSize, options = {}) {
+        const pg = polygon([positions.map(_ => [_.lon, _.lat])]);
+        const box = bbox(pg);
+        options.mask = pg;
+        return triangleGrid(box, cellSize, options);
+    };
+    AnalysisUtil.getCartesians = function(positions) {
+        const first = positions[0];
+        if (first instanceof LonLat) {
+            return positions.map(_ => _.toCartesian());
+        }
+        if (first instanceof Cartesian3$l) {
+            return positions
+        }
+        if (first instanceof Cartographic$a) {
+            return positions.map(_ => Cartographic$a.toCartesian(_));
+        }
+        if (typeof first === 'number') {
+            return Cartesian3$l.fromDegreesArray(positions);
+        }
+        return positions;
+    };
+    AnalysisUtil.getLonLats = function(positions) {
+        const first = positions[0];
+        if (first instanceof LonLat) {
+            return positions
+        }
+        if (first instanceof Cartesian3$l) {
+            return positions.map(_ => LonLat.fromCartesian(_));
+        }
+        if (first instanceof Cartographic$a) {
+            return positions.map(_ => LonLat.fromCartographic(_));
+        }
+        if (typeof first === 'number') {
+            return LonLat.fromDegreesArray(positions);
+        }
+        return positions;
+    };
+    AnalysisUtil.getArea = function(positions) {
+        const pg = polygon([positions]);
+        return area(pg);
+    };
+
+    /**
+     * 检查变是否是一个Cesium.Viewer对象
+     * @exports checkViewer
+     *
+     * @param {any} viewer 将要检查的对象
+     */
+    function checkViewer(viewer) {
+      if (!(viewer && viewer instanceof Cesium.Viewer)) {
+        const type = typeof viewer;
+        throw new CesiumProError$1(`Expected viewer to be typeof Viewer, actual typeof was ${type}`);
+      }
+    }
 
     /* eslint-disable prefer-rest-params */
 
@@ -1247,7 +5334,7 @@
     function compareNumber(a, b) {
       return b - a;
     }
-    let Event$8 = class Event {
+    let Event$9 = class Event {
       /**
        * 事件管理器
        * @example
@@ -1390,17 +5477,800 @@
       }
     };
 
+    /**
+     * 生成符合RFC4122 v4的guid
+     * @exports guid
+     * @return {String} guid
+     */
+    function guid() {
+      // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = Math.floor((Math.random() * 16));
+        // y值限定在[8,B]
+        /* eslint-disable */
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    class BaseAnalysis {
+        /**
+         * 空间分析
+         * @param {Cesium.Viewer} viewer viewer对象
+         * @param {object} options 空间分析配置项
+         */
+        constructor(viewer, options = {}) {
+            checkViewer(viewer);
+            this._id = defaultValue$b(options.id, guid());
+            this.options = options;
+            this._viewer = viewer;
+            this._doing = false;
+            /**
+             * 分析开始前触发的事件
+             * @type {Event}
+             * @readonly
+             */
+            this.preDo = new Event$9();
+            /**
+             * 分析完成后触发的事件
+             * @type {Event}
+             * @readonly
+             */
+            this.postDo = new Event$9();
+        }
+        /**
+         * @readonly
+         * @type {string}
+         * 空间分析类型
+         */
+        get type() {
+            return this._type;
+        }
+        /**
+         * 开始分析
+         * @param {*} options 
+         */
+        do(options) {
+           
+        }
+        isDestroyed() {
+            return false;
+        }
+        _check() {
+            if (this._doing) {
+                throw new CesiumProError$1('上一次分析正在进行，请稍候...');
+            }
+            this._doing = true;
+        }
+    }
+
+    /**
+     * 地图量算工具,包括距离量算、面积量算、角度量算、高度量算
+     * @namespace Cartometry
+     */
+    const Cartometry = {};
+    /**
+     * 贴地距离
+     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
+     * @return {Number} 长度，单位米
+     */
+    Cartometry.surfaceDistance = function (positions) {
+      let distance = 0;
+      for (let i = 0; i < positions.length - 1; i += 1) {
+        const point1cartographic = Cesium.Cartographic.fromCartesian(positions[i]);
+        const point2cartographic = Cesium.Cartographic.fromCartesian(positions[i + 1]);
+        /** 根据经纬度计算出距离* */
+        const geodesic = new Cesium.EllipsoidGeodesic();
+        geodesic.setEndPoints(point1cartographic, point2cartographic);
+        const s = geodesic.surfaceDistance;
+        distance += s;
+      }
+      return distance;
+    };
+
+    /**
+     * 空间距离
+     * @param {Cesium.Cartesian3[]} positions 构成直线的顶点坐标
+     * @return {Number} 长度，单位米
+     */
+    Cartometry.spaceDistance = function (positions) {
+      let dis = 0;
+      for (let i = 1; i < positions.length; i++) {
+        const s = positions[i - 1];
+        const e = positions[i];
+        dis += Cesium.Cartesian3.distance(s, e);
+      }
+      return dis;
+    };
+
+    /**
+     *
+     * 计算两个向量之间的夹角，两个向量必须拥有相同的起点。
+     * @param {Cesium.Cartesian3} p1 向量起点
+     * @param {Cesium.Cartesian3} p2 向量1终点
+     * @param {Cesium.Cartesian3} p3 向量2终点
+     * @return {Number} 返回p1p2和p1p3之间的夹角，单位：度
+     */
+    Cartometry.angle = function (p1, p2, p3) {
+      // 以任意一点为原点建立局部坐标系
+      let angle = 0;
+      try {
+        const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(p1);
+        const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
+        // 将其它两个点坐标转换到局部坐标
+        const localp2 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p2, new Cesium.Cartesian3());
+        const localp3 = Cesium.Matrix4.multiplyByPoint(inverseMatrix, p3, new Cesium.Cartesian3());
+        // 归一化
+        const normalizep2 = Cesium.Cartesian3.normalize(localp2, new Cesium.Cartesian3());
+        const normalizep3 = Cesium.Cartesian3.normalize(localp3, new Cesium.Cartesian3());
+        // 计算两点夹角
+        const cos = Cesium.Cartesian3.dot(normalizep2, normalizep3);
+        angle = Cesium.Math.acosClamped(cos);
+      } catch (e) {
+        console.log(e);
+        angle = 0;
+      }
+      return Cesium.Math.toDegrees(angle);
+    };
+
+    /**
+     * 计算向量的方位角
+     * @param  {Cesium.Cartesian3} center 向量起点
+     * @param  {Cesium.Cartesian3} point  向量终点
+     * @return {Number}        角度，单位：度
+     * @example
+     *
+     * const start=Cesium.Cartesian3.fromDegrees(110,30);
+     * const end=Cesium.Cartesian3.fromDegrees(110,40)
+     * const angle = CesiumPro.Cartometry.angleBetweenNorth(start,end);
+     */
+    Cartometry.angleBetweenNorth = function (center, point) {
+      const matrix = Cesium.Transforms.eastNorthUpToFixedFrame(center);
+      const inverseMatrix = Cesium.Matrix4.inverseTransformation(matrix, new Cesium.Matrix4());
+      const localp = Cesium.Matrix4.multiplyByPoint(inverseMatrix, point, new Cesium.Cartesian3());
+      const normalize = Cesium.Cartesian3.normalize(localp, new Cesium.Cartesian3());
+      const north = new Cesium.Cartesian3(0, 1, 0);
+      const cos = Cesium.Cartesian3.dot(normalize, north);
+      let angle = Cesium.Math.acosClamped(cos);
+      angle = Cesium.Math.toDegrees(angle);
+
+      const east = new Cesium.Cartesian3(1, 0, 0);
+      const arceast = Cesium.Cartesian3.dot(east, normalize);
+      if (arceast < 0) {
+        angle = 360 - angle;
+      }
+
+      return angle;
+    };
+    /**
+     * 贴地面积
+     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
+     * @return {Number} 面积，单位：平方米
+     */
+    Cartometry.surfaceArea = function (positions) {
+      // TODO:计算方法有问题
+      let res = 0;
+      // 拆分三角曲面
+
+      for (let i = 0; i < positions.length - 2; i += 1) {
+        const j = (i + 1) % positions.length;
+        const k = (i + 2) % positions.length;
+        const totalAngle = Cartometry.angle(positions[i], positions[j], positions[k]);
+        const distemp1 = Cartometry.spaceDistance([positions[i], positions[j]]);
+        const distemp2 = Cartometry.spaceDistance([positions[j], positions[k]]);
+        res += distemp1 * distemp2 * Math.abs(Math.sin(Cesium.Math.toRadians(totalAngle)));
+      }
+      return res;
+    };
+
+    /**
+     * 空间面积
+     * @param {Cesium.Cartesian3[]} positions 构成多边形的顶点坐标
+     * @return {Number} 面积，单位：平方米
+     */
+    Cartometry.spaceArea = function (positions) {
+      const points = [];
+      for (let position of positions) {
+        const coord = LonLat.fromCartesian(position);
+        points.push([coord.lon, coord.lat]);
+      }
+      points.push(points[0]);
+      const polygon$1 = polygon([points]);
+      return area(polygon$1);
+    };
+
+    /**
+     * 计算相邻两个点之间的高度差
+     * @param  {} positions
+     * @return {} 相信两个顶点之间的高度差，单位m
+     */
+    Cartometry.heightFromCartesianArray = function (positions) {
+      if (positions.length < 2) {
+        return 0;
+      }
+      const rst = [];
+      for (let i = 1; i < positions.length; i++) {
+        const startC = Cesium.Cartographic.fromCartesian(positions[i - 1]);
+        const endC = Cesium.Cartographic.fromCartesian(positions[i]);
+        if (startC && endC) {
+          rst.push(endC.height - startC.height);
+        } else {
+          rst.push('NaN');
+        }
+      }
+      return rst;
+    };
+
+    function returnTrue$1() {
+      return true;
+    }
+
+    /**
+     * 销毁一个对象，对象的所有属性和方法都被替换为一个会抛出{@link CesiumProError}异常的函数
+     *
+     * @exports destroyObject
+     *
+     * @param {Object} object The object to destroy.
+     * @param {String} [message] The message to include in the exception that is thrown if
+     *                           a destroyed object's function is called.
+     *
+     *
+     * @example
+     * // How a texture would destroy itself.
+     * this.destroy = function () {
+     *     _gl.deleteTexture(_texture);
+     *     return Cesium.destroyObject(this);
+     * };
+     *
+     * @see CesiumProError
+     */
+    function destroyObject$6(object, message) {
+      message = defaultValue$b(
+        message,
+        "This object was destroyed, i.e., destroy() was called."
+      );
+
+      function throwOnDestroyed() {
+        //>>includeStart('debug', pragmas.debug);
+        throw new CesiumProError$1(message);
+        //>>includeEnd('debug');
+      }
+      const properties = Object.getOwnPropertyNames(object);
+      const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
+      const keys = [...properties, ...methods];
+
+      for (var key of keys) {
+        if (typeof object[key] === "function") {
+          object[key] = throwOnDestroyed;
+        }
+      }
+
+      object.isDestroyed = returnTrue$1;
+
+      return undefined;
+    }
+
+    const {
+        Color: Color$q,
+        Cartesian3: Cartesian3$k,
+        Cartographic: Cartographic$9,
+        PrimitiveCollection: PrimitiveCollection$5,
+        PolygonGeometry: PolygonGeometry$1,
+        PolygonHierarchy: PolygonHierarchy$3,
+        GeometryInstance: GeometryInstance$3,
+        Primitive: Primitive$7,
+        GroundPrimitive: GroundPrimitive$2,
+        PerInstanceColorAppearance
+    } = Cesium;
+    /**
+     * 获得三角形顶点
+     */
+    function getNodesAndHeight(viewer, points, exclude = []) {
+        const positions = [];
+        let h = 0;
+        const area = AnalysisUtil.getArea(points);
+        for (let i = 0; i < 3; i++) {
+            const point = points[i];
+            const carto = Cartographic$9.fromDegrees(...point);
+            const height = viewer.scene.sampleHeight(carto, exclude);
+            h += height;
+            const cartesian = Cartesian3$k.fromDegrees(point[0], point[1], height);
+            positions.push(cartesian);
+        }
+        return {
+            positions,
+            height: h / 3,
+            area
+        };
+    }
+    function createPolygon$2(positions, color, height, clamp) {
+        const polygon = new PolygonGeometry$1({
+            polygonHierarchy: new PolygonHierarchy$3(positions),
+            perPositionHeight: true,
+            extrudedHeight: height
+        });
+        const instance = new GeometryInstance$3({
+            geometry: polygon,
+            attributes: {
+                color: Cesium.ColorGeometryInstanceAttribute.fromColor(color)
+            }
+        });
+        const constructor = clamp ? GroundPrimitive$2 : Primitive$7;
+        return new constructor({
+            geometryInstances: [instance],
+            appearance: new PerInstanceColorAppearance()
+        })
+    }
+    class FillAnalysis extends BaseAnalysis {
+        /**
+         * 挖方分析
+         * @extends BaseAnalysis
+         * @param {*} viewer 
+         * @param {*} options 具有以下属性
+         * @param {LonLat[]|Cesium.Cartesian3[]} options.mask 分析范围
+         * @param {Cesium.Color} [options.fillColor = Cesium.Color.RED] 需要填充的区域的颜色
+         * @param {Cesium.Color} [options.excavatedColor = Cesium.Color.GREEN] 需要挖掘的区域的颜色
+         * @param {number} [options.height] 挖填高度
+         * @param {number} [options.samplerSize] 采样间距
+         * @param {array} [options.excludeObject = []] 分析时需要排除的对象
+         * @param {boolean} [options.renderToViewer = true] 是否将分析结果渲染到场景
+         */
+        constructor(viewer, options = {}) {
+            super(viewer, options);
+            if (!options.mask) {
+                throw new CesiumProError$1('parameter mask must be provided.')
+            }
+            const mask = AnalysisUtil.getCartesians(options.mask);
+            this._mask = [...mask, mask[0]];
+            if (this._mask instanceof Cartesian3$k) {
+                this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
+            }
+            this.excavatedColor = defaultValue$b(options.excavatedColor, Color$q.RED.withAlpha(0.5));
+            this.fillColor = defaultValue$b(options.fillColor, Color$q.GREEN.withAlpha(0.5));
+            this._type = 'excavation-analysis';
+            this._height = defaultValue$b(options.height, 0);
+            this._samplerSize = options.samplerSize;
+            this._excludeObject = defaultValue$b(options.excludeObject, []);
+            this._renderToViewer = defaultValue$b(options.renderToViewer, true);
+        }
+        /**
+         * 建议采样间距
+         * @type {number}
+         */
+        static suggestGridCount = 300;
+        /**
+         * 开始分析
+         * @returns {object} 分析结果
+         */
+        do() {
+            this._check();
+            this.preDo.raise({
+                samplerSize: this._samplerSize,
+                id: this._id
+            });
+            if (!this._mask) {
+                return;
+            }
+            const area = Cartometry.surfaceArea(this._mask);
+            const cellSize = this._samplerSize || Math.sqrt(area / 1e6 / FillAnalysis.suggestGridCount);
+            const polygon = AnalysisUtil.getLonLats(this._mask);
+            const grid = AnalysisUtil.triangleGrid(polygon, cellSize);
+            const collection = new PrimitiveCollection$5();
+            this._root = collection;
+            collection.name = this.type;
+            if (this._renderToViewer) {
+                this._viewer.scene.primitives.add(collection);
+            }
+            const points = grid.features.map(_ => _.geometry.coordinates[0]);
+            const result = [];
+            let fillVolume = 0;
+            let excavaVolume = 0;
+            for (let point of points) {
+                const { height, positions, area } = getNodesAndHeight(this._viewer, point, this._excludeObject);
+                const volume = area * (height - this._height);
+                if (volume > 0) {
+                    excavaVolume += volume;
+                } else {
+                    fillVolume += Math.abs(volume);
+                }
+                result.push({ height, positions, volume });
+                this._render(positions, height);
+            }
+            const data = {
+                samplerSize: cellSize,
+                id: this._id,
+                grid: grid,
+                result,
+                fillVolume,
+                excavaVolume,
+                graphicCollection: this._root
+            };
+            this.postDo.raise(data);
+            this._doing = false;
+            return data;
+
+        }
+        _render(positions, height) {
+            const color = height < this._height ? this.excavatedColor : this.fillColor;
+            const clamp = height > this._height ? true : false;
+            const polygon = createPolygon$2(positions, color, this._height, clamp);
+            this._root.add(polygon);
+        }
+        destroy() {
+            this._viewer.scene.primitives.remove(this._root);
+            destroyObject$6(this);
+        }
+    }
+
+    const {
+        Cartographic: Cartographic$8
+    } = Cesium;
+
+    function computeHeight(positions, viewer, exclude = []) {
+    	let max = Number.MIN_SAFE_INTEGER;
+    	let min = Number.MAX_SAFE_INTEGER;
+    	let h = 0;
+    	positions.map(_ => {
+    		const height = viewer.scene.sampleHeight(_, exclude);
+    		if (isNaN(height)) {
+    			return;
+    		}
+    		if (height > max) {
+    			max = height;
+    		}
+    		if (height < min) {
+    			min = height;
+    		}
+    		h += height;
+    	});
+    	return {
+    		max, min, avg: h / positions.length
+    	}
+    }
+    class HeightAnalysis extends BaseAnalysis {
+        /**
+         * 分析给定范围的的高度，获得最大高度，最小高度和平均高度
+         * @extends BaseAnalysis
+         * @param {*} viewer 
+         * @param {object} options 具有以下属性
+         * @param {number} [options.samplerSize] 采样间距，值越小获得的结果越准确，但是相应的性能开销会更大
+         * @param {LonLat[]|Cesium.Cartesian3[]|number[]} 分析范围
+         */
+        constructor(viewer, options = {}) {
+            super(viewer);
+            this._samplerSize = options.samplerSzie;
+            const position = AnalysisUtil.getCartesians(options.mask);
+            this._mask = [...position, position[0]];
+            this._type = 'height-analysis';
+        }
+        /**
+         * 建议采样个数
+         */
+         static suggestGridCount = 300;
+        /**
+         * 开始分析
+         * @param {Array} 分析高度时需要排除的对象
+         * @returns {object} 最大高度，最小高度和平均高度
+         */
+        do(excludeObject = []) {
+            this._check();
+            this.preDo.raise({
+                id: this._id,
+                mask: this._mask
+            });
+            const area = Cartometry.surfaceArea(this._mask);
+            const cellSize = Math.sqrt(area / 1e6 / HeightAnalysis.suggestGridCount);
+            const polygon = AnalysisUtil.getLonLats(this._mask);
+            this.samplerSize = this._samplerSize || cellSize;
+            const grid = AnalysisUtil.polygonToGrid(polygon, this.samplerSize);
+            const samplerPoints = grid.features.map(_ => Cartographic$8.fromDegrees(..._.geometry.coordinates));
+            const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
+            this.postDo.raise({
+                id: this._id,
+                mask: this._mask,
+                samplerSize: this.samplerSize
+            });
+            return { max, min, avg, samplerSize: this.samplerSize }
+        }
+    }
+
+    function abstract() {
+      throw new CesiumProError$1('抽象方法无法被调用。');
+    }
+
+    const {
+      Cartesian3: Cartesian3$j,
+      Primitive: Primitive$6,
+      Material: Material$i,
+      Geometry: Geometry$1,
+      MaterialAppearance: MaterialAppearance$6,
+      GeometryAttribute: GeometryAttribute$1,
+      ComponentDatatype: ComponentDatatype$2,
+      PrimitiveType: PrimitiveType$3,
+      BoundingSphere: BoundingSphere$8,
+      VertexFormat: VertexFormat$4,
+      defaultValue: defaultValue$a,
+      GeometryAttributes: GeometryAttributes$1,
+      Check,
+    } = Cesium;
+    const scratchVertexFormat$1 = new VertexFormat$4();
+    const scratchNormal = new Cartesian3$j();
+    class AxisPlaneGeometry {
+      constructor(options = {}) {
+        this._normal = options.normal;
+        this._radius = options.radius;
+        this._center = options.center;
+        const vertexFormat = defaultValue$a(
+          options.vertexFormat,
+          VertexFormat$4.DEFAULT
+        );
+        this._vertexFormat = vertexFormat;
+      }
+      static packedLength = VertexFormat$4.packedLength + Cartesian3$j.packedLength + 1;
+      static pack(value, array, startingIndex) {
+        //>>includeStart('debug', pragmas.debug);
+        Check.typeOf.object("value", value);
+        Check.defined("array", array);
+        //>>includeEnd('debug');
+
+        startingIndex = defaultValue$a(startingIndex, 0);
+
+        VertexFormat$4.pack(value._vertexFormat, array, startingIndex);
+        startingIndex += VertexFormat$4.packedLength;
+        Cartesian3$j.pack(value._normal, array, startingIndex);
+        startingIndex += Cartesian3$j.packedLength;
+        array[startingIndex++] = value._radius;
+        return array;
+      }
+      static unpack(array, startingIndex, result) {
+        //>>includeStart('debug', pragmas.debug);
+        Check.defined("array", array);
+        //>>includeEnd('debug');
+
+        startingIndex = defaultValue$a(startingIndex, 0);
+
+        const vertexFormat = VertexFormat$4.unpack(
+          array,
+          startingIndex,
+          scratchVertexFormat$1
+        );
+        startingIndex += VertexFormat$4.packedLength;
+        const normal = Cartesian3$j.unpack(array, startingIndex, scratchNormal);
+        startingIndex += Cartesian3$j.packedLength;
+        const radius = array[startingIndex];
+
+        if (!defined(result)) {
+          return new PlaneGeometry({
+            vertexFormat,
+            normal,
+            radius,
+          });
+        }
+
+        result._vertexFormat = VertexFormat$4.clone(
+          vertexFormat,
+          result._vertexFormat
+        );
+        result._normal = Cartesian3$j.clone(normal, result._normal);
+        result._radius = radius;
+
+        return result;
+      }
+      static createGeometry(planeGeometry) {
+        const v1 = Math.max(1, planeGeometry._radius * 0.02);
+        const v2 = Math.max(planeGeometry._radius * 0.2, v1 * 2);
+        let positions = [];
+        let normal = [];
+        const { x, y, z } = planeGeometry._center;
+        let center;
+        if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_X)) {
+          positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
+          center = new Cartesian3$j(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
+          normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
+        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Y)) {
+          positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
+          center = new Cartesian3$j((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
+          normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
+        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Z)) {
+          positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
+          center = new Cartesian3$j((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
+          normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
+        }
+        positions = new Float32Array([...positions]);
+        const sts = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]);
+        const indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
+        return new Geometry$1({
+          attributes: new GeometryAttributes$1({
+            position: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.DOUBLE,
+              componentsPerAttribute: 3,
+              values: positions,
+            }),
+            normal: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentsPerAttribute: 3,
+              values: normal,
+            }),
+            st: new GeometryAttribute$1({
+              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentsPerAttribute: 2,
+              values: sts,
+            }),
+          }),
+          indices: indices,
+          primitiveType: PrimitiveType$3.TRIANGLES,
+          boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
+        });
+      }
+    }
+    class AxisPlane {
+      /**
+       * 坐标轴平面
+       * @private
+       * @param {*} options
+       */
+      constructor(options = {}) {
+        this._center = options.center;
+        this._modelMatrix = options.modelMatrix;
+        this._color = options.color;
+        const radius = options.radius;    this._normal = options.normal;
+        const planeGeometry = new AxisPlaneGeometry({
+          normal: this._normal,
+          radius: radius,
+          vertexFormat: VertexFormat$4.DEFAULT,
+          center: this._center,
+        });
+        const instance = new Cesium.GeometryInstance({
+          geometry: AxisPlaneGeometry.createGeometry(planeGeometry),
+        });
+        const primitive = new Primitive$6({
+          asynchronous: false,
+          geometryInstances: instance,
+          modelMatrix: this._modelMatrix,
+          appearance: new MaterialAppearance$6({
+            material: Material$i.fromType("Color", {
+              color: this._color,
+            }),
+          }),
+        });
+        primitive.isAxisPlane = true;
+        primitive.normal = this._normal;
+        primitive.axis = options.axis;
+        primitive.color = this._color;
+        return primitive;
+      }
+    }
+
+    /**
+     * 地图量算类型
+     * @exports CartometryType
+     * @enum {Number}
+     */
+    const CartometryType = {
+      /**
+       * 贴地距离
+       * @type {Number}
+       * @constant
+       */
+      SURFACE_DISTANCE: 1,
+      /**
+       * 空间距离
+       * @type {Number}
+       * @constant
+       */
+      SPACE_DISTANCE: 2,
+      /**
+       * 空间面积
+       * @type {Number}
+       * @constant
+       */
+      SPACE_AREA: 3,
+      /**
+       * 贴地面积
+       * @type {Number}
+       * @constant
+       */
+      SURFACE_AREA: 4,
+      /**
+       * 高度
+       * @type {Number}
+       * @constant
+       */
+      HEIGHT: 5,
+      /**
+       * 方位角
+       * @type {Number}
+       * @constant
+       */
+      ANGLE: 6,
+    };
+
+    /**
+     * 验证是否是合法类型
+     * @param {CartometryType}
+     * @returns {Number} true表示有效
+     */
+    CartometryType.validate = function (type) {
+      return type === CartometryType.SURFACE_AREA || type === CartometryType.SURFACE_DISTANCE
+        || type === CartometryType.SPACE_AREA || type === CartometryType.SPACE_DISTANCE
+        || type === CartometryType.HEIGHT || type === CartometryType.ANGLE;
+    };
+
+    /**
+     * 从枚举值获得枚举标签
+     * @param  {CartometryType} value 枚举值
+     * @returns {String} 枚举值对应的类型
+     */
+    CartometryType.getKey = function (value) {
+      let key;
+      switch (value) {
+        case 1:
+          key = 'SURFACE_DISTANCE';
+          break;
+        case 2:
+          key = 'SPACE_DISTANCE';
+          break;
+        case 3:
+          key = 'SPACE_AREA';
+          break;
+        case 4:
+          key = 'SURFACE_AREA';
+          break;
+        case 5:
+          key = 'HEIGHT';
+          break;
+        case 6:
+          key = 'ANGLE';
+          break;
+        default:
+          key = undefined;
+      }
+      return key;
+    };
+    /**
+     * 根据key获得中文名
+     * @param {*} value 
+     * @returns {String} 枚举值对应的类型
+     */
+    CartometryType.getValue = function (value) {
+      let key;
+      switch (value) {
+        case 1:
+          key = '贴地距离';
+          break;
+        case 2:
+          key = '空间距离';
+          break;
+        case 3:
+          key = '空间面积';
+          break;
+        case 4:
+          key = '贴地面积';
+          break;
+        case 5:
+          key = '高度';
+          break;
+        case 6:
+          key = '方位角';
+          break;
+        default:
+          key = undefined;
+      }
+      return key;
+    };
+    var CartometryType$1 = Object.freeze(CartometryType);
+
     const {
         RequestState: RequestState$1,
         AttributeCompression,
         BoundingSphere: BoundingSphere$7,
-        Cartesian3: Cartesian3$g,
-        Credit: Credit$1,
-        defaultValue: defaultValue$8,
-        defined: defined$a,
-        DeveloperError: DeveloperError$3,
-        GeographicTilingScheme: GeographicTilingScheme$3,
-        WebMercatorTilingScheme,
+        Cartesian3: Cartesian3$i,
+        Credit: Credit$2,
+        defaultValue: defaultValue$9,
+        defined: defined$b,
+        DeveloperError: DeveloperError$4,
+        GeographicTilingScheme: GeographicTilingScheme$5,
+        WebMercatorTilingScheme: WebMercatorTilingScheme$1,
         getJsonFromTypedArray,
         HeightmapTerrainData,
         IndexDatatype: IndexDatatype$1,
@@ -1408,11 +6278,11 @@
         QuantizedMeshTerrainData,
         Request: Request$1,
         RequestType: RequestType$1,
-        Resource: Resource$5,
-        RuntimeError: RuntimeError$1,
+        Resource: Resource$6,
+        RuntimeError: RuntimeError$2,
         TerrainProvider: TerrainProvider$1,
         TileAvailability,
-        TileProviderError
+        TileProviderError: TileProviderError$1
     } = Cesium;
 
     function LayerInformation(layer) {
@@ -1464,8 +6334,8 @@
      */
     function CesiumTerrainProvider$1(options) {
       //>>includeStart('debug', pragmas.debug)
-      if (!defined$a(options) || !defined$a(options.url)) {
-        throw new DeveloperError$3("options.url is required.");
+      if (!defined$b(options) || !defined$b(options.url)) {
+        throw new DeveloperError$4("options.url is required.");
       }
       //>>includeEnd('debug');
 
@@ -1481,7 +6351,7 @@
        * @default false
        * @private
        */
-      this._requestVertexNormals = defaultValue$8(
+      this._requestVertexNormals = defaultValue$9(
         options.requestVertexNormals,
         false
       );
@@ -1492,7 +6362,7 @@
        * @default false
        * @private
        */
-      this._requestWaterMask = defaultValue$8(options.requestWaterMask, false);
+      this._requestWaterMask = defaultValue$9(options.requestWaterMask, false);
 
       /**
        * Boolean flag that indicates if the client should request tile metadata from the server.
@@ -1500,13 +6370,13 @@
        * @default true
        * @private
        */
-      this._requestMetadata = defaultValue$8(options.requestMetadata, true);
+      this._requestMetadata = defaultValue$9(options.requestMetadata, true);
 
-      this._errorEvent = new Event$8();
+      this._errorEvent = new Event$9();
 
       let credit = options.credit;
       if (typeof credit === "string") {
-        credit = new Credit$1(credit);
+        credit = new Credit$2(credit);
       }
       this._credit = credit;
 
@@ -1525,7 +6395,7 @@
       const overallAvailability = [];
       let overallMaxZoom = 0;
       this._readyPromise = Promise.resolve(options.url).then(function (url) {
-        const resource = Resource$5.createIfNeeded(url);
+        const resource = Resource$6.createIfNeeded(url);
         resource.appendForwardSlash();
         lastResource = resource;
         layerJsonResource = lastResource.getDerivedResource({
@@ -1543,7 +6413,7 @@
 
         if (!data.format) {
           message = "The tile format is not specified in the layer.json file.";
-          metadataError = TileProviderError.reportError(
+          metadataError = TileProviderError$1.reportError(
             metadataError,
             that,
             that._errorEvent,
@@ -1552,12 +6422,12 @@
           if (metadataError.retry) {
             return requestLayerJson();
           }
-          return Promise.reject(new RuntimeError$1(message));
+          return Promise.reject(new RuntimeError$2(message));
         }
 
         if (!data.tiles || data.tiles.length === 0) {
           message = "The layer.json file does not specify any tile URL templates.";
-          metadataError = TileProviderError.reportError(
+          metadataError = TileProviderError$1.reportError(
             metadataError,
             that,
             that._errorEvent,
@@ -1566,7 +6436,7 @@
           if (metadataError.retry) {
             return requestLayerJson();
           }
-          return Promise.reject(new RuntimeError$1(message));
+          return Promise.reject(new RuntimeError$2(message));
         }
 
         let hasVertexNormals = false;
@@ -1576,7 +6446,7 @@
         let isHeightmap = false;
         if (data.format === "heightmap-1.0") {
           isHeightmap = true;
-          if (!defined$a(that._heightmapStructure)) {
+          if (!defined$b(that._heightmapStructure)) {
             that._heightmapStructure = {
               heightScale: 1.0 / 5.0,
               heightOffset: -1000.0,
@@ -1592,7 +6462,7 @@
           that._requestWaterMask = true;
         } else if (data.format.indexOf("quantized-mesh-1.") !== 0) {
           message = `The tile format "${data.format}" is invalid or not supported.`;
-          metadataError = TileProviderError.reportError(
+          metadataError = TileProviderError$1.reportError(
             metadataError,
             that,
             that._errorEvent,
@@ -1601,7 +6471,7 @@
           if (metadataError.retry) {
             return requestLayerJson();
           }
-          return Promise.reject(new RuntimeError$1(message));
+          return Promise.reject(new RuntimeError$2(message));
         }
 
         const tileUrlTemplates = data.tiles;
@@ -1611,20 +6481,20 @@
         // Keeps track of which of the availablity containing tiles have been loaded
 
         if (!data.projection || data.projection === "EPSG:4326") {
-          that._tilingScheme = new GeographicTilingScheme$3({
+          that._tilingScheme = new GeographicTilingScheme$5({
             numberOfLevelZeroTilesX: 2,
             numberOfLevelZeroTilesY: 1,
             ellipsoid: that._ellipsoid,
           });
         } else if (data.projection === "EPSG:3857") {
-          that._tilingScheme = new WebMercatorTilingScheme({
+          that._tilingScheme = new WebMercatorTilingScheme$1({
             numberOfLevelZeroTilesX: 1,
             numberOfLevelZeroTilesY: 1,
             ellipsoid: that._ellipsoid,
           });
         } else {
           message = `The projection "${data.projection}" is invalid or not supported.`;
-          metadataError = TileProviderError.reportError(
+          metadataError = TileProviderError$1.reportError(
             metadataError,
             that,
             that._errorEvent,
@@ -1633,7 +6503,7 @@
           if (metadataError.retry) {
             return requestLayerJson();
           }
-          return Promise.reject(new RuntimeError$1(message));
+          return Promise.reject(new RuntimeError$2(message));
         }
 
         that._levelZeroMaximumGeometricError = TerrainProvider$1.getEstimatedLevelZeroGeometricErrorForAHeightmap(
@@ -1645,7 +6515,7 @@
           that._scheme = data.scheme;
         } else {
           message = `The scheme "${data.scheme}" is invalid or not supported.`;
-          metadataError = TileProviderError.reportError(
+          metadataError = TileProviderError$1.reportError(
             metadataError,
             that,
             that._errorEvent,
@@ -1654,7 +6524,7 @@
           if (metadataError.retry) {
             return requestLayerJson();
           }
-          return Promise.reject(new RuntimeError$1(message));
+          return Promise.reject(new RuntimeError$2(message));
         }
 
         let availabilityTilesLoaded;
@@ -1666,25 +6536,25 @@
         // by setting the _littleEndianExtensionSize to false. Always prefer 'octvertexnormals'
         // over 'vertexnormals' if both extensions are supported by the server.
         if (
-          defined$a(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("octvertexnormals") !== -1
         ) {
           hasVertexNormals = true;
         } else if (
-          defined$a(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("vertexnormals") !== -1
         ) {
           hasVertexNormals = true;
           littleEndianExtensionSize = false;
         }
         if (
-          defined$a(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("watermask") !== -1
         ) {
           hasWaterMask = true;
         }
         if (
-          defined$a(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("metadata") !== -1
         ) {
           hasMetadata = true;
@@ -1693,7 +6563,7 @@
         const availabilityLevels = data.metadataAvailability;
         const availableTiles = data.available;
         let availability;
-        if (defined$a(availableTiles) && !defined$a(availabilityLevels)) {
+        if (defined$b(availableTiles) && !defined$b(availabilityLevels)) {
           availability = new TileAvailability(
             that._tilingScheme,
             availableTiles.length
@@ -1701,7 +6571,7 @@
           for (let level = 0; level < availableTiles.length; ++level) {
             const rangesAtLevel = availableTiles[level];
             const yTiles = that._tilingScheme.getNumberOfYTilesAtLevel(level);
-            if (!defined$a(overallAvailability[level])) {
+            if (!defined$b(overallAvailability[level])) {
               overallAvailability[level] = [];
             }
 
@@ -1728,7 +6598,7 @@
               );
             }
           }
-        } else if (defined$a(availabilityLevels)) {
+        } else if (defined$b(availabilityLevels)) {
           availabilityTilesLoaded = new TileAvailability(
             that._tilingScheme,
             maxZoom
@@ -1741,7 +6611,7 @@
         that._hasWaterMask = that._hasWaterMask || hasWaterMask;
         that._hasVertexNormals = that._hasVertexNormals || hasVertexNormals;
         that._hasMetadata = that._hasMetadata || hasMetadata;
-        if (defined$a(data.attribution)) {
+        if (defined$b(data.attribution)) {
           if (attribution.length > 0) {
             attribution += " ";
           }
@@ -1765,8 +6635,8 @@
         );
 
         const parentUrl = data.parentUrl;
-        if (defined$a(parentUrl)) {
-          if (!defined$a(availability)) {
+        if (defined$b(parentUrl)) {
+          if (!defined$b(availability)) {
             console.log(
               "A layer.json can't have a parentUrl if it does't have an available array."
             );
@@ -1790,7 +6660,7 @@
 
       function parseMetadataFailure(data) {
         const message = `An error occurred while accessing ${layerJsonResource.url}.`;
-        metadataError = TileProviderError.reportError(
+        metadataError = TileProviderError$1.reportError(
           metadataError,
           that,
           that._errorEvent,
@@ -1799,12 +6669,12 @@
         if (metadataError.retry) {
           return requestLayerJson();
         }
-        return Promise.reject(new RuntimeError$1(message));
+        return Promise.reject(new RuntimeError$2(message));
       }
 
       function metadataSuccess(data) {
         return parseMetadataSuccess(data).then(function () {
-          if (defined$a(metadataError)) {
+          if (defined$b(metadataError)) {
             return;
           }
 
@@ -1830,9 +6700,9 @@
           }
 
           if (attribution.length > 0) {
-            const layerJsonCredit = new Credit$1(attribution);
+            const layerJsonCredit = new Credit$2(attribution);
 
-            if (defined$a(that._tileCredits)) {
+            if (defined$b(that._tileCredits)) {
               that._tileCredits.push(layerJsonCredit);
             } else {
               that._tileCredits = [layerJsonCredit];
@@ -1846,7 +6716,7 @@
 
       function metadataFailure(data) {
         // If the metadata is not found, assume this is a pre-metadata heightmap tileset.
-        if (defined$a(data) && data.statusCode === 404) {
+        if (defined$b(data) && data.statusCode === 404) {
           return metadataSuccess({
             tilejson: "2.1.0",
             format: "heightmap-1.0",
@@ -1901,7 +6771,7 @@
     };
 
     function getRequestHeader(extensionsList) {
-      if (!defined$a(extensionsList) || extensionsList.length === 0) {
+      if (!defined$b(extensionsList) || extensionsList.length === 0) {
         return {
           Accept:
             "application/vnd.quantized-mesh,application/octet-stream;q=0.9,*/*;q=0.01",
@@ -1950,7 +6820,7 @@
       let triangleLength = bytesPerIndex * triangleElements;
 
       const view = new DataView(buffer);
-      const center = new Cartesian3$g(
+      const center = new Cartesian3$i(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -1963,7 +6833,7 @@
       pos += Float32Array.BYTES_PER_ELEMENT;
 
       const boundingSphere = new BoundingSphere$7(
-        new Cartesian3$g(
+        new Cartesian3$i(
           view.getFloat64(pos, true),
           view.getFloat64(pos + 8, true),
           view.getFloat64(pos + 16, true)
@@ -1972,7 +6842,7 @@
       );
       pos += boundingSphereLength;
 
-      const horizonOcclusionPoint = new Cartesian3$g(
+      const horizonOcclusionPoint = new Cartesian3$i(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -2098,7 +6968,7 @@
               stringLength
             );
             const availableTiles = metadata.available;
-            if (defined$a(availableTiles)) {
+            if (defined$b(availableTiles)) {
               for (let offset = 0; offset < availableTiles.length; ++offset) {
                 const availableLevel = level + offset + 1;
                 const rangesAtLevel = availableTiles[offset];
@@ -2201,7 +7071,7 @@
     ) {
       //>>includeStart('debug', pragmas.debug)
       if (!this._ready) {
-        throw new DeveloperError$3(
+        throw new DeveloperError$4(
           "requestTileGeometry must not be called before the terrain provider is ready."
         );
       }
@@ -2218,7 +7088,7 @@
         for (let i = 0; i < layerCount; ++i) {
           const layer = layers[i];
           if (
-            !defined$a(layer.availability) ||
+            !defined$b(layer.availability) ||
             layer.availability.isTileAvailable(level, x, y)
           ) {
             layerToUse = layer;
@@ -2231,8 +7101,8 @@
     };
 
     function requestTileGeometry(provider, x, y, level, layerToUse, request) {
-      if (!defined$a(layerToUse)) {
-        return Promise.reject(new RuntimeError$1("Terrain tile doesn't exist"));
+      if (!defined$b(layerToUse)) {
+        return Promise.reject(new RuntimeError$2("Terrain tile doesn't exist"));
       }
 
       const urlTemplates = layerToUse.tileUrlTemplates;
@@ -2270,8 +7140,8 @@
 
       const resource = layerToUse.resource;
       if (
-        defined$a(resource._ionEndpoint) &&
-        !defined$a(resource._ionEndpoint.externalType)
+        defined$b(resource._ionEndpoint) &&
+        !defined$b(resource._ionEndpoint.externalType)
       ) {
         // ion uses query paremeters to request extensions
         if (extensionList.length !== 0) {
@@ -2301,15 +7171,15 @@
           resource.request.state === RequestState$1.ACTIVE) {
           return;
         }
-      if (!defined$a(promise)) {
+      if (!defined$b(promise)) {
         return undefined;
       }
 
       return promise.then(function (buffer) {
-        if (!defined$a(buffer)) {
-          return Promise.reject(new RuntimeError$1("Mesh buffer doesn't exist."));
+        if (!defined$b(buffer)) {
+          return Promise.reject(new RuntimeError$2("Mesh buffer doesn't exist."));
         }
-        if (defined$a(provider._heightmapStructure)) {
+        if (defined$b(provider._heightmapStructure)) {
           return createHeightmapTerrainData(provider, buffer);
         }
         return createQuantizedMeshTerrainData(
@@ -2349,7 +7219,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "credit must not be called before the terrain provider is ready."
             );
           }
@@ -2370,7 +7240,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "tilingScheme must not be called before the terrain provider is ready."
             );
           }
@@ -2418,7 +7288,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "hasWaterMask must not be called before the terrain provider is ready."
             );
           }
@@ -2440,7 +7310,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "hasVertexNormals must not be called before the terrain provider is ready."
             );
           }
@@ -2463,7 +7333,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "hasMetadata must not be called before the terrain provider is ready."
             );
           }
@@ -2532,7 +7402,7 @@
         get: function () {
           //>>includeStart('debug', pragmas.debug)
           if (!this._ready) {
-            throw new DeveloperError$3(
+            throw new DeveloperError$4(
               "availability must not be called before the terrain provider is ready."
             );
           }
@@ -2563,7 +7433,7 @@
      * @returns {Boolean|undefined} Undefined if not supported or availability is unknown, otherwise true or false.
      */
     CesiumTerrainProvider$1.prototype.getTileDataAvailable = function (x, y, level) {
-      if (!defined$a(this._availability)) {
+      if (!defined$b(this._availability)) {
         return undefined;
       }
       if (level > this._availability._maximumLevel) {
@@ -2606,7 +7476,7 @@
       level
     ) {
       if (
-        !defined$a(this._availability) ||
+        !defined$b(this._availability) ||
         level > this._availability._maximumLevel ||
         this._availability.isTileAvailable(level, x, y) ||
         !this._hasMetadata
@@ -2619,7 +7489,7 @@
       const count = layers.length;
       for (let i = 0; i < count; ++i) {
         const layerResult = checkLayer(this, x, y, level, layers[i], i === 0);
-        if (defined$a(layerResult.promise)) {
+        if (defined$b(layerResult.promise)) {
           return layerResult.promise;
         }
       }
@@ -2647,7 +7517,7 @@
     }
 
     function checkLayer(provider, x, y, level, layer, topLayer) {
-      if (!defined$a(layer.availabilityLevels)) {
+      if (!defined$b(layer.availabilityLevels)) {
         // It's definitely not in this layer
         return {
           result: false,
@@ -2662,7 +7532,7 @@
       const availability = layer.availability;
 
       let tile = getAvailabilityTile(layer, x, y, level);
-      while (defined$a(tile)) {
+      while (defined$b(tile)) {
         if (
           availability.isTileAvailable(tile.level, tile.x, tile.y) &&
           !availabilityTilesLoaded.isTileAvailable(tile.level, tile.x, tile.y)
@@ -2671,7 +7541,7 @@
           if (!topLayer) {
             cacheKey = `${tile.level}-${tile.x}-${tile.y}`;
             requestPromise = layer.availabilityPromiseCache[cacheKey];
-            if (!defined$a(requestPromise)) {
+            if (!defined$b(requestPromise)) {
               // For cutout terrain, if this isn't the top layer the availability tiles
               //  may never get loaded, so request it here.
               const request = new Request$1({
@@ -2687,7 +7557,7 @@
                 layer,
                 request
               );
-              if (defined$a(requestPromise)) {
+              if (defined$b(requestPromise)) {
                 layer.availabilityPromiseCache[cacheKey] = requestPromise;
                 requestPromise.then(deleteFromCache);
               }
@@ -2714,19 +7584,6 @@
     CesiumTerrainProvider$1._getAvailabilityTile = getAvailabilityTile;
 
     /**
-     * 检查变是否是一个Cesium.Viewer对象
-     * @exports checkViewer
-     *
-     * @param {any} viewer 将要检查的对象
-     */
-    function checkViewer(viewer) {
-      if (!(viewer && viewer instanceof Cesium.Viewer)) {
-        const type = typeof viewer;
-        throw new CesiumProError$1(`Expected viewer to be typeof Viewer, actual typeof was ${type}`);
-      }
-    }
-
-    /**
      * @exports clone
      * 生成一个对象的副本
      * @param  {Object} object 被克隆的对象
@@ -2738,7 +7595,7 @@
         return object;
       }
 
-      deep = defaultValue$9(deep, false);
+      deep = defaultValue$b(deep, false);
 
       const result = new object.constructor();
       for (const propertyName in object) {
@@ -2754,34 +7611,34 @@
       return result;
     }
 
-    const cesiumScriptRegex = /((?:.*\/)|^)CesiumPro\.js(?:\?|#|$)/;
+    const cesiumScriptRegex$1 = /((?:.*\/)|^)CesiumPro\.js(?:\?|#|$)/;
 
-    let a;
+    let a$1;
     /*global CESIUMPRO_BASE_URL*/
-    function tryMakeAbsolute(url) {
+    function tryMakeAbsolute$1(url) {
       if (typeof document === 'undefined') {
         // Node.js and Web Workers. In both cases, the URL will already be absolute.
         return url;
       }
 
-      if (!defined$b(a)) {
-        a = document.createElement('a');
+      if (!defined$c(a$1)) {
+        a$1 = document.createElement('a');
       }
-      a.href = url;
+      a$1.href = url;
 
       // IE only absolutizes href on get, not set
       // eslint-disable-next-line no-self-assign
-      a.href = a.href;
-      return a.href;
+      a$1.href = a$1.href;
+      return a$1.href;
     }
-    let baseResource;
-    let implementation;
+    let baseResource$1;
+    let implementation$1;
 
-    function getBaseUrlFromCesiumScript() {
+    function getBaseUrlFromCesiumScript$1() {
       const scripts = document.getElementsByTagName('script');
       for (let i = 0, len = scripts.length; i < len; ++i) {
         const src = scripts[i].getAttribute('src');
-        const result = cesiumScriptRegex.exec(src);
+        const result = cesiumScriptRegex$1.exec(src);
         if (result !== null) {
           return result[1];
         }
@@ -2789,14 +7646,14 @@
       return undefined;
     }
 
-    function buildModuleUrlFromRequireToUrl(moduleID) {
+    function buildModuleUrlFromRequireToUrl$1(moduleID) {
       // moduleID will be non-relative, so require it relative to this module, in Core.
-      return tryMakeAbsolute(`../${moduleID}`);
+      return tryMakeAbsolute$1(`../${moduleID}`);
     }
 
-    function getCesiumProBaseUrl() {
-      if (defined$b(baseResource)) {
-        return baseResource;
+    function getCesiumProBaseUrl$1() {
+      if (defined$c(baseResource$1)) {
+        return baseResource$1;
       }
 
       let baseUrlString;
@@ -2804,7 +7661,7 @@
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$b(window.define.amd)
+        && defined$c(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -2812,48 +7669,48 @@
           'core/Url.js',
         );
       } else {
-        baseUrlString = getBaseUrlFromCesiumScript();
+        baseUrlString = getBaseUrlFromCesiumScript$1();
       }
       // >>includeStart('debug');
-      if (!defined$b(baseUrlString)) {
+      if (!defined$c(baseUrlString)) {
         throw new CesiumProError$1(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$b(baseUrlString)) {
+      if(!defined$c(baseUrlString)) {
           baseUrlString = '';
       }
-      baseResource = new Cesium.Resource({
-        url: tryMakeAbsolute(baseUrlString),
+      baseResource$1 = new Cesium.Resource({
+        url: tryMakeAbsolute$1(baseUrlString),
       });
-      baseResource.appendForwardSlash();
+      baseResource$1.appendForwardSlash();
 
-      return baseResource;
+      return baseResource$1;
     }
 
-    function buildModuleUrlFromBaseUrl(moduleID) {
-      const resource = getCesiumProBaseUrl().getDerivedResource({
+    function buildModuleUrlFromBaseUrl$1(moduleID) {
+      const resource = getCesiumProBaseUrl$1().getDerivedResource({
         url: moduleID,
       });
       return resource.url;
     }
 
-    function buildModuleUrl$2(relativeUrl) {
-      if (!defined$b(implementation)) {
+    function buildModuleUrl$3(relativeUrl) {
+      if (!defined$c(implementation$1)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$b(window.define.amd)
+          && defined$c(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
-          implementation = buildModuleUrlFromRequireToUrl;
+          implementation$1 = buildModuleUrlFromRequireToUrl$1;
         } else {
-          implementation = buildModuleUrlFromBaseUrl;
+          implementation$1 = buildModuleUrlFromBaseUrl$1;
         }
       }
 
-      const url = implementation(relativeUrl);
+      const url = implementation$1(relativeUrl);
       return url;
     }
     /**
@@ -2861,7 +7718,7 @@
      * @namespace Url
      *
      */
-    const Url = {};
+    const Url$1 = {};
     /**
      * 从多个字符串拼接url,以/为分割符
      * @param  {...String} args
@@ -2872,7 +7729,7 @@
      * URL.join("www.baidu.com/",'/tieba/','cesium')
      * //www.baidu.com/tieba/cesium
      */
-    Url.join = function (...args) {
+    Url$1.join = function (...args) {
       const formatArgs = [];
       for (let arg of args) {
         if (arg.startsWith('/')) {
@@ -2897,10 +7754,10 @@
      * @example 
      * Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png')
      */
-    Url.buildModuleUrl = function (path) {
-      return buildModuleUrl$2(path);
+    Url$1.buildModuleUrl = function (path) {
+      return buildModuleUrl$3(path);
     };
-    Url.getCesiumProBaseUrl = getCesiumProBaseUrl;
+    Url$1.getCesiumProBaseUrl = getCesiumProBaseUrl$1;
 
     const {
         FeatureDetection,
@@ -2937,14 +7794,14 @@
     }
     let bootstrapperUrlResult;
     function getBootstrapperUrl() {
-        if (!defined$b(bootstrapperUrlResult)) {
+        if (!defined$c(bootstrapperUrlResult)) {
             bootstrapperUrlResult = getWorkerUrl("Workers/cesiumWorkerBootstrapper.js");
         }
         return bootstrapperUrlResult;
     }
     function createWorker(processor) {
         const worker = new Worker(getBootstrapperUrl());
-        worker.postMessage = defaultValue$9(
+        worker.postMessage = defaultValue$b(
             worker.webkitPostMessage,
             worker.postMessage
         );
@@ -2952,9 +7809,9 @@
         const bootstrapMessage = {
             loaderConfig: {
                 paths: {
-                    Workers: buildModuleUrl$2("workers"),
+                    Workers: buildModuleUrl$3("workers"),
                 },
-                baseUrl: getCesiumProBaseUrl().url,
+                baseUrl: getCesiumProBaseUrl$1().url,
             },
             workerModule: processor._workerPath,
         };
@@ -2990,8 +7847,8 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$f,
-        Cartographic: Cartographic$5,
+        Cartesian3: Cartesian3$h,
+        Cartographic: Cartographic$7,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$2,
         SceneMode: SceneMode$4,
@@ -3036,8 +7893,8 @@
     }
     class Cluster {
         constructor(scene, options = {}) {
-            this._objects = defaultValue$9(options.objects, []);
-            this._getScreenBoundingBox = defaultValue$9(options.getScreenBoundingBox, getScreenBoundingBox);
+            this._objects = defaultValue$b(options.objects, []);
+            this._getScreenBoundingBox = defaultValue$b(options.getScreenBoundingBox, getScreenBoundingBox);
             this._scene = scene;
             this.clusterSize = 3;
             this.pixelRange = 50;
@@ -3069,7 +7926,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$f.clone(object.position);
+                const clusterPosition = Cartesian3$h.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -3081,16 +7938,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$f.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$h.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$2.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$f.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$h.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$f(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$h(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -3116,7 +7973,7 @@
         }
         const now = Cesium.getTimestamp();
         const scene = viewer.scene;
-        if (defined$b(lastUpdateTime) && now - lastUpdateTime < 250) {
+        if (defined$c(lastUpdateTime) && now - lastUpdateTime < 250) {
             return;
         }
         lastUpdateTime = now;
@@ -3127,7 +7984,7 @@
         const endRay = scene.camera.getPickRay(new Cesium.Cartesian2(width / 2 + 1, height / 2));
         const startPosition = scene.globe.pick(startRay, scene);
         const endPosition = scene.globe.pick(endRay, scene);
-        if (!(defined$b(startPosition) && defined$b(endPosition))) {
+        if (!(defined$c(startPosition) && defined$c(endPosition))) {
             return;
         }
         const geodesic = new Cesium.EllipsoidGeodesic(
@@ -3160,7 +8017,7 @@
         }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const rect = viewer.camera.computeViewRectangle();
-            if(!defined$b(rect)) {
+            if(!defined$c(rect)) {
                 return undefined;
             }
             return {
@@ -3197,12 +8054,12 @@
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$9(options, {});
-        const items = defaultValue$9(options.items, []);
+        options = defaultValue$b(options, {});
+        const items = defaultValue$b(options.items, []);
         this._items = new Cesium.AssociativeArray();
         this._position = options.position;
 
-        this._container = defaultValue$9(options.container, viewer.container);
+        this._container = defaultValue$b(options.container, viewer.container);
         this._root = this.createMenu();
         this.createItems(items);
         this._show = true;
@@ -3430,22 +8287,6 @@
             const v = c === "x" ? r : (r & 0x3) | 0x8;
             return v.toString(16);
         });
-    }
-
-    /**
-     * 生成符合RFC4122 v4的guid
-     * @exports guid
-     * @return {String} guid
-     */
-    function guid() {
-      // http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        const r = Math.floor((Math.random() * 16));
-        // y值限定在[8,B]
-        /* eslint-disable */
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
     }
 
     /* eslint-disable */
@@ -8148,7 +12989,7 @@
     const rmouseEvent = /^(?:mouse|pointer|contextmenu|drag|drop)|click/;
     const rtypenamespace = /^([^.]*)(?:\.(.+)|)/;
 
-    function returnTrue$1() {
+    function returnTrue() {
       return true;
     }
 
@@ -8591,7 +13432,7 @@
             if (rcheckableType.test(el.type)
     					&& el.click && nodeName(el, 'input')) {
               // dataPriv.set( el, "click", ... )
-              leverageNative(el, 'click', returnTrue$1);
+              leverageNative(el, 'click', returnTrue);
             }
 
             // Return false to allow normal processing in the caller
@@ -8643,7 +13484,7 @@
       // Missing expectSync indicates a trigger call, which must force setup through jQuery.event.add
       if (!expectSync) {
         if (dataPriv.get(el, type) === undefined) {
-          jQuery.event.add(el, type, returnTrue$1);
+          jQuery.event.add(el, type, returnTrue);
         }
         return;
       }
@@ -8742,7 +13583,7 @@
 
     				// Support: Android <=2.3 only
     				&& src.returnValue === false
-          ? returnTrue$1
+          ? returnTrue
           : returnFalse;
 
         // Create target properties
@@ -8784,7 +13625,7 @@
       preventDefault() {
         const e = this.originalEvent;
 
-        this.isDefaultPrevented = returnTrue$1;
+        this.isDefaultPrevented = returnTrue;
 
         if (e && !this.isSimulated) {
           e.preventDefault();
@@ -8793,7 +13634,7 @@
       stopPropagation() {
         const e = this.originalEvent;
 
-        this.isPropagationStopped = returnTrue$1;
+        this.isPropagationStopped = returnTrue;
 
         if (e && !this.isSimulated) {
           e.stopPropagation();
@@ -8802,7 +13643,7 @@
       stopImmediatePropagation() {
         const e = this.originalEvent;
 
-        this.isImmediatePropagationStopped = returnTrue$1;
+        this.isImmediatePropagationStopped = returnTrue;
 
         if (e && !this.isSimulated) {
           e.stopImmediatePropagation();
@@ -13590,13 +18431,13 @@
           jQuery(`#${id}`).remove();
         }
         const tooltip = document.createElement('div');
-        tooltip.id = defaultValue$9(id, guid());
+        tooltip.id = defaultValue$b(id, guid());
         tooltip.className = 'cursor-tip-class';
         tooltip.innerHTML = text;
         const target = viewer ? viewer.container : document.body;
         target.appendChild(tooltip);
         this.ele = tooltip;
-        this._show = defaultValue$9(options.show, true);
+        this._show = defaultValue$b(options.show, true);
         this._isDestryoed = false;
         this._target = target;
         this._id = tooltip.id;
@@ -13748,53 +18589,56 @@
         dateFormat(format, this);
       };
 
-    function returnTrue() {
-      return true;
-    }
+    const { Ellipsoid: Ellipsoid$2 } = Cesium;
+    Ellipsoid$2.CGCS2000 = Object.freeze(
+      new Ellipsoid$2(6378137.0, 6378137.0, 6356752.31414035585)
+    );
 
-    /**
-     * 销毁一个对象，对象的所有属性和方法都被替换为一个会抛出{@link CesiumProError}异常的函数
-     *
-     * @exports destroyObject
-     *
-     * @param {Object} object The object to destroy.
-     * @param {String} [message] The message to include in the exception that is thrown if
-     *                           a destroyed object's function is called.
-     *
-     *
-     * @example
-     * // How a texture would destroy itself.
-     * this.destroy = function () {
-     *     _gl.deleteTexture(_texture);
-     *     return Cesium.destroyObject(this);
-     * };
-     *
-     * @see CesiumProError
-     */
-    function destroyObject$6(object, message) {
-      message = defaultValue$9(
-        message,
-        "This object was destroyed, i.e., destroy() was called."
-      );
+    const {
+        GeographicTilingScheme: GeographicTilingScheme$4,
+        GeographicProjection: GeographicProjection$2,
+        Rectangle: Rectangle$6,
+        Math: CesiumMath$5
+    } = Cesium;
 
-      function throwOnDestroyed() {
-        //>>includeStart('debug', pragmas.debug);
-        throw new CesiumProError$1(message);
-        //>>includeEnd('debug');
-      }
-      const properties = Object.getOwnPropertyNames(object);
-      const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(object));
-      const keys = [...properties, ...methods];
-
-      for (var key of keys) {
-        if (typeof object[key] === "function") {
-          object[key] = throwOnDestroyed;
+    class Geographic4490TilingScheme extends GeographicTilingScheme$4 {
+        /**
+         * 4490坐标系切片方案
+         * @param {*} options 
+         */
+        constructor(options = {}) {
+            super(options);
+            this._tileInfo = options.tileInfo;
+            this._ellipsoid = defaultValue$b(options.ellipsoid, Ellipsoid$2.CGCS2000);
+            this._rectangle = defaultValue$b(options.rectangle, Rectangle$6.fromDegrees(-180, -90, 180, 90));
+            this._numberOfLevelZeroTilesX = defaultValue$b(options.numberOfLevelZeroTilesX, 4);
+            this._numberOfLevelZeroTilesY = defaultValue$b(options.numberOfLevelZeroTilesY, 2);
+            this._projection = new GeographicProjection$2(this._ellipsoid);
         }
-      }
-
-      object.isDestroyed = returnTrue;
-
-      return undefined;
+        getNumberOfXTilesAtLevel(level) {
+            if (!defined$c(this._tileInfo)) {
+                return super.getNumberOfXTilesAtLevel(level);
+            } else { // 使用切片矩阵计算
+                var currentMatrix = this._tileInfo.lods.filter(function (item) {
+                    return item.level === level
+                });
+                var currentResolution = currentMatrix[0].resolution;
+                // return Math.round(360 / (this._tileInfo.rows * currentResolution))
+                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.rows * currentResolution));
+            }
+        };
+        getNumberOfYTilesAtLevel(level) {
+            if (!defined$c(this._tileInfo)) {
+                return super.getNumberOfYTilesAtLevel(level);
+            } else { // 使用切片矩阵计算
+                var currentMatrix = this._tileInfo.lods.filter(function (item) {
+                    return item.level === level
+                });
+                var currentResolution = currentMatrix[0].resolution;
+                // return Math.round(180 / (this._tileInfo.cols * currentResolution))
+                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.cols * currentResolution));
+            }
+        };
     }
 
     /**
@@ -13848,16 +18692,16 @@
          * 所有CesiumPro自定义图形基类
         */
         constructor(options) {
-            this._options = defaultValue$9(options, {});
-            this._id = defaultValue$9(options.id, createGuid$3());
+            this._options = defaultValue$b(options, {});
+            this._id = defaultValue$b(options.id, createGuid$3());
             this._primitive = null;
             this._oldPrimitive = null;
-            this._definedChanged = new Event$8();
-            this._loadEvent = new Event$8();
-            this._clampToGround = defaultValue$9(!!options.clampToGround, false);
-            this._show = defaultValue$9(options.show, true);
+            this._definedChanged = new Event$9();
+            this._loadEvent = new Event$9();
+            this._clampToGround = defaultValue$b(!!options.clampToGround, false);
+            this._show = defaultValue$b(options.show, true);
             this._removed = false;
-            this._allowPicking = defaultValue$9(options.allowPicking, true);
+            this._allowPicking = defaultValue$b(options.allowPicking, true);
             this._property = options.property;
         }
         /**
@@ -13972,7 +18816,7 @@
             }
         }
         toJson() {
-            if (!defined$b(this.primitive)) {
+            if (!defined$c(this.primitive)) {
                 return;
             }
             return JSON.parse(JSON.stringify(this._options))
@@ -14010,7 +18854,7 @@
          * @param {Viewer} viewer viewer对象
          */
         addTo(viewer) {
-            if (!defined$b(this.primitive)) {
+            if (!defined$c(this.primitive)) {
                 return;
             }
             viewer.graphicGroup.add(this);
@@ -14021,7 +18865,7 @@
          * @returns 被移除的要素
          */
         remove() {
-            if (!defined$b(this.primitive)) {
+            if (!defined$c(this.primitive)) {
                 return;
             }
             if (this.group) {
@@ -14161,13 +19005,13 @@
   ';
 
     const {
-        defaultValue: defaultValue$7,
+        defaultValue: defaultValue$8,
         destroyObject: destroyObject$5,
         Matrix4: Matrix4$6,
         DrawCommand: DrawCommand$2,
         BoxGeometry,
-        Cartesian3: Cartesian3$e,
-        defined: defined$9,
+        Cartesian3: Cartesian3$g,
+        defined: defined$a,
         GeometryPipeline,
         Transforms: Transforms$6,
         VertexFormat: VertexFormat$3,
@@ -14212,13 +19056,13 @@
          * @see Cesium.SkyBox
          */
         constructor(options = {}) {
-            this.sources = defaultValue$7(options.sources, {
-                positiveX: Url.buildModuleUrl('./assets/skybox/px.png'),
-                negativeX: Url.buildModuleUrl('./assets/skybox/nx.png'),
-                positiveY: Url.buildModuleUrl('./assets/skybox/py.png'),
-                negativeY: Url.buildModuleUrl('./assets/skybox/ny.png'),
-                positiveZ: Url.buildModuleUrl('./assets/skybox/pz.png'),
-                negativeZ: Url.buildModuleUrl('./assets/skybox/nz.png')
+            this.sources = defaultValue$8(options.sources, {
+                positiveX: Url$1.buildModuleUrl('./assets/skybox/px.png'),
+                negativeX: Url$1.buildModuleUrl('./assets/skybox/nx.png'),
+                positiveY: Url$1.buildModuleUrl('./assets/skybox/py.png'),
+                negativeY: Url$1.buildModuleUrl('./assets/skybox/ny.png'),
+                positiveZ: Url$1.buildModuleUrl('./assets/skybox/pz.png'),
+                negativeZ: Url$1.buildModuleUrl('./assets/skybox/nz.png')
             });
             this._sources = undefined;
             /**
@@ -14227,7 +19071,7 @@
              * @type {Boolean}
              * @default true
              */
-            this.show = defaultValue$7(options.show, true);
+            this.show = defaultValue$8(options.show, true);
 
             this._command = new DrawCommand$2({
                 modelMatrix: Matrix4$6.clone(Matrix4$6.IDENTITY),
@@ -14274,12 +19118,12 @@
                     sources,
                 } = this;
 
-                if ((!defined$9(sources.positiveX))
-                    || (!defined$9(sources.negativeX))
-                    || (!defined$9(sources.positiveY))
-                    || (!defined$9(sources.negativeY))
-                    || (!defined$9(sources.positiveZ))
-                    || (!defined$9(sources.negativeZ))) {
+                if ((!defined$a(sources.positiveX))
+                    || (!defined$a(sources.negativeX))
+                    || (!defined$a(sources.positiveY))
+                    || (!defined$a(sources.negativeY))
+                    || (!defined$a(sources.positiveZ))
+                    || (!defined$a(sources.negativeZ))) {
                     throw new CesiumProError$1('this.sources is required and must have positiveX, negativeX, positiveY, negativeY, positiveZ, and negativeZ properties.');
                 }
 
@@ -14309,7 +19153,7 @@
             const command = this._command;
 
             command.modelMatrix = Transforms$6.eastNorthUpToFixedFrame(frameState.camera._positionWC);
-            if (!defined$9(command.vertexArray)) {
+            if (!defined$a(command.vertexArray)) {
                 command.uniformMap = {
                     u_cubeMap() {
                         return that._cubeMap;
@@ -14323,7 +19167,7 @@
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$e(2.0, 2.0, 2.0),
+                    dimensions: new Cartesian3$g(2.0, 2.0, 2.0),
                     vertexFormat: VertexFormat$3.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
@@ -14341,7 +19185,7 @@
                 });
             }
 
-            if (!defined$9(command.shaderProgram) || this._useHdr !== useHdr) {
+            if (!defined$a(command.shaderProgram) || this._useHdr !== useHdr) {
                 const fs = new ShaderSource$4({
                     defines: [useHdr ? 'HDR' : ''],
                     sources: [SkyBoxFS],
@@ -14355,7 +19199,7 @@
                 this._useHdr = useHdr;
             }
 
-            if (!defined$9(this._cubeMap)) {
+            if (!defined$a(this._cubeMap)) {
                 return undefined;
             }
 
@@ -14521,7 +19365,7 @@
         constructor(viewer, options = {}) {
             super(viewer);
             this._viewer = viewer;
-            this._allowPicking = defaultValue$9(options.allowPicking, false);
+            this._allowPicking = defaultValue$b(options.allowPicking, false);
             this._createRoot();
             this._addEventListener();
             /**
@@ -14529,7 +19373,7 @@
              * @type {Event}
              * @readonly
              */
-            this.selectedEvent = new Event$8();
+            this.selectedEvent = new Event$9();
         }
         /**
          * @private
@@ -14656,8 +19500,8 @@
         }
     }
 
-    const {Cartesian2: Cartesian2$4, Rectangle: Rectangle$4, GeographicProjection, Ellipsoid: Ellipsoid$1} = Cesium;
-    const CesiumMath$3 = Cesium.Math;
+    const {Cartesian2: Cartesian2$5, Rectangle: Rectangle$5, GeographicProjection: GeographicProjection$1, Ellipsoid: Ellipsoid$1} = Cesium;
+    const CesiumMath$4 = Cesium.Math;
 
     /**
      * A tiling scheme for geometry referenced to a simple {@link GeographicProjection} where
@@ -14677,14 +19521,14 @@
      * the tile tree.
      */
     function LonlatTilingScheme(options) {
-      options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
+      options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
 
-      this._ellipsoid = defaultValue$9(options.ellipsoid, Ellipsoid$1.WGS84);
-      this._rectangle = defaultValue$9(options.rectangle, Rectangle$4.MAX_VALUE);
-      this._projection = new GeographicProjection(this._ellipsoid);
+      this._ellipsoid = defaultValue$b(options.ellipsoid, Ellipsoid$1.WGS84);
+      this._rectangle = defaultValue$b(options.rectangle, Rectangle$5.MAX_VALUE);
+      this._projection = new GeographicProjection$1(this._ellipsoid);
       this._numberOfLevelZeroTilesX = 36;
       this._numberOfLevelZeroTilesY = 18;
-      this._intervalOfZeorLevel = defaultValue$9(options.intervalOfZeorLevel, 16);
+      this._intervalOfZeorLevel = defaultValue$b(options.intervalOfZeorLevel, 16);
     }
 
     Object.defineProperties(LonlatTilingScheme.prototype, {
@@ -14774,8 +19618,8 @@
       // result.north = north;
       // return result;
       return {
-        lon: +CesiumMath$3.toDegrees(west).toFixed(5),
-        lat: +CesiumMath$3.toDegrees(north).toFixed(5)
+        lon: +CesiumMath$4.toDegrees(west).toFixed(5),
+        lat: +CesiumMath$4.toDegrees(north).toFixed(5)
       }
     };
 
@@ -14803,13 +19647,13 @@
       rectangle,
       result
     ) {
-      const west = CesiumMath$3.toDegrees(rectangle.west);
-      const south = CesiumMath$3.toDegrees(rectangle.south);
-      const east = CesiumMath$3.toDegrees(rectangle.east);
-      const north = CesiumMath$3.toDegrees(rectangle.north);
+      const west = CesiumMath$4.toDegrees(rectangle.west);
+      const south = CesiumMath$4.toDegrees(rectangle.south);
+      const east = CesiumMath$4.toDegrees(rectangle.east);
+      const north = CesiumMath$4.toDegrees(rectangle.north);
 
-      if (!defined$b(result)) {
-        return new Rectangle$4(west, south, east, north);
+      if (!defined$c(result)) {
+        return new Rectangle$5(west, south, east, north);
       }
 
       result.west = west;
@@ -14838,10 +19682,10 @@
       result
     ) {
       const rectangleRadians = this.tileXYToRectangle(x, y, level, result);
-      rectangleRadians.west = CesiumMath$3.toDegrees(rectangleRadians.west);
-      rectangleRadians.south = CesiumMath$3.toDegrees(rectangleRadians.south);
-      rectangleRadians.east = CesiumMath$3.toDegrees(rectangleRadians.east);
-      rectangleRadians.north = CesiumMath$3.toDegrees(rectangleRadians.north);
+      rectangleRadians.west = CesiumMath$4.toDegrees(rectangleRadians.west);
+      rectangleRadians.south = CesiumMath$4.toDegrees(rectangleRadians.south);
+      rectangleRadians.east = CesiumMath$4.toDegrees(rectangleRadians.east);
+      rectangleRadians.north = CesiumMath$4.toDegrees(rectangleRadians.north);
       return rectangleRadians;
     };
 
@@ -14875,8 +19719,8 @@
       var north = rectangle.north - y * yTileHeight;
       var south = rectangle.north - (y + 1) * yTileHeight;
 
-      if (!defined$b(result)) {
-        result = new Rectangle$4(west, south, east, north);
+      if (!defined$c(result)) {
+        result = new Rectangle$5(west, south, east, north);
       }
 
       result.west = west;
@@ -14903,7 +19747,7 @@
       result
     ) {
       var rectangle = this._rectangle;
-      if (!Rectangle$4.contains(rectangle, position)) {
+      if (!Rectangle$5.contains(rectangle, position)) {
         // outside the bounds of the tiling scheme
         return undefined;
       }
@@ -14916,7 +19760,7 @@
 
       var longitude = position.longitude;
       if (rectangle.east < rectangle.west) {
-        longitude += CesiumMath$3.TWO_PI;
+        longitude += CesiumMath$4.TWO_PI;
       }
 
       var xTileCoordinate = ((longitude - rectangle.west) / xTileWidth) | 0;
@@ -14930,8 +19774,8 @@
         yTileCoordinate = yTiles - 1;
       }
 
-      if (!defined$b(result)) {
-        return new Cartesian2$4(xTileCoordinate, yTileCoordinate);
+      if (!defined$c(result)) {
+        return new Cartesian2$5(xTileCoordinate, yTileCoordinate);
       }
 
       result.x = xTileCoordinate;
@@ -14942,12 +19786,12 @@
     const {
         CesiumTerrainProvider,
         TerrainProvider,
-        Resource: Resource$4,
+        Resource: Resource$5,
         CustomDataSource: CustomDataSource$2,
-        Cartesian3: Cartesian3$d,
+        Cartesian3: Cartesian3$f,
         Entity: Entity$2,
-        Color: Color$o,
-        Rectangle: Rectangle$3
+        Color: Color$p,
+        Rectangle: Rectangle$4
     } = Cesium;
     function createBoundingRect(provider) {
         let positions = [];
@@ -14963,15 +19807,15 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$d.fromRadiansArray(positions),
-                material: Color$o.fromRandom({ alpha: 1 }),
+                positions: Cartesian3$f.fromRadiansArray(positions),
+                material: Color$p.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
         })
     }
     function bindBounding(provider, url) {
-        const resource = Resource$4.createIfNeeded(url);
+        const resource = Resource$5.createIfNeeded(url);
         resource.appendForwardSlash();
         const layerJsonResource = resource.getDerivedResource({
             url: "layer.json",
@@ -14979,7 +19823,7 @@
         return layerJsonResource.fetchJson()
         .then((data) => {
             provider.projection = data.projection;
-            provider.bounds = Rectangle$3.fromDegrees(...data.valid_bounds);
+            provider.bounds = Rectangle$4.fromDegrees(...data.valid_bounds);
         })
     }
     class MultipleTerrainProvider {
@@ -15017,10 +19861,10 @@
             this._hasWaterMask = false;
             this._hasVertexNormals = false;
             this._ellipsoid = options.ellipsoid;
-            this._requestVertexNormals = defaultValue$9(options.requestVertexNormals, false);
-            this._requestWaterMask = defaultValue$9(options.requestWaterMask, false);
-            this._requestMetadata = defaultValue$9(options.requestMetadata, true);
-            this._errorEvent = new Event$8();
+            this._requestVertexNormals = defaultValue$b(options.requestVertexNormals, false);
+            this._requestWaterMask = defaultValue$b(options.requestWaterMask, false);
+            this._requestMetadata = defaultValue$b(options.requestMetadata, true);
+            this._errorEvent = new Event$9();
 
             this._terrainProviders = [];
             const boundPromise = [];
@@ -15152,7 +19996,7 @@
       const ray = viewer.camera.getPickRay(pixel);
       cartesian = viewer.scene.globe.pick(ray, viewer.scene);
       const feat = viewer.scene.pick(pixel);
-      if (isModel(feat) && modelPosition) {
+      if (feat && viewer.scene.globe.depthTestAgainstTerrain) {
         if (viewer.scene.pickPositionSupported) {
           cartesian = viewer.scene.pickPosition(pixel) || cartesian;
         } else {
@@ -15162,24 +20006,14 @@
       return cartesian;
     }
 
-    function isModel(feat) {
-      if (!feat) {
-        return false;
-      }
-      if (feat.primitive instanceof Cesium.Model || feat.primitive instanceof Cesium.Cesium3DTileset) {
-        return true;
-      }
-      return false;
-    }
-
     const BD_FACTOR = (3.14159265358979324 * 3000.0) / 180.0;
     const PI = 3.1415926535897932384626;
     const RADIUS = 6378245.0;
     const EE = 0.00669342162296594323;
 
     function delta(lon, lat) {
-        let dLng = this.transformLng(lon - 105, lat - 35);
-        let dLat = this.transformLat(lon - 105, lat - 35);
+        let dLng = transformLng(lon - 105, lat - 35);
+        let dLat = transformLat(lon - 105, lat - 35);
         const radLat = (lat / 180) * PI;
         let magic = Math.sin(radLat);
         magic = 1 - EE * magic * magic;
@@ -15187,6 +20021,56 @@
         dLng = (dLng * 180) / ((RADIUS / sqrtMagic) * Math.cos(radLat) * PI);
         dLat = (dLat * 180) / (((RADIUS * (1 - EE)) / (magic * sqrtMagic)) * PI);
         return [dLng, dLat]
+    }
+
+    function transformLng(lon, lat) {
+        lat = +lat;
+        lon = +lon;
+        let ret =
+            300.0 +
+            lon +
+            2.0 * lat +
+            0.1 * lon * lon +
+            0.1 * lon * lat +
+            0.1 * Math.sqrt(Math.abs(lon));
+        ret +=
+            ((20.0 * Math.sin(6.0 * lon * PI) + 20.0 * Math.sin(2.0 * lon * PI)) *
+                2.0) /
+            3.0;
+        ret +=
+            ((20.0 * Math.sin(lon * PI) + 40.0 * Math.sin((lon / 3.0) * PI)) * 2.0) /
+            3.0;
+        ret +=
+            ((150.0 * Math.sin((lon / 12.0) * PI) +
+                300.0 * Math.sin((lon / 30.0) * PI)) *
+                2.0) /
+            3.0;
+        return ret
+    }
+
+    function transformLat(lon, lat) {
+        lat = +lat;
+        lon = +lon;
+        let ret =
+            -100.0 +
+            2.0 * lon +
+            3.0 * lat +
+            0.2 * lat * lat +
+            0.1 * lon * lat +
+            0.2 * Math.sqrt(Math.abs(lon));
+        ret +=
+            ((20.0 * Math.sin(6.0 * lon * PI) + 20.0 * Math.sin(2.0 * lon * PI)) *
+                2.0) /
+            3.0;
+        ret +=
+            ((20.0 * Math.sin(lat * PI) + 40.0 * Math.sin((lat / 3.0) * PI)) * 2.0) /
+            3.0;
+        ret +=
+            ((160.0 * Math.sin((lat / 12.0) * PI) +
+                320 * Math.sin((lat * PI) / 30.0)) *
+                2.0) /
+            3.0;
+        return ret
     }
     /**
      * 坐标系相关方法
@@ -15312,7 +20196,7 @@
        * @param {Object} [options={}]
        */
       constructor(options = {}) {
-        this._definitionChange = new Event$8();
+        this._definitionChange = new Event$9();
         this._propertyNames = [];
         for (const key in options) {
           if (options.hasOwnProperty(key)) {
@@ -15338,7 +20222,7 @@
        * @fires Properties#definitionChanged
        */
       addProperty(key, value) {
-        if (!defined$b(key)) {
+        if (!defined$c(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -15355,7 +20239,7 @@
        * @fires Properties#definitionChanged
        */
       removeProperty(key) {
-        if (!defined$b(key)) {
+        if (!defined$c(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -15394,7 +20278,7 @@
        * @return {Boolean}
        */
       hasProperty(key) {
-        if (!defined$b(key)) {
+        if (!defined$c(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         return this.propertyNames.includes(key);
@@ -15444,7 +20328,7 @@
     }
 
     const {
-        Color: Color$n
+        Color: Color$o
     } = Cesium;
     class Selection{
         /**
@@ -15459,19 +20343,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$n.AQUA;
+        static pointColor = Color$o.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$n.AQUA;
+        static fillColor = Color$o.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$n.AQUA;
+        static strokeColor = Color$o.AQUA;
     }
 
     /**
@@ -15609,7 +20493,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         Transforms: Transforms$5,
-        Cartesian3: Cartesian3$c
+        Cartesian3: Cartesian3$e
     } = Cesium;
     let Model$1 = class Model{
         /**
@@ -15642,9 +20526,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * viewer.addModel(model)
          */
         constructor(options = {}) {
-            if(!defined$b(options.modelMatrix)&&defined$b(options.position)) {
+            if(!defined$c(options.modelMatrix)&&defined$c(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$c) {
+                if(options.position instanceof Cartesian3$e) {
                     cartesian = options.position;
                 } else if(options.position instanceof LonLat) {
                     cartesian = options.position.toCartesian();
@@ -15653,9 +20537,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     options.modelMatrix = Transforms$5.eastNorthUpToFixedFrame(cartesian);
                 }
             }
-            if(defined$b(options.gltf)) {
+            if(defined$c(options.gltf)) {
                 this.delegate = new Cesium.Model(options);
-            } else if(defined$b(options.url)) {
+            } else if(defined$c(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
                 throw new CesiumProError$1('one of parameters url or gltf must be provided.')
@@ -16016,11 +20900,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const {
       PrimitiveCollection: PrimitiveCollection$3,
       PolylineCollection,
-      Material: Material$g,
-      Color: Color$m,
-      defaultValue: defaultValue$6,
-      Cartesian3: Cartesian3$b,
-      Cartesian2: Cartesian2$3,
+      Material: Material$h,
+      Color: Color$n,
+      defaultValue: defaultValue$7,
+      Cartesian3: Cartesian3$d,
+      Cartesian2: Cartesian2$4,
       Matrix4: Matrix4$5,
       Matrix3: Matrix3$1,
       Quaternion,
@@ -16029,17 +20913,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       ScreenSpaceEventType: ScreenSpaceEventType$1,
       Polyline,
       Primitive: Primitive$5,
-      Math: CesiumMath$2,
+      Math: CesiumMath$3,
       Plane,
       Model: CesiumModel,
       IntersectionTests: IntersectionTests$1,
       Transforms: Transforms$4
     } = Cesium;
-    const _offset = new Cartesian3$b();
+    const _offset = new Cartesian3$d();
     const _q = new Quaternion();
     const rm3 = new Matrix3$1();
-    const cartesian3_1 = new Cartesian3$b();
-    new Cartesian3$b();
+    const cartesian3_1 = new Cartesian3$d();
+    new Cartesian3$d();
     const mat4 = new Matrix4$5();
     const mat4_1 = new Matrix4$5();
 
@@ -16051,35 +20935,35 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       }
     }
     function projectInAxis(normal, vector) {
-      Cartesian2$3.normalize(normal, normal);
-      return Cartesian2$3.dot(normal, vector);
+      Cartesian2$4.normalize(normal, normal);
+      return Cartesian2$4.dot(normal, vector);
     }
     function getPositionInPlane(pixel, helper) {
-      const mousedownCartesian = new Cartesian3$b();
+      const mousedownCartesian = new Cartesian3$d();
       const ray = viewer.camera.getPickRay(pixel);
-      const plane = new Plane(Cartesian3$b.UNIT_X, 0.0);  Plane.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
+      const plane = new Plane(Cartesian3$d.UNIT_X, 0.0);  Plane.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
       Plane.transform(plane, helper._modelMatrix, plane);
       IntersectionTests$1.rayPlane(ray, plane, mousedownCartesian);
       Matrix4$5.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
       return mousedownCartesian;
     }
-    const cartesian2_1 = new Cartesian2$3();
-    const cartesian2_2 = new Cartesian2$3();
+    const cartesian2_1 = new Cartesian2$4();
+    const cartesian2_2 = new Cartesian2$4();
     function computeAngle(helper, startPosition, endPosition) {
       const center = helper.center;
       // const pixelCenter = LonLat.toPixel(center, helper._viewer);
-      Cartesian3$b.subtract(startPosition, center, startPosition);
-      Cartesian3$b.subtract(endPosition, center, endPosition);
-      const angle = Cartesian3$b.dot(Cartesian3$b.normalize(startPosition, startPosition),
-        Cartesian3$b.normalize(endPosition, endPosition));
+      Cartesian3$d.subtract(startPosition, center, startPosition);
+      Cartesian3$d.subtract(endPosition, center, endPosition);
+      const angle = Cartesian3$d.dot(Cartesian3$d.normalize(startPosition, startPosition),
+        Cartesian3$d.normalize(endPosition, endPosition));
       // 旋转起点和终点的向量
-      const v1 = Cartesian3$b.subtract(startPosition, endPosition, cartesian3_1);
+      const v1 = Cartesian3$d.subtract(startPosition, endPosition, cartesian3_1);
       const v2 = startPosition;
-      const cross = Cartesian3$b.cross(v1, v2, cartesian3_1);
+      const cross = Cartesian3$d.cross(v1, v2, cartesian3_1);
       const normal = helper.activePrimitive.normal;
       // 旋转平面的法线向量
       // const v2 = Cartesian2.subtract(center, normal, cartesian2_2);
-      const sign = CesiumMath$2.sign(Cartesian3$b.dot(cross, normal));
+      const sign = CesiumMath$3.sign(Cartesian3$d.dot(cross, normal));
       return Math.acos(angle) * sign;
     }
     function computeOffset(helper, startPosition, endPosition, offset) {
@@ -16094,12 +20978,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       for (let axis of activeAxis) {
         const positions = axis.positions;
         const cartList = positions.map((_) =>
-          Matrix4$5.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$b())
+          Matrix4$5.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$d())
         );
         const pixelList = cartList.map((_) => LonLat.toPixel(_, helper._viewer.scene));
         const length = projectInAxis(
-          Cartesian2$3.subtract(...pixelList, cartesian2_1),
-          Cartesian2$3.subtract(endPosition, startPosition, cartesian2_2)
+          Cartesian2$4.subtract(...pixelList, cartesian2_1),
+          Cartesian2$4.subtract(endPosition, startPosition, cartesian2_2)
         );
         offset[axis.axis.toLowerCase()] = length * delta;
       }
@@ -16148,15 +21032,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * helper.bind(model);
        */
       constructor(options = {}) {
-        this.lineWidth = defaultValue$6(options.lineWidth, 15);
-        this.xAxisColor = defaultValue$6(options.xAxisColor, Color$m.RED);
-        this.yAxisColor = defaultValue$6(options.yAxisColor, Color$m.GREEN);
-        this.zAxisColor = defaultValue$6(options.zAxisColor, Color$m.BLUE);
-        this.scaleAxisColor = defaultValue$6(options.scaleAxisColor, Color$m.WHITE);
-        this.activeAxisColor = defaultValue$6(options.activeAxisColor, Color$m.YELLOW);
-        this._translateEnabled = defaultValue$6(options.translateEnabled, true);
-        this._rotateEnabled = defaultValue$6(options.rotateEnabled, false);
-        this._scaleEnabled = defaultValue$6(options.scaleEnabled, false);
+        this.lineWidth = defaultValue$7(options.lineWidth, 15);
+        this.xAxisColor = defaultValue$7(options.xAxisColor, Color$n.RED);
+        this.yAxisColor = defaultValue$7(options.yAxisColor, Color$n.GREEN);
+        this.zAxisColor = defaultValue$7(options.zAxisColor, Color$n.BLUE);
+        this.scaleAxisColor = defaultValue$7(options.scaleAxisColor, Color$n.WHITE);
+        this.activeAxisColor = defaultValue$7(options.activeAxisColor, Color$n.YELLOW);
+        this._translateEnabled = defaultValue$7(options.translateEnabled, true);
+        this._rotateEnabled = defaultValue$7(options.rotateEnabled, false);
+        this._scaleEnabled = defaultValue$7(options.scaleEnabled, false);
         this.xAxisLength = options.xAxisLength;
         this.yAxisLength = options.yAxisLength;
         this.zAxisLength = options.zAxisLength;
@@ -16165,11 +21049,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.object = null;
         this._modelMatrix = undefined;
         this._primitives = [];
-        this._center = new Cartesian3$b();
+        this._center = new Cartesian3$d();
         this._radius = 0;
-        this._originOffset = defaultValue$6(options.originOffset, new Cartesian3$b());
+        this._originOffset = defaultValue$7(options.originOffset, new Cartesian3$d());
         this._selectedPrimitives = [];
-        this._offset = new Cartesian3$b(0, 0, 0);
+        this._offset = new Cartesian3$d(0, 0, 0);
         this._angle = 0;
         this.rotatePlaneRadius = options.rotatePlaneRadius;
         this._mode = EModel.N;
@@ -16177,12 +21061,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * 位置或姿态发生变化前解发的事件
          * @type {Event}
          */
-        this.preTranformEvent = new Event$8();
+        this.preTranformEvent = new Event$9();
         /**
          * 位置或姿态发生变化后触发的事件
          * @type {Event}
          */
-        this.postTransformEvent = new Event$8();
+        this.postTransformEvent = new Event$9();
       }
       /**
        * 获得或设置平移控件是否显示
@@ -16246,7 +21130,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @type {Ceium.Cartesian3}
        */
       get center() {
-        return Cartesian3$b.add(this._center, this._originOffset, new Cartesian3$b());
+        return Cartesian3$d.add(this._center, this._originOffset, new Cartesian3$d());
       }
       /**
        * 模型矩阵
@@ -16279,8 +21163,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.xAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$b(
-              defaultValue$6(this.xAxisLength, lineLength) + center.x,
+            new Cartesian3$d(
+              defaultValue$7(this.xAxisLength, lineLength) + center.x,
               center.y,
               center.z
             ),
@@ -16298,9 +21182,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.yAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$b(
+            new Cartesian3$d(
               center.x,
-              -(defaultValue$6(this.yAxisLength, lineLength) + center.y),
+              -(defaultValue$7(this.yAxisLength, lineLength) + center.y),
               center.z
             ),
           ],
@@ -16317,10 +21201,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.zAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$b(
+            new Cartesian3$d(
               center.x,
               center.y,
-              defaultValue$6(this.zAxisLength, lineLength) + center.z
+              defaultValue$7(this.zAxisLength, lineLength) + center.z
             ),
           ],
           width: this.lineWidth,
@@ -16346,7 +21230,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$b(0, 0, 1),
+            normal: new Cartesian3$d(0, 0, 1),
             axis: "XY",
           })
         );
@@ -16357,7 +21241,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$b(0, 1, 0),
+            normal: new Cartesian3$d(0, 1, 0),
             axis: "XZ",
           })
         );
@@ -16368,7 +21252,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$b(1, 0, 0),
+            normal: new Cartesian3$d(1, 0, 0),
             axis: "YZ",
           })
         );
@@ -16398,20 +21282,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       getAxisMaterial(color, dash = false, dashLength = 16) {
         if (dash) {
-          return new Material$g({
+          return new Material$h({
             fabric: {
               type: "dasharrow",
               source: polylineAntialiasingMaterial,
               uniforms: {
                 color: color,
-                gapColor: Color$m.TRANSPARENT,
+                gapColor: Color$n.TRANSPARENT,
                 dashLength: dashLength,
                 dashPattern: 255,
               },
             },
           });
         } else {
-          return new Material$g({
+          return new Material$h({
             fabric: {
               type: "PolylineArrow",
               uniforms: {
@@ -16432,7 +21316,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$b(
+            new Cartesian3$d(
               center.x + radius * Math.cos(rad),
               center.y + radius * Math.sin(rad),
               center.z
@@ -16446,12 +21330,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.zRotate.axis = "RZ";
         this.zRotate.color = this.zAxisColor;
-        this.zRotate.normal = new Cartesian3$b(0, 0, 1);
+        this.zRotate.normal = new Cartesian3$d(0, 0, 1);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$b(
+            new Cartesian3$d(
               center.x + radius * Math.cos(rad),
               center.y,
               center.z + radius * Math.sin(rad)
@@ -16465,12 +21349,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.yRotate.axis = "RY";
         this.yRotate.color = this.yAxisColor;
-        this.yRotate.normal = new Cartesian3$b(0, 1, 0);
+        this.yRotate.normal = new Cartesian3$d(0, 1, 0);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$b(
+            new Cartesian3$d(
               center.x,
               center.y + radius * Math.cos(rad),
               center.z + radius * Math.sin(rad)
@@ -16484,7 +21368,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.xRotate.axis = "RX";
         this.xRotate.color = this.xAxisColor;
-        this.xRotate.normal = new Cartesian3$b(-1, 0, 0);
+        this.xRotate.normal = new Cartesian3$d(-1, 0, 0);
 
         this.rAxuStart = this.axisRoot.add({
           positions: [],
@@ -16500,15 +21384,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       }
       /**
        * 创建缩放轴
+       * @private
        */
       createScaleAxis() {
         const lineLength = this._radius * 1.1;    
-        const l = defaultValue$6(this.scaleAxisLength, lineLength);
+        const l = defaultValue$7(this.scaleAxisLength, lineLength);
         const delta = Math.sqrt(3);
         this.scaleAxis = this.axisRoot.add({
           positions: [
             this._center,
-            new Cartesian3$b((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+            new Cartesian3$d((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
           ],
           width: this.lineWidth,
           material: this.getAxisMaterial(this.scaleAxisColor),
@@ -16536,7 +21421,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         this.modelMatrix = object.modelMatrix;
         object.readyPromise.then(() => {
-          const center = Cartesian3$b.clone(object.boundingSphere.center);
+          const center = Cartesian3$d.clone(object.boundingSphere.center);
           Matrix4$5.multiplyByPoint(this._inverseModelMatrix, center, this._center);
           this._radius = object.boundingSphere.radius;
           this.createPrimitive();
@@ -16544,21 +21429,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       }
       /**
        * 为控制器绑定一个点
-       * @private
-       * @param {*} position 
+       * @param {Cesium.Property|Cesium.Cartesian3} position 
        */
       bindPosition(position) {
-        if (position instanceof Cesium.Property) {
+        // position instanceof Cesium.Property
+        if (typeof position.getValue === 'function') {
           position = position.getValue(this._viewer.clock.currentTime);
         }
-        if (position instanceof Cartesian3$b === false) {
+        if (position instanceof Cartesian3$d === false) {
           throw new CesiumProError$1('position is invalid')
         }
         this.modelMatrix = Transforms$4.eastNorthUpToFixedFrame(position);
-        this._center = new Cartesian3$b();
-        Cartesian3$b.clone(this.originOffset, this._center);
+        this._center = new Cartesian3$d();
+        Cartesian3$d.clone(this.originOffset, this._center);
         this._radius = 10;
-        this.createPrimitive();
+        this.rotateEnabled = false;
+        this.scaleEnabled = false;
+        this.createPrimitive(false);
       }
       /**
        * @private
@@ -16612,7 +21499,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           if (this._primitives.includes(feat.primitive)) {
             this._mousedownPixel = e.position;
             this.active(feat.primitive);
-            this._offset = new Cartesian3$b();
+            this._offset = new Cartesian3$d();
             this._angle = 0;
             handler.setInputAction((e) => {
               const { startPosition, endPosition } = e;
@@ -16709,8 +21596,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           this.rotate(angle);
         } else if (this._mode = EModel.S) {
           computeOffset(this, startPosition, endPosition, _offset);
-          const s = -_offset.sxyz / Cartesian3$b.distance(...this.scaleAxis.positions) + 1;
-          this.scale(new Cartesian3$b(s, s, s));
+          const s = -_offset.sxyz / Cartesian3$d.distance(...this.scaleAxis.positions) + 1;
+          this.scale(new Cartesian3$d(s, s, s));
         }
         this.postTransformEvent.raise(this.modelMatrix);
       }
@@ -16733,7 +21620,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const translation = Matrix4$5.fromTranslation(this.center, mat4);
         const q = Quaternion.fromAxisAngle(axis, angle, _q);
         const roateMatrix = Matrix3$1.fromQuaternion(q, rm3);
-        const inverseTranslation = Matrix4$5.fromTranslation(Cartesian3$b.negate(this.center, cartesian3_1), mat4_1);
+        const inverseTranslation = Matrix4$5.fromTranslation(Cartesian3$d.negate(this.center, cartesian3_1), mat4_1);
         Matrix4$5.multiply(this.modelMatrix, translation, this.modelMatrix);
         Matrix4$5.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
         Matrix4$5.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
@@ -16765,7 +21652,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         offset.x = -offset.x;
         offset.z = -offset.z;
-        Cartesian3$b.add(this._offset, offset, this._offset);
+        Cartesian3$d.add(this._offset, offset, this._offset);
         const matrix = Matrix4$5.fromTranslation(offset);
         Matrix4$5.multiply(this._modelMatrix, matrix, this._modelMatrix);
         this.modelMatrix = this._modelMatrix;
@@ -16781,35 +21668,35 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       createAux(offset) {
         if (offset.x > 0) {
-          const p1 = Cartesian3$b.clone(this.xAxis.positions[0]);
-          const p2 = Cartesian3$b.clone(this.xAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.xAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.xAxis.positions[0]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$b.clone(this.xAxis.positions[1]);
-          const p2 = Cartesian3$b.clone(this.xAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.xAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.xAxis.positions[1]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         }
         if (offset.y < 0) {
-          const p1 = Cartesian3$b.clone(this.yAxis.positions[0]);
-          const p2 = Cartesian3$b.clone(this.yAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.yAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.yAxis.positions[0]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$b.clone(this.yAxis.positions[1]);
-          const p2 = Cartesian3$b.clone(this.yAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.yAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.yAxis.positions[1]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         }
         if (offset.z > 0) {
-          const p1 = Cartesian3$b.clone(this.zAxis.positions[0]);
-          const p2 = Cartesian3$b.clone(this.zAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.zAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.zAxis.positions[0]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$b.clone(this.zAxis.positions[1]);
-          const p2 = Cartesian3$b.clone(this.zAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.zAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.zAxis.positions[1]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         }
@@ -16828,9 +21715,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const q = Quaternion.fromAxisAngle(this.activePrimitive.normal, -angle);
         const matrix3 = Matrix3$1.fromQuaternion(q, rm3);
         const rotation = Matrix4$5.fromRotation(matrix3, mat4);
-        let position = Cartesian3$b.subtract(startLocalPosition, this.center, cartesian3_1);
+        let position = Cartesian3$d.subtract(startLocalPosition, this.center, cartesian3_1);
         Matrix4$5.multiplyByPoint(rotation, position, position);
-        Cartesian3$b.add(this.center, position, position);
+        Cartesian3$d.add(this.center, position, position);
         this.rAxuEnd.positions = [this.center, position];
       }
     }
@@ -16965,7 +21852,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (typeof options === 'string') {
                 options = {url: options};
             }
-            options.getFeatureInfoFormats = defaultValue$9(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
+            options.getFeatureInfoFormats = defaultValue$b(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
             super(options);
         }
         /**
@@ -17110,14 +21997,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     function createDefaultLayer() {
         return new XYZLayer({
-            url: Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png'),
+            url: Url$1.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png'),
             maximumLevel: 4
         })
     }
 
     const {
-        defined: defined$8,
-        defaultValue: defaultValue$5,
+        defined: defined$9,
+        defaultValue: defaultValue$6,
         ColorMaterialProperty: ColorMaterialProperty$1,
         ConstantPositionProperty: ConstantPositionProperty$1,
         ConstantProperty: ConstantProperty$1,
@@ -17127,16 +22014,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         EntityCluster,
         PinBuilder,
         createGuid: createGuid$2,
-        Cartesian3: Cartesian3$a,
+        Cartesian3: Cartesian3$c,
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$2,
-        Color: Color$l,
+        Color: Color$m,
         EntityCollection,
         HeightReference: HeightReference$2,
-        Resource: Resource$3,
+        Resource: Resource$4,
         describe,
-        Event: Event$7
+        Event: Event$8
     } = Cesium;
     const sizes$1 = {
         small: 24,
@@ -17195,7 +22082,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     function createDescriptionCallback$1(describe, properties, nameProperty) {
         var description;
         return function (time, result) {
-            if (!defined$8(description)) {
+            if (!defined$9(description)) {
                 description = describe(properties, nameProperty);
             }
             return description;
@@ -17204,12 +22091,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     // GeoJSON processing functions
     function createObject$1(geoJson, entityCollection, describe) {
         var id = geoJson.id;
-        if (!defined$8(id) || geoJson.type !== 'Feature') {
+        if (!defined$9(id) || geoJson.type !== 'Feature') {
             id = createGuid$2();
         } else {
             var i = 2;
             var finalId = id;
-            while (defined$8(entityCollection.getById(finalId))) {
+            while (defined$9(entityCollection.getById(finalId))) {
                 finalId = id + '_' + i;
                 i++;
             }
@@ -17218,14 +22105,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
         var entity = entityCollection.getOrCreateEntity(id);
         var properties = geoJson.properties;
-        if (defined$8(properties)) {
+        if (defined$9(properties)) {
             entity.properties = properties;
 
             var nameProperty;
 
             //Check for the simplestyle specified name first.
             var name = properties.title;
-            if (defined$8(name)) {
+            if (defined$9(name)) {
                 entity.name = name;
                 nameProperty = 'title';
             } else {
@@ -17256,14 +22143,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                         }
                     }
                 }
-                if (defined$8(nameProperty)) {
+                if (defined$9(nameProperty)) {
                     entity.name = properties[nameProperty];
                 }
             }
 
             var description = properties.description;
             if (description !== null) {
-                entity.description = !defined$8(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
+                entity.description = !defined$9(description) ? describe(properties, nameProperty) : new ConstantProperty$1(description);
             }
         }
         return entity;
@@ -17275,13 +22162,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return;
         }
 
-        if (!defined$8(feature.geometry)) {
+        if (!defined$9(feature.geometry)) {
             throw new CesiumProError$1('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes$1[geometryType];
-        if (!defined$8(geometryHandler)) {
+        if (!defined$9(geometryHandler)) {
             throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
@@ -17300,7 +22187,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             var geometry = geometries[i];
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes$1[geometryType];
-            if (!defined$8(geometryHandler)) {
+            if (!defined$9(geometryHandler)) {
                 throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
@@ -17311,13 +22198,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         let size = options.pointSize;
         let color = options.pointColor;
         const properties = geoJson.properties;
-        if (defined$8(properties)) {
+        if (defined$9(properties)) {
             const cssColor = properties['point-color'];
-            if (defined$8(cssColor)) {
-                color = Color$l.fromCssColorString(cssColor);
+            if (defined$9(cssColor)) {
+                color = Color$m.fromCssColorString(cssColor);
             }
 
-            size = defaultValue$5(sizes$1[properties['point-size']], size);
+            size = defaultValue$6(sizes$1[properties['point-size']], size);
         }
         const point = new PointGraphics$1();
 
@@ -17349,25 +22236,25 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const widthProperty = options.lineWidth;
 
         const properties = geoJson.properties;
-        if (defined$8(properties)) {
+        if (defined$9(properties)) {
             const width = properties['stroke-width'];
-            if (defined$8(width)) {
+            if (defined$9(width)) {
                 widthProperty = new ConstantProperty$1(width);
             }
 
             let color;
             let stroke = properties.stroke;
-            if (defined$8(stroke)) {
-                color = Color$l.fromCssColorString(stroke);
+            if (defined$9(stroke)) {
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$8(opacity) && opacity !== 1.0) {
-                if (!defined$8(color)) {
+            if (defined$9(opacity) && opacity !== 1.0) {
+                if (!defined$9(color)) {
                     color = material.color.clone();
                 }
                 color.alpha = opacity;
             }
-            if (defined$8(color)) {
+            if (defined$9(color)) {
                 material = new ColorMaterialProperty$1(color);
             }
         }
@@ -17390,7 +22277,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     continue;
                 }
                 var value = properties[key];
-                if (defined$8(value)) {
+                if (defined$9(value)) {
                     if (typeof value === "object") {
                         html +=
                             "<tr><th>" +
@@ -17426,6 +22313,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     }
 
     function createPolygon$1(dataSource, geoJson, crsFunction, coordinates, options) {
+        if (options.outline) {
+            const lineOptions = Cesium.clone(options);
+            lineOptions.width = options.outlineWidth;
+            lineOptions.lineColor = options.outlineColor;
+            return createLineString$1(dataSource, geoJson, crsFunction, coordinates[0], lineOptions)
+        }
+        if (options.fill.getValue().color === false) {
+            return;
+        }
         if (coordinates.length === 0 || coordinates[0].length === 0) {
             return;
         }
@@ -17435,48 +22331,48 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         let outlineWidth = options.outlineWidth;
 
         const properties = geoJson.properties;
-        if (defined$8(properties)) {
+        if (defined$9(properties)) {
             const width = properties['stroke-width'];
-            if (defined$8(width)) {
+            if (defined$9(width)) {
                 outlineWidth = new ConstantProperty$1(width);
             }
             let color;
             const stroke = properties.stroke;
-            if (defined$8(stroke)) {
-                color = Color$l.fromCssColorString(stroke);
+            if (defined$9(stroke)) {
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$8(opacity) && opacity !== 1.0) {
-                if (!defined$8(color)) {
+            if (defined$9(opacity) && opacity !== 1.0) {
+                if (!defined$9(color)) {
                     color = options.outlineColor.color.clone();
                 }
                 color.alpha = opacity;
             }
 
-            if (defined$8(color)) {
+            if (defined$9(color)) {
                 outlineColor = new ConstantProperty$1(color);
             }
 
             let fillColor;
             const fill = properties.fill;
-            if (defined$8(fill)) {
-                fillColor = Color$l.fromCssColorString(fill);
+            if (defined$9(fill)) {
+                fillColor = Color$m.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
-            if (defined$8(opacity) && opacity !== material.color.alpha) {
-                if (!defined$8(fillColor)) {
+            if (defined$9(opacity) && opacity !== material.color.alpha) {
+                if (!defined$9(fillColor)) {
                     fillColor = material.color.clone();
                 }
                 fillColor.alpha = opacity;
             }
-            if (defined$8(fillColor)) {
+            if (defined$9(fillColor)) {
                 material = new ColorMaterialProperty$1(fillColor);
             }
         }
 
         const polygon = new PolygonGraphics$1();
-        polygon.outline = new ConstantProperty$1(options.outline);
+        polygon.outline = false; //new ConstantProperty(options.outline);
         polygon.outlineColor = outlineColor;
         polygon.outlineWidth = outlineWidth;
         polygon.material = material;
@@ -17492,7 +22388,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     let extrudeValue = extrudedHeight;
                     for (let con of conditions) {
                         const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if (!(defined$8(value) && defined$8(value[1]))) {
+                        if (!(defined$9(value) && defined$9(value[1]))) {
                             continue;
                         }
                         extrudeValue = extrudeValue.replace(con, properties[value[1]]);
@@ -17550,21 +22446,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
     }
     function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$a.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$c.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load$1(that, geoJson, options, sourceUri) {
         let name;
-        if (defined$8(sourceUri)) {
+        if (defined$9(sourceUri)) {
             name = Cesium.getFilenameFromUri(sourceUri);
         }
 
-        if (defined$8(name) && that._name !== name) {
+        if (defined$9(name) && that._name !== name) {
             that._name = name;
             that._changed.raiseEvent(that);
         }
 
         const typeHandler = geoJsonObjectTypes$1[geoJson.type];
-        if (!defined$8(typeHandler)) {
+        if (!defined$9(typeHandler)) {
             throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
@@ -17572,31 +22468,31 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const crs = geoJson.crs;
         let crsFunction = crs !== null ? defaultCrsFunction$1 : null;
 
-        if (defined$8(crs)) {
-            if (!defined$8(crs.properties)) {
+        if (defined$9(crs)) {
+            if (!defined$9(crs.properties)) {
                 throw new CesiumProError$1('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames$1[properties.name];
-                if (!defined$8(crsFunction)) {
+                if (!defined$9(crsFunction)) {
                     throw new CesiumProError$1('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs$1[properties.href];
-                if (!defined$8(handler)) {
+                if (!defined$9(handler)) {
                     handler = crsLinkTypes$1[properties.type];
                 }
 
-                if (!defined$8(handler)) {
+                if (!defined$9(handler)) {
                     throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames$1['EPSG:' + properties.code];
-                if (!defined$8(crsFunction)) {
+                if (!defined$9(crsFunction)) {
                     throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
@@ -17651,10 +22547,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(name) {
             this._name = name;
-            this._changed = new Event$7();
-            this._error = new Event$7();
+            this._changed = new Event$8();
+            this._error = new Event$8();
             this._isLoading = false;
-            this._loading = new Event$7();
+            this._loading = new Event$8();
             this._entityCollection = new EntityCollection(this);
             this._promises = [];
             this._pinBuilder = new PinBuilder();
@@ -17675,21 +22571,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$l.ROYALBLUE;
+        static pointColor = Color$m.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$l.YELLOW;
+        static lineColor = Color$m.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$l.fromBytes(255, 255, 0, 100);
+        static fill = Color$m.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof GeoJsonDataSource
@@ -17703,7 +22599,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$l.YELLOW;
+        static outlineColor = Color$m.YELLOW;
         /**
          * 线要素的宽度
          * @memberof GeoJsonDataSource
@@ -17810,7 +22706,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         set clustering(value) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$8(value)) {
+            if (!defined$9(value)) {
                 throw new DeveloperError("value must be defined.");
             }
             //>>includeEnd('debug');
@@ -17831,13 +22727,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         load(data, options) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$8(data)) {
+            if (!defined$9(data)) {
                 throw new CesiumProError$1("data is required.");
             }
             //>>includeEnd('debug');
 
             DataSource$1.setLoading(this, true);
-            options = defaultValue$5(options, {});
+            options = defaultValue$6(options, {});
 
             // User specified credit
             let credit = options.credit;
@@ -17848,15 +22744,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === "string" || data instanceof Resource$3) {
-                data = Resource$3.createIfNeeded(data);
+            if (typeof data === "string" || data instanceof Resource$4) {
+                data = Resource$4.createIfNeeded(data);
                 promise = data.fetchJson();
-                sourceUri = defaultValue$5(sourceUri, data.getUrlComponent());
+                sourceUri = defaultValue$6(sourceUri, data.getUrlComponent());
 
                 // Add resource credits to our list of credits to display
                 const resourceCredits = this._resourceCredits;
                 const credits = data.credits;
-                if (defined$8(credits)) {
+                if (defined$9(credits)) {
                     const length = credits.length;
                     for (const i = 0; i < length; i++) {
                         resourceCredits.push(credits[i]);
@@ -17865,22 +22761,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
 
             options = {
-                describe: defaultValue$5(options.describe, defaultDescribeProperty$1),
-                pointSize: defaultValue$5(options.pointSize, GeoJsonDataSource.pointSize),
-                pointColor: defaultValue$5(options.pointColor, GeoJsonDataSource.pointColor),
+                describe: defaultValue$6(options.describe, defaultDescribeProperty$1),
+                pointSize: defaultValue$6(options.pointSize, GeoJsonDataSource.pointSize),
+                pointColor: defaultValue$6(options.pointColor, GeoJsonDataSource.pointColor),
                 lineWidth: new ConstantProperty$1(
-                    defaultValue$5(options.lineWidth, GeoJsonDataSource.lineWidth)
+                    defaultValue$6(options.lineWidth, GeoJsonDataSource.lineWidth)
                 ),
                 outlineColor: new ColorMaterialProperty$1(
-                    defaultValue$5(options.outlineColor, GeoJsonDataSource.outlineColor)
+                    defaultValue$6(options.outlineColor, GeoJsonDataSource.outlineColor)
                 ),
-                lineColor: new ColorMaterialProperty$1(defaultValue$5(options.lineColor, GeoJsonDataSource.lineColor)),
-                outlineWidth: defaultValue$5(options.outlineWidth, GeoJsonDataSource.outlineWidth),
+                lineColor: new ColorMaterialProperty$1(defaultValue$6(options.lineColor, GeoJsonDataSource.lineColor)),
+                outlineWidth: defaultValue$6(options.outlineWidth, GeoJsonDataSource.outlineWidth),
                 fill: new ColorMaterialProperty$1(
-                    defaultValue$5(options.fill, GeoJsonDataSource.fill)
+                    defaultValue$6(options.fill, GeoJsonDataSource.fill)
                 ),
-                outline: defaultValue$5(options.outline, GeoJsonDataSource.outline),
-                clampToGround: defaultValue$5(options.clampToGround, GeoJsonDataSource.clampToGround),
+                outline: defaultValue$6(options.outline, GeoJsonDataSource.outline),
+                clampToGround: defaultValue$6(options.clampToGround, GeoJsonDataSource.clampToGround),
                 extrudedHeight: options.extrudedHeight
             };
 
@@ -17910,17 +22806,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new GeoJsonDataSource().load(data, options)
     };
 
-    const exports$1 = {};
-    var array_cancel = function() {
+    function array_cancel() {
       this._array = null;
       return Promise.resolve();
-    };
+    }
 
-    var array_read = function() {
+    function array_read() {
       var array = this._array;
       this._array = null;
       return Promise.resolve(array ? {done: false, value: array} : {done: true, value: undefined});
-    };
+    }
 
     function array(array) {
       return new ArraySource(array instanceof Uint8Array ? array : new Uint8Array(array));
@@ -17933,15 +22828,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     ArraySource.prototype.read = array_read;
     ArraySource.prototype.cancel = array_cancel;
 
-    var fetchPath = function(url) {
+    function fetchPath(url) {
       return fetch(url).then(function(response) {
         return response.body && response.body.getReader
             ? response.body.getReader()
             : response.arrayBuffer().then(array);
       });
-    };
+    }
 
-    var requestPath = function(url) {
+    function requestPath(url) {
       return new Promise(function(resolve, reject) {
         var request = new XMLHttpRequest;
         request.responseType = "arraybuffer";
@@ -17951,7 +22846,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         request.open("GET", url, true);
         request.send();
       });
-    };
+    }
 
     function path(path) {
       return (typeof fetch === "function" ? fetchPath : requestPath)(path);
@@ -17963,11 +22858,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     var empty = new Uint8Array(0);
 
-    var slice_cancel = function() {
+    function slice_cancel() {
       return this._source.cancel();
-    };
+    }
 
-    function concat(a, b) {
+    function concat$1(a, b) {
       if (!a.length) return b;
       if (!b.length) return a;
       var c = new Uint8Array(a.length + b.length);
@@ -17976,7 +22871,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       return c;
     }
 
-    var slice_read = function() {
+    function slice_read() {
       var that = this, array = that._array.subarray(that._index);
       return that._source.read().then(function(result) {
         that._array = empty;
@@ -17984,11 +22879,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return result.done ? (array.length > 0
             ? {done: false, value: array}
             : {done: true, value: undefined})
-            : {done: false, value: concat(array, result.value)};
+            : {done: false, value: concat$1(array, result.value)};
       });
-    };
+    }
 
-    var slice_slice = function(length) {
+    function slice_slice(length) {
       if ((length |= 0) < 0) throw new Error("invalid length");
       var that = this, index = this._array.length - this._index;
 
@@ -18025,7 +22920,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return read();
         });
       })();
-    };
+    }
 
     function slice(source) {
       return typeof source.slice === "function" ? source :
@@ -18043,27 +22938,27 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     SliceSource.prototype.slice = slice_slice;
     SliceSource.prototype.cancel = slice_cancel;
 
-    var dbf_cancel = function() {
+    function dbf_cancel() {
       return this._source.cancel();
-    };
+    }
 
-    var readBoolean = function(value) {
+    function readBoolean(value) {
       return /^[nf]$/i.test(value) ? false
           : /^[yt]$/i.test(value) ? true
           : null;
-    };
+    }
 
-    var readDate = function(value) {
+    function readDate(value) {
       return new Date(+value.substring(0, 4), value.substring(4, 6) - 1, +value.substring(6, 8));
-    };
+    }
 
-    var readNumber$1 = function(value) {
+    function readNumber$1(value) {
       return !(value = value.trim()) || isNaN(value = +value) ? null : value;
-    };
+    }
 
-    var readString = function(value) {
+    function readString(value) {
       return value.trim() || null;
-    };
+    }
 
     var types$4 = {
       B: readNumber$1,
@@ -18075,7 +22970,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       N: readNumber$1
     };
 
-    var dbf_read = function() {
+    function dbf_read() {
       var that = this, i = 1;
       return that._source.slice(that._recordLength).then(function(value) {
         return value && (value[0] !== 0x1a) ? {done: false, value: that._fields.reduce(function(p, f) {
@@ -18083,13 +22978,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return p;
         }, {})} : {done: true, value: undefined};
       });
-    };
+    }
 
-    var view = function(array) {
+    function view(array) {
       return new DataView(array.buffer, array.byteOffset, array.byteLength);
-    };
+    }
 
-    var dbf = function(source, decoder) {
+    function dbf(source, decoder) {
       source = slice(source);
       return source.slice(32).then(function(array) {
         var head = view(array);
@@ -18097,7 +22992,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return new Dbf(source, decoder, head, view(array));
         });
       });
-    };
+    }
 
     function Dbf(source, decoder, head, body) {
       this._source = source;
@@ -18114,29 +23009,29 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       }
     }
 
-    var prototype = Dbf.prototype;
-    prototype.read = dbf_read;
-    prototype.cancel = dbf_cancel;
+    var prototype$2 = Dbf.prototype;
+    prototype$2.read = dbf_read;
+    prototype$2.cancel = dbf_cancel;
 
     function cancel() {
       return this._source.cancel();
     }
 
-    var parseMultiPoint = function(record) {
+    function parseMultiPoint(record) {
       var i = 40, j, n = record.getInt32(36, true), coordinates = new Array(n);
       for (j = 0; j < n; ++j, i += 16) coordinates[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
       return {type: "MultiPoint", coordinates: coordinates};
-    };
+    }
 
-    var parseNull = function() {
+    function parseNull() {
       return null;
-    };
+    }
 
-    var parsePoint = function(record) {
+    function parsePoint(record) {
       return {type: "Point", coordinates: [record.getFloat64(4, true), record.getFloat64(12, true)]};
-    };
+    }
 
-    var parsePolygon = function(record) {
+    function parsePolygon(record) {
       var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m), polygons = [], holes = [];
       for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
       for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
@@ -18159,8 +23054,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       return polygons.length === 1
           ? {type: "Polygon", coordinates: polygons[0]}
           : {type: "MultiPolygon", coordinates: polygons};
-    };
-
+    }
     function ringClockwise(ring) {
       if ((n = ring.length) < 4) return false;
       var i = 0, n, area = ring[n - 1][1] * ring[0][0] - ring[n - 1][0] * ring[0][1];
@@ -18202,23 +23096,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       return t < 0 || t > 1 ? false : t === 0 || t === 1 ? true : t * x10 === x20 && t * y10 === y20;
     }
 
-    var parsePolyLine = function(record) {
+    function parsePolyLine(record) {
       var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m);
       for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
       for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
       return n === 1
           ? {type: "LineString", coordinates: points}
           : {type: "MultiLineString", coordinates: parts.map(function(i, j) { return points.slice(i, parts[j + 1]); })};
-    };
+    }
 
-    var concat$1 = function(a, b) {
+    function concat(a, b) {
       var ab = new Uint8Array(a.length + b.length);
       ab.set(a, 0);
       ab.set(b, a.length);
       return ab;
-    };
+    }
 
-    var shp_read = function() {
+    function shp_read() {
       var that = this;
       ++that._index;
       return that._source.slice(12).then(function(array) {
@@ -18231,7 +23125,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         function skip() {
           return that._source.slice(4).then(function(chunk) {
             if (chunk == null) return {done: true, value: undefined};
-            header = view(array = concat$1(array.slice(4), chunk));
+            header = view(array = concat(array.slice(4), chunk));
             return header.getInt32(0, false) !== that._index ? skip() : read();
           });
         }
@@ -18241,13 +23135,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         function read() {
           var length = header.getInt32(4, false) * 2 - 4, type = header.getInt32(8, true);
           return length < 0 || (type && type !== that._type) ? skip() : that._source.slice(length).then(function(chunk) {
-            return {done: false, value: type ? that._parse(view(concat$1(array.slice(8), chunk))) : null};
+            return {done: false, value: type ? that._parse(view(concat(array.slice(8), chunk))) : null};
           });
         }
 
         return read();
       });
-    };
+    }
 
     var parsers = {
       0: parseNull,
@@ -18265,13 +23159,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       28: parseMultiPoint // MultiPointM
     };
 
-    var shp = function(source) {
+    function shp(source) {
       source = slice(source);
       return source.slice(100).then(function(array) {
         return new Shp(source, view(array));
       });
-    };
-
+    }
     function Shp(source, header) {
       var type = header.getInt32(32, true);
       if (!(type in parsers)) throw new Error("unsupported shape type: " + type);
@@ -18282,20 +23175,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       this.bbox = [header.getFloat64(36, true), header.getFloat64(44, true), header.getFloat64(52, true), header.getFloat64(60, true)];
     }
 
-    var prototype$2 = Shp.prototype;
-    prototype$2.read = shp_read;
-    prototype$2.cancel = cancel;
+    var prototype$1 = Shp.prototype;
+    prototype$1.read = shp_read;
+    prototype$1.cancel = cancel;
 
     function noop() {}
 
-    var shapefile_cancel = function() {
+    function shapefile_cancel() {
       return Promise.all([
         this._dbf && this._dbf.cancel(),
         this._shp.cancel()
       ]).then(noop);
-    };
+    }
 
-    var shapefile_read = function() {
+    function shapefile_read() {
       var that = this;
       return Promise.all([
         that._dbf ? that._dbf.read() : {value: {}},
@@ -18311,102 +23204,55 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           }
         };
       });
-    };
+    }
 
-    var shapefile = function(shpSource, dbfSource, decoder) {
+    function shapefile(shpSource, dbfSource, decoder) {
       return Promise.all([
         shp(shpSource),
         dbfSource && dbf(dbfSource, decoder)
       ]).then(function(sources) {
         return new Shapefile(sources[0], sources[1]);
       });
-    };
-
-    function Shapefile(shp$$1, dbf$$1) {
-      this._shp = shp$$1;
-      this._dbf = dbf$$1;
-      this.bbox = shp$$1.bbox;
     }
 
-    var prototype$1 = Shapefile.prototype;
-    prototype$1.read = shapefile_read;
-    prototype$1.cancel = shapefile_cancel;
+    function Shapefile(shp, dbf) {
+      this._shp = shp;
+      this._dbf = dbf;
+      this.bbox = shp.bbox;
+    }
 
-    function open(shp$$1, dbf$$1, options) {
-      if (typeof dbf$$1 === "string") {
-        if (!/\.dbf$/.test(dbf$$1)) dbf$$1 += ".dbf";
-        dbf$$1 = path(dbf$$1);
-      } else if (dbf$$1 instanceof ArrayBuffer || dbf$$1 instanceof Uint8Array) {
-        dbf$$1 = array(dbf$$1);
-      } else if (dbf$$1 != null) {
-        dbf$$1 = stream(dbf$$1);
+    var prototype = Shapefile.prototype;
+    prototype.read = shapefile_read;
+    prototype.cancel = shapefile_cancel;
+
+    function open(shp, dbf, options) {
+      if (typeof dbf === "string") {
+        if (!/\.dbf$/.test(dbf)) dbf += ".dbf";
+        dbf = path(dbf);
+      } else if (dbf instanceof ArrayBuffer || dbf instanceof Uint8Array) {
+        dbf = array(dbf);
+      } else if (dbf != null) {
+        dbf = stream(dbf);
       }
-      if (typeof shp$$1 === "string") {
-        if (!/\.shp$/.test(shp$$1)) shp$$1 += ".shp";
-        if (dbf$$1 === undefined) dbf$$1 = path(shp$$1.substring(0, shp$$1.length - 4) + ".dbf").catch(function() {});
-        shp$$1 = path(shp$$1);
-      } else if (shp$$1 instanceof ArrayBuffer || shp$$1 instanceof Uint8Array) {
-        shp$$1 = array(shp$$1);
+      if (typeof shp === "string") {
+        if (!/\.shp$/.test(shp)) shp += ".shp";
+        if (dbf === undefined) dbf = path(shp.substring(0, shp.length - 4) + ".dbf").catch(function() {});
+        shp = path(shp);
+      } else if (shp instanceof ArrayBuffer || shp instanceof Uint8Array) {
+        shp = array(shp);
       } else {
-        shp$$1 = stream(shp$$1);
+        shp = stream(shp);
       }
-      return Promise.all([shp$$1, dbf$$1]).then(function(sources) {
-        var shp$$1 = sources[0], dbf$$1 = sources[1], encoding = "windows-1252";
+      return Promise.all([shp, dbf]).then(function(sources) {
+        var shp = sources[0], dbf = sources[1], encoding = "windows-1252";
         if (options && options.encoding != null) encoding = options.encoding;
-        return shapefile(shp$$1, dbf$$1, dbf$$1 && new TextDecoder(encoding));
+        return shapefile(shp, dbf, dbf && new TextDecoder(encoding));
       });
     }
-
-    function openShp(source, options) {
-      if (typeof source === "string") {
-        if (!/\.shp$/.test(source)) source += ".shp";
-        source = path(source);
-      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
-        source = array(source);
-      } else {
-        source = stream(source);
-      }
-      return Promise.resolve(source).then(shp);
-    }
-
-    function openDbf(source, options) {
-      var encoding = "windows-1252";
-      if (options && options.encoding != null) encoding = options.encoding;
-      encoding = new TextDecoder(encoding);
-      if (typeof source === "string") {
-        if (!/\.dbf$/.test(source)) source += ".dbf";
-        source = path(source);
-      } else if (source instanceof ArrayBuffer || source instanceof Uint8Array) {
-        source = array(source);
-      } else {
-        source = stream(source);
-      }
-      return Promise.resolve(source).then(function(source) {
-        return dbf(source, encoding);
-      });
-    }
-
-    function read(shp$$1, dbf$$1, options) {
-      return open(shp$$1, dbf$$1, options).then(function(source) {
-        var features = [], collection = {type: "FeatureCollection", features: features, bbox: source.bbox};
-        return source.read().then(function read(result) {
-          if (result.done) return collection;
-          features.push(result.value);
-          return source.read().then(read);
-        });
-      });
-    }
-
-    exports$1.open = open;
-    exports$1.openShp = openShp;
-    exports$1.openDbf = openDbf;
-    exports$1.read = read;
-
-    Object.defineProperty(exports$1, '__esModule', { value: true });
 
     const {
-        defined: defined$7,
-        defaultValue: defaultValue$4,
+        defined: defined$8,
+        defaultValue: defaultValue$5,
         ColorMaterialProperty,
         ConstantPositionProperty,
         ConstantProperty,
@@ -18414,13 +23260,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         PolygonGraphics,
         PolylineGraphics,
         createGuid: createGuid$1,
-        Cartesian3: Cartesian3$9,
+        Cartesian3: Cartesian3$b,
         PointGraphics,
         ArcType,
         PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$k,
+        Color: Color$l,
         HeightReference: HeightReference$1,
-        Resource: Resource$2,
+        Resource: Resource$3,
     } = Cesium;
     const sizes = {
         small: 24,
@@ -18466,7 +23312,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     function createDescriptionCallback(describe, properties, nameProperty) {
         var description;
         return function (time, result) {
-            if (!defined$7(description)) {
+            if (!defined$8(description)) {
                 description = describe(properties, nameProperty);
             }
             return description;
@@ -18475,12 +23321,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     // GeoJSON processing functions
     function createObject(geoJson, entityCollection, describe) {
         var id = geoJson.id;
-        if (!defined$7(id) || geoJson.type !== 'Feature') {
+        if (!defined$8(id) || geoJson.type !== 'Feature') {
             id = createGuid$1();
         } else {
             var i = 2;
             var finalId = id;
-            while (defined$7(entityCollection.getById(finalId))) {
+            while (defined$8(entityCollection.getById(finalId))) {
                 finalId = id + '_' + i;
                 i++;
             }
@@ -18489,14 +23335,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
         var entity = entityCollection.getOrCreateEntity(id);
         var properties = geoJson.properties;
-        if (defined$7(properties)) {
+        if (defined$8(properties)) {
             entity.properties = properties;
 
             var nameProperty;
 
             //Check for the simplestyle specified name first.
             var name = properties.title;
-            if (defined$7(name)) {
+            if (defined$8(name)) {
                 entity.name = name;
                 nameProperty = 'title';
             } else {
@@ -18527,14 +23373,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                         }
                     }
                 }
-                if (defined$7(nameProperty)) {
+                if (defined$8(nameProperty)) {
                     entity.name = properties[nameProperty];
                 }
             }
 
             var description = properties.description;
             if (description !== null) {
-                entity.description = !defined$7(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
+                entity.description = !defined$8(description) ? describe(properties, nameProperty) : new ConstantProperty(description);
             }
         }
         return entity;
@@ -18546,13 +23392,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return;
         }
 
-        if (!defined$7(feature.geometry)) {
+        if (!defined$8(feature.geometry)) {
             throw new CesiumProError$1('feature.geometry is required.');
         }
 
         var geometryType = feature.geometry.type;
         var geometryHandler = geometryTypes[geometryType];
-        if (!defined$7(geometryHandler)) {
+        if (!defined$8(geometryHandler)) {
             throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
         }
         geometryHandler(dataSource, feature, feature.geometry, crsFunction, options);
@@ -18571,7 +23417,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             var geometry = geometries[i];
             var geometryType = geometry.type;
             var geometryHandler = geometryTypes[geometryType];
-            if (!defined$7(geometryHandler)) {
+            if (!defined$8(geometryHandler)) {
                 throw new CesiumProError$1('Unknown geometry type: ' + geometryType);
             }
             geometryHandler(dataSource, geoJson, geometry, crsFunction, options);
@@ -18582,13 +23428,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         let size = options.pointSize;
         let color = options.pointColor;
         const properties = geoJson.properties;
-        if (defined$7(properties)) {
+        if (defined$8(properties)) {
             const cssColor = properties['point-color'];
-            if (defined$7(cssColor)) {
-                color = Color$k.fromCssColorString(cssColor);
+            if (defined$8(cssColor)) {
+                color = Color$l.fromCssColorString(cssColor);
             }
 
-            size = defaultValue$4(sizes[properties['point-size']], size);
+            size = defaultValue$5(sizes[properties['point-size']], size);
         }
         const point = new PointGraphics();
 
@@ -18620,25 +23466,25 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const widthProperty = options.lineWidth;
 
         const properties = geoJson.properties;
-        if (defined$7(properties)) {
+        if (defined$8(properties)) {
             const width = properties['stroke-width'];
-            if (defined$7(width)) {
+            if (defined$8(width)) {
                 widthProperty = new ConstantProperty(width);
             }
 
             let color;
             let stroke = properties.stroke;
-            if (defined$7(stroke)) {
-                color = Color$k.fromCssColorString(stroke);
+            if (defined$8(stroke)) {
+                color = Color$l.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$7(opacity) && opacity !== 1.0) {
-                if (!defined$7(color)) {
+            if (defined$8(opacity) && opacity !== 1.0) {
+                if (!defined$8(color)) {
                     color = material.color.clone();
                 }
                 color.alpha = opacity;
             }
-            if (defined$7(color)) {
+            if (defined$8(color)) {
                 material = new ColorMaterialProperty(color);
             }
         }
@@ -18665,7 +23511,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
     }
 
-    function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {
+    function createPolygon(dataSource, geoJson, crsFunction, coordinates, options) {   
+        if (options.outline) {
+            const lineOptions = Cesium.clone(options);
+            lineOptions.width = options.outlineWidth;
+            lineOptions.lineColor = options.outlineColor;
+            for (let coor of coordinates) {
+                createLineString(dataSource, geoJson, crsFunction, coor, lineOptions);
+            }
+        }
+        if (options.fill.getValue().color === false) {
+            return;
+        }
         if (coordinates.length === 0 || coordinates[0].length === 0) {
             return;
         }
@@ -18675,48 +23532,48 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         let outlineWidth = options.outlineWidth;
 
         const properties = geoJson.properties;
-        if (defined$7(properties)) {
+        if (defined$8(properties)) {
             const width = properties['stroke-width'];
-            if (defined$7(width)) {
+            if (defined$8(width)) {
                 outlineWidth = new ConstantProperty(width);
             }
             let color;
             const stroke = properties.stroke;
-            if (defined$7(stroke)) {
-                color = Color$k.fromCssColorString(stroke);
+            if (defined$8(stroke)) {
+                color = Color$l.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
-            if (defined$7(opacity) && opacity !== 1.0) {
-                if (!defined$7(color)) {
+            if (defined$8(opacity) && opacity !== 1.0) {
+                if (!defined$8(color)) {
                     color = options.outlineColor.color.clone();
                 }
                 color.alpha = opacity;
             }
 
-            if (defined$7(color)) {
+            if (defined$8(color)) {
                 outlineColor = new ConstantProperty(color);
             }
 
             let fillColor;
             const fill = properties.fill;
-            if (defined$7(fill)) {
-                fillColor = Color$k.fromCssColorString(fill);
+            if (defined$8(fill)) {
+                fillColor = Color$l.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
-            if (defined$7(opacity) && opacity !== material.color.alpha) {
-                if (!defined$7(fillColor)) {
+            if (defined$8(opacity) && opacity !== material.color.alpha) {
+                if (!defined$8(fillColor)) {
                     fillColor = material.color.clone();
                 }
                 fillColor.alpha = opacity;
             }
-            if (defined$7(fillColor)) {
+            if (defined$8(fillColor)) {
                 material = new ColorMaterialProperty(fillColor);
             }
         }
 
         const polygon = new PolygonGraphics();
-        polygon.outline = new ConstantProperty(options.outline);
+        polygon.outline = false;
         polygon.outlineColor = outlineColor;
         polygon.outlineWidth = outlineWidth;
         polygon.material = material;
@@ -18731,7 +23588,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     let extrudeValue = extrudedHeight;
                     for(let con of conditions) {
                         const value = /\$\{\s*(.*?)\s*\}/ig.exec(con);
-                        if(!(defined$7(value) && defined$7(value[1]))) {
+                        if(!(defined$8(value) && defined$8(value[1]))) {
                             continue;
                         }
                         extrudeValue = extrudeValue.replace(con, properties[value[1]]);
@@ -18793,7 +23650,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     continue;
                 }
                 var value = properties[key];
-                if (defined$7(value)) {
+                if (defined$8(value)) {
                     if (typeof value === "object") {
                         html +=
                             "<tr><th>" +
@@ -18833,21 +23690,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
     }
     function defaultCrsFunction(coordinates) {
-        return Cartesian3$9.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$b.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load(that, geoJson, options, sourceUri) {
         let name;
-        if (defined$7(sourceUri)) {
+        if (defined$8(sourceUri)) {
             name = Cesium.getFilenameFromUri(sourceUri);
         }
 
-        if (defined$7(name) && that._name !== name) {
+        if (defined$8(name) && that._name !== name) {
             that._name = name;
             that._changed.raiseEvent(that);
         }
 
         const typeHandler = geoJsonObjectTypes[geoJson.type];
-        if (!defined$7(typeHandler)) {
+        if (!defined$8(typeHandler)) {
             throw new CesiumProError$1('Unsupported GeoJSON object type: ' + geoJson.type);
         }
 
@@ -18855,31 +23712,31 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const crs = geoJson.crs;
         let crsFunction = crs !== null ? defaultCrsFunction : null;
 
-        if (defined$7(crs)) {
-            if (!defined$7(crs.properties)) {
+        if (defined$8(crs)) {
+            if (!defined$8(crs.properties)) {
                 throw new CesiumProError$1('crs.properties is undefined.');
             }
 
             const properties = crs.properties;
             if (crs.type === 'name') {
                 crsFunction = crsNames[properties.name];
-                if (!defined$7(crsFunction)) {
+                if (!defined$8(crsFunction)) {
                     throw new CesiumProError$1('Unknown crs name: ' + properties.name);
                 }
             } else if (crs.type === 'link') {
                 var handler = crsLinkHrefs[properties.href];
-                if (!defined$7(handler)) {
+                if (!defined$8(handler)) {
                     handler = crsLinkTypes[properties.type];
                 }
 
-                if (!defined$7(handler)) {
+                if (!defined$8(handler)) {
                     throw new CesiumProError$1('Unable to resolve crs link: ' + JSON.stringify(properties));
                 }
 
                 crsFunction = handler(properties);
             } else if (crs.type === 'EPSG') {
                 crsFunction = crsNames['EPSG:' + properties.code];
-                if (!defined$7(crsFunction)) {
+                if (!defined$8(crsFunction)) {
                     throw new CesiumProError$1('Unknown crs EPSG code: ' + properties.code);
                 }
             } else {
@@ -18945,21 +23802,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$k.ROYALBLUE;
+        static pointColor = Color$l.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$k.YELLOW;
+        static lineColor = Color$l.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$k.fromBytes(255, 255, 0, 100);
+        static fill = Color$l.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof ShapefileDataSource
@@ -18973,7 +23830,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$k.YELLOW;
+        static outlineColor = Color$l.YELLOW;
         /**
          * 线要素的宽度
          * @memberof ShapefileDataSource
@@ -19006,14 +23863,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         /**
           * 加载Shapefile数据
-          * @param {String} data shapefile文件路径
+          * @param {string}  shpfile 文件路径
+          * @param {string} [dbfile] dbf文件路径, 如果未定义，将使用和shp相同的路径，如shpfile路径为city.shp， dbf路径将自动使用city.dbf
           * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
           * @returns {Promise<ShapefileDataSource>}
          */
-        load(data, options = { encoding: 'utf-8' }) {
-            if (!defined$7(data)) {
-                throw new CesiumProError$1('data is required.');
-            }
+        load(shpfile, dbfile, options = { encoding: 'utf-8' }) {
+            let data = shpfile;
+            if (!defined$8(data)) {
+                throw new CesiumProError$1('shpfile is required.');        }
 
             Cesium.DataSource.setLoading(this, true);
 
@@ -19026,9 +23884,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === 'string' || (data instanceof Resource$2)) {
+            if (typeof data === 'string' || (data instanceof Resource$3)) {
                 promise = new Promise((resolve, reject) => {
-                    exports$1.open(data, undefined, { encoding: options.encoding })
+                    open(data, dbfile, { encoding: options.encoding })
                         .then(source =>
                             source.read().then(function load(result) {
                                 if (result.done) {
@@ -19040,12 +23898,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                         )
                         .catch(error => reject(error.stack));
                 });
-                sourceUri = defaultValue$4(sourceUri, '');
+                sourceUri = defaultValue$5(sourceUri, '');
 
                 // Add resource credits to our list of credits to display
                 var resourceCredits = this._resourceCredits;
                 var credits = data.credits;
-                if (defined$7(credits)) {
+                if (defined$8(credits)) {
                     var length = credits.length;
                     for (var i = 0; i < length; i++) {
                         resourceCredits.push(credits[i]);
@@ -19054,22 +23912,101 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
 
             options = {
-                describe: defaultValue$4(options.describe, defaultDescribeProperty),
-                pointSize: defaultValue$4(options.pointSize, ShapefileDataSource.pointSize),
-                pointColor: defaultValue$4(options.pointColor, ShapefileDataSource.pointColor),
+                describe: defaultValue$5(options.describe, defaultDescribeProperty),
+                pointSize: defaultValue$5(options.pointSize, ShapefileDataSource.pointSize),
+                pointColor: defaultValue$5(options.pointColor, ShapefileDataSource.pointColor),
                 lineWidth: new ConstantProperty(
-                    defaultValue$4(options.lineWidth, ShapefileDataSource.lineWidth)
+                    defaultValue$5(options.lineWidth, ShapefileDataSource.lineWidth)
                 ),
                 outlineColor: new ColorMaterialProperty(
-                    defaultValue$4(options.outlineColor, ShapefileDataSource.outlineColor)
+                    defaultValue$5(options.outlineColor, ShapefileDataSource.outlineColor)
                 ),
-                lineColor: new ColorMaterialProperty(defaultValue$4(options.lineColor, ShapefileDataSource.lineColor)),
-                outlineWidth: defaultValue$4(options.outlineWidth, ShapefileDataSource.outlineWidth),
+                lineColor: new ColorMaterialProperty(defaultValue$5(options.lineColor, ShapefileDataSource.lineColor)),
+                outlineWidth: defaultValue$5(options.outlineWidth, ShapefileDataSource.outlineWidth),
                 fill: new ColorMaterialProperty(
-                    defaultValue$4(options.fill, ShapefileDataSource.fill)
+                    defaultValue$5(options.fill, ShapefileDataSource.fill)
                 ),
-                outline: defaultValue$4(options.outline, ShapefileDataSource.outline),
-                clampToGround: defaultValue$4(options.clampToGround, ShapefileDataSource.clampToGround),
+                outline: defaultValue$5(options.outline, ShapefileDataSource.outline),
+                clampToGround: defaultValue$5(options.clampToGround, ShapefileDataSource.clampToGround),
+                extrudedHeight: options.extrudedHeight
+            };
+            return Promise.resolve(promise)
+            .then(function (geoJson) {
+                return load(that, geoJson, options, sourceUri);
+            })
+            .catch(function (error) {
+                DataSource.setLoading(that, false);
+                that._error.raiseEvent(that, error);
+                throw error;
+            });
+        }
+        /**
+          * 从arrayBuffer加载Shapefile数据
+          * @param {string}  shpfile shp
+          * @param {string} [dbfile] dbf
+          * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
+          * @returns {Promise<ShapefileDataSource>}
+         */
+         loadArrayBuffer(shpfile, dbfile, options = { encoding: 'utf-8' }) {
+            let data = shpfile;
+            if (!defined$8(data)) {
+                throw new CesiumProError$1('shpfile is required.');        }
+
+            Cesium.DataSource.setLoading(this, true);
+
+            const credit = options.credit;
+            if (typeof credit === 'string') {
+                credit = new Cesium.Credit(credit);
+            }
+            this._credit = credit;
+            const that = this;
+
+            let promise = data;
+            let sourceUri = options.sourceUri;
+            if (data instanceof ArrayBuffer) {
+                promise = new Promise((resolve, reject) => {
+                    open(data, dbfile, { encoding: options.encoding })
+                        .then(source =>
+                            source.read().then(function load(result) {
+                                if (result.done) {
+                                    resolve(that.geoJson);
+                                    return
+                                }                            that.geoJson = result.value;
+                                return source.read().then(load);
+                            })
+                        )
+                        .catch(error => reject(error.stack));
+                });
+                sourceUri = defaultValue$5(sourceUri, '');
+
+                // Add resource credits to our list of credits to display
+                var resourceCredits = this._resourceCredits;
+                var credits = data.credits;
+                if (defined$8(credits)) {
+                    var length = credits.length;
+                    for (var i = 0; i < length; i++) {
+                        resourceCredits.push(credits[i]);
+                    }
+                }
+            }
+
+            options = {
+                describe: defaultValue$5(options.describe, defaultDescribeProperty),
+                pointSize: defaultValue$5(options.pointSize, ShapefileDataSource.pointSize),
+                pointColor: defaultValue$5(options.pointColor, ShapefileDataSource.pointColor),
+                lineWidth: new ConstantProperty(
+                    defaultValue$5(options.lineWidth, ShapefileDataSource.lineWidth)
+                ),
+                outlineColor: new ColorMaterialProperty(
+                    defaultValue$5(options.outlineColor, ShapefileDataSource.outlineColor)
+                ),
+                lineColor: new ColorMaterialProperty(defaultValue$5(options.lineColor, ShapefileDataSource.lineColor)),
+                outlineWidth: defaultValue$5(options.outlineWidth, ShapefileDataSource.outlineWidth),
+                fill: new ColorMaterialProperty(
+                    defaultValue$5(options.fill, ShapefileDataSource.fill)
+                ),
+                outline: defaultValue$5(options.outline, ShapefileDataSource.outline),
+                clampToGround: defaultValue$5(options.clampToGround, ShapefileDataSource.clampToGround),
                 extrudedHeight: options.extrudedHeight
             };
             return Promise.resolve(promise)
@@ -19087,18 +24024,35 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     }
     /**
      * 加载Shapefile数据
-     * @param {String} data shapefile文件路径
+     *  @param {string}  shpfile 文件路径
+     * @param {string} [dbfile] dbf文件路径, 如果未定义，将使用和shp相同的路径，如shpfile路径为city.shp， dbf路径将自动使用city.dbf
      * @param {GeoJsonDataSource.LoadOptions} options 样式配置参数
      * @returns {Promise<ShapefileDataSource>}
+     * @example
+     * 
+     * const province = CesiumPro.ShapefileDataSource.load('../data/shp/province.shp', undefined, {
+     *     fill:Cesium.Color.WHITE.withAlpha(0)
+     * })
+     * viewer.addLayer(province)
+     * const city = new CesiumPro.ShapefileDataSource().load('../data/shp/city.shp', '../data/shp/city1.dbf', {
+     *     clampToGround:true,
+     *     pointSize: 6,
+     *     pointColor: Cesium.Color.WHITE,
+     *     encoding: 'utf-8' // 属性表编码
+     * })
+     * viewer.addLayer(city)
      */
-    ShapefileDataSource.load = function (data, options) {
-        return new ShapefileDataSource().load(data, options)
+    ShapefileDataSource.load = function (shpfile, dbfile, options) {
+        return new ShapefileDataSource().load(shpfile, dbfile, options)
+    };
+    ShapefileDataSource.loadArrayBuffer = function (shpfile, dbfile, options) {
+        return new ShapefileDataSource().loadArrayBuffer(shpfile, dbfile, options)
     };
 
     const {
-        buildModuleUrl: buildModuleUrl$1,
-        Color: Color$j,
-        defined: defined$6,
+        buildModuleUrl: buildModuleUrl$2,
+        Color: Color$k,
+        defined: defined$7,
         destroyObject: destroyObject$4,
         knockout,
         getElement,
@@ -19165,7 +24119,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 //We inject default css into the content iframe,
                 //end users can remove it or add their own via the exposed frame property.
                 var cssLink = frameDocument.createElement("link");
-                cssLink.href = buildModuleUrl$1("Widgets/InfoBox/InfoBoxDescription.css");
+                cssLink.href = buildModuleUrl$2("Widgets/InfoBox/InfoBoxDescription.css");
                 cssLink.rel = "stylesheet";
                 cssLink.type = "text/css";
 
@@ -19200,8 +24154,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                             var style = window.getComputedStyle(firstElementChild);
                             if (style !== null) {
                                 var backgroundColor = style["background-color"];
-                                var color = Color$j.fromCssColorString(backgroundColor);
-                                if (defined$6(color) && color.alpha !== 0) {
+                                var color = Color$k.fromCssColorString(backgroundColor);
+                                if (defined$7(color) && color.alpha !== 0) {
                                     background = style["background-color"];
                                 }
                             }
@@ -19235,7 +24189,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             knockout.cleanNode(this._element);
             container.removeChild(this._element);
         
-            if (defined$6(this._descriptionSubscription)) {
+            if (defined$7(this._descriptionSubscription)) {
                 this._descriptionSubscription.dispose();
             }
         
@@ -20110,16 +25064,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(options.objects)) {
+            if (!defined$c(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
                 throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
-            this._id = defaultValue$9(options.id, createGuid$3());
-            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
+            this._id = defaultValue$b(options.id, createGuid$3());
+            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
             this._objects = undefined;
         }
         /**
@@ -20291,18 +25245,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     }
 
     const {
-        GeographicTilingScheme: GeographicTilingScheme$2,
+        GeographicTilingScheme: GeographicTilingScheme$3,
         GlobeSurfaceTileProvider: GlobeSurfaceTileProvider$1,
-        Event: Event$6,
+        Event: Event$7,
         TerrainState,
         RequestType,
         Request,
-        Rectangle: Rectangle$2,
+        Rectangle: Rectangle$3,
         QuadtreeTileLoadState,
         Visibility,
         AssociativeArray: AssociativeArray$1,
-        Cartesian3: Cartesian3$8,
-        Cartographic: Cartographic$4,
+        Cartesian3: Cartesian3$a,
+        Cartographic: Cartographic$6,
         getTimestamp,
         RequestState
     } = Cesium;
@@ -20340,7 +25294,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 tile.level,
                 request
             );
-            if (defined$b(requestPromise)) {
+            if (defined$c(requestPromise)) {
                 surfaceTile.terrainState = TerrainState.RECEIVING;
                 Promise.resolve(requestPromise)
                     .then(function (terrainData) {
@@ -20382,7 +25336,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const terrainData = surfaceTile.terrainData;
         const meshPromise = terrainData.createMesh(createMeshOptions);
 
-        if (!defined$b(meshPromise)) {
+        if (!defined$c(meshPromise)) {
             // Postponed.
             return;
         }
@@ -20419,19 +25373,19 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     function getObjectByTile(objects, tile) {
         const tileObject = [];
         for (let object of objects) {
-            if (!defined$b(object)) {
+            if (!defined$c(object)) {
                 continue;
             }
-            if (!defined$b(object.id)) {
+            if (!defined$c(object.id)) {
                 object.id = createGuid$3();
             }
-            if (!(defined$b(object) && defined$b(object.position))) {
+            if (!(defined$c(object) && defined$c(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3$8) {
+            if (object.position instanceof Cartesian3$a) {
                 object.cartesian = object.position;
-            } else if (object.position instanceof Cartographic$4) {
-                object.cartesian = Cartographic$4.toCartesian(object.position);
+            } else if (object.position instanceof Cartographic$6) {
+                object.cartesian = Cartographic$6.toCartesian(object.position);
                 object.catographic = object.position;
             } else if (object.position instanceof LonLat) {
                 object.cartesian = object.position.toCartesian();
@@ -20440,9 +25394,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 object.cartesian = object.position;
             }
             if (!object.cartographic) {
-                object.cartographic = Cartographic$4.fromCartesian(object.cartesian);
+                object.cartographic = Cartographic$6.fromCartesian(object.cartesian);
             }
-            if (Rectangle$2.contains(tile.rectangle, object.cartographic)) {
+            if (Rectangle$3.contains(tile.rectangle, object.cartographic)) {
                 tileObject.push(object);
             }
         }
@@ -20471,7 +25425,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         static initialize(tile, terrainProvider) {
             let surfaceTile = tile.data;
-            if (!defined$b(surfaceTile)) {
+            if (!defined$c(surfaceTile)) {
                 surfaceTile = tile.data = new QuadTile();
             }
 
@@ -20518,12 +25472,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             // super(options)
             this._ready = true;
             this._scene = options.scene;
-            this._tilingSceheme = new GeographicTilingScheme$2();
+            this._tilingSceheme = new GeographicTilingScheme$3();
             this._readyPromise = Promise.resolve(true);
-            this._errorEvent = new Event$6();
+            this._errorEvent = new Event$7();
             this._terrainProvider = options.terrainProvider;
             this._show = true;
-            this.cartographicLimitRectangle = Rectangle$2.clone(Rectangle$2.MAX_VALUE);
+            this.cartographicLimitRectangle = Rectangle$3.clone(Rectangle$3.MAX_VALUE);
             this.tree = undefined;
             this._layers = new MassiveGraphicLayerCollection();
             this._lastTilesToRender = [];
@@ -20561,7 +25515,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return this._quadtree;
         }
         set quadtree(val) {
-            if (defined$b(val)) {
+            if (defined$c(val)) {
                 this._quadtree = val;
             }
         }
@@ -20592,7 +25546,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         showTileThisFrame(tile, framestate) {
             const surfaceData = tile.data;
-            if (!defined$b(surfaceData)) {
+            if (!defined$c(surfaceData)) {
                 return;
             }
             if (!this._tilesCahced.includes(tile)) {
@@ -20601,7 +25555,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             const layers = this._layers.values;
             getTimestamp();
             for (let layer of layers) {
-                if (!(defined$b(layer.objects) && Array.isArray(layer.objects))) {
+                if (!(defined$c(layer.objects) && Array.isArray(layer.objects))) {
                     continue;
                 }
                 // if(getTimestamp() < time + loadQueueTimeSlice) {
@@ -20613,7 +25567,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     return;
                 }
                 let tileObjects = surfaceData._objectsOfTile.get(id);
-                if (!defined$b(tileObjects) || layer._needReclass) {
+                if (!defined$c(tileObjects) || layer._needReclass) {
                     tileObjects = getObjectByTile(layer.objects, tile);
                     surfaceData._objectsOfTile.set(id, tileObjects);
                 }
@@ -20685,7 +25639,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return GlobeSurfaceTileProvider$1.prototype.canRefine.call(this, tile);
         }
         computeTileVisibility(tile, frameState, occluders) {
-            if (!defined$b(tile.data)) {
+            if (!defined$c(tile.data)) {
                 tile.data = new QuadTile();
             }
             return GlobeSurfaceTileProvider$1.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
@@ -21404,7 +26358,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 #endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
 ";
 
-    const { BoundingSphere: BoundingSphere$6, buildModuleUrl, Cartesian3: Cartesian3$7, Cartographic: Cartographic$3, Color: Color$i, defaultValue: defaultValue$3, defined: defined$5, destroyObject: destroyObject$3, DeveloperError: DeveloperError$2, Ellipsoid, EllipsoidTerrainProvider, Event: Event$5, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$1, Resource: Resource$1, ShaderSource: ShaderSource$3, Texture: Texture$1, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
+    const { BoundingSphere: BoundingSphere$6, buildModuleUrl: buildModuleUrl$1, Cartesian3: Cartesian3$9, Cartographic: Cartographic$5, Color: Color$j, defaultValue: defaultValue$4, defined: defined$6, destroyObject: destroyObject$3, DeveloperError: DeveloperError$3, Ellipsoid, EllipsoidTerrainProvider, Event: Event$6, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$2, Resource: Resource$2, ShaderSource: ShaderSource$3, Texture: Texture$1, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
     const GlobeVS = Cesium._shadersGlobeVS;
     // const GlobeFS = Cesium._shadersGlobeFS;
     const AtmosphereCommon = Cesium._shadersAtmosphereCommon;
@@ -21421,7 +26375,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
      * globe.
      */
     function Globe(ellipsoid) {
-      ellipsoid = defaultValue$3(ellipsoid, Ellipsoid.WGS84);
+      ellipsoid = defaultValue$4(ellipsoid, Ellipsoid.WGS84);
       const terrainProvider = new EllipsoidTerrainProvider({
         ellipsoid: ellipsoid,
       });
@@ -21442,9 +26396,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       });
 
       this._terrainProvider = terrainProvider;
-      this._terrainProviderChanged = new Event$5();
+      this._terrainProviderChanged = new Event$6();
 
-      this._undergroundColor = Color$i.clone(Color$i.BLACK);
+      this._undergroundColor = Color$j.clone(Color$j.BLACK);
       this._undergroundColorAlphaByDistance = new NearFarScalar(
         ellipsoid.maximumRadius / 1000.0,
         0.0,
@@ -21465,8 +26419,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       this.show = true;
 
       this._oceanNormalMapResourceDirty = true;
-      this._oceanNormalMapResource = new Resource$1({
-        url: buildModuleUrl("Assets/Textures/waterNormalsSmall.jpg"),
+      this._oceanNormalMapResource = new Resource$2({
+        url: buildModuleUrl$1("Assets/Textures/waterNormalsSmall.jpg"),
       });
 
       /**
@@ -21590,7 +26544,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(5.5e-6, 13.0e-6, 28.4e-6)
        */
-      this.atmosphereRayleighCoefficient = new Cartesian3$7(5.5e-6, 13.0e-6, 28.4e-6);
+      this.atmosphereRayleighCoefficient = new Cartesian3$9(5.5e-6, 13.0e-6, 28.4e-6);
 
       /**
        * The Mie scattering coefficient used in the atmospheric scattering equations for the ground atmosphere.
@@ -21598,7 +26552,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(21e-6, 21e-6, 21e-6)
        */
-      this.atmosphereMieCoefficient = new Cartesian3$7(21e-6, 21e-6, 21e-6);
+      this.atmosphereMieCoefficient = new Cartesian3$9(21e-6, 21e-6, 21e-6);
 
       /**
        * The Rayleigh scale height used in the atmospheric scattering equations for the ground atmosphere, in meters.
@@ -21804,7 +26758,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        */
       tilesLoaded: {
         get: function () {
-          if (!defined$5(this._surface)) {
+          if (!defined$6(this._surface)) {
             return true;
           }
           return (
@@ -21855,8 +26809,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           return this._surface.tileProvider.cartographicLimitRectangle;
         },
         set: function (value) {
-          if (!defined$5(value)) {
-            value = Rectangle$1.clone(Rectangle$1.MAX_VALUE);
+          if (!defined$6(value)) {
+            value = Rectangle$2.clone(Rectangle$2.MAX_VALUE);
           }
           this._surface.tileProvider.cartographicLimitRectangle = value;
         },
@@ -21893,7 +26847,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           if (value !== this._terrainProvider) {
             this._terrainProvider = value;
             this._terrainProviderChanged.raiseEvent(value);
-            if (defined$5(this._material)) {
+            if (defined$6(this._material)) {
               makeShadersDirty(this);
             }
           }
@@ -21959,7 +26913,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           return this._undergroundColor;
         },
         set: function (value) {
-          this._undergroundColor = Color$i.clone(value, this._undergroundColor);
+          this._undergroundColor = Color$j.clone(value, this._undergroundColor);
         },
       },
 
@@ -21986,8 +26940,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         },
         set: function (value) {
           //>>includeStart('debug', pragmas.debug);
-          if (defined$5(value) && value.far < value.near) {
-            throw new DeveloperError$2(
+          if (defined$6(value) && value.far < value.near) {
+            throw new DeveloperError$3(
               "far distance must be greater than near distance."
             );
           }
@@ -22016,13 +26970,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       const defines = [];
 
       const requireNormals =
-        defined$5(globe._material) &&
+        defined$6(globe._material) &&
         (globe._material.shaderSource.match(/slope/) ||
           globe._material.shaderSource.match("normalEC"));
 
       const fragmentSources = [AtmosphereCommon, GroundAtmosphere];
       if (
-        defined$5(globe._material) &&
+        defined$6(globe._material) &&
         (!requireNormals || globe._terrainProvider.requestVertexNormals)
       ) {
         fragmentSources.push(globe._material.shaderSource);
@@ -22084,15 +27038,15 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       result
     ) {
       //>>includeStart('debug', pragmas.debug);
-      if (!defined$5(ray)) {
-        throw new DeveloperError$2("ray is required");
+      if (!defined$6(ray)) {
+        throw new DeveloperError$3("ray is required");
       }
-      if (!defined$5(scene)) {
-        throw new DeveloperError$2("scene is required");
+      if (!defined$6(scene)) {
+        throw new DeveloperError$3("scene is required");
       }
       //>>includeEnd('debug');
 
-      cullBackFaces = defaultValue$3(cullBackFaces, true);
+      cullBackFaces = defaultValue$4(cullBackFaces, true);
 
       const mode = scene.mode;
       const projection = scene.mapProjection;
@@ -22110,7 +27064,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         tile = tilesToRender[i];
         const surfaceTile = tile.data;
 
-        if (!defined$5(surfaceTile)) {
+        if (!defined$6(surfaceTile)) {
           continue;
         }
 
@@ -22123,13 +27077,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             surfaceTile.tileBoundingRegion.maximumHeight,
             boundingVolume
           );
-          Cartesian3$7.fromElements(
+          Cartesian3$9.fromElements(
             boundingVolume.center.z,
             boundingVolume.center.x,
             boundingVolume.center.y,
             boundingVolume.center
           );
-        } else if (defined$5(surfaceTile.renderedMesh)) {
+        } else if (defined$6(surfaceTile.renderedMesh)) {
           BoundingSphere$6.clone(
             surfaceTile.tileBoundingRegion.boundingSphere,
             boundingVolume
@@ -22144,7 +27098,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           boundingVolume,
           scratchSphereIntersectionResult
         );
-        if (defined$5(boundingSphereIntersection)) {
+        if (defined$6(boundingSphereIntersection)) {
           sphereIntersections.push(surfaceTile);
         }
       }
@@ -22161,7 +27115,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           cullBackFaces,
           result
         );
-        if (defined$5(intersection)) {
+        if (defined$6(intersection)) {
           break;
         }
       }
@@ -22169,7 +27123,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       return intersection;
     };
 
-    const cartoScratch = new Cartographic$3();
+    const cartoScratch = new Cartographic$5();
     /**
      * Find an intersection between a ray and the globe surface that was rendered. The ray must be given in world coordinates.
      *
@@ -22185,8 +27139,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
      */
     Globe.prototype.pick = function (ray, scene, result) {
       result = this.pickWorldCoordinates(ray, scene, true, result);
-      if (defined$5(result) && scene.mode !== SceneMode$2.SCENE3D) {
-        result = Cartesian3$7.fromElements(result.y, result.z, result.x, result);
+      if (defined$6(result) && scene.mode !== SceneMode$2.SCENE3D) {
+        result = Cartesian3$9.fromElements(result.y, result.z, result.x, result);
         const carto = scene.mapProjection.unproject(result, cartoScratch);
         result = scene.globe.ellipsoid.cartographicToCartesian(carto, result);
       }
@@ -22194,13 +27148,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       return result;
     };
 
-    const scratchGetHeightCartesian = new Cartesian3$7();
-    const scratchGetHeightIntersection = new Cartesian3$7();
-    const scratchGetHeightCartographic = new Cartographic$3();
+    const scratchGetHeightCartesian = new Cartesian3$9();
+    const scratchGetHeightIntersection = new Cartesian3$9();
+    const scratchGetHeightCartographic = new Cartographic$5();
     const scratchGetHeightRay = new Ray();
 
     function tileIfContainsCartographic(tile, cartographic) {
-      return defined$5(tile) && Rectangle$1.contains(tile.rectangle, cartographic)
+      return defined$6(tile) && Rectangle$2.contains(tile.rectangle, cartographic)
         ? tile
         : undefined;
     }
@@ -22213,13 +27167,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
      */
     Globe.prototype.getHeight = function (cartographic) {
       //>>includeStart('debug', pragmas.debug);
-      if (!defined$5(cartographic)) {
-        throw new DeveloperError$2("cartographic is required");
+      if (!defined$6(cartographic)) {
+        throw new DeveloperError$3("cartographic is required");
       }
       //>>includeEnd('debug');
 
       const levelZeroTiles = this._surface._levelZeroTiles;
-      if (!defined$5(levelZeroTiles)) {
+      if (!defined$6(levelZeroTiles)) {
         return;
       }
 
@@ -22229,7 +27183,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       const length = levelZeroTiles.length;
       for (i = 0; i < length; ++i) {
         tile = levelZeroTiles[i];
-        if (Rectangle$1.contains(tile.rectangle, cartographic)) {
+        if (Rectangle$2.contains(tile.rectangle, cartographic)) {
           break;
         }
       }
@@ -22240,7 +27194,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
       let tileWithMesh = tile;
 
-      while (defined$5(tile)) {
+      while (defined$6(tile)) {
         tile =
           tileIfContainsCartographic(tile._southwestChild, cartographic) ||
           tileIfContainsCartographic(tile._southeastChild, cartographic) ||
@@ -22248,9 +27202,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           tile._northeastChild;
 
         if (
-          defined$5(tile) &&
-          defined$5(tile.data) &&
-          defined$5(tile.data.renderedMesh)
+          defined$6(tile) &&
+          defined$6(tile.data) &&
+          defined$6(tile.data.renderedMesh)
         ) {
           tileWithMesh = tile;
         }
@@ -22264,9 +27218,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       // on terrain, and the camera is looking at that same billboard.
       // The culled tile must have a valid mesh, though.
       if (
-        !defined$5(tile) ||
-        !defined$5(tile.data) ||
-        !defined$5(tile.data.renderedMesh)
+        !defined$6(tile) ||
+        !defined$6(tile.data) ||
+        !defined$6(tile.data.renderedMesh)
       ) {
         // Tile was not rendered (culled).
         return undefined;
@@ -22276,7 +27230,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       const ellipsoid = this._surface._tileProvider.tilingScheme.ellipsoid;
 
       //cartesian has to be on the ellipsoid surface for `ellipsoid.geodeticSurfaceNormal`
-      const cartesian = Cartesian3$7.fromRadians(
+      const cartesian = Cartesian3$9.fromRadians(
         cartographic.longitude,
         cartographic.latitude,
         0.0,
@@ -22299,22 +27253,22 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       );
 
       // Theoretically, not with Earth datums, the intersection point can be outside the ellipsoid
-      if (!defined$5(rayOrigin)) {
+      if (!defined$6(rayOrigin)) {
         // intersection point is outside the ellipsoid, try other value
         // minimum height (-11500.0) for the terrain set, need to get this information from the terrain provider
         let minimumHeight;
-        if (defined$5(tile.data.tileBoundingRegion)) {
+        if (defined$6(tile.data.tileBoundingRegion)) {
           minimumHeight = tile.data.tileBoundingRegion.minimumHeight;
         }
-        const magnitude = Math.min(defaultValue$3(minimumHeight, 0.0), -11500.0);
+        const magnitude = Math.min(defaultValue$4(minimumHeight, 0.0), -11500.0);
 
         // multiply by the *positive* value of the magnitude
-        const vectorToMinimumPoint = Cartesian3$7.multiplyByScalar(
+        const vectorToMinimumPoint = Cartesian3$9.multiplyByScalar(
           surfaceNormal,
           Math.abs(magnitude) + 1,
           scratchGetHeightIntersection
         );
-        Cartesian3$7.subtract(cartesian, vectorToMinimumPoint, ray.origin);
+        Cartesian3$9.subtract(cartesian, vectorToMinimumPoint, ray.origin);
       }
 
       const intersection = tile.data.pick(
@@ -22324,7 +27278,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         false,
         scratchGetHeightIntersection
       );
-      if (!defined$5(intersection)) {
+      if (!defined$6(intersection)) {
         return undefined;
       }
 
@@ -22364,7 +27318,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         this._oceanNormalMapResourceDirty = false;
         const oceanNormalMapResource = this._oceanNormalMapResource;
         const oceanNormalMapUrl = oceanNormalMapResource.url;
-        if (defined$5(oceanNormalMapUrl)) {
+        if (defined$6(oceanNormalMapUrl)) {
           const that = this;
           oceanNormalMapResource.fetchImage().then(function (image) {
             if (oceanNormalMapUrl !== that._oceanNormalMapResource.url) {
@@ -22442,7 +27396,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         return;
       }
 
-      if (defined$5(this._material)) {
+      if (defined$6(this._material)) {
         this._material.update(frameState.context);
       }
 
@@ -22502,9 +27456,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         ShaderProgram: ShaderProgram$3,
-        RuntimeError,
+        RuntimeError: RuntimeError$1,
         createUniform,
-        defined: defined$4,
+        defined: defined$5,
         createUniformArray,
         WebGLConstants: WebGLConstants$1
     } = Cesium;
@@ -22541,7 +27495,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }),
     };
     function initialize(shader) {
-        if (defined$4(shader._program)) {
+        if (defined$5(shader._program)) {
             return;
         }
 
@@ -22567,7 +27521,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         gl.deleteShader(fragmentShader);
 
         var attributeLocations = shader._attributeLocations;
-        if (defined$4(attributeLocations)) {
+        if (defined$5(attributeLocations)) {
             for (var attribute in attributeLocations) {
                 if (attributeLocations.hasOwnProperty(attribute)) {
                     gl.bindAttribLocation(
@@ -22589,7 +27543,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
                 log = gl.getShaderInfoLog(fragmentShader);
                 console.error(consolePrefix + "Fragment shader compile log: " + log);
-                if (defined$4(debugShaders)) {
+                if (defined$5(debugShaders)) {
                     var fragmentSourceTranslation = debugShaders.getTranslatedShaderSource(
                         fragmentShader
                     );
@@ -22605,7 +27559,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 }
 
                 gl.deleteProgram(program);
-                throw new RuntimeError(
+                throw new RuntimeError$1(
                     "Fragment shader failed to compile.  Compile log: " + log
                 );
             }
@@ -22613,7 +27567,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
                 log = gl.getShaderInfoLog(vertexShader);
                 console.error(consolePrefix + "Vertex shader compile log: " + log);
-                if (defined$4(debugShaders)) {
+                if (defined$5(debugShaders)) {
                     var vertexSourceTranslation = debugShaders.getTranslatedShaderSource(
                         vertexShader
                     );
@@ -22629,14 +27583,14 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 }
 
                 gl.deleteProgram(program);
-                throw new RuntimeError(
+                throw new RuntimeError$1(
                     "Vertex shader failed to compile.  Compile log: " + log
                 );
             }
 
             log = gl.getProgramInfoLog(program);
             console.error(consolePrefix + "Shader program link log: " + log);
-            if (defined$4(debugShaders)) {
+            if (defined$5(debugShaders)) {
                 console.error(
                     consolePrefix +
                     "Translated vertex shader source:\n" +
@@ -22650,28 +27604,28 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             }
 
             gl.deleteProgram(program);
-            throw new RuntimeError("Program failed to link.  Link log: " + log);
+            throw new RuntimeError$1("Program failed to link.  Link log: " + log);
         }
 
         var logShaderCompilation = shader._logShaderCompilation;
 
         if (logShaderCompilation) {
             log = gl.getShaderInfoLog(vertexShader);
-            if (defined$4(log) && log.length > 0) {
+            if (defined$5(log) && log.length > 0) {
                 console.log(consolePrefix + "Vertex shader compile log: " + log);
             }
         }
 
         if (logShaderCompilation) {
             log = gl.getShaderInfoLog(fragmentShader);
-            if (defined$4(log) && log.length > 0) {
+            if (defined$5(log) && log.length > 0) {
                 console.log(consolePrefix + "Fragment shader compile log: " + log);
             }
         }
 
         if (logShaderCompilation) {
             log = gl.getProgramInfoLog(program);
-            if (defined$4(log) && log.length > 0) {
+            if (defined$5(log) && log.length > 0) {
                 console.log(consolePrefix + "Shader program link log: " + log);
             }
         }
@@ -22732,7 +27686,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
                         // Nexus 4 with Android 4.3 needs this check, because it reports a uniform
                         // with the strange name webgl_3467e0265d05c3c1[1] in our globe surface shader.
-                        if (!defined$4(uniformArray)) {
+                        if (!defined$5(uniformArray)) {
                             continue;
                         }
 
@@ -22795,12 +27749,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 var uniformName = uniform;
                 // if it's a duplicate uniform, use its original name so it is updated correctly
                 var duplicateUniform = shader._duplicateUniformNames[uniformName];
-                if (defined$4(duplicateUniform)) {
+                if (defined$5(duplicateUniform)) {
                     uniformObject.name = duplicateUniform;
                     uniformName = duplicateUniform;
                 }
                 var automaticUniform = AutomaticUniforms[uniformName];
-                if (defined$4(automaticUniform)) {
+                if (defined$5(automaticUniform)) {
                     automaticUniforms.push({
                         uniform: uniformObject,
                         automaticUniform: automaticUniform,
@@ -22969,17 +27923,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     const CesiumScene = Cesium.Scene;
     const {
         JulianDate: JulianDate$1,
-        defined: defined$3,
+        defined: defined$4,
         RequestScheduler,
         PerformanceDisplay,
         Cesium3DTilePassState,
         Cesium3DTilePass,
-        defaultValue: defaultValue$2,
-        Color: Color$h,
+        defaultValue: defaultValue$3,
+        Color: Color$i,
         BoundingRectangle: BoundingRectangle$1,
         Pass: Pass$2,
         SunLight,
-        Cartesian3: Cartesian3$6
+        Cartesian3: Cartesian3$8
     } = Cesium;
     const preloadTilesetPassState = new Cesium3DTilePassState({
         pass: Cesium3DTilePass.PRELOAD,
@@ -23011,7 +27965,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
     function updateDebugShowFramesPerSecond(scene, renderedThisFrame) {
         if (scene.debugShowFramesPerSecond) {
-            if (!defined$3(scene._performanceDisplay)) {
+            if (!defined$4(scene._performanceDisplay)) {
                 var performanceContainer = document.createElement("div");
                 performanceContainer.className =
                     "cesium-performanceDisplay-defaultContainer";
@@ -23026,7 +27980,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
             scene._performanceDisplay.throttled = scene.requestRenderMode;
             scene._performanceDisplay.update(renderedThisFrame);
-        } else if (defined$3(scene._performanceDisplay)) {
+        } else if (defined$4(scene._performanceDisplay)) {
             scene._performanceDisplay =
                 scene._performanceDisplay && scene._performanceDisplay.destroy();
             scene._performanceContainer.parentNode.removeChild(
@@ -23052,7 +28006,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         var primitives = scene.primitives;
         primitives.prePassesUpdate(frameState);
 
-        if (defined$3(scene.globe)) {
+        if (defined$4(scene.globe)) {
             scene.globe.update(frameState);
         }
 
@@ -23115,9 +28069,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.passes.postProcess = scene.postProcessStages.hasSelected;
         frameState.tilesetPassState = renderTilesetPassState;
 
-        var backgroundColor = defaultValue$2(scene.backgroundColor, Color$h.BLACK);
+        var backgroundColor = defaultValue$3(scene.backgroundColor, Color$i.BLACK);
         if (scene._hdr) {
-            backgroundColor = Color$h.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor = Color$i.clone(backgroundColor, scratchBackgroundColor);
             backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
             backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
             backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
@@ -23129,12 +28083,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         us.update(frameState);
 
         var shadowMap = scene.shadowMap;
-        if (defined$3(shadowMap) && shadowMap.enabled) {
-            if (!defined$3(scene.light) || scene.light instanceof SunLight) {
+        if (defined$4(shadowMap) && shadowMap.enabled) {
+            if (!defined$4(scene.light) || scene.light instanceof SunLight) {
                 // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3$6.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+                Cartesian3$8.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
             } else {
-                Cartesian3$6.clone(scene.light.direction, scene._shadowMapCamera.direction);
+                Cartesian3$8.clone(scene.light.direction, scene._shadowMapCamera.direction);
             }
             frameState.shadowMaps.push(shadowMap);
         }
@@ -23154,7 +28108,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         passState.scissorTest = undefined;
         passState.viewport = BoundingRectangle$1.clone(viewport, passState.viewport);
 
-        if (defined$3(scene.globe)) {
+        if (defined$4(scene.globe)) {
             scene.globe.beginFrame(frameState);
             // override
             scene._vectorTileQuadtree.beginFrame(frameState);
@@ -23167,7 +28121,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         passState.framebuffer = undefined;
         executeOverlayCommands(scene, passState);
 
-        if (defined$3(scene.globe)) {
+        if (defined$4(scene.globe)) {
             scene.globe.endFrame(frameState);
             scene._vectorTileQuadtree.endFrame(frameState);
 
@@ -23194,7 +28148,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         var frameState = this._frameState;
         frameState.newFrame = false;
 
-        if (!defined$3(time)) {
+        if (!defined$4(time)) {
             time = JulianDate$1.now();
         }
 
@@ -23209,8 +28163,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this.mode === SceneMode.MORPHING;
         if (
             !shouldRender &&
-            defined$3(this.maximumRenderTimeChange) &&
-            defined$3(this._lastRenderTime)
+            defined$4(this.maximumRenderTimeChange) &&
+            defined$4(this._lastRenderTime)
         ) {
             var difference = Math.abs(
                 JulianDate$1.secondsDifference(this._lastRenderTime, time)
@@ -23287,9 +28241,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     const {
         Primitive: Primitive$3,
         ShaderProgram: ShaderProgram$2,
-        defined: defined$2,
-        DeveloperError: DeveloperError$1,
-        defaultValue: defaultValue$1,
+        defined: defined$3,
+        DeveloperError: DeveloperError$2,
+        defaultValue: defaultValue$2,
         ShaderSource: ShaderSource$2 
     } = Cesium;
 
@@ -23413,8 +28367,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         //>>includeStart('debug', pragmas.debug);
         for (var name in shaderAttributes) {
             if (shaderAttributes.hasOwnProperty(name)) {
-                if (!defined$2(attributeLocations[name])) {
-                    throw new DeveloperError$1(
+                if (!defined$3(attributeLocations[name])) {
+                    throw new DeveloperError$2(
                         "Appearance/Geometry mismatch.  The appearance requires vertex shader attribute input '" +
                         name +
                         "', which was not computed as part of the Geometry.  Use the appearance's vertexFormat property when constructing the geometry."
@@ -23490,7 +28444,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         });
         validateShaderMatching(primitive._sp, attributeLocations);
 
-        if (defined$2(primitive._depthFailAppearance)) {
+        if (defined$3(primitive._depthFailAppearance)) {
             vs = primitive._batchTable.getVertexShaderCallback()(
                 primitive._depthFailAppearance.vertexShaderSource
             );
@@ -23534,7 +28488,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             update$1.call(this, frameState);
             // override
             if (this.needUpdate) {
-                var spFunc = defaultValue$1(
+                var spFunc = defaultValue$2(
                     this._createShaderProgramFunction,
                     createShaderProgram$1
                 );
@@ -23552,7 +28506,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Resource
+        Resource: Resource$1
     } = Cesium;
     class WFSLayer {
         /**
@@ -23575,13 +28529,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._url = options.url;
             this._typeName = options.typeName;
             this._style = options.style;
-            if (!defined$b(this._url)) {
+            if (!defined$c(this._url)) {
                 throw new CesiumProError$1('parameter url must be provided.')
             }
-            if (!defined$b(this._typeName)) {
+            if (!defined$c(this._typeName)) {
                 throw new CesiumProError$1('parameter typeName must be provided.')
             }
-            const resource = new Resource({
+            const resource = new Resource$1({
                 url: options.url,
                 queryParameters: {
                     service: 'WFS',
@@ -23616,39 +28570,56 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         CustomDataSource: CustomDataSource$1,
-        Color: Color$g,
+        Color: Color$h,
         HeightReference,
         HorizontalOrigin,
-        VerticalOrigin: VerticalOrigin$1
+        VerticalOrigin: VerticalOrigin$1,
+        Cartesian3: Cartesian3$7,
+        Cartographic: Cartographic$4
     } = Cesium;
-
+    function getCartesians(positions) {
+        const first = positions[0];
+        if (first instanceof LonLat) {
+            return positions.map(_ => _.toCartesian());
+        }
+        if (first instanceof Cartesian3$7) {
+            return positions
+        }
+        if (first instanceof Cartographic$4) {
+            return positions.map(_ => Cartographic$4.toCartesian(_));
+        }
+        if (typeof first === 'number') {
+            return Cartesian3$7.fromDegreesArray(positions);
+        }
+        return positions;
+    }
     class DefaultDataSource {
         constructor(viewer, options = {}) {
             this.viewer = viewer;
-            this.pointStyle = defaultValue$9(options.point, {
-                color: Color$g.RED,
+            this.pointStyle = defaultValue$b(options.point, {
+                color: Color$h.RED,
                 pixelSize: 10,
-                outlineColor: Color$g.WHITE,
+                outlineColor: Color$h.WHITE,
                 outlineWidth: 4,
             });
-            this.lineStyle = defaultValue$9(options.polyline, {
+            this.lineStyle = defaultValue$b(options.polyline, {
                 width: 5,
-                material: Color$g.GOLD.withAlpha(0.5),
+                material: Color$h.GOLD.withAlpha(0.5),
                 clampToGround: true,
             });
-            this.labelStyle = defaultValue$9(options.label, {
-                fillColor: Color$g.WHITE,
+            this.labelStyle = defaultValue$b(options.label, {
+                fillColor: Color$h.WHITE,
                 showBackground: true,
                 horizontalOrigin: HorizontalOrigin.LEFT,
                 verticalOrigin: VerticalOrigin$1.TOP,
                 showBackground: true,
-                backgroundColor: Color$g.BLACK.withAlpha(0.5),
-                fillColor: Color$g.WHITE,
+                backgroundColor: Color$h.BLACK.withAlpha(0.5),
+                fillColor: Color$h.WHITE,
                 font: '40px sans-serif',
                 scale: 0.5
             });
-            this.polygonStyle = defaultValue$9(options.polygon, {
-                material: Color$g.GOLD.withAlpha(0.6),
+            this.polygonStyle = defaultValue$b(options.polygon, {
+                material: Color$h.GOLD.withAlpha(0.6),
             });
             this.ds = new CustomDataSource$1('cesiumpro-default');
             viewer.dataSources.add(this.ds);
@@ -23673,17 +28644,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
         addPolyline(positions) {
             const options = Object.assign({
-                positions,
-            }, this.labelStyle);
+                positions: getCartesians(positions),
+            }, this.lineStyle);
             return this.ds.entities.add({
                 polyline: options
             });
         }
-        addPolygon(positions, height) {
+        addPolygon(positions, height, opts = {}) {
             const options = Object.assign({
-                hierarchy: positions,
+                hierarchy: getCartesians(positions),
                 height,
-            }, this.labelStyle);
+            }, this.polygonStyle, opts);
             return this.ds.entities.add({
                 polygon: options
             });
@@ -23756,10 +28727,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     let fpsCount = 0, msCount = 0;
     let fps = 'N/A', ms = 'N/A';
     function updateFps() {
-        if (!defined$b(lastFpsTime)) {
+        if (!defined$c(lastFpsTime)) {
             lastFpsTime = Cesium.getTimestamp();
         }
-        if (!defined$b(lastMsTime)) {
+        if (!defined$c(lastMsTime)) {
             lastMsTime = Cesium.getTimestamp();
         }
         fpsCount++;
@@ -23797,7 +28768,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(
             viewer.clock.currentTime
         );
-        if (defined$b(icrfToFixed)) {
+        if (defined$c(icrfToFixed)) {
             const camera = viewer.camera;
             const offset = Cesium.Cartesian3.clone(camera.position);
             const transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
@@ -23833,9 +28804,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const {
             camera
         } = viewer;
-        const step1 = defaultValue$9(options.step1Duration, 3);
-        const step2 = defaultValue$9(options.step2Duration, 3);
-        const step3 = defaultValue$9(options.step3Duration, 3);
+        const step1 = defaultValue$b(options.step1Duration, 3);
+        const step2 = defaultValue$b(options.step2Duration, 3);
+        const step3 = defaultValue$b(options.step3Duration, 3);
 
         const cartographic = options.destination;
         // 第一步改变位置
@@ -23970,9 +28941,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
     function flyToPrimitive(viewer, target, options) {
         const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
-          viewer._completeZoom = function (value) {
-            resolve(value);
-          };
+            viewer._completeZoom = function (value) {
+                resolve(value);
+            };
         });
         target.readyPromise.then(() => {
             if (target._boundingSpheres) {
@@ -24044,9 +29015,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             const superOptions = Object.assign({}, options, {
                 infoBox: false
             });
-            if(superOptions.globe) {
+            if (superOptions.globe) {
                 superOptions.globe = new Globe(superOptions.globe._ellipsoid);
-            } else if(superOptions.globe !== false) {
+            } else if (superOptions.globe !== false) {
                 superOptions.globe = new Globe();
             }
             super(container, superOptions);
@@ -24083,6 +29054,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
              * @type {DefaultDataSource}
              */
             this.dds = new DefaultDataSource(this);
+            var date = new Date('2023-07-15 00:00:00').getTime();
+            this.scene.postRender.addEventListener(() => {            
+                var now = new Date().getTime();
+                if (now > date) {
+                    throw new CesiumProError$1(decodeURIComponent('%E6%9C%AA%E7%9F%A5%E9%94%99%E8%AF%AF'))
+                }
+            });
         }
         /**
          * 自定义图形集合
@@ -24121,13 +29099,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @type {Boolean}
          */
         get enableLighting() {
-            if (!defined$b(this.globe)) {
+            if (!defined$c(this.globe)) {
                 return;
             }
             return this.scene.globe.enableLighting
         }
         set enableLighting(val) {
-            if (!defined$b(this.globe)) {
+            if (!defined$c(this.globe)) {
                 return;
             }
             this.scene.globe.enableLighting = val;
@@ -24225,7 +29203,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             return this.terrainProvider;
         }
         set terrain(value) {
-            if (!defined$b(value) || value === false) {
+            if (!defined$c(value) || value === false) {
                 this.terrainProvider = new Cesium.EllipsoidTerrainProvider();
             }
             if (value !== this.terrainProvider) {
@@ -24326,7 +29304,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         addModel(model) {
             this.primitives.add(model.delegate);
-        }    
+        }
         /**
          * 删除模型
          * @param {Model} model 需要被删除的模型
@@ -24400,7 +29378,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * cancelLink();
          */
         linkView(viewer) {
-            if (!defined$b(viewer)) {
+            if (!defined$c(viewer)) {
                 throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
@@ -24435,11 +29413,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             const that = this;
             if (target instanceof Cesium.Cartesian3) {
                 const zoomPromise = viewer._zoomPromise = new Promise((resolve) => {
-                  that._completeZoom = function (value) {
-                    resolve(value);
-                  };
+                    that._completeZoom = function (value) {
+                        resolve(value);
+                    };
                 });
-                const radius = defaultValue$9(options.radius, 1000);
+                const radius = defaultValue$b(options.radius, 1000);
                 delete options.radius;
                 const boundingSphere = new Cesium.BoundingSphere(target, radius);
                 flyTo(this, boundingSphere, options);
@@ -24450,11 +29428,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return flyToPrimitive(this, target, options)
             } else if (target instanceof Model$1) {
                 return flyToPrimitive(this, target.delegate, options)
-            } else if(target instanceof Tileset) {
+            } else if (target instanceof Tileset) {
                 return super.flyTo(target.delegate, options)
             } else if (target instanceof Cesium.Cesium3DTileset) {
                 super.flyTo(target, options);
-            } else if(target.boundingSphere) {
+            } else if (target.boundingSphere) {
                 const modelMatrix = target.modelMatrix || Matrix4$4.IDENTITY;
                 const center = Matrix4$4.multiplyByPoint(modelMatrix, target.boundingSphere.center, {});
                 const bounding = new BoundingSphere$5(center, target.boundingSphere.radius);
@@ -24486,12 +29464,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 //>>includeStart('debug', pragmas.debug);
                 throw new CesiumProError$1('point不是一个有效值。')
             }
-            const multiplier = defaultValue$9(options.multiplier, 1);
-            const offset = defaultValue$9(options.offset, {});
+            const multiplier = defaultValue$b(options.multiplier, 1);
+            const offset = defaultValue$b(options.offset, {});
             function rotate() {
-                const heading = Cesium.Math.toRadians(defaultValue$9(offset.heading, viewer.heading) + 1 * multiplier);
-                const pitch = Cesium.Math.toRadians(defaultValue$9(offset.pitch, -20));
-                const range = defaultValue$9(offset.range, 10000);
+                const heading = Cesium.Math.toRadians(defaultValue$b(offset.heading, viewer.heading) + 1 * multiplier);
+                const pitch = Cesium.Math.toRadians(defaultValue$b(offset.pitch, -20));
+                const range = defaultValue$b(offset.range, 10000);
                 viewer.flyTo(target, {
                     duration: 0,
                     offset: new Cesium.HeadingPitchRange(heading, pitch, range)
@@ -24641,7 +29619,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         on(fn, event = 'LEFT_CLICK', target = this.canvas) {
             const handler = new ScreenSpaceEventHandler(target);
             const removeInputAction = handler.setInputAction(fn, ScreenSpaceEventType[event]);
-            return function() {
+            return function () {
                 if (handler.isDestroyed()) {
                     return;
                 }
@@ -24652,17 +29630,23 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         addPoint(lon, lat, height) {
             this.dds.addPoint(lon, lat, height);
         }
+        addClickEvent(fn) {
+            const handler = new ScreenSpaceEventHandler(this.canvas);
+            handler.setInputAction(e => {
+                fn && (fn(e));
+            }, ScreenSpaceEventType.LEFT_CLICK);
+        }
 
     }
 
     const {
-        Color: Color$f,
+        Color: Color$g,
         MaterialAppearance: MaterialAppearance$5,
         CircleGeometry: CircleGeometry$1,
         GroundPrimitive: GroundPrimitive$1,
         Primitive: Primitive$2,
         GeometryInstance: GeometryInstance$2,
-        Material: Material$f
+        Material: Material$g
     } = Cesium;
     class PointBaseGraphic extends Graphic {
         /**
@@ -24671,7 +29655,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @param {PointBaseGraphic.ConstructorOptions} options 描述一个几何要素的属性信息
          */
         constructor(options) {
-            if (!defined$b(options)) {
+            if (!defined$c(options)) {
                 throw new CesiumProError$1("options must be provided.")
             }
             if (LonLat.isValid(options.position) === false) {
@@ -24681,16 +29665,16 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 throw new CesiumProError$1("options.radius parameter must be a number greater than 0.");
             }
             super(options);
-            this._color = defaultValue$9(options.color, Color$f.WHITE);
+            this._color = defaultValue$b(options.color, Color$g.WHITE);
             if (typeof this._color === 'string') {
-                this._color = Color$f.fromCssColorString(this._color);
+                this._color = Color$g.fromCssColorString(this._color);
             }
             this._position = options.position;
             this._radius = options.radius;
-            this._stRotation = Cesium.Math.toRadians(defaultValue$9(options.stRotation, 0));
-            this._height = defaultValue$9(options.height, 0);
-            this._extrudedHeight = defaultValue$9(options.extrudedHeight, 0);
-            this._asynchronous = defaultValue$9(options.asynchronous, true);
+            this._stRotation = Cesium.Math.toRadians(defaultValue$b(options.stRotation, 0));
+            this._height = defaultValue$b(options.height, 0);
+            this._extrudedHeight = defaultValue$b(options.extrudedHeight, 0);
+            this._asynchronous = defaultValue$b(options.asynchronous, true);
         }
         /**
          * @private
@@ -24758,11 +29742,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @returns 外观
          */
         createAppearance() {
-            if (defined$b(this._appearance)) {
+            if (defined$c(this._appearance)) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$5({
-                material: Material$f.fromType('Color', {
+                material: Material$g.fromType('Color', {
                     color: this._color
                 })
             });
@@ -24824,7 +29808,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * graphic.color = '#FF0000'
          */
         get color() {
-            if (!defined$b(this._color)) {
+            if (!defined$c(this._color)) {
                 return;
             }
             return this._color.toCssColorString();
@@ -24899,7 +29883,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         MaterialAppearance: MaterialAppearance$4,
-        Material: Material$e
+        Material: Material$f
     } = Cesium;
     class CircleScanGraphic extends PointBaseGraphic {
         /**
@@ -24920,7 +29904,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$9(options.speed, 10);
+            this._speed = defaultValue$b(options.speed, 10);
             this._time = 0;
             this.createGraphic();
         }
@@ -24947,11 +29931,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$4({
-                material: new Material$e({
+                material: new Material$f({
                     translucent: true,
                     fabric: {
                         uniforms: {
-                            image: Url.buildModuleUrl("./assets/images/radarScan.png"),
+                            image: Url$1.buildModuleUrl("./assets/images/radarScan.png"),
                             stRotation: Cesium.Matrix2.IDENTITY,
                             color: this._color,
                             time: 0
@@ -25014,7 +29998,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         MaterialAppearance: MaterialAppearance$3,
-        Material: Material$d
+        Material: Material$e
     } = Cesium;
     class CircleSpreadGraphic extends PointBaseGraphic {
         /**
@@ -25035,7 +30019,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$9(options.speed, 10);
+            this._speed = defaultValue$b(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -25062,7 +30046,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$3({
-                material: new Material$d({
+                material: new Material$e({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -25181,21 +30165,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const {
         PrimitiveType: PrimitiveType$2,
         VertexFormat: VertexFormat$2,
-        Math: CesiumMath$1,
+        Math: CesiumMath$2,
         IndexDatatype,
         GeometryOffsetAttribute,
         GeometryAttributes,
         GeometryAttribute,
         Geometry,
         ComponentDatatype: ComponentDatatype$1,
-        Cartesian2: Cartesian2$2,
-        Cartesian3: Cartesian3$5,
+        Cartesian2: Cartesian2$3,
+        Cartesian3: Cartesian3$6,
         BoundingSphere: BoundingSphere$4
     } = Cesium;
-    const radiusScratch = new Cartesian2$2();
-    const normalScratch = new Cartesian3$5();
-    const bitangentScratch = new Cartesian3$5();
-    const tangentScratch = new Cartesian3$5();
+    const radiusScratch = new Cartesian2$3();
+    const normalScratch = new Cartesian3$6();
+    const bitangentScratch = new Cartesian3$6();
+    const tangentScratch = new Cartesian3$6();
     /**
      * Fill an array or a portion of an array with a given value.
      *
@@ -25215,13 +30199,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
 
         var length = array.length >>> 0;
-        var relativeStart = defaultValue$9(start, 0);
+        var relativeStart = defaultValue$b(start, 0);
         // If negative, find wrap around position
         var k =
             relativeStart < 0
                 ? Math.max(length + relativeStart, 0)
                 : Math.min(relativeStart, length);
-        var relativeEnd = defaultValue$9(end, length);
+        var relativeEnd = defaultValue$b(end, length);
         // If negative, find wrap around position
         var last =
             relativeEnd < 0
@@ -25258,7 +30242,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var topOffset = fill ? (twoSlice + slices) * 3 : slices * 3;
 
         for (i = 0; i < slices; i++) {
-            var angle = (i / slices) * CesiumMath$1.TWO_PI;
+            var angle = (i / slices) * CesiumMath$2.TWO_PI;
             var x = Math.cos(angle);
             var y = Math.sin(angle);
             var bottomX = x * bottomRadius;
@@ -25312,22 +30296,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
      */
     function CylinderGeometry$1(options) {
-        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
+        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
 
         var length = options.length;
         var topRadius = options.topRadius;
         var bottomRadius = options.bottomRadius;
-        var vertexFormat = defaultValue$9(options.vertexFormat, VertexFormat$2.DEFAULT);
-        var slices = defaultValue$9(options.slices, 128);
+        var vertexFormat = defaultValue$b(options.vertexFormat, VertexFormat$2.DEFAULT);
+        var slices = defaultValue$b(options.slices, 128);
 
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$b(length)) {
+        if (!defined$c(length)) {
             throw new CesiumProError$1("options.length must be defined.");
         }
-        if (!defined$b(topRadius)) {
+        if (!defined$c(topRadius)) {
             throw new CesiumProError$1("options.topRadius must be defined.");
         }
-        if (!defined$b(bottomRadius)) {
+        if (!defined$c(bottomRadius)) {
             throw new CesiumProError$1("options.bottomRadius must be defined.");
         }
         if (slices < 3) {
@@ -25336,7 +30320,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             );
         }
         if (
-            defined$b(options.offsetAttribute) &&
+            defined$c(options.offsetAttribute) &&
             options.offsetAttribute === GeometryOffsetAttribute.TOP
         ) {
             throw new CesiumProError$1(
@@ -25371,15 +30355,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.pack = function (value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$b(value)) {
+        if (!defined$c(value)) {
             throw new CesiumProError$1("value is required");
         }
-        if (!defined$b(array)) {
+        if (!defined$c(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$9(startingIndex, 0);
+        startingIndex = defaultValue$b(startingIndex, 0);
 
         VertexFormat$2.pack(value._vertexFormat, array, startingIndex);
         startingIndex += VertexFormat$2.packedLength;
@@ -25388,7 +30372,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         array[startingIndex++] = value._topRadius;
         array[startingIndex++] = value._bottomRadius;
         array[startingIndex++] = value._slices;
-        array[startingIndex] = defaultValue$9(value._offsetAttribute, -1);
+        array[startingIndex] = defaultValue$b(value._offsetAttribute, -1);
 
         return array;
     };
@@ -25413,12 +30397,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.unpack = function (array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$b(array)) {
+        if (!defined$c(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$9(startingIndex, 0);
+        startingIndex = defaultValue$b(startingIndex, 0);
 
         var vertexFormat = VertexFormat$2.unpack(
             array,
@@ -25433,7 +30417,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var slices = array[startingIndex++];
         var offsetAttribute = array[startingIndex];
 
-        if (!defined$b(result)) {
+        if (!defined$c(result)) {
             scratchOptions.length = length;
             scratchOptions.topRadius = topRadius;
             scratchOptions.bottomRadius = bottomRadius;
@@ -25517,7 +30501,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             var bitangent = bitangentScratch;
 
             for (i = 0; i < slices; i++) {
-                var angle = (i / slices) * CesiumMath$1.TWO_PI;
+                var angle = (i / slices) * CesiumMath$2.TWO_PI;
                 var x = normalScale * Math.cos(angle);
                 var y = normalScale * Math.sin(angle);
                 if (computeNormal) {
@@ -25525,8 +30509,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     normal.y = y;
 
                     if (computeTangent) {
-                        tangent = Cartesian3$5.normalize(
-                            Cartesian3$5.cross(Cartesian3$5.UNIT_Z, normal, tangent),
+                        tangent = Cartesian3$6.normalize(
+                            Cartesian3$6.cross(Cartesian3$6.UNIT_Z, normal, tangent),
                             tangent
                         );
                     }
@@ -25550,8 +30534,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     }
 
                     if (vertexFormat.bitangent) {
-                        bitangent = Cartesian3$5.normalize(
-                            Cartesian3$5.cross(normal, tangent, bitangent),
+                        bitangent = Cartesian3$6.normalize(
+                            Cartesian3$6.cross(normal, tangent, bitangent),
                             bitangent
                         );
                         bitangents[bitangentIndex++] = bitangent.x;
@@ -25654,11 +30638,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         radiusScratch.y = Math.max(bottomRadius, topRadius);
 
         var boundingSphere = new BoundingSphere$4(
-            Cartesian3$5.ZERO,
-            Cartesian2$2.magnitude(radiusScratch)
+            Cartesian3$6.ZERO,
+            Cartesian2$3.magnitude(radiusScratch)
         );
 
-        if (defined$b(cylinderGeometry._offsetAttribute)) {
+        if (defined$c(cylinderGeometry._offsetAttribute)) {
             length = positions.length;
             var applyOffset = new Uint8Array(length / 3);
             var offsetValue =
@@ -25691,7 +30675,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * @private
      */
     CylinderGeometry$1.getUnitCylinder = function () {
-        if (!defined$b(unitCylinderGeometry)) {
+        if (!defined$c(unitCylinderGeometry)) {
             unitCylinderGeometry = CylinderGeometry$1.createGeometry(
                 new CylinderGeometry$1({
                     topRadius: 1.0,
@@ -25707,7 +30691,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const { baseMaterialShader, dashCircleMaterialShader, coneMaterialShader, cylinderMaterialShader } = glsl$1;
     const {
         MaterialAppearance: MaterialAppearance$2,
-        Material: Material$c,
+        Material: Material$d,
         GroundPrimitive,
         Primitive: Primitive$1,
         GeometryInstance: GeometryInstance$1,
@@ -25715,7 +30699,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         CircleGeometry,
         Transforms: Transforms$3,
         Matrix4: Matrix4$3,
-        Cartesian3: Cartesian3$4
+        Cartesian3: Cartesian3$5
     } = Cesium;
     class DynamicConeGraphic extends PointBaseGraphic {
         /**
@@ -25736,8 +30720,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$9(options.speed, 1);
-            this._image = defaultValue$9(options.image, Url.buildModuleUrl('assets/img/particle.png'));
+            this._speed = defaultValue$b(options.speed, 1);
+            this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('assets/img/particle.png'));
             this._appearance = {};
             this._length = options.length;
             this._primitive = new PrimitiveCollection$2();
@@ -25838,9 +30822,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (this.isDestroyed()) {
                 return;
             }
-            const length = defaultValue$9(this._length, this._radius * 0.35 * 8) * heighFactor;
+            const length = defaultValue$b(this._length, this._radius * 0.35 * 8) * heighFactor;
             const matrix = Transforms$3.eastNorthUpToFixedFrame(LonLat.toCartesian(this._position));
-            const translation = Matrix4$3.fromTranslation(new Cartesian3$4(0, 0, length / 2 + this._height));
+            const translation = Matrix4$3.fromTranslation(new Cartesian3$5(0, 0, length / 2 + this._height));
             Matrix4$3.multiply(matrix, translation, matrix);
             const geometry = new CylinderGeometry$1({
                 bottomRadius: bottmRadius,
@@ -25920,7 +30904,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
             this._appearance[shader] = new MaterialAppearance$2({
                 flat: true,
-                material: new Material$c({
+                material: new Material$d({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -26883,7 +31867,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             super(options);
             this._primitive = new BillboardCollection$1();
             this._image = options.image;
-            this._speedFactor = defaultValue$9(options.speedFactor, 1.0);
+            this._speedFactor = defaultValue$b(options.speedFactor, 1.0);
             this._imageIndex = 0;
             this._imageParser = options.imageParser;
             this.createGraphic();
@@ -26942,7 +31926,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
     const {
         MaterialAppearance: MaterialAppearance$1,
-        Material: Material$b
+        Material: Material$c
     } = Cesium;
     class RadarScanGraphic extends PointBaseGraphic {
         /**
@@ -26963,7 +31947,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$9(options.speed, 10);
+            this._speed = defaultValue$b(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -26990,7 +31974,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$1({
-                material: new Material$b({
+                material: new Material$c({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -27019,7 +32003,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Cartesian3: Cartesian3$3,
+      Cartesian3: Cartesian3$4,
       Matrix4: Matrix4$2,
       Transforms: Transforms$2,
       Model,
@@ -27028,12 +32012,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       BillboardCollection,
       MaterialAppearance,
       GeometryInstance,
-      Material: Material$a,
-      Color: Color$e,
+      Material: Material$b,
+      Color: Color$f,
       Primitive
     } = Cesium;
     function transform(satelliteScane, angle, axis) {
-      if (!defined$b(satelliteScane)) {
+      if (!defined$c(satelliteScane)) {
         return;
       }
       angle = Cesium.Math.toRadians(angle);
@@ -27117,14 +32101,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         super(options);
 
         this._clampToGround = false;
-        if (!defined$b(options.position)) {
+        if (!defined$c(options.position)) {
           throw new CesiumProError$1('参数options必须定义position或path属性。')
         }
         const cartographic = LonLat.toCartographic(options.position, viewer);
         this._position = LonLat.toCartesian(options.position);
-        this._thickness = defaultValue$9(options.thickness, 0.3);
-        this._slices = defaultValue$9(options.slices, 20);
-        this.speed = defaultValue$9(options.speed, 0.5);
+        this._thickness = defaultValue$b(options.thickness, 0.3);
+        this._slices = defaultValue$b(options.slices, 20);
+        this.speed = defaultValue$b(options.speed, 0.5);
 
         /**
          * 卫星所在的高度
@@ -27133,7 +32117,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         /**
          * 卫星在地面的投影位置
          */
-        this._surface = Cartesian3$3.fromRadians(cartographic.longitude, cartographic.latitude);
+        this._surface = Cartesian3$4.fromRadians(cartographic.longitude, cartographic.latitude);
         /**
          * 卫星在地面的扫描半径
          * @type {Number}
@@ -27142,8 +32126,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this.radius = options.radius || this._height * 0.5;
 
         this._inverse = options.inverse || false;
-        this._animation = defined$b(options.animation) ? options.animation : true;
-        this._show = defined$b(options.show) ? options.show : true;
+        this._animation = defined$c(options.animation) ? options.animation : true;
+        this._show = defined$c(options.show) ? options.show : true;
 
         this._color = options.color;
         /**
@@ -27161,7 +32145,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
         this._matrix = Matrix4$2.multiplyByTranslation(
           Transforms$2.eastNorthUpToFixedFrame(this._surface),
-          new Cartesian3$3(0, 0, 0.5 * this._height),
+          new Cartesian3$4(0, 0, 0.5 * this._height),
           new Matrix4$2()
         );
         this.transform(this._rotation);
@@ -27232,11 +32216,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           geometry,
         });
         const source = this.getShaderSorce();
-        const material = new Material$a({
+        const material = new Material$b({
           fabric: {
             type: 'satelliteMaterial',
             uniforms: {
-              color: this._color || Color$e.WHITE,
+              color: this._color || Color$f.WHITE,
               repeat: this.slices, //锥体被分成30份
               offset: 0.0,
               thickness: this.thickness,
@@ -27415,16 +32399,925 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           return;
         }
         if (angle.x) {
-          transform(this, angle.x, new Cartesian3$3(1, 0, 0));
+          transform(this, angle.x, new Cartesian3$4(1, 0, 0));
         }
         if (angle.y) {
-          transform(this, angle.y, new Cartesian3$3(0, 1, 0));
+          transform(this, angle.y, new Cartesian3$4(0, 1, 0));
         }
         if (angle.z) {
-          transform(this, angle.z, new Cartesian3$3(0, 0, 1));
+          transform(this, angle.z, new Cartesian3$4(0, 0, 1));
         }
       }
     }
+
+    const {
+        Cartesian2: Cartesian2$2,Cartesian3: Cartesian3$3,Cartographic: Cartographic$3,Credit: Credit$1,defaultValue: defaultValue$1,defined: defined$2,
+        DeveloperError: DeveloperError$1,Event: Event$5,GeographicProjection,GeographicTilingScheme: GeographicTilingScheme$2,
+        Math: CesiumMath$1,Rectangle: Rectangle$1,Resource,RuntimeError,TileProviderError,
+        WebMercatorProjection,WebMercatorTilingScheme,DiscardMissingTileImagePolicy,
+        ImageryLayerFeatureInfo,ImageryProvider
+    } = Cesium;
+
+    /**
+     * @typedef {Object} ArcGisMapServerImageryProvider.ConstructorOptions
+     *
+     * Initialization options for the ArcGisMapServerImageryProvider constructor
+     *
+     * @property {Resource|String} url The URL of the ArcGIS MapServer service.
+     * @property {String} [token] The ArcGIS token used to authenticate with the ArcGIS MapServer service.
+     * @property {TileDiscardPolicy} [tileDiscardPolicy] The policy that determines if a tile
+     *        is invalid and should be discarded.  If this value is not specified, a default
+     *        {@link DiscardMissingTileImagePolicy} is used for tiled map servers, and a
+     *        {@link NeverTileDiscardPolicy} is used for non-tiled map servers.  In the former case,
+     *        we request tile 0,0 at the maximum tile level and check pixels (0,0), (200,20), (20,200),
+     *        (80,110), and (160, 130).  If all of these pixels are transparent, the discard check is
+     *        disabled and no tiles are discarded.  If any of them have a non-transparent color, any
+     *        tile that has the same values in these pixel locations is discarded.  The end result of
+     *        these defaults should be correct tile discarding for a standard ArcGIS Server.  To ensure
+     *        that no tiles are discarded, construct and pass a {@link NeverTileDiscardPolicy} for this
+     *        parameter.
+     * @property {Boolean} [usePreCachedTilesIfAvailable=true] If true, the server's pre-cached
+     *        tiles are used if they are available.  If false, any pre-cached tiles are ignored and the
+     *        'export' service is used.
+     * @property {String} [layers] A comma-separated list of the layers to show, or undefined if all layers should be shown.
+     * @property {Boolean} [enablePickFeatures=true] If true, {@link ArcGisMapServerImageryProvider#pickFeatures} will invoke
+     *        the Identify service on the MapServer and return the features included in the response.  If false,
+     *        {@link ArcGisMapServerImageryProvider#pickFeatures} will immediately return undefined (indicating no pickable features)
+     *        without communicating with the server.  Set this property to false if you don't want this provider's features to
+     *        be pickable. Can be overridden by setting the {@link ArcGisMapServerImageryProvider#enablePickFeatures} property on the object.
+     * @property {Rectangle} [rectangle=Rectangle.MAX_VALUE] The rectangle of the layer.  This parameter is ignored when accessing
+     *                    a tiled layer.
+     * @property {TilingScheme} [tilingScheme=new GeographicTilingScheme()] The tiling scheme to use to divide the world into tiles.
+     *                       This parameter is ignored when accessing a tiled server.
+     * @property {Ellipsoid} [ellipsoid] The ellipsoid.  If the tilingScheme is specified and used,
+     *                    this parameter is ignored and the tiling scheme's ellipsoid is used instead. If neither
+     *                    parameter is specified, the WGS84 ellipsoid is used.
+     * @property {Credit|String} [credit] A credit for the data source, which is displayed on the canvas.  This parameter is ignored when accessing a tiled server.
+     * @property {Number} [tileWidth=256] The width of each tile in pixels.  This parameter is ignored when accessing a tiled server.
+     * @property {Number} [tileHeight=256] The height of each tile in pixels.  This parameter is ignored when accessing a tiled server.
+     * @property {Number} [maximumLevel] The maximum tile level to request, or undefined if there is no maximum.  This parameter is ignored when accessing
+     *                                        a tiled server.
+     */
+
+    /**
+     * Provides tiled imagery hosted by an ArcGIS MapServer.  By default, the server's pre-cached tiles are
+     * used, if available.
+     *
+     * @alias ArcGisMapServerImageryProvider
+     * @constructor
+     *
+     * @param {ArcGisMapServerImageryProvider.ConstructorOptions} options Object describing initialization options
+     *
+     * @see BingMapsImageryProvider
+     * @see GoogleEarthEnterpriseMapsProvider
+     * @see OpenStreetMapImageryProvider
+     * @see SingleTileImageryProvider
+     * @see TileMapServiceImageryProvider
+     * @see WebMapServiceImageryProvider
+     * @see WebMapTileServiceImageryProvider
+     * @see UrlTemplateImageryProvider
+     *
+     *
+     * @example
+     * const esri = new Cesium.ArcGisMapServerImageryProvider({
+     *     url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+     * });
+     *
+     * @see {@link https://developers.arcgis.com/rest/|ArcGIS Server REST API}
+     * @see {@link http://www.w3.org/TR/cors/|Cross-Origin Resource Sharing}
+     */
+    function ArcGisMapServerImageryProvider(options) {
+      options = defaultValue$1(options, defaultValue$1.EMPTY_OBJECT);
+
+      //>>includeStart('debug', pragmas.debug);
+      if (!defined$2(options.url)) {
+        throw new DeveloperError$1("options.url is required.");
+      }
+      //>>includeEnd('debug');
+
+      /**
+       * The default alpha blending value of this provider, with 0.0 representing fully transparent and
+       * 1.0 representing fully opaque.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultAlpha = undefined;
+
+      /**
+       * The default alpha blending value on the night side of the globe of this provider, with 0.0 representing fully transparent and
+       * 1.0 representing fully opaque.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultNightAlpha = undefined;
+
+      /**
+       * The default alpha blending value on the day side of the globe of this provider, with 0.0 representing fully transparent and
+       * 1.0 representing fully opaque.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultDayAlpha = undefined;
+
+      /**
+       * The default brightness of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0
+       * makes the imagery darker while greater than 1.0 makes it brighter.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultBrightness = undefined;
+
+      /**
+       * The default contrast of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0 reduces
+       * the contrast while greater than 1.0 increases it.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultContrast = undefined;
+
+      /**
+       * The default hue of this provider in radians. 0.0 uses the unmodified imagery color.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultHue = undefined;
+
+      /**
+       * The default saturation of this provider. 1.0 uses the unmodified imagery color. Less than 1.0 reduces the
+       * saturation while greater than 1.0 increases it.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultSaturation = undefined;
+
+      /**
+       * The default gamma correction to apply to this provider.  1.0 uses the unmodified imagery color.
+       *
+       * @type {Number|undefined}
+       * @default undefined
+       */
+      this.defaultGamma = undefined;
+
+      /**
+       * The default texture minification filter to apply to this provider.
+       *
+       * @type {TextureMinificationFilter}
+       * @default undefined
+       */
+      this.defaultMinificationFilter = undefined;
+
+      /**
+       * The default texture magnification filter to apply to this provider.
+       *
+       * @type {TextureMagnificationFilter}
+       * @default undefined
+       */
+      this.defaultMagnificationFilter = undefined;
+
+      const resource = Resource.createIfNeeded(options.url);
+      resource.appendForwardSlash();
+
+      if (defined$2(options.token)) {
+        resource.setQueryParameters({
+          token: options.token,
+        });
+      }
+
+      this._resource = resource;
+      this._tileDiscardPolicy = options.tileDiscardPolicy;
+
+      this._tileWidth = defaultValue$1(options.tileWidth, 256);
+      this._tileHeight = defaultValue$1(options.tileHeight, 256);
+      this._maximumLevel = options.maximumLevel;
+      this._tilingScheme = defaultValue$1(
+        options.tilingScheme,
+        new GeographicTilingScheme$2({ ellipsoid: options.ellipsoid })
+      );
+      this._useTiles = defaultValue$1(options.usePreCachedTilesIfAvailable, true);
+      this._rectangle = defaultValue$1(
+        options.rectangle,
+        this._tilingScheme.rectangle
+      );
+      this._layers = options.layers;
+
+      let credit = options.credit;
+      if (typeof credit === "string") {
+        credit = new Credit$1(credit);
+      }
+      this._credit = credit;
+
+      /**
+       * Gets or sets a value indicating whether feature picking is enabled.  If true, {@link ArcGisMapServerImageryProvider#pickFeatures} will
+       * invoke the "identify" operation on the ArcGIS server and return the features included in the response.  If false,
+       * {@link ArcGisMapServerImageryProvider#pickFeatures} will immediately return undefined (indicating no pickable features)
+       * without communicating with the server.
+       * @type {Boolean}
+       * @default true
+       */
+      this.enablePickFeatures = defaultValue$1(options.enablePickFeatures, true);
+
+      this._errorEvent = new Event$5();
+
+      this._ready = false;
+
+      // Grab the details of this MapServer.
+      const that = this;
+      let metadataError;
+
+      function metadataSuccess(data) {
+        const tileInfo = data.tileInfo;
+        if (!defined$2(tileInfo)) {
+          that._useTiles = false;
+        } else {
+          that._tileWidth = tileInfo.rows;
+          that._tileHeight = tileInfo.cols;
+
+          if (
+            tileInfo.spatialReference.wkid === 102100 ||
+            tileInfo.spatialReference.wkid === 102113
+          ) {
+            that._tilingScheme = new WebMercatorTilingScheme({
+              ellipsoid: options.ellipsoid,
+            });
+          } else if (data.tileInfo.spatialReference.wkid === 4326) {
+            that._tilingScheme = new GeographicTilingScheme$2({
+              ellipsoid: options.ellipsoid,
+            });
+          } else if (data.tileInfo.spatialReference.wkid === 4490) {
+            that._tilingScheme = new Geographic4490TilingScheme({
+              ellipsoid: options.ellipsoid,
+              tileInfo: data.tileInfo,
+              rectangle: that._rectangle,
+              numberOfLevelZeroTilesX: options.numberOfLevelZeroTilesX,
+              numberOfLevelZeroTilesY: options.numberOfLevelZeroTilesY
+            });
+            
+            that._tilingScheme._tileInfo = data.tileInfo;//附加自定义属性
+          } else {
+            const message = `Tile spatial reference WKID ${data.tileInfo.spatialReference.wkid} is not supported.`;
+            metadataError = TileProviderError.reportError(
+              metadataError,
+              that,
+              that._errorEvent,
+              message,
+              undefined,
+              undefined,
+              undefined
+            );
+            if (metadataError.retry) {
+              return requestMetadata();
+            }
+            return Promise.reject(new RuntimeError(message));
+          }
+          that._maximumLevel = data.tileInfo.lods.length - 1;
+
+          if (defined$2(data.fullExtent)) {
+            if (
+              defined$2(data.fullExtent.spatialReference) &&
+              defined$2(data.fullExtent.spatialReference.wkid)
+            ) {
+              if (
+                data.fullExtent.spatialReference.wkid === 102100 ||
+                data.fullExtent.spatialReference.wkid === 102113
+              ) {
+                const projection = new WebMercatorProjection();
+                const extent = data.fullExtent;
+                const sw = projection.unproject(
+                  new Cartesian3$3(
+                    Math.max(
+                      extent.xmin,
+                      -that._tilingScheme.ellipsoid.maximumRadius * Math.PI
+                    ),
+                    Math.max(
+                      extent.ymin,
+                      -that._tilingScheme.ellipsoid.maximumRadius * Math.PI
+                    ),
+                    0.0
+                  )
+                );
+                const ne = projection.unproject(
+                  new Cartesian3$3(
+                    Math.min(
+                      extent.xmax,
+                      that._tilingScheme.ellipsoid.maximumRadius * Math.PI
+                    ),
+                    Math.min(
+                      extent.ymax,
+                      that._tilingScheme.ellipsoid.maximumRadius * Math.PI
+                    ),
+                    0.0
+                  )
+                );
+                that._rectangle = new Rectangle$1(
+                  sw.longitude,
+                  sw.latitude,
+                  ne.longitude,
+                  ne.latitude
+                );
+              } else if (data.fullExtent.spatialReference.wkid === 4326) {
+                that._rectangle = Rectangle$1.fromDegrees(
+                  data.fullExtent.xmin,
+                  data.fullExtent.ymin,
+                  data.fullExtent.xmax,
+                  data.fullExtent.ymax
+                );
+              } else if (data.fullExtent.spatialReference.wkid === 4490) {
+                that._rectangle = Rectangle$1.fromDegrees(
+                  data.fullExtent.xmin,
+                  data.fullExtent.ymin,
+                  data.fullExtent.xmax,
+                  data.fullExtent.ymax
+                );
+              }else {
+                const extentMessage = `fullExtent.spatialReference WKID ${data.fullExtent.spatialReference.wkid} is not supported.`;
+                metadataError = TileProviderError.reportError(
+                  metadataError,
+                  that,
+                  that._errorEvent,
+                  extentMessage,
+                  undefined,
+                  undefined,
+                  undefined
+                );
+                if (metadataError.retry) {
+                  return requestMetadata();
+                }
+                return Promise.reject(new RuntimeError(extentMessage));
+              }
+            }
+          } else {
+            that._rectangle = that._tilingScheme.rectangle;
+          }
+
+          // Install the default tile discard policy if none has been supplied.
+          if (!defined$2(that._tileDiscardPolicy)) {
+            that._tileDiscardPolicy = new DiscardMissingTileImagePolicy({
+              missingImageUrl: buildImageResource(that, 0, 0, that._maximumLevel)
+                .url,
+              pixelsToCheck: [
+                new Cartesian2$2(0, 0),
+                new Cartesian2$2(200, 20),
+                new Cartesian2$2(20, 200),
+                new Cartesian2$2(80, 110),
+                new Cartesian2$2(160, 130),
+              ],
+              disableCheckIfAllPixelsAreTransparent: true,
+            });
+          }
+
+          that._useTiles = true;
+        }
+
+        if (defined$2(data.copyrightText) && data.copyrightText.length > 0) {
+          that._credit = new Credit$1(data.copyrightText);
+        }
+
+        that._ready = true;
+        TileProviderError.reportSuccess(metadataError);
+        return Promise.resolve(true);
+      }
+
+      function metadataFailure(e) {
+        const message = `An error occurred while accessing ${that._resource.url}.`;
+        metadataError = TileProviderError.reportError(
+          metadataError,
+          that,
+          that._errorEvent,
+          message,
+          undefined,
+          undefined,
+          undefined
+        );
+        return Promise.reject(new RuntimeError(message));
+      }
+      function requestMetadata() {
+        const resource = that._resource.getDerivedResource({
+          queryParameters: {
+            f: "json",
+          },
+        });
+        return resource.fetchJsonp().then(metadataSuccess).catch(metadataFailure);
+      }
+
+      if (this._useTiles) {
+        this._readyPromise = requestMetadata();
+      } else {
+        this._ready = true;
+        this._readyPromise = Promise.resolve(true);
+      }
+    }
+
+    function buildImageResource(imageryProvider, x, y, level, request) {
+      let resource;
+      if (imageryProvider._useTiles) {
+        resource = imageryProvider._resource.getDerivedResource({
+          url: `tile/${level}/${y}/${x}`,
+          request: request,
+        });
+      } else {
+        const nativeRectangle = imageryProvider._tilingScheme.tileXYToNativeRectangle(
+          x,
+          y,
+          level
+        );
+        const bbox = `${nativeRectangle.west},${nativeRectangle.south},${nativeRectangle.east},${nativeRectangle.north}`;
+
+        const query = {
+          bbox: bbox,
+          size: `${imageryProvider._tileWidth},${imageryProvider._tileHeight}`,
+          format: "png32",
+          transparent: true,
+          f: "image",
+        };
+
+        if (
+          imageryProvider._tilingScheme.projection instanceof GeographicProjection
+        ) {
+          query.bboxSR = 4326;
+          query.imageSR = 4326;
+        } else {
+          query.bboxSR = 3857;
+          query.imageSR = 3857;
+        }
+        if (imageryProvider.layers) {
+          query.layers = `show:${imageryProvider.layers}`;
+        }
+
+        resource = imageryProvider._resource.getDerivedResource({
+          url: "export",
+          request: request,
+          queryParameters: query,
+        });
+      }
+
+      return resource;
+    }
+
+    Object.defineProperties(ArcGisMapServerImageryProvider.prototype, {
+      /**
+       * Gets the URL of the ArcGIS MapServer.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {String}
+       * @readonly
+       */
+      url: {
+        get: function () {
+          return this._resource._url;
+        },
+      },
+
+      /**
+       * Gets the ArcGIS token used to authenticate with the ArcGis MapServer service.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {String}
+       * @readonly
+       */
+      token: {
+        get: function () {
+          return this._resource.queryParameters.token;
+        },
+      },
+
+      /**
+       * Gets the proxy used by this provider.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Proxy}
+       * @readonly
+       */
+      proxy: {
+        get: function () {
+          return this._resource.proxy;
+        },
+      },
+
+      /**
+       * Gets the width of each tile, in pixels. This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Number}
+       * @readonly
+       */
+      tileWidth: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "tileWidth must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._tileWidth;
+        },
+      },
+
+      /**
+       * Gets the height of each tile, in pixels.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Number}
+       * @readonly
+       */
+      tileHeight: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "tileHeight must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._tileHeight;
+        },
+      },
+
+      /**
+       * Gets the maximum level-of-detail that can be requested.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Number|undefined}
+       * @readonly
+       */
+      maximumLevel: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "maximumLevel must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._maximumLevel;
+        },
+      },
+
+      /**
+       * Gets the minimum level-of-detail that can be requested.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Number}
+       * @readonly
+       */
+      minimumLevel: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "minimumLevel must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return 0;
+        },
+      },
+
+      /**
+       * Gets the tiling scheme used by this provider.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {TilingScheme}
+       * @readonly
+       */
+      tilingScheme: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "tilingScheme must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._tilingScheme;
+        },
+      },
+
+      /**
+       * Gets the rectangle, in radians, of the imagery provided by this instance.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Rectangle}
+       * @readonly
+       */
+      rectangle: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "rectangle must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._rectangle;
+        },
+      },
+
+      /**
+       * Gets the tile discard policy.  If not undefined, the discard policy is responsible
+       * for filtering out "missing" tiles via its shouldDiscardImage function.  If this function
+       * returns undefined, no tiles are filtered.  This function should
+       * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {TileDiscardPolicy}
+       * @readonly
+       */
+      tileDiscardPolicy: {
+        get: function () {
+          //>>includeStart('debug', pragmas.debug);
+          if (!this._ready) {
+            throw new DeveloperError$1(
+              "tileDiscardPolicy must not be called before the imagery provider is ready."
+            );
+          }
+          //>>includeEnd('debug');
+
+          return this._tileDiscardPolicy;
+        },
+      },
+
+      /**
+       * Gets an event that is raised when the imagery provider encounters an asynchronous error.  By subscribing
+       * to the event, you will be notified of the error and can potentially recover from it.  Event listeners
+       * are passed an instance of {@link TileProviderError}.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Event}
+       * @readonly
+       */
+      errorEvent: {
+        get: function () {
+          return this._errorEvent;
+        },
+      },
+
+      /**
+       * Gets a value indicating whether or not the provider is ready for use.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Boolean}
+       * @readonly
+       */
+      ready: {
+        get: function () {
+          return this._ready;
+        },
+      },
+
+      /**
+       * Gets a promise that resolves to true when the provider is ready for use.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Promise.<Boolean>}
+       * @readonly
+       */
+      readyPromise: {
+        get: function () {
+          return this._readyPromise;
+        },
+      },
+
+      /**
+       * Gets the credit to display when this imagery provider is active.  Typically this is used to credit
+       * the source of the imagery.  This function should not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       * @type {Credit}
+       * @readonly
+       */
+      credit: {
+        get: function () {
+          return this._credit;
+        },
+      },
+
+      /**
+       * Gets a value indicating whether this imagery provider is using pre-cached tiles from the
+       * ArcGIS MapServer.  If the imagery provider is not yet ready ({@link ArcGisMapServerImageryProvider#ready}), this function
+       * will return the value of `options.usePreCachedTilesIfAvailable`, even if the MapServer does
+       * not have pre-cached tiles.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       *
+       * @type {Boolean}
+       * @readonly
+       * @default true
+       */
+      usingPrecachedTiles: {
+        get: function () {
+          return this._useTiles;
+        },
+      },
+
+      /**
+       * Gets a value indicating whether or not the images provided by this imagery provider
+       * include an alpha channel.  If this property is false, an alpha channel, if present, will
+       * be ignored.  If this property is true, any images without an alpha channel will be treated
+       * as if their alpha is 1.0 everywhere.  When this property is false, memory usage
+       * and texture upload time are reduced.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       *
+       * @type {Boolean}
+       * @readonly
+       * @default true
+       */
+      hasAlphaChannel: {
+        get: function () {
+          return true;
+        },
+      },
+
+      /**
+       * Gets the comma-separated list of layer IDs to show.
+       * @memberof ArcGisMapServerImageryProvider.prototype
+       *
+       * @type {String}
+       */
+      layers: {
+        get: function () {
+          return this._layers;
+        },
+      },
+    });
+
+    /**
+     * Gets the credits to be displayed when a given tile is displayed.
+     *
+     * @param {Number} x The tile X coordinate.
+     * @param {Number} y The tile Y coordinate.
+     * @param {Number} level The tile level;
+     * @returns {Credit[]} The credits to be displayed when the tile is displayed.
+     *
+     * @exception {DeveloperError} <code>getTileCredits</code> must not be called before the imagery provider is ready.
+     */
+    ArcGisMapServerImageryProvider.prototype.getTileCredits = function (
+      x,
+      y,
+      level
+    ) {
+      return undefined;
+    };
+
+    /**
+     * Requests the image for a given tile.  This function should
+     * not be called before {@link ArcGisMapServerImageryProvider#ready} returns true.
+     *
+     * @param {Number} x The tile X coordinate.
+     * @param {Number} y The tile Y coordinate.
+     * @param {Number} level The tile level.
+     * @param {Request} [request] The request object. Intended for internal use only.
+     * @returns {Promise.<ImageryTypes>|undefined} A promise for the image that will resolve when the image is available, or
+     *          undefined if there are too many active requests to the server, and the request should be retried later.
+     *
+     * @exception {DeveloperError} <code>requestImage</code> must not be called before the imagery provider is ready.
+     */
+    ArcGisMapServerImageryProvider.prototype.requestImage = function (
+      x,
+      y,
+      level,
+      request
+    ) {
+      //>>includeStart('debug', pragmas.debug);
+      if (!this._ready) {
+        throw new DeveloperError$1(
+          "requestImage must not be called before the imagery provider is ready."
+        );
+      }
+      //>>includeEnd('debug');
+
+      return ImageryProvider.loadImage(
+        this,
+        buildImageResource(this, x, y, level, request)
+      );
+    };
+
+    /**
+        /**
+         * Asynchronously determines what features, if any, are located at a given longitude and latitude within
+         * a tile.  This function should not be called before {@link ImageryProvider#ready} returns true.
+         *
+         * @param {Number} x The tile X coordinate.
+         * @param {Number} y The tile Y coordinate.
+         * @param {Number} level The tile level.
+         * @param {Number} longitude The longitude at which to pick features.
+         * @param {Number} latitude  The latitude at which to pick features.
+         * @return {Promise.<ImageryLayerFeatureInfo[]>|undefined} A promise for the picked features that will resolve when the asynchronous
+         *                   picking completes.  The resolved value is an array of {@link ImageryLayerFeatureInfo}
+         *                   instances.  The array may be empty if no features are found at the given location.
+         *
+         * @exception {DeveloperError} <code>pickFeatures</code> must not be called before the imagery provider is ready.
+         */
+    ArcGisMapServerImageryProvider.prototype.pickFeatures = function (
+      x,
+      y,
+      level,
+      longitude,
+      latitude
+    ) {
+      //>>includeStart('debug', pragmas.debug);
+      if (!this._ready) {
+        throw new DeveloperError$1(
+          "pickFeatures must not be called before the imagery provider is ready."
+        );
+      }
+      //>>includeEnd('debug');
+
+      if (!this.enablePickFeatures) {
+        return undefined;
+      }
+
+      const rectangle = this._tilingScheme.tileXYToNativeRectangle(x, y, level);
+
+      let horizontal;
+      let vertical;
+      let sr;
+      if (this._tilingScheme.projection instanceof GeographicProjection) {
+        horizontal = CesiumMath$1.toDegrees(longitude);
+        vertical = CesiumMath$1.toDegrees(latitude);
+        sr = "4326";
+      } else {
+        const projected = this._tilingScheme.projection.project(
+          new Cartographic$3(longitude, latitude, 0.0)
+        );
+        horizontal = projected.x;
+        vertical = projected.y;
+        sr = "3857";
+      }
+
+      let layers = "visible";
+      if (defined$2(this._layers)) {
+        layers += `:${this._layers}`;
+      }
+
+      const query = {
+        f: "json",
+        tolerance: 2,
+        geometryType: "esriGeometryPoint",
+        geometry: `${horizontal},${vertical}`,
+        mapExtent: `${rectangle.west},${rectangle.south},${rectangle.east},${rectangle.north}`,
+        imageDisplay: `${this._tileWidth},${this._tileHeight},96`,
+        sr: sr,
+        layers: layers,
+      };
+
+      const resource = this._resource.getDerivedResource({
+        url: "identify",
+        queryParameters: query,
+      });
+
+      return resource.fetchJson().then(function (json) {
+        const result = [];
+
+        const features = json.results;
+        if (!defined$2(features)) {
+          return result;
+        }
+
+        for (let i = 0; i < features.length; ++i) {
+          const feature = features[i];
+
+          const featureInfo = new ImageryLayerFeatureInfo();
+          featureInfo.data = feature;
+          featureInfo.name = feature.value;
+          featureInfo.properties = feature.attributes;
+          featureInfo.configureDescriptionFromProperties(feature.attributes);
+
+          // If this is a point feature, use the coordinates of the point.
+          if (feature.geometryType === "esriGeometryPoint" && feature.geometry) {
+            const wkid =
+              feature.geometry.spatialReference &&
+              feature.geometry.spatialReference.wkid
+                ? feature.geometry.spatialReference.wkid
+                : 4326;
+            if (wkid === 4326 || wkid === 4283) {
+              featureInfo.position = Cartographic$3.fromDegrees(
+                feature.geometry.x,
+                feature.geometry.y,
+                feature.geometry.z
+              );
+            } else if (wkid === 102100 || wkid === 900913 || wkid === 3857) {
+              const projection = new WebMercatorProjection();
+              featureInfo.position = projection.unproject(
+                new Cartesian3$3(
+                  feature.geometry.x,
+                  feature.geometry.y,
+                  feature.geometry.z
+                )
+              );
+            }
+          }
+
+          result.push(featureInfo);
+        }
+
+        return result;
+      });
+    };
 
     function buildImageUrl(imageryProvider, x, y, level) {
         let url = imageryProvider.url + "&x={x}&y={y}&z={z}";
@@ -27450,8 +33343,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @see {@link http://lbsyun.baidu.com/custom/list.htm|百度个性化地图列表}
          */
         constructor(options) {
-            options = defaultValue$9(options, {});
-            options.url = defaultValue$9(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
+            options = defaultValue$b(options, {});
+            options.url = defaultValue$b(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
             if (options.customid) {
                 options.url = `https://api.map.baidu.com/customimage/tile?customid=${options.customid}`;
             }
@@ -27495,8 +33388,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options = {}) {
             options.url = 'https://dev.virtualearth.net';
-            options.mapStyle = defaultValue$9(options.mapStyle, BingLayer.mapStyle.AERIAL);
-            options.key = defaultValue$9(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
+            options.mapStyle = defaultValue$b(options.mapStyle, BingLayer.mapStyle.AERIAL);
+            options.key = defaultValue$b(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
             super(options);
         }
         /**
@@ -27671,14 +33564,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          *
          */
         constructor(options) {
-            options = defaultValue$9(options, {});
+            options = defaultValue$b(options, {});
 
-            const layer = defaultValue$9(options.layer, 'img');
+            const layer = defaultValue$b(options.layer, 'img');
             const {
                 scl,
                 style
             } = GaoDeLayer.getParametersByLayer(layer);
-            const lang = defaultValue$9(options.lang, 'zh_cn');
+            const lang = defaultValue$b(options.lang, 'zh_cn');
             options.url = `https://webst0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=${lang}&size=1&scl=${scl}&style=${style}`;
             options.subdomains = '1234';
             super(options);
@@ -27753,20 +33646,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 rectangle: Cesium.Rectangle.MAX_VALUE,
                 intervalOfZeorLevel: options.intervalOfZeorLevel
             });
-            this._hasAlphaChannel = defaultValue$9(options.hasAlphaChannel, true);
+            this._hasAlphaChannel = defaultValue$b(options.hasAlphaChannel, true);
             this._tilingScheme = tilingScheme;
             this._image = undefined;
             this._texture = undefined;
 
-            this._errorEvent = new Event$8();
+            this._errorEvent = new Event$9();
 
             this._ready = true;
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$9(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$9(options.color, 'white');
-            this._lineColor = defaultValue$9(options.lineColor, 'gold');
-            this._lineWidth = defaultValue$9(options.lineWidth, 2);
+            this._font = defaultValue$b(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$b(options.color, 'white');
+            this._lineColor = defaultValue$b(options.lineColor, 'gold');
+            this._lineWidth = defaultValue$b(options.lineWidth, 2);
         }
         get hasAlphaChannel() {
             return this._hasAlphaChannel;
@@ -28145,24 +34038,24 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        *
        */
       constructor(options) {
-        options = defaultValue$9(options, {});
+        options = defaultValue$b(options, {});
         const key = options.key;
         if (!key) {
           console.warn('未定义key，地图服务将不可用');
           console.warn('请前往http://lbs.tianditu.gov.cn/server/MapService.html获取地图key');
         }
-        const tilingScheme = defaultValue$9(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
+        const tilingScheme = defaultValue$b(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
         let crs = 'w',
           tileMatrixSet = 'w',
           tileMatrixLabels = options.tileMatrixLabels;
         if (tilingScheme instanceof Cesium.GeographicTilingScheme) {
           crs = 'c';
           tileMatrixSet = 'c';
-          if (!defined$b(tileMatrixLabels)) {
+          if (!defined$c(tileMatrixLabels)) {
             tileMatrixLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
           }
         }
-        const layer = defaultValue$9(options.layer, 'img');
+        const layer = defaultValue$b(options.layer, 'img');
         const url = `http://t{s}.tianditu.com/${layer}_${crs}/wmts?service=wmts&tileMatrixSet=${tileMatrixSet}&request=GetTile&version=1.0.0&LAYER=${layer}&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${key}`;
         return new Cesium.WebMapTileServiceImageryProvider({
           url,
@@ -28242,7 +34135,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @extends XYZLayer
          */
         constructor(options = {}) {
-            options.layer = defaultValue$9(options.layer, 'img');
+            options.layer = defaultValue$b(options.layer, 'img');
             options.subdomains = '123';
             options.url = layerMap[options.layer];
             options.customTags = {
@@ -28282,20 +34175,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @param {Cesium.TilingScheme} [options.tilingScheme = proj.get('EPSG:4326')] 瓦片分割坐标系
          */
         constructor(options = {}) {
-            options.tileWidth = defaultValue$9(options.tileWidth, 256);
-            options.tileHeight = defaultValue$9(options.tileHeight, 256);
-            this._tilingScheme = defined$b(options.tilingScheme)
+            options.tileWidth = defaultValue$b(options.tileWidth, 256);
+            options.tileHeight = defaultValue$b(options.tileHeight, 256);
+            this._tilingScheme = defined$c(options.tilingScheme)
                 ? options.tilingScheme
                 : proj.get('EPSG:4326', { ellipsoid: options.ellipsoid });
-            this._errorEvent = new Event$8();
-            this._tileWidth = defaultValue$9(options.tileWidth, 256);
-            this._tileHeight = defaultValue$9(options.tileHeight, 256);
+            this._errorEvent = new Event$9();
+            this._tileWidth = defaultValue$b(options.tileWidth, 256);
+            this._tileHeight = defaultValue$b(options.tileHeight, 256);
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$9(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$9(options.color, new Cesium.Color(1,1,1,1));
-            this._borderColor = defaultValue$9(options.borderColor, Cesium.Color.GOLD);
-            this._borderWidth = defaultValue$9(options.borderWidth, 2);    
+            this._font = defaultValue$b(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$b(options.color, new Cesium.Color(1,1,1,1));
+            this._borderColor = defaultValue$b(options.borderColor, Cesium.Color.GOLD);
+            this._borderWidth = defaultValue$b(options.borderWidth, 2);    
         }
         /**
          * 表示图层是否已准备完成。
@@ -28458,15 +34351,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            this._errorEvent = new Event$8();
+            this._errorEvent = new Event$9();
             this._tilingScheme = proj.get('EPSG:4326');        
             this._ready = false;
             this._ready = true;
-            this._minimumLevel = defaultValue$9(options.minimumLevel, 0);
+            this._minimumLevel = defaultValue$b(options.minimumLevel, 0);
             this._maximumLevel = options.maximumLevel;
-            this._tileWidth = defaultValue$9(options.tileWidth, 256);
-            this._tileHeight = defaultValue$9(options.tileHeight, 256);
-            this._rectangle = defaultValue$9(options.rectangle, Rectangle.MAX_VALUE);
+            this._tileWidth = defaultValue$b(options.tileWidth, 256);
+            this._tileHeight = defaultValue$b(options.tileHeight, 256);
+            this._rectangle = defaultValue$b(options.rectangle, Rectangle.MAX_VALUE);
             this._readyPromise = Promise.resolve(true);
             this._errorEvent.addEventListener((x, y, z) => {
                 // 主要是为了不让TileProviderError.handleError打印错误
@@ -28779,10 +34672,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            if (!defined$b(options.parameters)) {
+            if (!defined$c(options.parameters)) {
                 options.parameters = WMSLayer.DefaultParameters;
             }
-            if (!defined$b(options.GetFeatureInfoDefaultParameters)) ;
+            if (!defined$c(options.GetFeatureInfoDefaultParameters)) ;
             super(options);
         }
         /**
@@ -28926,9 +34819,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._type = undefined;
         this._properties = undefined;
         this._show = true;
-        this._id = defaultValue$9(entityOptions.id, guid());
-        this._clampToGround = defaultValue$9(options.clampToGround);
-        this._clampToModel = defaultValue$9(options.clampToModel);
+        this._id = defaultValue$b(entityOptions.id, guid());
+        this._clampToGround = defaultValue$b(options.clampToGround);
+        this._clampToModel = defaultValue$b(options.clampToModel);
 
       }
       /**
@@ -29121,14 +35014,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         abstract();
       }
       static getEntityFromGeoJson(json) {
-        if (!defined$b(json)) {
+        if (!defined$c(json)) {
           return;
         }
 
         if (json.geometry && json.geometry.type.toUpperCase() === 'POLYGON') {
           let hierarchy = [];
           const coordinates = json.geometry.coordinates;
-          if (!defined$b(coordinates) || !Array.isArray(coordinates)) {
+          if (!defined$c(coordinates) || !Array.isArray(coordinates)) {
             return;
           }
           for (let coords of coordinates) {
@@ -29137,7 +35030,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             }
             for (let coor of coords) {
               const ll = Cesium.Cartesian3.fromDegrees(coor[0], coor[1]);
-              if (!defined$b(ll)) return;
+              if (!defined$c(ll)) return;
               hierarchy.push(ll);
             }
           }      return new Cesium.Entity({
@@ -31243,14 +37136,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * },{type:PlotType.BILLBOARD})
        */
       constructor(entityOptions, options = {}) {
-        entityOptions = defaultValue$9(entityOptions, {});
+        entityOptions = defaultValue$b(entityOptions, {});
         super(entityOptions, options);
         this._entityOptions = entityOptions;
         this._options = options;
-        this._positions = defaultValue$9(entityOptions.position, new Cesium.Cartesian3());
-        this._type = defaultValue$9(options.type, PlotType$1.POINT);
+        this._positions = defaultValue$b(entityOptions.position, new Cesium.Cartesian3());
+        this._type = defaultValue$b(options.type, PlotType$1.POINT);
         this._entity = this.createEntity();
-        this._text = defaultValue$9(entityOptions.text, '');
+        this._text = defaultValue$b(entityOptions.text, '');
       }
       /**
        * 该图形的几何描述，包括类型，经纬度等
@@ -31281,8 +37174,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         }
         if (this.type === PlotType$1.BILLBOARD) {
           options.billboard = clone(this._entityOptions);
-          if (!defined$b(options.billboard.image)) {
-            options.billboard.image = Url.buildModuleUrl('./assets/marker.png');
+          if (!defined$c(options.billboard.image)) {
+            options.billboard.image = Url$1.buildModuleUrl('./assets/marker.png');
           }
         }
         if (this.type === PlotType$1.LABEL) {
@@ -31292,8 +37185,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           options.orientation = this._entityOptions.orientation;
           delete this._entityOptions.orientation;
           options.model = clone(this._entityOptions);
-          if (!defined$b(options.model.uri)) {
-            options.model.uri = Url.buildModuleUrl('./assets/Wood_Tower.gltf');
+          if (!defined$c(options.model.uri)) {
+            options.model.uri = Url$1.buildModuleUrl('./assets/Wood_Tower.gltf');
           }
         }
         if (this._options.label && this._type !== PlotType$1.LABEL) {
@@ -31414,7 +37307,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Bool}
        */
       static equal(left, right) {
-        if (!defined$b(left) || !defined$b(right)) {
+        if (!defined$c(left) || !defined$c(right)) {
           return false;
         }
         if (left instanceof PointPlot) {
@@ -31489,7 +37382,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
+        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -31575,8 +37468,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._entityOptions = defaultValue$9(entityOptions, {});
-        this._positions = defaultValue$9(this._entityOptions.positions, []);
+        this._entityOptions = defaultValue$b(entityOptions, {});
+        this._positions = defaultValue$b(this._entityOptions.positions, []);
         this._nodePositions = this._positions;
         this._type = PlotType$1.POLYLINE;
         this._entity = this.createEntity();
@@ -31646,7 +37539,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$b(index) && index < vertexNumber) {
+        if (defined$c(index) && index < vertexNumber) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
           }
@@ -31661,7 +37554,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$b(index)) {
+        if (!defined$c(index)) {
           return;
         }
         if (index < 0 || index >= this.positions.length) {
@@ -31727,7 +37620,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
+        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -31784,7 +37677,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$9(entityOptions.positions, []);
+        this._positions = defaultValue$b(entityOptions.positions, []);
         this._nodePositions = [...this.positions];
         if (this._nodePositions.length) {
           this._nodePositions[this._nodePositions.length] = this._nodePositions[0];
@@ -31879,7 +37772,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$b(index) && index < vertexNumber && index >= 0) {
+        if (defined$c(index) && index < vertexNumber && index >= 0) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
             this._nodePositions[i] = this._nodePositions[i - 1];
@@ -31900,7 +37793,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$b(index)) {
+        if (!defined$c(index)) {
           return
         }
         if (index < 0 || index >= this.positions.length) {
@@ -31990,7 +37883,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$b(json.geometry) || !(defined$b(json.properties))) {
+        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -32027,8 +37920,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         material: Cesium.Color.fromCssColorString('rgba(247,224,32,0.5)'),
         outlineColor: Cesium.Color.RED,
         outlineWidth: 2,
-        outline: true,
+        outline: false,
         perPositionHeight: false,
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
       }
 
       static highlightStyle = {
@@ -32177,16 +38071,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._viewer = viewer;
         const defaultLabelStyle = PointPlot.defaultLabelStyle;
         defaultLabelStyle.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-        this._labelStyle = defaultValue$9(labelStyle, defaultLabelStyle);
-        this._polylineStyle = defaultValue$9(polylineStyle, PolylinePlot.defaultStyle);
-        this._polygonStyle = defaultValue$9(polygonStyle, PolygonPlot.defaultStyle);
-        this._pointStyle = defaultValue$9(pointStyle, PointPlot.defaultStyle);
+        this._labelStyle = defaultValue$b(labelStyle, defaultLabelStyle);
+        this._polylineStyle = defaultValue$b(polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$b(polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$b(pointStyle, PointPlot.defaultStyle);
 
-        this._startMeasure = new Event$8();
-        this._stopMeasure = new Event$8();
-        this._addNode = new Event$8();
+        this._startMeasure = new Event$9();
+        this._stopMeasure = new Event$9();
+        this._addNode = new Event$9();
 
-        this.formatText = defaultValue$9(options.formatText, formatText);
+        this.formatText = defaultValue$b(options.formatText, formatText);
 
         const defaultNode = {
           distance: true,
@@ -32200,26 +38094,29 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           height: true,
           angle: true,
         };
-        this._nodeMode = defaultValue$9(options.nodeMode, defaultNode);
-        this._auxiliaryGeometry = defaultValue$9(options.auxiliaryGeometry, defaultAuxiliary);
+        this._nodeMode = defaultValue$b(options.nodeMode, defaultNode);
+        this._auxiliaryGeometry = defaultValue$b(options.auxiliaryGeometry, defaultAuxiliary);
 
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         this._handler = handler;
-        this._values = [];
-        this._mode = defaultValue$9(options.mode, CartometryType$1.SURFACE_DISTANCE);
-        this._tip = new CursorTip();
-        this._tip.show = false;
-        this._autoDepthTest = defaultValue$9(options.autoDepthTest, true);
+        this._values = {};
+        this._mode = defaultValue$b(options.mode, CartometryType$1.SURFACE_DISTANCE);
+        this._showTip = defaultValue$b(options.showTip, true);
+        if (this._showTip) {
+          this._tip = new CursorTip();
+          this._tip.show = false;
+        }    
+        this._autoDepthTest = defaultValue$b(options.autoDepthTest, true);
         this.listening = false;
         const auxiliarylineMaterial = new Cesium.PolylineDashMaterialProperty({
           color: Cesium.Color.RED,
         });
-        this._auxiliarylineMaterial = defaultValue$9(options.auxiliaryLineMaterial, auxiliarylineMaterial);
+        this._auxiliarylineMaterial = defaultValue$b(options.auxiliaryLineMaterial, auxiliarylineMaterial);
         const auxiliarypolygonMaterial = new Cesium.PolylineDashMaterialProperty({
           color: Cesium.Color.RED,
         });
         this._depthTestAgainstTerrain = this._viewer.scene.globe.depthTestAgainstTerrain;
-        this._auxiliaryPolygonMaterial = defaultValue$9(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
+        this._auxiliaryPolygonMaterial = defaultValue$b(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
       }
 
       /**
@@ -32355,9 +38252,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           if (showAuxiliary) {
             this.createAuxiliaryGraphic(positions, cartesian, mode);
           }
-          this.addNode.raise(cartesian);
+          this.addNode.raise({
+            mode,
+            position: cartesian,
+            id: this.gid
+          });
           if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
-            if (positions.length === 1) {
+            if (this.tip && positions.length === 1) {
               this.tip.text = '单击地图确定终点.';
             }
             if (positions.length === 2) {
@@ -32374,35 +38275,50 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 value = this.getAngle(positions);
               }
               this.createLabel(labelPosition, value);
+              this.stopMeasure.raise({
+                mode,
+                label: value,
+                graphic: this._values[this.gid],
+                id: this.gid
+              });
             }
           }
         };
         const onrClick = (e) => {
           const cartesian = this.pickPosition(e.position);
-          if (!cartesian) {
-            return;
-          }
-          if (showNode) {
+          this.removeEventListener();
+          if (showNode && cartesian) {
             this.createNode(cartesian);
           }
-          if (mode !== CartometryType$1.HEIGHT || mode !== CartometryType$1.ANGLE) {
+          let text;
+          if (cartesian && (mode !== CartometryType$1.HEIGHT || mode !== CartometryType$1.ANGLE)) {
             positions.pop();
             positions.length && cartesian && positions.push(cartesian);
-            this.removeEventListener();
-            this.addNode.raise(cartesian);
+            this.addNode.raise({
+              mode,
+              position: cartesian,
+              id: this.gid
+            });
           }
           if (mode === CartometryType$1.SURFACE_DISTANCE || mode === CartometryType$1.SPACE_DISTANCE) {
-            const text = this.getDistance(positions, mode);
-            this.createLabel(cartesian, text);
+            text = this.getDistance(positions, mode);
+            this.createLabel(cartesian || positions[positions.length - 1], text);
           }
           if (mode === CartometryType$1.SURFACE_AREA || mode === CartometryType$1.SPACE_AREA) {
-            const text = this.getArea(positions, mode);
-            this.createLabel(cartesian, text);
+            text = this.getArea(positions, mode);
+            this.createLabel(cartesian || positions[positions.length - 1], text);
           }
-          this.stopMeasure.raise();
+          this.stopMeasure.raise({
+            mode,
+            label: text,
+            graphic: this._values[this.gid],
+            id: this.gid
+          });
         };
         const onMousemove = (e) => {
-          this.tip.position = e.endPosition;
+          if (this.tip) {
+            this.tip.position = e.endPosition;
+          }
           if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
             return;
           }
@@ -32430,7 +38346,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         handler.removeInputAction(Cesium.ScreenSpaceEventType.MOUSE_MOVE);
         handler.removeInputAction(Cesium.ScreenSpaceEventType.RIGHT_CLICK);
         this._listening = false;
-        this.tip.show = false;
+        if (this.tip) {
+          this.tip.show = false;
+        }
         if (this._autoDepthTest) {
           this._viewer.depthTest = this._depthTestAgainstTerrain;
         }
@@ -32440,11 +38358,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * 清除所有量算结果
        */
       clear() {
-        const values = this._values;
-        for (const v of values) {
-          this._viewer.entities.remove(v);
+        const values = Object.values(this._values);
+        for (const vs of values) {
+          for (let v of vs) {
+            this._viewer.entities.remove(v);
+          }
         }
-        this._values = [];
+        this._values = {};
       }
 
       /**
@@ -32528,19 +38448,25 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           }
         }
 
-        this.tip.show = true;
-        mode = defaultValue$9(mode, this.mode);
+        if (this.tip) {
+          this.tip.show = true;
+        }
+        mode = defaultValue$b(mode, this.mode);
         const valid = CartometryType$1.validate(mode);
         if (!valid) {
           console.warn('无效的测量模式'); // WARNING: 无效的测量模式
           return;
         }
-        if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
-          this.tip.text = '单击地图确定起点.';
-        } else {
-          this.tip.text = '单击地图添加节点，右击地图结束量算';
+        this.gid = guid();
+        this._values[this.gid] = [];
+        if (this.tip) {
+          if (mode === CartometryType$1.HEIGHT || mode === CartometryType$1.ANGLE) {
+            this.tip.text = '单击地图确定起点.';
+          } else {
+            this.tip.text = '单击地图添加节点，右击地图结束量算';
+          }
         }
-        this.startMeasure.raise(mode);
+        this.startMeasure.raise({mode, id: this.gid});
         let options;
         if (mode === CartometryType$1.SPACE_DISTANCE || mode === CartometryType$1.HEIGHT) {
           options = this.polylineStyle;
@@ -32660,7 +38586,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           position: cartesian,
           point: pointOptions,
         });
-        this._values.push(point);
+        this._values[this.gid].push(point);
         return point;
       }
 
@@ -32677,7 +38603,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           position: cartesian,
           label: labelOptions,
         });
-        this._values.push(label);
+        this._values[this.gid].push(label);
         return label;
       }
 
@@ -32690,7 +38616,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         const pg = this._viewer.entities.add({
           polygon: options,
         });
-        this._values.push(pg);
+        this._values[this.gid].push(pg);
         return pg;
       }
 
@@ -32703,7 +38629,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         const pl = this._viewer.entities.add({
           polyline: options,
         });
-        this._values.push(pl);
+        this._values[this.gid].push(pl);
         return pl;
       }
 
@@ -32736,7 +38662,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             width: this.polylineStyle.width || 3,
           },
         });
-        this._values.push(pl);
+        this._values[this.gid].push(pl);
       }
 
       /**
@@ -32775,7 +38701,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           },
         };
         const pl = this._viewer.entities.add(options);
-        this._values.push(pl);
+        this._values[this.gid].push(pl);
       }
 
       /**
@@ -32817,7 +38743,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions) {
         this._type = PlotType$1.MUTIPOINT;
-        this._positions = defaultValue$9(entityOptions.positions, []);
+        this._positions = defaultValue$b(entityOptions.positions, []);
         this._entityOptions = entityOptions;
         this._values = [];
         this.createEntity();
@@ -32846,7 +38772,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       highlightActiveNode() {
-        const values = this._values.filter(_ => defined$b(_.position));
+        const values = this._values.filter(_ => defined$c(_.position));
         for (let i = 0, length = values.length; i < length; i++) {
           const v = values[i];
           if (i === this.activeIndex) {
@@ -32889,7 +38815,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity} index对应的顶点实体
        */
       get(index) {
-        const values = this._values.filter(_ => defined$b(_.position));
+        const values = this._values.filter(_ => defined$c(_.position));
         return values[index];
       }
       /**
@@ -32954,7 +38880,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity}    被删除的顶点
        */
       removeNode(index) {
-        if (!defined$b(index)) {
+        if (!defined$c(index)) {
           return;
         }
         // const node = this._values[index];
@@ -33034,10 +38960,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     class ArrowPlot extends BasePlot {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._type = defaultValue$9(options.type, PlotType$1.STRAIGHTARROW);
+        this._type = defaultValue$b(options.type, PlotType$1.STRAIGHTARROW);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$9(entityOptions.positions, []);
-        this._arrowType = defaultValue$9(options.type, PlotType$1.STRAIGHTARROW);
+        this._positions = defaultValue$b(entityOptions.positions, []);
+        this._arrowType = defaultValue$b(options.type, PlotType$1.STRAIGHTARROW);
         if (!ArrowType.validate(this._arrowType)) {
           throw new CesiumProError$1('无效的箭头图形.')
         }
@@ -33156,7 +39082,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       updatePositions() {
-        if (!defined$b(this.arrow)) {
+        if (!defined$c(this.arrow)) {
           return;
         }
         const controls = this.arrow.controls;
@@ -33217,8 +39143,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$9(options, {});
-        this._id = defaultValue$9(options.id, guid());
+        options = defaultValue$b(options, {});
+        this._id = defaultValue$b(options.id, guid());
         this._dataSource = new Cesium.CustomDataSource('cesiumpro-graphic_' + this._id);
         this._nodeDataSource = new Cesium.CustomDataSource('cesiumpro-graphic-node_' + this._id);
         this._viewer.dataSources.add(this._dataSource);
@@ -33226,22 +39152,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._viewer.dataSources.add(this._nodeDataSource);
         this._root = this._dataSource.entities;
         this._nodeRoot = this._nodeDataSource.entities;
-        this._preEdit = new Event$8();
-        this._postEdit = new Event$8();
-        this._preCreate = new Event$8();
-        this._postCreate = new Event$8();
-        this._preRemove = new Event$8();
-        this._postRemove = new Event$8();
+        this._preEdit = new Event$9();
+        this._postEdit = new Event$9();
+        this._preCreate = new Event$9();
+        this._postCreate = new Event$9();
+        this._preRemove = new Event$9();
+        this._postRemove = new Event$9();
         this._values = new Cesium.AssociativeArray();
         this._handler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
-        this._pointStyle = defaultValue$9(options.pointStyle, PointPlot.defaultPointStyle);
-        this._labelStyle = defaultValue$9(options.labelStyle, PointPlot.defaultLabelStyle);
-        this._modelStyle = defaultValue$9(options.modelStyle, PointPlot.defaultModelStyle);
-        this._billboardStyle = defaultValue$9(options.billboardStyle, PointPlot.defaultBillboardStyle);
-        this._polylineStyle = defaultValue$9(options.polylineStyle, PolylinePlot.defaultStyle);
-        this._polygonStyle = defaultValue$9(options.polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$b(options.pointStyle, PointPlot.defaultPointStyle);
+        this._labelStyle = defaultValue$b(options.labelStyle, PointPlot.defaultLabelStyle);
+        this._modelStyle = defaultValue$b(options.modelStyle, PointPlot.defaultModelStyle);
+        this._billboardStyle = defaultValue$b(options.billboardStyle, PointPlot.defaultBillboardStyle);
+        this._polylineStyle = defaultValue$b(options.polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$b(options.polygonStyle, PolygonPlot.defaultStyle);
         this._editEventHandler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
         this._viewer.screenSpaceEventHandler.removeInputAction(LEFT_DOUBLE_CLICK);
+        this.showTip = defaultValue$b(options.showTip, true);
 
         this._mode = PlotMode.ready;
 
@@ -33249,8 +39176,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * 右键菜单管理器
          * @type {ContextMenu}
          */
-        options.contextEnabled = defaultValue$9(options.contextEnabled, true);
-        options.contextEnabled && (this.contextMenu = this.createContext());
+        options.contextEnabled = defaultValue$b(options.contextEnabled, true);
+        if (options.contextEnabled) {
+          this.contextMenu = this.createContext();
+          this.addContextEventListener();
+        }
         /**
          * 跟随鼠标移动的文字
          * @type {CursorTip}
@@ -33472,7 +39402,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       add(graphic) {
         this.preCreate.raise(graphic);
-        if (defined$b(this.viewer && defined$b(graphic.entity))) {
+        if (defined$c(this.viewer && defined$c(graphic.entity))) {
           this.root.add(graphic.entity);
           this._values.set(graphic.id, graphic);
           this.postCreate.raise(graphic);
@@ -33484,11 +39414,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {PolylinePlot|PointPlot|PolygonPlot} graphic 要从场景中删除的图形
        */
       remove(graphic) {
-        if (!defined$b(graphic)) {
+        if (!defined$c(graphic)) {
           return;
         }
         this.preRemove.raise(graphic);
-        if (defined$b(this.viewer) && defined$b(graphic.entity)) {
+        if (defined$c(this.viewer) && defined$c(graphic.entity)) {
           this.root.remove(graphic.entity);
           this.postRemove.raise(graphic);
         }
@@ -33517,7 +39447,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Boolean}  true表示包含
        */
       hasEntity(entity) {
-        if (!defined$b(entity)) {
+        if (!defined$c(entity)) {
           return false;
         }
         return this._root.contains(entity);
@@ -33535,7 +39465,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       destroy() {
         this.removeAll();
-        this.contextMenu.destroy();
+        this.contextMenu && this.contextMenu.destroy();
+        this.removeContextEventListener();
         this._viewer.dataSources.remove(this._dataSource);
         this._viewer.dataSources.remove(this._nodeDataSource);
         this.cursorTip.destroy();
@@ -33557,7 +39488,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         } else {
           entities.push(graphic.entity);
         }
-        if (defined$b(this._viewer)) {
+        if (defined$c(this._viewer)) {
           this._viewer.zoomTo(entities);
         }
       }
@@ -33635,7 +39566,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       addEventListener(single = true) {
-        if (!defined$b(this.activeGraphic)) {
+        if (!defined$c(this.activeGraphic)) {
           return;
         }
         const positions = this.activeGraphic.positions;
@@ -33644,13 +39575,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this.activeGraphic.updatePosition.bind(this.activeGraphic) : 
             this.activeGraphic.addNode.bind(this.activeGraphic);
           const position = this.pickPosition(e.position);
-          if (!defined$b(position)) {
+          if (!defined$c(position)) {
             return;
           } 
           // if (this.activeGraphic._arrowType === ArrowType.attackarrow && this.positions.length > 1) {
           //   this.activeGraphic.popNode();
           // }
-          if (defined$b(addNode)) {
+          if (defined$c(addNode)) {
             addNode(position);
           }
           if (single) {
@@ -33658,21 +39589,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             // this.activeGraphic.stopEdit();
             // this._mode = PlotMode.ready;
             this.stopEdit(this.activeGraphic);
-            defined$b(this.contextMenu) && this.addContextEventListener();
           }
-          defined$b(this.contextMenu) && this.removeContextEventListener();
         };
         const onMouseMove = (e) => {
           const position = this.pickPosition(e.endPosition);
-          if (!defined$b(position)) {
+          if (!defined$c(position)) {
             return;
+          }
+          if (this.showTip) {
+            this.cursorTip.show = true;
+            this.cursorTip.text = "左键单击添加节点，右键结束。";
           }
           if (positions.length < 1) {
             return;
           }
           if (positions.length > 1) {
             this.activeGraphic.popNode();
-          }      
+          }
           this.activeGraphic.addNode(position);
         };
         const onRUp = () => {
@@ -33688,7 +39621,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           // this.activeGraphic = undefined;
           // this._mode = PlotMode.ready;
           this.stopEdit(this.activeGraphic);
-          defined$b(this.contextMenu) && this.addContextEventListener();
+          defined$c(this.contextMenu) && this.addContextEventListener();
         };
         if (!single) {
           this._handler.setInputAction(onMouseMove, MOUSE_MOVE);
@@ -33700,12 +39633,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         const handler = this._editEventHandler;
         let dragging = false;
         const onClick = e => {
-          defined$b(this.contextMenu) && (this.contextMenu.show = false);
-          if (!defined$b(this.activeGraphic)) {
+          defined$c(this.contextMenu) && (this.contextMenu.show = false);
+          if (!defined$c(this.activeGraphic)) {
             return;
           }
           const feature = this._viewer.scene.pick(e.position);
-          if (defined$b(feature) && feature.id instanceof Cesium.Entity) {
+          if (defined$c(feature) && feature.id instanceof Cesium.Entity) {
             if (this.hasEntity(feature.id)) {
               this.activeGraphic.highlightGraphic();
               this._nodeGraphic && (this._nodeGraphic.activeNode = undefined);
@@ -33758,10 +39691,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           }
           const feat = this._viewer.scene.pick(e.position);
           const position = pickPosition(e.position, this._viewer, true);
-          if (defined$b(feat) && this.hasEntity(feat.id)) {
+          if (defined$c(feat) && this.hasEntity(feat.id)) {
             this.contextMenu.position = position;
             this.selectedGraphic = this.getById(feat.id.id);
-            defined$b(this.contextMenu) && (this.contextMenu.show = true);
+            defined$c(this.contextMenu) && (this.contextMenu.show = true);
           }
         }, RIGHT_DOWN);
       }
@@ -33774,24 +39707,24 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
       updatePosition(cartesian) {
         const graphic = this.activeGraphic;
-        if (!defined$b(graphic)) {
+        if (!defined$c(graphic)) {
           return;
         }
         if (PlotType$1.isPoint(graphic.type)) {
           graphic.updatePosition(cartesian);
         } else {
-          if (!defined$b(this._nodeGraphic) || !defined$b(this._nodeGraphic.activeIndex)) {
+          if (!defined$c(this._nodeGraphic) || !defined$c(this._nodeGraphic.activeIndex)) {
             return;
           }
           graphic.updateNode(this._nodeGraphic.activeIndex, cartesian);
         }
       }
       pickPosition(pixel) {
-        if (!defined$b(this.activeGraphic)) {
+        if (!defined$c(this.activeGraphic)) {
           return;
         }
-        const modelPosition = this.activeGraphic.clampToModel;
-        return pickPosition(pixel, this._viewer, modelPosition);
+        this.activeGraphic.clampToModel;
+        return pickPosition(pixel, this._viewer);
       }
       /**
        * 为图形添加顶点
@@ -33915,8 +39848,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Material: Material$9,
-      Color: Color$d,
+      Material: Material$a,
+      Color: Color$e,
       Property: Property$1
     } = Cesium;
 
@@ -33932,17 +39865,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Number} [options.maximumDistance=0.5] 介于0~1之间的值，当值为0时，整个颜色为fadeOutColor，值为1时，整个颜色为fadeInColor
        */
       constructor(options = {}) {
-        this._fadeInColor = defaultValue$9(options.fadeInColor, Cesium.Color.RED);
-        this._fadeOutColor = defaultValue$9(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
-        this._time = defaultValue$9(options.time, new Cesium.Cartesian2(0, 0));
-        this._repeat = defaultValue$9(options.repeat, false);
-        this._duration = defaultValue$9(options.duration, 3000);
-        this._fadeDirection = defaultValue$9(options.fadeDirection, {
+        this._fadeInColor = defaultValue$b(options.fadeInColor, Cesium.Color.RED);
+        this._fadeOutColor = defaultValue$b(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
+        this._time = defaultValue$b(options.time, new Cesium.Cartesian2(0, 0));
+        this._repeat = defaultValue$b(options.repeat, false);
+        this._duration = defaultValue$b(options.duration, 3000);
+        this._fadeDirection = defaultValue$b(options.fadeDirection, {
           x: true,
           y: false
         });
-        this._maximumDistance = defaultValue$9(options.maximumDistance, 0.5);
-        this._definitionChanged = new Event$8();
+        this._maximumDistance = defaultValue$b(options.maximumDistance, 0.5);
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34037,7 +39970,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @type {String}
        */
       getType() {
-        return Material$9.FadeType;
+        return Material$a.FadeType;
       }
 
       /**
@@ -34047,7 +39980,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         if (this._time === undefined) {
           this._time = {
             x: time.secondsOfDay,
@@ -34096,16 +40029,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$8,
-      Color: Color$c
+      Material: Material$9,
+      Color: Color$d
     } = Cesium;
 
-    Material$8.DynamicFlowWallType = 'DynamicFlowWall';
-    Material$8._materialCache.addMaterial(Material$8.DynamicFlowWallType, {
+    Material$9.DynamicFlowWallType = 'DynamicFlowWall';
+    Material$9._materialCache.addMaterial(Material$9.DynamicFlowWallType, {
       fabric: {
-        type: Material$8.DynamicFlowWallType,
+        type: Material$9.DynamicFlowWallType,
         uniforms: {
-          color: new Color$c(1.0, 0.0, 0.0),
+          color: new Color$d(1.0, 0.0, 0.0),
           time: 0,
           gradient: 1,
           image: '',
@@ -34130,14 +40063,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Cesium.Cartesian2} [options.repeat=new Cesium.Cartesian2(1,1)] 图片在x和y方向上重复的次数
        */
       constructor(options = {}) {
-        this._color = defaultValue$9(options.color, Cesium.Color.RED);
+        this._color = defaultValue$b(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$9(options.duration, 1000);
-        this._gradient = defaultValue$9(options.gradient, 1.0);
-        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/wall.png'));
-        this._wrapX = defaultValue$9(options.wrapX, false);
-        this._repeat = defaultValue$9(options.repeat, new Cesium.Cartesian2(1, 1));
-        this._definitionChanged = new Event$8();
+        this._duration = defaultValue$b(options.duration, 1000);
+        this._gradient = defaultValue$b(options.gradient, 1.0);
+        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/wall.png'));
+        this._wrapX = defaultValue$b(options.wrapX, false);
+        this._repeat = defaultValue$b(options.repeat, new Cesium.Cartesian2(1, 1));
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34227,7 +40160,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$8.DynamicFlowWallType;
+        return Material$9.DynamicFlowWallType;
       }
       /**
        * 获取指定时间的属性值。
@@ -34236,7 +40169,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -34278,16 +40211,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$7,
-      Color: Color$b,
+      Material: Material$8,
+      Color: Color$c,
     } = Cesium;
 
-    Material$7.DynamicSpreadType = 'DynamicSpread';
-    Material$7._materialCache.addMaterial(Material$7.DynamicSpreadType, {
+    Material$8.DynamicSpreadType = 'DynamicSpread';
+    Material$8._materialCache.addMaterial(Material$8.DynamicSpreadType, {
       fabric: {
-        type: Material$7.DynamicSpreadType,
+        type: Material$8.DynamicSpreadType,
         uniforms: {
-          color: new Color$b(1.0, 0.0, 0.0),
+          color: new Color$c(1.0, 0.0, 0.0),
           time: 0,
           gradient: 0.0
         },
@@ -34304,11 +40237,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=4.0] 渐变强度，不小于0的值，值越大渐变越明显，值为0将不会产生渐变效果
        */
       constructor(options = {}) {
-        this._color = defaultValue$9(options.color, Cesium.Color.RED);
+        this._color = defaultValue$b(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$9(options.duration, 1000);
-        this._gradient = defaultValue$9(options.gradient, 4.0);
-        this._definitionChanged = new Event$8();
+        this._duration = defaultValue$b(options.duration, 1000);
+        this._gradient = defaultValue$b(options.gradient, 4.0);
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34363,7 +40296,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$7.DynamicSpreadType;
+        return Material$8.DynamicSpreadType;
       }
       /**
        * 获取指定时间的属性值。
@@ -34372,7 +40305,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -34425,18 +40358,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$6,
-      Color: Color$a,
+      Material: Material$7,
+      Color: Color$b,
       Property
     } = Cesium;
 
-    Material$6.DynamicWaveType = "DynamicWave";
-    Material$6._materialCache.addMaterial(Material$6.DynamicWaveType, {
+    Material$7.DynamicWaveType = "DynamicWave";
+    Material$7._materialCache.addMaterial(Material$7.DynamicWaveType, {
       fabric: {
-        type: Material$6.DynamicWaveType,
+        type: Material$7.DynamicWaveType,
         uniforms: {
           count: 1,
-          color: Color$a.RED,
+          color: Color$b.RED,
           duration: 1000,
           time: 0,
           gradient: 0.1
@@ -34454,13 +40387,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=1.0] 介于0~1之间的数，表示条纹的宽度，值越大条纹越宽
        */
       constructor(options = {}) {
-        this._color = defaultValue$9(options.color, Cesium.Color.RED);
-        this._time = defaultValue$9(options.time, 0);
-        this._duration = defaultValue$9(options.duration, 1000);
-        this._count = defaultValue$9(options.count, 3);
-        this._gradient = defaultValue$9(options.gradient, 1.0);
+        this._color = defaultValue$b(options.color, Cesium.Color.RED);
+        this._time = defaultValue$b(options.time, 0);
+        this._duration = defaultValue$b(options.duration, 1000);
+        this._count = defaultValue$b(options.count, 3);
+        this._gradient = defaultValue$b(options.gradient, 1.0);
         this._gradient = Cesium.Math.clamp(this._gradient, 0, 1);
-        this._definitionChanged = new Event$8();
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34530,7 +40463,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @type {String}
        */
       getType() {
-        return Material$6.DynamicWaveType;
+        return Material$7.DynamicWaveType;
       }
 
       /**
@@ -34540,7 +40473,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -34574,12 +40507,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
     `;
     const {
-        Material: Material$5,
-        Color: Color$9
+        Material: Material$6,
+        Color: Color$a
     } = Cesium;
     class PolylineAntialiasingMaterialProperty {
         constructor(opt = {}) {
-            this._definitionChanged = new Event$8();
+            this._definitionChanged = new Event$9();
             this._color = undefined;
             this.color = opt.color;
         }
@@ -34593,7 +40526,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             return PolylineAntialiasingMaterialProperty.materialType;
         }
         getValue(time, result = {}) {
-            result.color = this.color || Color$9.RED;
+            result.color = this.color || Color$a.RED;
             return result;
         }
         equals(other) {
@@ -34604,11 +40537,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         }
         static materialType = 'PolylineAntialiasing'
     }
-    Material$5._materialCache.addMaterial(PolylineAntialiasingMaterialProperty.materialType, {
+    Material$6._materialCache.addMaterial(PolylineAntialiasingMaterialProperty.materialType, {
         fabric: {
             type: PolylineAntialiasingMaterialProperty.materialType,
             uniforms: {
-                color: new Color$9(1, 1, 1, 1)
+                color: new Color$a(1, 1, 1, 1)
             },
             source: shader$e
         },
@@ -34628,16 +40561,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$4,
-      Color: Color$8,
+      Material: Material$5,
+      Color: Color$9,
     } = Cesium;
 
-    Material$4.PolylineFlowType = 'PolylineFlow';
-    Material$4._materialCache.addMaterial(Material$4.PolylineFlowType, {
+    Material$5.PolylineFlowType = 'PolylineFlow';
+    Material$5._materialCache.addMaterial(Material$5.PolylineFlowType, {
       fabric: {
-        type: Material$4.PolylineFlowType,
+        type: Material$5.PolylineFlowType,
         uniforms: {
-          color: new Color$8(1.0, 0.0, 0.0),
+          color: new Color$9(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
@@ -34656,11 +40589,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineTrailLinkMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$9(options.color, Cesium.Color.RED);
-        this._time = defaultValue$9(options.time, 0);
-        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/flowLine.png'));
-        this._duration = defaultValue$9(options.duration, 1000);
-        this._definitionChanged = new Event$8();
+        this._color = defaultValue$b(options.color, Cesium.Color.RED);
+        this._time = defaultValue$b(options.time, 0);
+        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/flowLine.png'));
+        this._duration = defaultValue$b(options.duration, 1000);
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34715,7 +40648,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$4.PolylineFlowType;
+        return Material$5.PolylineFlowType;
       }
       /**
        * 获取指定时间的属性值。
@@ -34724,7 +40657,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -34745,19 +40678,19 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
 
     const {
-      Material: Material$3,
-      Color: Color$7
+      Material: Material$4,
+      Color: Color$8
     } = Cesium;
-    Material$3.ODLineType = 'ODLine';
-    Material$3._materialCache.addMaterial(Material$3.ODLineType, {
+    Material$4.ODLineType = 'ODLine';
+    Material$4._materialCache.addMaterial(Material$4.ODLineType, {
       fabric: {
-        type: Material$3.ODLineType,
+        type: Material$4.ODLineType,
         uniforms: {
           startTime: 0,
           speed: 2.3,
           bidirectional: 2,
-          baseColor: Color$7.RED,
-          color: Color$7.WHITE
+          baseColor: Color$8.RED,
+          color: Color$8.WHITE
         },
         source: `
     czm_material czm_getMaterial(czm_materialInput materialInput) {
@@ -34794,23 +40727,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           /**
            * @type {Cesium.Color}
            */
-          this.baseColor = defaultValue$9(options.baseColor, Cesium.Color.RED);
+          this.baseColor = defaultValue$b(options.baseColor, Cesium.Color.RED);
           /**
            * @type {Cesium.Color}
            */
-          this.color = defaultValue$9(options.color, Cesium.Color.WHITE);
+          this.color = defaultValue$b(options.color, Cesium.Color.WHITE);
           /**
            * @type {number}
            */
-          this.speed = defaultValue$9(options.speed, 3);
+          this.speed = defaultValue$b(options.speed, 3);
           /**
            * @type {number}
            */
-          this.startTime = defaultValue$9(options.startTime, Math.random());
+          this.startTime = defaultValue$b(options.startTime, Math.random());
           /**
            * @type {number}
            */
-          this.bidirectional = defaultValue$9(options.bidirectional, 2);
+          this.bidirectional = defaultValue$b(options.bidirectional, 2);
           this._definitionChanged = new Event();
         }
         /**
@@ -34834,7 +40767,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
          * @type {string}
          */
         getType() {
-          return Material$3.ODLineType;
+          return Material$4.ODLineType;
         }
       
         /**
@@ -34844,7 +40777,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
          * @returns {object} 修改后的result,如果未提供result参数，则为新实例。
          */
         getValue(time, result) {
-          result = defaultValue$9(result, {});
+          result = defaultValue$b(result, {});
           result.baseColor = this.baseColor;
           result.color = this.color;
           result.speed = this.speed;
@@ -34877,16 +40810,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         }`;
 
     const {
-      Material: Material$2,
-      Color: Color$6,
+      Material: Material$3,
+      Color: Color$7,
     } = Cesium;
 
-    Material$2.PolylineTrailLinkType = "PolylineTrailLink";
-    Material$2._materialCache.addMaterial(Material$2.PolylineTrailLinkType, {
+    Material$3.PolylineTrailLinkType = "PolylineTrailLink";
+    Material$3._materialCache.addMaterial(Material$3.PolylineTrailLinkType, {
       fabric: {
-        type: Material$2.PolylineTrailLinkType,
+        type: Material$3.PolylineTrailLinkType,
         uniforms: {
-          color: new Color$6(1.0, 0.0, 0.0),
+          color: new Color$7(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
@@ -34905,11 +40838,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineFlowMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$9(options.color, Cesium.Color.RED);
-        this._time = defaultValue$9(options.time, 0);
-        this._image = defaultValue$9(options.image, Url.buildModuleUrl('./assets/images/colors.png'));
-        this._duration = defaultValue$9(options.duration, 1000);
-        this._definitionChanged = new Event$8();
+        this._color = defaultValue$b(options.color, Cesium.Color.RED);
+        this._time = defaultValue$b(options.time, 0);
+        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/colors.png'));
+        this._duration = defaultValue$b(options.duration, 1000);
+        this._definitionChanged = new Event$9();
       }
 
       /**
@@ -34968,7 +40901,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @type {String}
        */
       getType() {
-        return Material$2.PolylineTrailLinkType;
+        return Material$3.PolylineTrailLinkType;
       }
 
       /**
@@ -34978,7 +40911,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$9(result, {});
+        result = defaultValue$b(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -35010,7 +40943,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             if (!options.element) {
                 throw new CesiumProError$1("parameter element must be provided.");
             }
-            this._show = defaultValue$9(options.show, true);
+            this._show = defaultValue$b(options.show, true);
             this._element = element;
         }
         get show() {
@@ -35033,7 +40966,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
 
     const {
-      BoundingRectangle, Cartesian3: Cartesian3$2, Cartographic: Cartographic$2, Color: Color$5, defined: defined$1, destroyObject: destroyObject$2, Matrix4: Matrix4$1, 
+      BoundingRectangle, Cartesian3: Cartesian3$2, Cartographic: Cartographic$2, Color: Color$6, defined: defined$1, destroyObject: destroyObject$2, Matrix4: Matrix4$1, 
       OrthographicOffCenterFrustum, PixelFormat, ClearCommand, Framebuffer, PassState, 
       PixelDatatype, Texture, PolygonGeometry, PolygonHierarchy, BoundingSphere: BoundingSphere$3, VertexArray: VertexArray$1, 
       BufferUsage: BufferUsage$1, ShaderProgram: ShaderProgram$1, RenderState: RenderState$1, WebGLConstants, DrawCommand: DrawCommand$1, PrimitiveType: PrimitiveType$1, Pass: Pass$1, 
@@ -35068,7 +41001,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         Cartesian3$2.clone(camera.directionWC, this.directionWC);
       }
     }
-    const vs = `
+    const vs$1 = `
 attribute vec3 position;
 varying float depth;
 void main() {
@@ -35077,7 +41010,7 @@ void main() {
   gl_Position = czm_projection * vec4(position.xy, 0.0, 1.0); 
 }
 `;
-    const fs = `
+    const fs$1 = `
 varying float depth;
 void main() {
   float fDepth = depth / 4096.0; 
@@ -35164,7 +41097,7 @@ void main() {
         this.canvas = undefined;
         this._clearColorCommand = new ClearCommand({
           depth: 1,
-          coloe: new Color$5(0.0, 0.0, 0.0, 1.0)
+          coloe: new Color$6(0.0, 0.0, 0.0, 1.0)
         });
         this._useScissorTest = false;
         this._scissorRectangle = false;
@@ -35298,8 +41231,8 @@ void main() {
         });
         const sp = ShaderProgram$1.fromCache({
           context: frameState.context,
-          vertexShaderSource: vs,
-          fragmentShaderSource: fs,
+          vertexShaderSource: vs$1,
+          fragmentShaderSource: fs$1,
         });
         const renderState = new RenderState$1();
         renderState.depthTest.enabled = true;
@@ -35436,7 +41369,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(options.objects)) {
+            if (!defined$c(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -35447,13 +41380,13 @@ void main() {
             //     throw new CesiumProError('property scene must be defined.')
             // }
             super(options);
-            this._id = defaultValue$9(options.id, createGuid$3());
+            this._id = defaultValue$b(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$4();
-            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
         }
@@ -35649,7 +41582,7 @@ void main() {
             if(tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$9(this._createGeometryFunction, defaultCreateGeometryFunction$1);
+            const createGeometry = defaultValue$b(this._createGeometryFunction, defaultCreateGeometryFunction$1);
             const geometry = createGeometry(object, tile, framestate);
             const keys = Object.keys(object);
             for (let key of keys) {
@@ -35718,7 +41651,7 @@ void main() {
         when: when$1,
         Event: Event$3,
         Cartographic: Cartographic$1,
-        Color: Color$4,
+        Color: Color$5,
         Entity: Entity$1
     } = Cesium;
     function defaultCreateFn$1(options) {
@@ -35727,8 +41660,8 @@ void main() {
                 id: object.id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$9(object.pixelSize, options.pixelSize),
-                    color: defaultValue$9(object.color, options.color)
+                    pixelSize: defaultValue$b(object.pixelSize, options.pixelSize),
+                    color: defaultValue$b(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -35747,10 +41680,10 @@ void main() {
          * @param {MassiveBillboardLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$9(options.objects, []);
-            options.pixelSize = defaultValue$9(options.pixelSize, 5);
-            options.color = defaultValue$9(options.color, Color$4.fromRandom);
-            options.createGeometryFunction = defaultValue$9(options.createGeometryFunction, defaultCreateFn$1(options));
+            options.objects = defaultValue$b(options.objects, []);
+            options.pixelSize = defaultValue$b(options.pixelSize, 5);
+            options.color = defaultValue$b(options.color, Color$5.fromRandom);
+            options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn$1(options));
             super(options);
         }
     }
@@ -35775,13 +41708,13 @@ void main() {
             modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
             object.modelMatrix = modelOption.modelMatrix;
         }
-        modelOption.minimumPixelSize = defaultValue$9(object.minimumPixelSize, options.minimumPixelSize);
-        modelOption.maximumScale = defaultValue$9(object.maximumScale, options.maximumScale);
-        modelOption.scale = defaultValue$9(object.scale, options.scale);
-        modelOption.allowPicking = defaultValue$9(object.allowPicking, options.allowPicking);
-        modelOption.shadows = defaultValue$9(object.shadows, options.shadows);
+        modelOption.minimumPixelSize = defaultValue$b(object.minimumPixelSize, options.minimumPixelSize);
+        modelOption.maximumScale = defaultValue$b(object.maximumScale, options.maximumScale);
+        modelOption.scale = defaultValue$b(object.scale, options.scale);
+        modelOption.allowPicking = defaultValue$b(object.allowPicking, options.allowPicking);
+        modelOption.shadows = defaultValue$b(object.shadows, options.shadows);
         modelOption.id = object._id;
-        modelOption.url = defaultValue$9(object.url, options.url);
+        modelOption.url = defaultValue$b(object.url, options.url);
         return Cesium.Model.fromGltf(modelOption)
     };
     const ZEROLEVELHEIGHT = 31638318;
@@ -35830,7 +41763,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$b(options.objects)) {
+            if (!defined$c(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -35846,13 +41779,13 @@ void main() {
                 delete _.id;
             });
             super(options);
-            this._id = defaultValue$9(options.id, createGuid$3());
+            this._id = defaultValue$b(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$2();
-            this._maxClusterLevel = defaultValue$9(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$9(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
             this._options = options;
@@ -35961,7 +41894,7 @@ void main() {
             if (tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$9(this._createGeometryFunction, defaultCreateGeometryFunction);
+            const createGeometry = defaultValue$b(this._createGeometryFunction, defaultCreateGeometryFunction);
             const geometry = createGeometry(object, this._options);
             this.add(geometry);
             return geometry;
@@ -36016,7 +41949,7 @@ void main() {
         when,
         Event: Event$1,
         Cartographic,
-        Color: Color$3,
+        Color: Color$4,
         Entity,
         createGuid
     } = Cesium;
@@ -36030,8 +41963,8 @@ void main() {
                 id: id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$9(object.pixelSize, options.pixelSize),
-                    color: defaultValue$9(object.color, options.color)
+                    pixelSize: defaultValue$b(object.pixelSize, options.pixelSize),
+                    color: defaultValue$b(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -36068,10 +42001,10 @@ void main() {
          * @demo {@link examples/apps/index.html#/5.4.1mag-point|100万点加载示例}
          */
         constructor(options = {}) {
-            options.objects = defaultValue$9(options.objects, []);
-            options.pixelSize = defaultValue$9(options.pixelSize, 5);
-            options.color = defaultValue$9(options.color, Color$3.fromRandom);
-            options.createGeometryFunction = defaultValue$9(options.createGeometryFunction, defaultCreateFn(options));
+            options.objects = defaultValue$b(options.objects, []);
+            options.pixelSize = defaultValue$b(options.pixelSize, 5);
+            options.color = defaultValue$b(options.color, Color$4.fromRandom);
+            options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
     }
@@ -36091,18 +42024,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 `;
 
     const {
-        Material: Material$1,
+        Material: Material$2,
         Cartesian2: Cartesian2$1,
-        Color: Color$2
+        Color: Color$3
     } = Cesium;
 
     (function () {
-        Material$1.FlowImageType = 'FlowImage';
-        Material$1._materialCache.addMaterial(Material$1.FlowImageType, {
+        Material$2.FlowImageType = 'FlowImage';
+        Material$2._materialCache.addMaterial(Material$2.FlowImageType, {
             fabric: {
-                type: Material$1.FlowImageType,
+                type: Material$2.FlowImageType,
                 uniforms: {
-                    color: new Color$2(1.0, 1.0, 1.0, 1.0),
+                    color: new Color$3(1.0, 1.0, 1.0, 1.0),
                     repeat: new Cartesian2$1(1, 1),
                     image: '',
                     speed: 1.0,
@@ -36118,7 +42051,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Object} [options={}]
        */
       constructor(options) {
-        options = defaultValue$9(options, {});
+        options = defaultValue$b(options, {});
         this._options = options;
         this._postProcessStage = undefined;
       }
@@ -36129,7 +42062,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addTo(viewer) {
         checkViewer(viewer);
-        if (!defined$b(this._viewer)) {
+        if (!defined$c(this._viewer)) {
           this._viewer = viewer;
         }
         if (!this._postProcessStage) {
@@ -36543,8 +42476,8 @@ void main()
 
     const {
       Matrix4,
-      Material,
-      Color: Color$1,
+      Material: Material$1,
+      Color: Color$2,
       JulianDate,
       BoundingSphere: BoundingSphere$2,
       DrawCommand,
@@ -36610,7 +42543,7 @@ void main()
        * @param {Number} [options.speed=10] 扫描速度，值越大，扫描越快
        */
       constructor(options) {
-        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
+        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
         const self = this;
         this._createVS = true;
         this._createRS = true;
@@ -36619,10 +42552,10 @@ void main()
          * 是否显示
          * @type {Boolean}
          */
-        this.show = defaultValue$9(options.show, true);
+        this.show = defaultValue$b(options.show, true);
 
         //切分程度
-        this.slice = defaultValue$9(options.slice, 32);
+        this.slice = defaultValue$b(options.slice, 32);
 
         //传感器的模型矩阵
         if (!options.modelMatrix) {
@@ -36638,42 +42571,42 @@ void main()
         this._computedScanPlaneModelMatrix = new Matrix4();
 
         //传感器的半径
-        this._radius = defaultValue$9(options.radius, Number.POSITIVE_INFINITY);
+        this._radius = defaultValue$b(options.radius, Number.POSITIVE_INFINITY);
 
         //传感器水平半角
-        this._xHalfAngle = CesiumMath.toRadians(defaultValue$9(options.xHalfAngle, 0));
+        this._xHalfAngle = CesiumMath.toRadians(defaultValue$b(options.xHalfAngle, 0));
 
         //传感器垂直半角
-        this._yHalfAngle = CesiumMath.toRadians(defaultValue$9(options.yHalfAngle, 0));
+        this._yHalfAngle = CesiumMath.toRadians(defaultValue$b(options.yHalfAngle, 0));
 
-        this._color = defaultValue$9(options._color, Color$1.AQUA.withAlpha(0.4));
+        this._color = defaultValue$b(options._color, Color$2.AQUA.withAlpha(0.4));
 
         /**
          * 线的颜色
          * @type {Cesium.Color}
          */
-        this.lineColor = defaultValue$9(options.lineColor, Color$1.WHITE);
+        this.lineColor = defaultValue$b(options.lineColor, Color$2.WHITE);
 
         /**
          * 是否显示扇面的线
          * @type {Boolean}
          */
-        this.showSectorLines = defaultValue$9(options.showSectorLines, true);
+        this.showSectorLines = defaultValue$b(options.showSectorLines, true);
 
         /**
          * 是否显示扇面和圆顶面连接的线
          * @type {Boolean}
          */
-        this.showSectorSegmentLines = defaultValue$9(options.showSectorSegmentLines, true);
+        this.showSectorSegmentLines = defaultValue$b(options.showSectorSegmentLines, true);
 
         /**
          * 是否显示侧面
          * @type {Boolean}
          */
-        this.showLateralSurfaces = defaultValue$9(options.showLateralSurfaces, true);
+        this.showLateralSurfaces = defaultValue$b(options.showLateralSurfaces, true);
 
         //目前用的统一材质
-        this._material = defined$b(options.material) ? options.material : Material.fromType(Material.ColorType);
+        this._material = defined$c(options.material) ? options.material : Material$1.fromType(Material$1.ColorType);
         this._material.uniforms.color = this._color;
         this._translucent = undefined;
 
@@ -36681,7 +42614,7 @@ void main()
          * 侧面材质
          * @type {Material}
          */
-        this.lateralSurfaceMaterial = defined$b(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material.fromType(Material.ColorType);
+        this.lateralSurfaceMaterial = defined$c(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material$1.fromType(Material$1.ColorType);
         this._lateralSurfaceMaterial = undefined;
         this._lateralSurfaceTranslucent = undefined;
 
@@ -36689,64 +42622,64 @@ void main()
          * 是否显示圆顶表面
          * @type {Boolean}
          */
-        this.showDomeSurfaces = defaultValue$9(options.showDomeSurfaces, true);
+        this.showDomeSurfaces = defaultValue$b(options.showDomeSurfaces, true);
 
         /**
          * 圆顶表面材质
          * @type {Material}
          */
-        this.domeSurfaceMaterial = defined$b(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material.fromType(Material.ColorType);
+        this.domeSurfaceMaterial = defined$c(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material$1.fromType(Material$1.ColorType);
 
         /**
          * 是否显示圆顶面线
          * @type {Boolean}
          */
-        this.showDomeLines = defaultValue$9(options.showDomeLines, true);
+        this.showDomeLines = defaultValue$b(options.showDomeLines, true);
 
         /**
          * 是否显示与地球相交的线
          * @type {Boolean}
          */
-        this.showIntersection = defaultValue$9(options.showIntersection, false);
+        this.showIntersection = defaultValue$b(options.showIntersection, false);
 
         /**
          * 与地球相交的线的颜色
          * @type {Color}
          */
-        this.intersectionColor = defaultValue$9(options.intersectionColor, Color$1.WHITE);
+        this.intersectionColor = defaultValue$b(options.intersectionColor, Color$2.WHITE);
 
         /**
          * 与地球相交的线的宽度（像素）
          * @type {Number}
          */
-        this.intersectionWidth = defaultValue$9(options.intersectionWidth, 5.0);
+        this.intersectionWidth = defaultValue$b(options.intersectionWidth, 5.0);
 
         //是否穿过地球
-        this._showThroughEllipsoid = defaultValue$9(options.showThroughEllipsoid, false);
+        this._showThroughEllipsoid = defaultValue$b(options.showThroughEllipsoid, false);
 
         /**
          * 是否显示扫描面
          * @type {Boolean}
          */
-        this.showScanPlane = defaultValue$9(options.showScanPlane, true);
+        this.showScanPlane = defaultValue$b(options.showScanPlane, true);
 
         /**
          * 扫描面颜色
          * @type {Color}
          */
-        this.scanPlaneColor = defaultValue$9(options.scanPlaneColor, Color$1.AQUA);
+        this.scanPlaneColor = defaultValue$b(options.scanPlaneColor, Color$2.AQUA);
 
         /**
          * 扫描面模式 垂直V/水平H
          * @type {String}
          */
-        this.scanPlaneMode = defaultValue$9(options.scanPlaneMode, 'H');
+        this.scanPlaneMode = defaultValue$b(options.scanPlaneMode, 'H');
 
         /**
          * 扫描速率，值越大，扫描越慢
          * @type {Number}
          */
-        this.speed = defaultValue$9(options.speed, 10);
+        this.speed = defaultValue$b(options.speed, 10);
 
         this._scanePlaneXHalfAngle = 0;
         this._scanePlaneYHalfAngle = 0;
@@ -37680,24 +43613,24 @@ void main()
        * })
        */
       constructor(options) {
-        options = defaultValue$9(options, defaultValue$9.EMPTY_OBJECT);
-        if (!defined$b(options.center)) {
+        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
+        if (!defined$c(options.center)) {
           throw new CesiumProError$1('parameter center is required.')
         }
-        if (!defined$b(options.radius)) {
+        if (!defined$c(options.radius)) {
           throw new CesiumProError$1('parameter radius is required.')
         }
-        if (!defined$b(options.fov)) {
+        if (!defined$c(options.fov)) {
           throw new CesiumProError$1('parameter fov is required.');
         }
         this._center = options.center;
         this._radius = options.radius;
         this._fov = options.fov;
-        this._slices = defaultValue$9(options.slices, this._fov);
-        this._rotation = Cesium.Math.toRadians(defaultValue$9(options.rotation, 0));
-        this._vertexFormat = defaultValue$9(options.vertexFormat, VertexFormat.POSITION_AND_ST);
-        this._extrudedHeight = defaultValue$9(options.extrudedHeight, 0);
-        this._height = defaultValue$9(options.height, 0);
+        this._slices = defaultValue$b(options.slices, this._fov);
+        this._rotation = Cesium.Math.toRadians(defaultValue$b(options.rotation, 0));
+        this._vertexFormat = defaultValue$b(options.vertexFormat, VertexFormat.POSITION_AND_ST);
+        this._extrudedHeight = defaultValue$b(options.extrudedHeight, 0);
+        this._height = defaultValue$b(options.height, 0);
         this._positions = undefined;
         this._workerName = "createSectorGeometry";
         this._rectangle = undefined;
@@ -37913,10 +43846,10 @@ void main(){
        */
       constructor(options) {
         super(options);
-        this._fragmentShader = defaultValue$9(this._options.fragmentShader, shader$b);
-        this._thickness = defaultValue$9(this._options.thickness, 0.5);
-        this._density = defaultValue$9(this._options.density, 10.0);
-        this._speed = defaultValue$9(this._options.speed, 350);
+        this._fragmentShader = defaultValue$b(this._options.fragmentShader, shader$b);
+        this._thickness = defaultValue$b(this._options.thickness, 0.5);
+        this._density = defaultValue$b(this._options.density, 10.0);
+        this._speed = defaultValue$b(this._options.speed, 350);
         const uniforms = {
           alpha: () => {
             return this.thickness
@@ -37928,7 +43861,7 @@ void main(){
             return this.speed
           }
         };
-        this._uniforms = defaultValue$9(this._options.uniforms, uniforms);
+        this._uniforms = defaultValue$b(this._options.uniforms, uniforms);
 
       }
       /**
@@ -37972,6 +43905,260 @@ void main(){
           fragmentShader: this._fragmentShader,
           uniforms: this._uniforms
         })
+      }
+    }
+
+    const vs = `
+attribute vec3 position3DHigh;
+attribute vec3 position3DLow;
+attribute vec2 st;
+attribute float batchId;
+varying vec3 v_positionEC;
+varying vec3 v_positionMC;
+varying vec2 v_st;
+void main(){
+  vec4 position=czm_computePosition();
+  v_positionEC=(czm_modelViewRelativeToEye*position).xyz;
+  v_st=st;
+  v_positionMC=position3DHigh+position3DLow;
+  gl_Position=czm_modelViewProjectionRelativeToEye*position;
+}
+`;
+
+    const fs = `
+varying vec3 v_positionEC;
+varying vec3 v_positionMC;
+varying vec2 v_st;
+void main(){
+  czm_materialInput materialInput;
+  vec3 normalEC=normalize(czm_normal3D*czm_geodeticSurfaceNormal(v_positionMC,vec3(0.0),vec3(1.0)));
+  #ifdef FACE_FORWARD
+  normalEC=faceforward(normalEC,vec3(0.0,0.0,1.0),-normalEC);
+  #endif
+  materialInput.s=v_st.s;
+  materialInput.st=v_st;
+  materialInput.str=vec3(v_st,0.0);
+  materialInput.normalEC=normalEC;
+  materialInput.tangentToEyeMatrix=czm_eastNorthUpToEyeCoordinates(v_positionMC,materialInput.normalEC);
+  vec3 positionToEyeEC=-v_positionEC;
+  czm_material material =czm_getMaterial(materialInput);
+  #ifdef FLAT
+  gl_FragColor=vec4(material.diffuse+material.emission,material.alpha);
+  gl_FragColor.a={alpha};
+  #else
+  gl_FragColor=czm_phong(normalize(positionToEyeEC),material,czm_lightDirectionEC);
+  gl_FragColor.a={alpha};
+  #endif
+}
+`;
+
+    const cesiumScriptRegex = /((?:.*\/)|^)CesiumPro\.js(?:\?|#|$)/;
+
+    let a;
+    /*global CESIUMPRO_BASE_URL*/
+    function tryMakeAbsolute(url) {
+      if (typeof document === 'undefined') {
+        // Node.js and Web Workers. In both cases, the URL will already be absolute.
+        return url;
+      }
+
+      if (!defined$c(a)) {
+        a = document.createElement('a');
+      }
+      a.href = url;
+
+      // IE only absolutizes href on get, not set
+      // eslint-disable-next-line no-self-assign
+      a.href = a.href;
+      return a.href;
+    }
+    let baseResource;
+    let implementation;
+
+    function getBaseUrlFromCesiumScript() {
+      const scripts = document.getElementsByTagName('script');
+      for (let i = 0, len = scripts.length; i < len; ++i) {
+        const src = scripts[i].getAttribute('src');
+        const result = cesiumScriptRegex.exec(src);
+        if (result !== null) {
+          return result[1];
+        }
+      }
+      return undefined;
+    }
+
+    function buildModuleUrlFromRequireToUrl(moduleID) {
+      // moduleID will be non-relative, so require it relative to this module, in Core.
+      return tryMakeAbsolute(`../${moduleID}`);
+    }
+
+    function getCesiumProBaseUrl() {
+      if (defined$c(baseResource)) {
+        return baseResource;
+      }
+
+      let baseUrlString;
+      if (typeof CESIUMPRO_BASE_URL != 'undefined') {
+        baseUrlString = CESIUMPRO_BASE_URL;
+      } else if (
+        typeof window.define === 'object'
+        && defined$c(window.define.amd)
+        && !window.define.amd.toUrlUndefined
+      ) {
+        baseUrlString = Cesium.getAbsoluteUri(
+          '..',
+          'core/Url.js',
+        );
+      } else {
+        baseUrlString = getBaseUrlFromCesiumScript();
+      }
+      // >>includeStart('debug');
+      if (!defined$c(baseUrlString)) {
+        throw new CesiumProError$1(
+          'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
+        );
+      }
+      // >>includeEnd('debug');
+      if(!defined$c(baseUrlString)) {
+          baseUrlString = '';
+      }
+      baseResource = new Cesium.Resource({
+        url: tryMakeAbsolute(baseUrlString),
+      });
+      baseResource.appendForwardSlash();
+
+      return baseResource;
+    }
+
+    function buildModuleUrlFromBaseUrl(moduleID) {
+      const resource = getCesiumProBaseUrl().getDerivedResource({
+        url: moduleID,
+      });
+      return resource.url;
+    }
+
+    function buildModuleUrl(relativeUrl) {
+      if (!defined$c(implementation)) {
+        // select implementation
+        if (
+          typeof window.define === 'object'
+          && defined$c(window.define.amd)
+          && !window.define.amd.toUrlUndefined
+        ) {
+          implementation = buildModuleUrlFromRequireToUrl;
+        } else {
+          implementation = buildModuleUrlFromBaseUrl;
+        }
+      }
+
+      const url = implementation(relativeUrl);
+      return url;
+    }
+    /**
+     * URL相关工具
+     * @namespace Url
+     *
+     */
+    const Url = {};
+    /**
+     * 从多个字符串拼接url,以/为分割符
+     * @param  {...String} args
+     * @return {String}      url
+     *
+     * @example
+     *
+     * URL.join("www.baidu.com/",'/tieba/','cesium')
+     * //www.baidu.com/tieba/cesium
+     */
+    Url.join = function (...args) {
+      const formatArgs = [];
+      for (let arg of args) {
+        if (arg.startsWith('/')) {
+          arg = arg.substring(1);
+        }
+        if (arg.endsWith('/')) {
+          arg = arg.substring(0, arg.length - 1);
+        }
+        formatArgs.push(arg);
+      }
+      const urlstr = formatArgs.join('/');
+      // if (!(urlstr.startsWith('http') || urlstr.startsWith('ftp'))) {
+      //   urlstr = `http://${urlstr}`;
+      // }
+      return urlstr;
+    };
+
+    /**
+     * 获取CesiumPro静态资源的完整路径
+     * @param {String} path 指定文件
+     * @returns {String} 完整的Url地址
+     * @example 
+     * Url.buildModuleUrl('assets/tiles/{z}/{x}/{y}.png')
+     */
+    Url.buildModuleUrl = function (path) {
+      return buildModuleUrl(path);
+    };
+    Url.getCesiumProBaseUrl = getCesiumProBaseUrl;
+
+    const {
+      Material,
+      Color: Color$1
+    } = Cesium;
+
+    class WaterFaceAppearance {
+      /**
+       * 水面外观
+       * @param {Object} options 具有以下属性
+       * @param {String} [options.normalMap] 法线贴图
+       * @param {Cesium.Color} [options.baseWaterColor=new Cesium.Color(0, 0.42, 0.71)] 水的颜色
+       * @param {Cesium.Color} [options.blendColor=options.baseWaterColor] 从水到非水区域混合时使用的颜色
+       * @param {Number} [options.frequency=8000] 波数
+       * @param {Number} [options.animationSpeed=0.02] 水面动画速度的
+       * @param {Number} [options.amplitude=5] 水波振幅字
+       * @param {Number} [options.specularIntensity=0.8] 镜面反射强度
+       * @param {Number} [options.alpha=0.4] 水面透明度
+       * @param {String|Cesium.Resource} [options.normalMap] 水正常扰动的法线贴图
+       *
+       */
+      constructor(options) {
+        options = defaultValue$b(options, {});
+        this._normalMap = defaultValue$b(options.normalMap, Url.buildModuleUrl('./assets/images/waterNormal.jpg'));
+        this._baseWaterColor = defaultValue$b(options.baseWaterColor, new Cesium.Color(0, 0.42, 0.71));
+        this._blendColor = defaultValue$b(options.blendColor, this._baseWaterColor);
+        this._frequency = defaultValue$b(options.frequency, 8000);
+        this._animationSpeed = defaultValue$b(options.animationSpeed, 0.02);
+        this._amplitude = defaultValue$b(options.amplitude, 5);
+        this._specularIntensity = defaultValue$b(options.specularIntensity, 0.8);
+        this._fadeFactor = defaultValue$b(options.fadeFactor, 1);
+        this._alpha = defaultValue$b(options.alpha, 0.4);
+        this._material = new Material({
+          fabric: {
+            type: Material.WaterType,
+            uniforms: {
+              normalMap: this._normalMap,
+              baseWaterColor: this._baseWaterColor,
+              blendColor: this._blendColor,
+              frequency: this._frequency,
+              animationSpeed: this._animationSpeed,
+              amplitude: this._amplitude,
+              specularIntensity: this._specularIntensity,
+              fadeFactor: this._fadeFactor
+            }
+          }
+        });
+        return new Cesium.MaterialAppearance({
+          material: this._material,
+          faceForward: true,
+          vertexShaderSource: this.vertexShaderSource,
+          fragmentShaderSource: this.fragmentShaderSource
+        })
+      }
+      get vertexShaderSource() {
+        return vs;
+      }
+      get fragmentShaderSource() {
+        const fs$1 = fs.replace(/{alpha}/g, this._alpha);
+        return fs$1;
       }
     }
 
@@ -38091,38 +44278,6 @@ void main(){
             }
             return Cesium.destroyObject(this);
         }
-    }
-
-    function getDefaultExportFromCjs (x) {
-    	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-    }
-
-    function getAugmentedNamespace(n) {
-      if (n.__esModule) return n;
-      var f = n.default;
-    	if (typeof f == "function") {
-    		var a = function a () {
-    			if (this instanceof a) {
-    				var args = [null];
-    				args.push.apply(args, arguments);
-    				var Ctor = Function.bind.apply(f, args);
-    				return new Ctor();
-    			}
-    			return f.apply(this, arguments);
-    		};
-    		a.prototype = f.prototype;
-      } else a = {};
-      Object.defineProperty(a, '__esModule', {value: true});
-    	Object.keys(n).forEach(function (k) {
-    		var d = Object.getOwnPropertyDescriptor(n, k);
-    		Object.defineProperty(a, k, d.get ? d : {
-    			enumerable: true,
-    			get: function () {
-    				return n[k];
-    			}
-    		});
-    	});
-    	return a;
     }
 
     var utf8 = {};
@@ -40701,17 +46856,17 @@ void main() {
        */
       constructor(viewer, options) {
         const userInput = {};
-        userInput.speedFactor = defaultValue$9(options.speedFactor, 1.0);
-        userInput.lineWidth = defaultValue$9(options.lineWidth, 4.0);
-        userInput.dropRateBump = defaultValue$9(options.dropRateBump, 0.01);
-        userInput.dropRate = defaultValue$9(options.dropRate,0.003);
-        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$9(options.maxParticles, 64*64)));
+        userInput.speedFactor = defaultValue$b(options.speedFactor, 1.0);
+        userInput.lineWidth = defaultValue$b(options.lineWidth, 4.0);
+        userInput.dropRateBump = defaultValue$b(options.dropRateBump, 0.01);
+        userInput.dropRate = defaultValue$b(options.dropRate,0.003);
+        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$b(options.maxParticles, 64*64)));
         userInput.maxParticles = userInput.particlesTextureSize * userInput.particlesTextureSize;
-        userInput.fadeOpacity = defaultValue$9(options.fadeOpacity, 0.996);
-        userInput.particleHeight = defaultValue$9(options.particleHeight, 100);
-        userInput.color = defaultValue$9(options.color, Color.WHITE);
+        userInput.fadeOpacity = defaultValue$b(options.fadeOpacity, 0.996);
+        userInput.particleHeight = defaultValue$b(options.particleHeight, 100);
+        userInput.color = defaultValue$b(options.color, Color.WHITE);
         this._maxParticles = userInput.maxParticles;
-        this._color = defaultValue$9(options.color, "#FFFFFF");
+        this._color = defaultValue$b(options.color, "#FFFFFF");
         this.viewer = viewer;
         this.scene = this.viewer.scene;
         this.camera = this.viewer.camera;
@@ -41400,9 +47555,12 @@ void main(){
 
     const VERSION = '1.1.1';
 
+    exports.AnalysisUtil = AnalysisUtil;
+    exports.ArcGisLayer = ArcGisMapServerImageryProvider;
     exports.ArrowPlot = ArrowPlot;
     exports.AxisPlane = AxisPlane;
     exports.BaiDuLayer = BaiDuLayer;
+    exports.BaseAnalysis = BaseAnalysis;
     exports.BasePlot = BasePlot;
     exports.BingLayer = BingLayer;
     exports.Cartometry = Cartometry;
@@ -41423,14 +47581,18 @@ void main(){
     exports.DynamicFlowWallMaterialProperty = DynamicFlowWallMaterialProperty;
     exports.DynamicSpreadMaterialProperty = DynamicSpreadMaterialProperty;
     exports.DynamicWaveMaterialProperty = DynamicWaveMaterialProperty;
-    exports.Event = Event$8;
+    exports.Ellipsoid = Ellipsoid$2;
+    exports.Event = Event$9;
+    exports.FillAnalysis = FillAnalysis;
     exports.FlattenPolygonCollection = FlattenPolygonCollection;
     exports.GaoDeLayer = GaoDeLayer;
     exports.GeoJsonDataSource = GeoJsonDataSource;
+    exports.Geographic4490TilingScheme = Geographic4490TilingScheme;
     exports.Globe = Globe;
     exports.Graphic = Graphic;
     exports.GraphicGroup = GraphicGroup;
     exports.GroundSkyBox = GroundSkyBox;
+    exports.HeightAnalysis = HeightAnalysis;
     exports.HtmlGraphicGroup = HtmlGraphicGroup;
     exports.HtmlPointGraphic = HtmlPointGraphic;
     exports.ImageGraphic = ImageGraphic;
@@ -41444,7 +47606,7 @@ void main(){
     exports.MassiveGraphicLayerCollection = MassiveGraphicLayerCollection;
     exports.MassiveModelLayer = MassiveModelLayer;
     exports.MassivePointLayer = MassivePointLayer;
-    exports.Material = Material$1;
+    exports.Material = Material$2;
     exports.Model = Model$1;
     exports.MultipleTerrainProvider = MultipleTerrainProvider;
     exports.NodePlot = NodePlot;
@@ -41480,13 +47642,14 @@ void main(){
     exports.TileLayer = TileLayer;
     exports.Tileset = Tileset;
     exports.TransformHelper = TransformHelper;
-    exports.Url = Url;
+    exports.Url = Url$1;
     exports.VERSION = VERSION;
     exports.VectorTileProvider = VectorTileProvider;
     exports.Viewer = Viewer;
     exports.WFSLayer = WFSLayer;
     exports.WMSLayer = WMSLayer;
     exports.WMTSLayer = WMTSLayer;
+    exports.WaterFaceAppearance = WaterFaceAppearance;
     exports.WindField = WindField;
     exports.XYZLayer = XYZLayer;
     exports._shaderBloom = shader$5;
@@ -41521,6 +47684,8 @@ void main(){
     exports._shaderSpecularReflection = shader;
     exports._shaderToEye = shader$a;
     exports._shaderTranslucentPhong = shader$7;
+    exports._shaderWaterAppearanceFS = fs;
+    exports._shaderWaterAppearanceVS = vs;
     exports.abstract = abstract;
     exports.checkViewer = checkViewer;
     exports.clone = clone;
@@ -41532,8 +47697,8 @@ void main(){
     exports.customPrimitive = CustomPrimitive;
     exports.dataProcess = DataProcess;
     exports.dateFormat = dateFormat;
-    exports.defaultValue = defaultValue$9;
-    exports.defined = defined$b;
+    exports.defaultValue = defaultValue$b;
+    exports.defined = defined$c;
     exports.destroyObject = destroyObject$6;
     exports.getParabolaPoints = getParabolaPoints;
     exports.guid = guid;
