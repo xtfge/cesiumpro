@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+   <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+  <script src='/build/CesiumPro.js'></script>
+  <style>
+    #map {
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+    body,html {
+      margin: 0;
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+   <div id='toolbar'></div>
+  <script>
+    const viewer = new CesiumPro.Viewer('map');
+    const tileset = new Cesium.Cesium3DTileset({
+        url: "../data/tileset/fsdzm/tileset.json"
+      })
+      viewer.scene.primitives.add(tileset);
+      viewer.flyTo(tileset);
+      const Cartesian3 = Cesium.Cartesian3;
+      const pos = [
+        new Cartesian3(-2892795.482515005, 4724485.383762788, 3150351.7507632035),
+        new Cartesian3(-2892796.359477946, 4724503.626292513, 3150323.776094027),
+        new Cartesian3(-2892833.4123412515, 4724489.455285151, 3150311.089485862),
+        new Cartesian3(-2892830.4973629434, 4724470.010799752, 3150342.713565623)
+      ]
+      const polygon = new Cesium.PolygonGeometry({
+        polygonHierarchy: new Cesium.PolygonHierarchy(pos),
+        perPositionHeight: false,
+        height: 5.8
+      });
+      const water = new CesiumPro.WaterFacePrimitive({
+        waterPolygon: polygon
+      })
+      parent.viewer = viewer;
+      parent.water = water;
+      viewer.scene.primitives.add(water);
+      /****************************************/
+      const object = {
+        color: Cesium.Color.DARKCYAN.toCssColorString(),
+        waveWidth: 5,
+        flowDirection: 45,
+        flowSpeed: 3,
+      }
+      const gui = new GUI();
+      gui.addColor(object, 'color').name('水面颜色').onChange(() => {
+        water.waterColor = Cesium.Color.fromCssColorString(object.color);
+      })
+      gui.add(object, 'waveWidth', 1, 10).name('波浪大小').onChange(() => {
+        water.waveWidth = object.waveWidth
+      })
+      gui.add(object, 'flowDirection', 0, 360).name('流动方向').onChange(() => {
+        water.flowDirection = object.flowDirection
+      })
+      gui.add(object, 'flowSpeed', 1, 10).name('流动速度').onChange(() => {
+        water.flowSpeed = object.flowSpeed;
+      })
+  </script>
+</body>
+</html>

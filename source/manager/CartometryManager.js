@@ -301,7 +301,7 @@ class CartometryManager {
       }
       if (mode === CartometryType.SURFACE_DISTANCE || mode === CartometryType.SPACE_DISTANCE) {
         text = this.getDistance(positions, mode);
-        this.createLabel(cartesian || positions[positions.length - 1], text);
+        this.createLabel(cartesian || positions[positions.length - 1], text, new Cesium.Cartesian2(0, 35));
       }
       if (mode === CartometryType.SURFACE_AREA || mode === CartometryType.SPACE_AREA) {
         text = this.getArea(positions, mode);
@@ -593,15 +593,15 @@ class CartometryManager {
    * @private
    * @param  {} options
    */
-  createLabel(cartesian, text) {
+  createLabel(cartesian, text, offset = new Cesium.Cartesian2()) {
     const labelOptions = this.labelStyle;
     labelOptions.text = text;
-    const coor = LonLat.fromCartesian(cartesian)
-    labelOptions.pixelOffset = new Cesium.Cartesian3(0, 0, coor.height > 0 ? -coor.height : 0);
-    const label = this._viewer.entities.add({
+    labelOptions.pixelOffset = offset;
+    const opt = {
       position: cartesian,
-      label: labelOptions,
-    });
+      label: labelOptions
+    }
+    const label = this._viewer.entities.add(opt);
     this._values[this.gid].push(label);
     return label;
   }

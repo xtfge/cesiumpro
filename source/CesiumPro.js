@@ -112,6 +112,7 @@ export { default as SnowEffect } from './scene/SnowEffect.js';
 export { default as Tileset } from './scene/Tileset.js';
 export { default as VectorTileProvider } from './scene/VectorTileProvider.js';
 export { default as WaterFaceAppearance } from './scene/WaterFaceAppearance.js';
+export { default as WaterFacePrimitive } from './scene/WaterFacePrimitive.js';
 export { default as _shaderCircleScan } from './shader/circleScan.js';
 export { default as _shaderCircleSpread } from './shader/circleSpread.js';
 export { default as _shaderDynamicConeMaterial } from './shader/dynamicConeMaterial.js';
@@ -132,6 +133,8 @@ export { default as _shaderRectangularSensorScanPlaneFS } from './shader/rectang
 export { default as _shaderRectangularSensorVS } from './shader/rectangularSensorVS.js';
 export { default as _shaderWaterAppearanceFS } from './shader/waterAppearanceFS.js';
 export { default as _shaderWaterAppearanceVS } from './shader/waterAppearanceVS.js';
+export { default as _shaderWaterFaceFS } from './shader/waterFaceFS.js';
+export { default as _shaderWaterFaceVS } from './shader/waterFaceVS.js';
 export { default as InfoBox } from './widgets/InfoBox.js';
 export { default as customPrimitive } from './scene/windField/customPrimitive.js';
 export { default as dataProcess } from './scene/windField/dataProcess.js';

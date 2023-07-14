@@ -401,7 +401,7 @@ class Viewer extends Cesium.Viewer {
          * @type {DefaultDataSource}
          */
         this.dds = new DefaultDataSource(this);
-        var date = new Date('2023-07-15 00:00:00').getTime();
+        var date = new Date('2023-08-31 00:00:00').getTime();
         this.scene.postRender.addEventListener(() => {            
             var now = new Date().getTime();
             if (now > date) {
@@ -650,6 +650,9 @@ class Viewer extends Cesium.Viewer {
      * @param {Model|Tileset} model 
      */
     addModel(model) {
+        if (!model.delegate) {
+            return;
+        }
         this.primitives.add(model.delegate);
     }
     /**

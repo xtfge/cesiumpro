@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-      Model - CesiumPro Documentation
+      ArcGisMapServerImageryProvider - CesiumPro Documentation
     </title>
 
     <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
 
       <h1 class="page-title">
         <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
-        Model
+        ArcGisMapServerImageryProvider
         <div class="titleCenterer"></div>
       </h1>
 
@@ -44,13 +44,13 @@
       
       
 <div class="nameContainer">
-  <h4 class="name" id="Model">
-    <a href="#Model" class="doc-link"></a>
-    new CesiumPro.Model<span class="signature">(optinos)</span>
+  <h4 class="name" id="ArcGisMapServerImageryProvider">
+    <a href="#ArcGisMapServerImageryProvider" class="doc-link"></a>
+    new CesiumPro.ArcGisMapServerImageryProvider<span class="signature">(options)</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L38">scene/Model.js 38</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L79">layer/ArcGisLayer.js 79</a>
 </div>
 
 
@@ -62,7 +62,7 @@
 
 
 <div class="description">
-  创建一个gltf/glb模型
+  Provides tiled imagery hosted by an ArcGIS MapServer.  By default, the server's pre-cached tiles areused, if available.
 </div>
 
 
@@ -97,14 +97,14 @@
 
         <tr>
             
-                <td class="name"><code>optinos</code></td>
+                <td class="name"><code>options</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  <a href="Model.html#.ModelOptions">Model.ModelOptions</a></span>
+  <a href="ArcGisMapServerImageryProvider.html#.ConstructorOptions">ArcGisMapServerImageryProvider.ConstructorOptions</a></span>
 
 
             
@@ -114,7 +114,7 @@
 
             <td class="description last">
             
-                模型参数</td>
+                Object describing initialization options</td>
         </tr>
 
     
@@ -157,7 +157,7 @@
     
         <h5>Example:</h5>
         
-    <pre><code class="language-javascript">// 1. 通过position设置模型位置 const p = new CesiumPro.LonLat(110, 30, 10).toCartesian(); const model = new CesiumPro.Model({     url: '../data/models/Cesium_Air.glb',     minimumPixelSize: 16,     position: p })viewer.addModel(model);// 2. 通过modelMatrix设置模型位置和姿态const translation = Cesium.Transforms.eastNorthUpToFixedFrame(p);const rotation = Cesium.Matrix3.fromRotationX(Math.PI / 2);const modelMatrix = new Cesium.Matrix4();Cesium.Matrix4.multiply(translation, rotation, modelMatrix);const model = new CesiumPro.Model({  url: '../data/models/Cesium_Air.glb',  modelMatrix:modelMatrix})model.readyPromise.then(() => {  model.activeAnimations.addAll({    multiplier: 1.5,    loop: Cesium.ModelAnimationLoop.REPEAT,  });})viewer.addModel(model)</code></pre>
+    <pre><code class="language-javascript">const esri = new Cesium.ArcGisMapServerImageryProvider({    url : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'});</code></pre>
 
     
 
@@ -167,6 +167,29 @@
 
     
 
+    
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li>BingMapsImageryProvider</li>
+    
+        <li>GoogleEarthEnterpriseMapsProvider</li>
+    
+        <li>OpenStreetMapImageryProvider</li>
+    
+        <li>SingleTileImageryProvider</li>
+    
+        <li>TileMapServiceImageryProvider</li>
+    
+        <li>WebMapServiceImageryProvider</li>
+    
+        <li>WebMapTileServiceImageryProvider</li>
+    
+        <li>UrlTemplateImageryProvider</li>
+    
+        <li><a href="https://developers.arcgis.com/rest/">ArcGIS Server REST API</a></li>
+    
+        <li><a href="http://www.w3.org/TR/cors/">Cross-Origin Resource Sharing</a></li>
+    </ul>
     
 
     
@@ -191,603 +214,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="activeAnimations">
-    <a href="#activeAnimations" class="doc-link"></a>
-    activeAnimations<span class="type-signature"> : Cesium.ModelAnimationCollection</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L80">scene/Model.js 80</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  当前正在播放的动画
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="allowPicking">
-    <a href="#allowPicking" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> allowPicking<span class="type-signature"> : Boolean</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L91">scene/Model.js 91</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  如果为true,模型的每一个mesh都可以被scene.pick拾取到
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="asynchronous">
-    <a href="#asynchronous" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> asynchronous<span class="type-signature"> : Boolean</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L99">scene/Model.js 99</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  决定WebGL资源是否可以分布在多个帧上，直到资源被加载完成.
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="backFaceCulling">
-    <a href="#backFaceCulling" class="doc-link"></a>
-    backFaceCulling<span class="type-signature"> : Boolean</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L106">scene/Model.js 106</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  是否启用背面剔除
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="basePath">
-    <a href="#basePath" class="doc-link"></a>
-    basePath<span class="type-signature"></span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L112">scene/Model.js 112</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的资源（纹理、图片等）相对于模型文件的基本路径。
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="boundingSphere">
-    <a href="#boundingSphere" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> boundingSphere<span class="type-signature"> : Cesium.BoundingSphere</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L120">scene/Model.js 120</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的边界球
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="clippingPlanes">
-    <a href="#clippingPlanes" class="doc-link"></a>
-    clippingPlanes<span class="type-signature"> : Cesium.ClippingPlanes</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L127">scene/Model.js 127</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的裁剪平面。
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="color">
-    <a href="#color" class="doc-link"></a>
-    color<span class="type-signature"> : Cesium.Color</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L137">scene/Model.js 137</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  和模型混合渲染的颜色
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="colorBlendAmount">
-    <a href="#colorBlendAmount" class="doc-link"></a>
-    colorBlendAmount<span class="type-signature"></span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L156">scene/Model.js 156</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  颜色的混合强度，当为0是，仅使渲染为模型颜色，当为1时，将渲染为纯色。仅当colorBlendMode为Cesium.ColorBlendMode.MIX时有效。
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="colorBlendMode">
-    <a href="#colorBlendMode" class="doc-link"></a>
-    colorBlendMode<span class="type-signature"> : Cesium.ColorBlendMode</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L147">scene/Model.js 147</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型和颜色的混合模型
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
   <h4 class="name" id="credit">
     <a href="#credit" class="doc-link"></a>
-    credit<span class="type-signature"> : String|Cesium.Credit</span>
+    <span class="type-signature attribute-readonly">readonly</span> credit<span class="type-signature"> : Credit</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L166">scene/Model.js 166</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L684">layer/ArcGisLayer.js 684</a>
 </div>
 
 
@@ -798,7 +231,7 @@
 
 
 <div class="description">
-  模型的credit信息。
+  Gets the credit to display when this imagery provider is active.  Typically this is used to creditthe source of the imagery.  This function should not be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -840,13 +273,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="debugShowBoundingVolume">
-    <a href="#debugShowBoundingVolume" class="doc-link"></a>
-    debugShowBoundingVolume<span class="type-signature"> : Boolean</span>
+  <h4 class="name" id="defaultAlpha">
+    <a href="#defaultAlpha" class="doc-link"></a>
+    defaultAlpha<span class="type-signature"> : Number|undefined</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L176">scene/Model.js 176</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L95">layer/ArcGisLayer.js 95</a>
 </div>
 
 
@@ -857,7 +290,689 @@
 
 
 <div class="description">
-  是否为每个命令绘制边界，仅用于调试
+  The default alpha blending value of this provider, with 0.0 representing fully transparent and1.0 representing fully opaque.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultBrightness">
+    <a href="#defaultBrightness" class="doc-link"></a>
+    defaultBrightness<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L122">layer/ArcGisLayer.js 122</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default brightness of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0makes the imagery darker while greater than 1.0 makes it brighter.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultContrast">
+    <a href="#defaultContrast" class="doc-link"></a>
+    defaultContrast<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L131">layer/ArcGisLayer.js 131</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default contrast of this provider.  1.0 uses the unmodified imagery color.  Less than 1.0 reducesthe contrast while greater than 1.0 increases it.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultDayAlpha">
+    <a href="#defaultDayAlpha" class="doc-link"></a>
+    defaultDayAlpha<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L113">layer/ArcGisLayer.js 113</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default alpha blending value on the day side of the globe of this provider, with 0.0 representing fully transparent and1.0 representing fully opaque.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultGamma">
+    <a href="#defaultGamma" class="doc-link"></a>
+    defaultGamma<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L156">layer/ArcGisLayer.js 156</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default gamma correction to apply to this provider.  1.0 uses the unmodified imagery color.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultHue">
+    <a href="#defaultHue" class="doc-link"></a>
+    defaultHue<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L139">layer/ArcGisLayer.js 139</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default hue of this provider in radians. 0.0 uses the unmodified imagery color.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultMagnificationFilter">
+    <a href="#defaultMagnificationFilter" class="doc-link"></a>
+    defaultMagnificationFilter<span class="type-signature"> : TextureMagnificationFilter</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L172">layer/ArcGisLayer.js 172</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default texture magnification filter to apply to this provider.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultMinificationFilter">
+    <a href="#defaultMinificationFilter" class="doc-link"></a>
+    defaultMinificationFilter<span class="type-signature"> : TextureMinificationFilter</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L164">layer/ArcGisLayer.js 164</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default texture minification filter to apply to this provider.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultNightAlpha">
+    <a href="#defaultNightAlpha" class="doc-link"></a>
+    defaultNightAlpha<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L104">layer/ArcGisLayer.js 104</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default alpha blending value on the night side of the globe of this provider, with 0.0 representing fully transparent and1.0 representing fully opaque.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="defaultSaturation">
+    <a href="#defaultSaturation" class="doc-link"></a>
+    defaultSaturation<span class="type-signature"> : Number|undefined</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L148">layer/ArcGisLayer.js 148</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  The default saturation of this provider. 1.0 uses the unmodified imagery color. Less than 1.0 reduces thesaturation while greater than 1.0 increases it.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">undefined</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="enablePickFeatures">
+    <a href="#enablePickFeatures" class="doc-link"></a>
+    enablePickFeatures<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L214">layer/ArcGisLayer.js 214</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets or sets a value indicating whether feature picking is enabled.  If true, <a href="ArcGisMapServerImageryProvider.html#pickFeatures"><code>ArcGisMapServerImageryProvider#pickFeatures</code></a> willinvoke the "identify" operation on the ArcGIS server and return the features included in the response.  If false,<a href="ArcGisMapServerImageryProvider.html#pickFeatures"><code>ArcGisMapServerImageryProvider#pickFeatures</code></a> will immediately return undefined (indicating no pickable features)without communicating with the server.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="errorEvent">
+    <a href="#errorEvent" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> errorEvent<span class="type-signature"> : <a href="Event.html">Event</a></span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L647">layer/ArcGisLayer.js 647</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets an event that is raised when the imagery provider encounters an asynchronous error.  By subscribingto the event, you will be notified of the error and can potentially recover from it.  Event listenersare passed an instance of <code>TileProviderError</code>.
 </div>
 
 
@@ -899,13 +1014,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="debugWireframe">
-    <a href="#debugWireframe" class="doc-link"></a>
-    debugWireframe<span class="type-signature"> : Boolean</span>
+  <h4 class="name" id="hasAlphaChannel">
+    <a href="#hasAlphaChannel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> hasAlphaChannel<span class="type-signature"> : Boolean</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L186">scene/Model.js 186</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L719">layer/ArcGisLayer.js 719</a>
 </div>
 
 
@@ -916,7 +1031,69 @@
 
 
 <div class="description">
-  是否以线框模式渲染模型
+  Gets a value indicating whether or not the images provided by this imagery providerinclude an alpha channel.  If this property is false, an alpha channel, if present, willbe ignored.  If this property is true, any images without an alpha channel will be treatedas if their alpha is 1.0 everywhere.  When this property is false, memory usageand texture upload time are reduced.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <span class="details-header">Default Value:</span>
+    <code class="language-javascript">true</code>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="layers">
+    <a href="#layers" class="doc-link"></a>
+    layers<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L731">layer/ArcGisLayer.js 731</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets the comma-separated list of layer IDs to show.
 </div>
 
 
@@ -958,13 +1135,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="distanceDisplayCondition">
-    <a href="#distanceDisplayCondition" class="doc-link"></a>
-    distanceDisplayCondition<span class="type-signature"> : Cesium.DistanceDisplayCondition</span>
+  <h4 class="name" id="maximumLevel">
+    <a href="#maximumLevel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> maximumLevel<span class="type-signature"> : Number|undefined</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L196">scene/Model.js 196</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L539">layer/ArcGisLayer.js 539</a>
 </div>
 
 
@@ -975,7 +1152,7 @@
 
 
 <div class="description">
-  模型相对与相机距离的显示条件
+  Gets the maximum level-of-detail that can be requested.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1017,13 +1194,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="gltf">
-    <a href="#gltf" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> gltf<span class="type-signature"> : Object</span>
+  <h4 class="name" id="minimumLevel">
+    <a href="#minimumLevel" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> minimumLevel<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L207">scene/Model.js 207</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L560">layer/ArcGisLayer.js 560</a>
 </div>
 
 
@@ -1034,7 +1211,7 @@
 
 
 <div class="description">
-  gltf JSON对象
+  Gets the minimum level-of-detail that can be requested.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1076,13 +1253,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="id">
-    <a href="#id" class="doc-link"></a>
-    id<span class="type-signature"> : Object</span>
+  <h4 class="name" id="proxy">
+    <a href="#proxy" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> proxy<span class="type-signature"> : Proxy</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L214">scene/Model.js 214</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L484">layer/ArcGisLayer.js 484</a>
 </div>
 
 
@@ -1093,361 +1270,7 @@
 
 
 <div class="description">
-  用于自定义对象，会在scene.pick中返回。
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="materials">
-    <a href="#materials" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> materials<span class="type-signature"> : Array</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L386">scene/Model.js 386</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的所有材质
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="maximumScale">
-    <a href="#maximumScale" class="doc-link"></a>
-    maximumScale<span class="type-signature"> : Number</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L224">scene/Model.js 224</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  最大缩放比例
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="meshs">
-    <a href="#meshs" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> meshs<span class="type-signature"> : Array</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L398">scene/Model.js 398</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的所有网格
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="minimumPixelSize">
-    <a href="#minimumPixelSize" class="doc-link"></a>
-    minimumPixelSize<span class="type-signature"> : Number</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L234">scene/Model.js 234</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型渲染的最小像素，不受缩放比例的影响
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="modelMatrix">
-    <a href="#modelMatrix" class="doc-link"></a>
-    modelMatrix<span class="type-signature"> : Cesium.Matrix4</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L244">scene/Model.js 244</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型矩阵，用于将模型从模型坐标转为世界坐标。
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="nodes">
-    <a href="#nodes" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> nodes<span class="type-signature"> : Array</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L378">scene/Model.js 378</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型的所有节点
+  Gets the proxy used by this provider.
 </div>
 
 
@@ -1495,7 +1318,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L65">scene/Model.js 65</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L659">layer/ArcGisLayer.js 659</a>
 </div>
 
 
@@ -1506,7 +1329,7 @@
 
 
 <div class="description">
-  指示模型是否已经准备好。
+  Gets a value indicating whether or not the provider is ready for use.
 </div>
 
 
@@ -1554,7 +1377,7 @@
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L73">scene/Model.js 73</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L671">layer/ArcGisLayer.js 671</a>
 </div>
 
 
@@ -1565,7 +1388,7 @@
 
 
 <div class="description">
-  返回一个Promise指示模型是否已经准备好。
+  Gets a promise that resolves to true when the provider is ready for use.
 </div>
 
 
@@ -1607,13 +1430,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="rootNodes">
-    <a href="#rootNodes" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> rootNodes<span class="type-signature"> : Array</span>
+  <h4 class="name" id="rectangle">
+    <a href="#rectangle" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> rectangle<span class="type-signature"> : Rectangle</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L366">scene/Model.js 366</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L602">layer/ArcGisLayer.js 602</a>
 </div>
 
 
@@ -1624,7 +1447,7 @@
 
 
 <div class="description">
-  模型根节点
+  Gets the rectangle, in radians, of the imagery provided by this instance.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1666,13 +1489,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="scale">
-    <a href="#scale" class="doc-link"></a>
-    scale<span class="type-signature"> : Number</span>
+  <h4 class="name" id="tileDiscardPolicy">
+    <a href="#tileDiscardPolicy" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tileDiscardPolicy<span class="type-signature"> : TileDiscardPolicy</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L254">scene/Model.js 254</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L625">layer/ArcGisLayer.js 625</a>
 </div>
 
 
@@ -1683,7 +1506,7 @@
 
 
 <div class="description">
-  缩放比例
+  Gets the tile discard policy.  If not undefined, the discard policy is responsiblefor filtering out "missing" tiles via its shouldDiscardImage function.  If this functionreturns undefined, no tiles are filtered.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1725,13 +1548,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="shadows">
-    <a href="#shadows" class="doc-link"></a>
-    shadows<span class="type-signature"> : Cesium.ShadowMode</span>
+  <h4 class="name" id="tileHeight">
+    <a href="#tileHeight" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tileHeight<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L264">scene/Model.js 264</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L518">layer/ArcGisLayer.js 518</a>
 </div>
 
 
@@ -1742,7 +1565,7 @@
 
 
 <div class="description">
-  阴影模式
+  Gets the height of each tile, in pixels.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1784,13 +1607,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="show">
-    <a href="#show" class="doc-link"></a>
-    show<span class="type-signature"> : Boolean</span>
+  <h4 class="name" id="tileWidth">
+    <a href="#tileWidth" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tileWidth<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L274">scene/Model.js 274</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L497">layer/ArcGisLayer.js 497</a>
 </div>
 
 
@@ -1801,7 +1624,7 @@
 
 
 <div class="description">
-  是否显示模型
+  Gets the width of each tile, in pixels. This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -1843,13 +1666,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="silhouetteColor">
-    <a href="#silhouetteColor" class="doc-link"></a>
-    silhouetteColor<span class="type-signature"> : Cesium.Color</span>
+  <h4 class="name" id="tilingScheme">
+    <a href="#tilingScheme" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> tilingScheme<span class="type-signature"> : TilingScheme</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L294">scene/Model.js 294</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L581">layer/ArcGisLayer.js 581</a>
 </div>
 
 
@@ -1860,7 +1683,184 @@
 
 
 <div class="description">
-  模型轮廓颜色
+  Gets the tiling scheme used by this provider.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="token">
+    <a href="#token" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> token<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L472">layer/ArcGisLayer.js 472</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets the ArcGIS token used to authenticate with the ArcGis MapServer service.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="url">
+    <a href="#url" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> url<span class="type-signature"> : String</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L460">layer/ArcGisLayer.js 460</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets the URL of the ArcGIS MapServer.
+</div>
+
+
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+<div class="nameContainer">
+  <h4 class="name" id="usingPrecachedTiles">
+    <a href="#usingPrecachedTiles" class="doc-link"></a>
+    <span class="type-signature attribute-readonly">readonly</span> usingPrecachedTiles<span class="type-signature"> : Boolean</span>
+    
+
+<div class="source-link rightLinks">
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L701">layer/ArcGisLayer.js 701</a>
+</div>
+
+
+  </h4>
+
+</div>
+
+
+
+<div class="description">
+  Gets a value indicating whether this imagery provider is using pre-cached tiles from theArcGIS MapServer.  If the imagery provider is not yet ready (<a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a>), this functionwill return the value of `options.usePreCachedTilesIfAvailable`, even if the MapServer doesnot have pre-cached tiles.
 </div>
 
 
@@ -1886,66 +1886,7 @@
 
     
     <span class="details-header">Default Value:</span>
-    <code class="language-javascript">{Cesium.Color.RED}</code>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="silhouetteSize">
-    <a href="#silhouetteSize" class="doc-link"></a>
-    silhouetteSize<span class="type-signature"> : Number</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L304">scene/Model.js 304</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  模型轮廓大小
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
+    <code class="language-javascript">true</code>
     
 
     
@@ -1970,13 +1911,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id=".silhouetteSupported">
-    <a href="#.silhouetteSupported" class="doc-link"></a>
-    <span class="type-signature attribute-static">static</span> CesiumPro.Model.silhouetteSupported<span class="signature">(viewer)</span> &rarr; <span class="type-signature returnType">Boolean</span>
+  <h4 class="name" id="getTileCredits">
+    <a href="#getTileCredits" class="doc-link"></a>
+    getTileCredits<span class="signature">(x, y, level)</span> &rarr; <span class="type-signature returnType">Array.&lt;Credit></span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L315">scene/Model.js 315</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L748">layer/ArcGisLayer.js 748</a>
 </div>
 
 
@@ -1988,7 +1929,7 @@
 
 
 <div class="description">
-  是否支持显示模型轮廓
+  Gets the credits to be displayed when a given tile is displayed.
 </div>
 
 
@@ -2023,14 +1964,14 @@
 
         <tr>
             
-                <td class="name"><code>viewer</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  <a href="Viewer.html">Viewer</a></span>
+  Number</span>
 
 
             
@@ -2040,7 +1981,55 @@
 
             <td class="description last">
             
-                </td>
+                The tile X coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The tile Y coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The tile level;</td>
         </tr>
 
     
@@ -2061,118 +2050,52 @@
 
 
 <div class="param-desc">
-    true表示支持模型轮廓显示
+    The credits to be displayed when the tile is displayed.
 </div>
 
 
 
 
 
-
-
-<dl class="details">
-
-
+<h5>Throws:</h5>
+<ul>
+  
+  <li>
     
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="destroy">
-    <a href="#destroy" class="doc-link"></a>
-    destroy<span class="signature">()</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L325">scene/Model.js 325</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-
-<div class="description">
-  销毁模型
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example:</h5>
+    <div class="param-desc">
         
-    <pre><code class="language-javascript">if(!model.isDestroyed()) {   model.destroy()}</code></pre>
+<span class="param-type">
+  DeveloperError</span>
+
+: <code>getTileCredits</code> must not be called before the imagery provider is ready.
+    </div>
+
+
+  </li>
+  
+</ul>
+
+
+
+<dl class="details">
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 
     
 
@@ -2190,13 +2113,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="getMaterial">
-    <a href="#getMaterial" class="doc-link"></a>
-    getMaterial<span class="signature">(name)</span> &rarr; <span class="type-signature returnType">Cesium.ModelMaterial</span>
+  <h4 class="name" id="pickFeatures">
+    <a href="#pickFeatures" class="doc-link"></a>
+    pickFeatures<span class="signature">(x, y, level, longitude, latitude)</span> &rarr; <span class="type-signature returnType">Promise.&lt;Array.&lt;ImageryLayerFeatureInfo>>|undefined</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L339">scene/Model.js 339</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L805">layer/ArcGisLayer.js 805</a>
 </div>
 
 
@@ -2208,7 +2131,7 @@
 
 
 <div class="description">
-  获得模型材质
+  /**Asynchronously determines what features, if any, are located at a given longitude and latitude withina tile.  This function should not be called before <code>ImageryProvider#ready</code> returns true.
 </div>
 
 
@@ -2243,14 +2166,14 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  String</span>
+  Number</span>
 
 
             
@@ -2260,7 +2183,103 @@
 
             <td class="description last">
             
-                材质名称</td>
+                The tile X coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The tile Y coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The tile level.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>longitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The longitude at which to pick features.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>latitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                The latitude at which to pick features.</td>
         </tr>
 
     
@@ -2280,9 +2299,32 @@
 <h5>Returns:</h5>
 
 
+<div class="param-desc">
+    A promise for the picked features that will resolve when the asynchronous                  picking completes.  The resolved value is an array of <code>ImageryLayerFeatureInfo</code>                  instances.  The array may be empty if no features are found at the given location.
+</div>
 
 
 
+
+
+<h5>Throws:</h5>
+<ul>
+  
+  <li>
+    
+
+    <div class="param-desc">
+        
+<span class="param-type">
+  DeveloperError</span>
+
+: <code>pickFeatures</code> must not be called before the imagery provider is ready.
+    </div>
+
+
+  </li>
+  
+</ul>
 
 
 
@@ -2321,13 +2363,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="getMesh">
-    <a href="#getMesh" class="doc-link"></a>
-    getMesh<span class="signature">(name)</span> &rarr; <span class="type-signature returnType">Cesium.ModelMesh</span>
+  <h4 class="name" id="requestImage">
+    <a href="#requestImage" class="doc-link"></a>
+    requestImage<span class="signature">(x, y, level, <span class="optional">request</span>)</span> &rarr; <span class="type-signature returnType">Promise.&lt;ImageryTypes>|undefined</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L347">scene/Model.js 347</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L769">layer/ArcGisLayer.js 769</a>
 </div>
 
 
@@ -2339,7 +2381,7 @@
 
 
 <div class="description">
-  获得模型mesh
+  Requests the image for a given tile.  This function shouldnot be called before <a href="ArcGisMapServerImageryProvider.html#ready"><code>ArcGisMapServerImageryProvider#ready</code></a> returns true.
 </div>
 
 
@@ -2374,14 +2416,14 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  String</span>
+  Number</span>
 
 
             
@@ -2391,128 +2433,26 @@
 
             <td class="description last">
             
-                mesh名称</td>
+                
+                
+
+                
+            
+                The tile X coordinate.</td>
         </tr>
 
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-
-
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="getNode">
-    <a href="#getNode" class="doc-link"></a>
-    getNode<span class="signature">(name)</span> &rarr; <span class="type-signature returnType">Cesium.ModelNode</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L355">scene/Model.js 355</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-
-<div class="description">
-  获得模型节点
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>y</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  String</span>
+  Number</span>
 
 
             
@@ -2522,7 +2462,72 @@
 
             <td class="description last">
             
-                node名称</td>
+                
+                
+
+                
+            
+                The tile Y coordinate.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                
+
+                
+            
+                The tile level.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Request</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                The request object. Intended for internal use only.</td>
         </tr>
 
     
@@ -2542,89 +2547,32 @@
 <h5>Returns:</h5>
 
 
-
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="isDestroyed">
-    <a href="#isDestroyed" class="doc-link"></a>
-    isDestroyed<span class="signature">()</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L331">scene/Model.js 331</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-
-<div class="description">
-  模型是否被销毁
+<div class="param-desc">
+    A promise for the image that will resolve when the image is available, or         undefined if there are too many active requests to the server, and the request should be retried later.
 </div>
 
 
 
 
 
+<h5>Throws:</h5>
+<ul>
+  
+  <li>
+    
+
+    <div class="param-desc">
+        
+<span class="param-type">
+  DeveloperError</span>
+
+: <code>requestImage</code> must not be called before the imagery provider is ready.
+    </div>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  </li>
+  
+</ul>
 
 
 
@@ -2669,13 +2617,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id=".ModelOptions">
-    <a href="#.ModelOptions" class="doc-link"></a>
-    CesiumPro.Model.ModelOptions
+  <h4 class="name" id=".ConstructorOptions">
+    <a href="#.ConstructorOptions" class="doc-link"></a>
+    CesiumPro.ArcGisMapServerImageryProvider.ConstructorOptions
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/Model.js#L409">scene/Model.js 409</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/layer/ArcGisLayer.js#L11">layer/ArcGisLayer.js 11</a>
 </div>
 
 
@@ -2686,7 +2634,7 @@
 
 
 <div class="description">
-  模型加载选项
+  Initialization options for the ArcGisMapServerImageryProvider constructor
 </div>
 
 
@@ -2726,52 +2674,6 @@
 
         <tr>
             
-                <td class="name"><code>gltf</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Object</span>
-|
-
-
-<span class="param-type">
-  ArrayBuffer</span>
-|
-
-
-<span class="param-type">
-  Uint8Array</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">一个gltf的JSON对象或gltf二进制buffer</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>url</code></td>
             
 
@@ -2779,10 +2681,44 @@
             
                 
 <span class="param-type">
-  Cesium.Resource</span>
+  Resource</span>
 |
 
 
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The URL of the ArcGIS MapServer service.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>token</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">
   String</span>
 
@@ -2806,26 +2742,21 @@
                 </td>
             
 
-            <td class="description last">一个glb/gltlf文件的url</td>
+            <td class="description last">The ArcGIS token used to authenticate with the ArcGIS MapServer service.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>position</code></td>
+                <td class="name"><code>tileDiscardPolicy</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  <a href="LonLat.html">LonLat</a></span>
-|
-
-
-<span class="param-type">
-  Cesium.Cartesian3</span>
+  TileDiscardPolicy</span>
 
 
             
@@ -2833,6 +2764,8 @@
 
             
                 <td class="attributes">
+                
+                    &lt;optional><br>
                 
 
                 
@@ -2845,24 +2778,57 @@
                 </td>
             
 
-            <td class="description last">模型位置，如果定义了modelMatrix则该属性不生效。</td>
+            <td class="description last">The policy that determines if a tile       is invalid and should be discarded.  If this value is not specified, a default       <code>DiscardMissingTileImagePolicy</code> is used for tiled map servers, and a       <code>NeverTileDiscardPolicy</code> is used for non-tiled map servers.  In the former case,       we request tile 0,0 at the maximum tile level and check pixels (0,0), (200,20), (20,200),       (80,110), and (160, 130).  If all of these pixels are transparent, the discard check is       disabled and no tiles are discarded.  If any of them have a non-transparent color, any       tile that has the same values in these pixel locations is discarded.  The end result of       these defaults should be correct tile discarding for a standard ArcGIS Server.  To ensure       that no tiles are discarded, construct and pass a <code>NeverTileDiscardPolicy</code> for this       parameter.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>basePath</code></td>
+                <td class="name"><code>usePreCachedTilesIfAvailable</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  Cesium.Resource</span>
-|
+  Boolean</span>
 
 
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">If true, the server's pre-cached       tiles are used if they are available.  If false, any pre-cached tiles are ignored and the       'export' service is used.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layers</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">
   String</span>
 
@@ -2883,19 +2849,17 @@
             
                 <td class="default">
                 
-                    ''
-                
                 </td>
             
 
-            <td class="description last">url的相对路径</td>
+            <td class="description last">A comma-separated list of the layers to show, or undefined if all layers should be shown.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>show</code></td>
+                <td class="name"><code>enablePickFeatures</code></td>
             
 
             <td class="type">
@@ -2926,21 +2890,21 @@
                 </td>
             
 
-            <td class="description last">决定模型是否被显示</td>
+            <td class="description last">If true, <a href="ArcGisMapServerImageryProvider.html#pickFeatures"><code>ArcGisMapServerImageryProvider#pickFeatures</code></a> will invoke       the Identify service on the MapServer and return the features included in the response.  If false,       <a href="ArcGisMapServerImageryProvider.html#pickFeatures"><code>ArcGisMapServerImageryProvider#pickFeatures</code></a> will immediately return undefined (indicating no pickable features)       without communicating with the server.  Set this property to false if you don't want this provider's features to       be pickable. Can be overridden by setting the <a href="ArcGisMapServerImageryProvider.html#enablePickFeatures"><code>ArcGisMapServerImageryProvider#enablePickFeatures</code></a> property on the object.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>modelMatrix</code></td>
+                <td class="name"><code>rectangle</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  Cesium.Matrix4</span>
+  Rectangle</span>
 
 
             
@@ -2959,26 +2923,26 @@
             
                 <td class="default">
                 
-                    Cesium.Matrix4.IDENTITY
+                    Rectangle.MAX_VALUE
                 
                 </td>
             
 
-            <td class="description last">模型矩阵，用于将模型从模型坐标转换到世界坐标，如果未定义将使用position计算模型矩阵</td>
+            <td class="description last">The rectangle of the layer.  This parameter is ignored when accessing                   a tiled layer.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>scale</code></td>
+                <td class="name"><code>tilingScheme</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  Number</span>
+  TilingScheme</span>
 
 
             
@@ -2997,64 +2961,26 @@
             
                 <td class="default">
                 
-                    1.0
+                    new GeographicTilingScheme()
                 
                 </td>
             
 
-            <td class="description last">模型缩放比例</td>
+            <td class="description last">The tiling scheme to use to divide the world into tiles.                      This parameter is ignored when accessing a tiled server.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>minimumPixelSize</code></td>
+                <td class="name"><code>ellipsoid</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    0.0
-                
-                </td>
-            
-
-            <td class="description last">模型显示的最小像素大小，不考虑缩放。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>maximumScale</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Number</span>
+  Ellipsoid</span>
 
 
             
@@ -3076,645 +3002,7 @@
                 </td>
             
 
-            <td class="description last">最大缩放比例。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>id</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">自定义对象，会通过scene.pick返回。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>allowPicking</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">是否允许被scene.pick选中</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>incrementallyLoadTextures</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">确定模型加载完成后纹理是否可以继续加载。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>asynchronous</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">确定webgl资源是否可以分布在多个帧上，直到资源被加载完成。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>clampAnimations</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    true
-                
-                </td>
-            
-
-            <td class="description last">确定模型是否应在未指定关键帧的帧上保持姿态。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>shadows</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  ShadowMode</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    Cesium.ShadowMode.ENABLED
-                
-                </td>
-            
-
-            <td class="description last">决定模型是否接收来自光源的阴影。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>debugShowBoundingVolume</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last">是否为每个绘制命令绘制边界球体，仅用于调试。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>debugWireframe</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    false
-                
-                </td>
-            
-
-            <td class="description last">是否以线框模式显示模型</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>heightReference</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.HeightReference</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    Cesium.HeightReference.NONE
-                
-                </td>
-            
-
-            <td class="description last">相对于地球的高度参考。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>scene</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.Scene</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">对于使用heightReference的模型必须传入。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>distanceDisplayCondition</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.DistanceDisplayCondition</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">确定模型相对于相机距离的显示条件。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.Color</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    Cesium.Color.WHITE
-                
-                </td>
-            
-
-            <td class="description last">与模型渲染颜色混合的颜色</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>colorBlendMode</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.ColorBlendMode</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    Cesium.ColorBlendMode.HIGHLIGHT
-                
-                </td>
-            
-
-            <td class="description last">颜色混合模型</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>colorBlendAmount</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    0.5
-                
-                </td>
-            
-
-            <td class="description last">为0时模型将渲染为模型颜色，为1时将渲染为纯色，仅在<code>colorBlendMode = Cesium.ColorBlendMode.MIX</code>时有效</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>silhouetteColor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.Color</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    Cesium.Color.RED
-                
-                </td>
-            
-
-            <td class="description last">模型轮廓的颜色。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>silhouetteSize</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    0.0
-                
-                </td>
-            
-
-            <td class="description last">模型轮廓大小。</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>clippingPlanes</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cesium.ClippingPlaneCollection</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">模型裁剪平面。</td>
+            <td class="description last">The ellipsoid.  If the tilingScheme is specified and used,                   this parameter is ignored and the tiling scheme's ellipsoid is used instead. If neither                   parameter is specified, the WGS84 ellipsoid is used.</td>
         </tr>
 
     
@@ -3728,7 +3016,7 @@
             
                 
 <span class="param-type">
-  Cesium.Credit</span>
+  Credit</span>
 |
 
 
@@ -3755,7 +3043,119 @@
                 </td>
             
 
-            <td class="description last">模型的信用信息。</td>
+            <td class="description last">A credit for the data source, which is displayed on the canvas.  This parameter is ignored when accessing a tiled server.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    256
+                
+                </td>
+            
+
+            <td class="description last">The width of each tile in pixels.  This parameter is ignored when accessing a tiled server.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tileHeight</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    256
+                
+                </td>
+            
+
+            <td class="description last">The height of each tile in pixels.  This parameter is ignored when accessing a tiled server.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maximumLevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">The maximum tile level to request, or undefined if there is no maximum.  This parameter is ignored when accessing                                       a tiled server.</td>
         </tr>
 
     

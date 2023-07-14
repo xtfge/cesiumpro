@@ -336,7 +336,7 @@ class PointPlot extends BasePlot {
    * @memberof PointPlot
    */
   static defaultLabelStyle = {
-    font: '30px Helvetica',
+    font: '24px Helvetica',
     fillColor: Cesium.Color.WHITE,
     showBackground: true,
     style: Cesium.LabelStyle.FILL_AND_OUTLINE,
@@ -345,6 +345,9 @@ class PointPlot extends BasePlot {
     verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
     pixelOffset: new Cesium.Cartesian2(0, 0),
     heightReference: Cesium.HeightReference.NONE,
+    // outlineWidth: 1.0,
+    // outlineColor: Cesium.Color.BLACK,
+    // style: Cesium.LabelStyle.FILL_AND_OUTLINE,
   }
 
   /**

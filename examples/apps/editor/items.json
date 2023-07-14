@@ -386,6 +386,10 @@
             "label": "水面模拟",
             "value": "4.2.4waterMaterial",
             "thumb": "./images/4.2.4waterMaterial"
+          }, {
+            "label": "水面倒影",
+            "value": "4.2.5waterFace1",
+            "thumb": "./images/4.2.5waterFace1"
           }
         ]
       }

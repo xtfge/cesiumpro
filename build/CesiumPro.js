@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-07-13
+ * @datetime 2023-07-14
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -5221,8 +5221,8 @@
     }
 
     const {
-        Cartographic: Cartographic$a,
-        Cartesian3: Cartesian3$l
+        Cartographic: Cartographic$b,
+        Cartesian3: Cartesian3$m
     } = Cesium;
     /**
      * 空间分析工具集
@@ -5283,14 +5283,14 @@
         if (first instanceof LonLat) {
             return positions.map(_ => _.toCartesian());
         }
-        if (first instanceof Cartesian3$l) {
+        if (first instanceof Cartesian3$m) {
             return positions
         }
-        if (first instanceof Cartographic$a) {
-            return positions.map(_ => Cartographic$a.toCartesian(_));
+        if (first instanceof Cartographic$b) {
+            return positions.map(_ => Cartographic$b.toCartesian(_));
         }
         if (typeof first === 'number') {
-            return Cartesian3$l.fromDegreesArray(positions);
+            return Cartesian3$m.fromDegreesArray(positions);
         }
         return positions;
     };
@@ -5299,10 +5299,10 @@
         if (first instanceof LonLat) {
             return positions
         }
-        if (first instanceof Cartesian3$l) {
+        if (first instanceof Cartesian3$m) {
             return positions.map(_ => LonLat.fromCartesian(_));
         }
-        if (first instanceof Cartographic$a) {
+        if (first instanceof Cartographic$b) {
             return positions.map(_ => LonLat.fromCartographic(_));
         }
         if (typeof first === 'number') {
@@ -5724,7 +5724,7 @@
      *
      * @see CesiumProError
      */
-    function destroyObject$6(object, message) {
+    function destroyObject$7(object, message) {
       message = defaultValue$b(
         message,
         "This object was destroyed, i.e., destroy() was called."
@@ -5751,14 +5751,14 @@
     }
 
     const {
-        Color: Color$q,
-        Cartesian3: Cartesian3$k,
-        Cartographic: Cartographic$9,
+        Color: Color$r,
+        Cartesian3: Cartesian3$l,
+        Cartographic: Cartographic$a,
         PrimitiveCollection: PrimitiveCollection$5,
-        PolygonGeometry: PolygonGeometry$1,
+        PolygonGeometry: PolygonGeometry$2,
         PolygonHierarchy: PolygonHierarchy$3,
         GeometryInstance: GeometryInstance$3,
-        Primitive: Primitive$7,
+        Primitive: Primitive$8,
         GroundPrimitive: GroundPrimitive$2,
         PerInstanceColorAppearance
     } = Cesium;
@@ -5771,10 +5771,10 @@
         const area = AnalysisUtil.getArea(points);
         for (let i = 0; i < 3; i++) {
             const point = points[i];
-            const carto = Cartographic$9.fromDegrees(...point);
+            const carto = Cartographic$a.fromDegrees(...point);
             const height = viewer.scene.sampleHeight(carto, exclude);
             h += height;
-            const cartesian = Cartesian3$k.fromDegrees(point[0], point[1], height);
+            const cartesian = Cartesian3$l.fromDegrees(point[0], point[1], height);
             positions.push(cartesian);
         }
         return {
@@ -5784,7 +5784,7 @@
         };
     }
     function createPolygon$2(positions, color, height, clamp) {
-        const polygon = new PolygonGeometry$1({
+        const polygon = new PolygonGeometry$2({
             polygonHierarchy: new PolygonHierarchy$3(positions),
             perPositionHeight: true,
             extrudedHeight: height
@@ -5795,7 +5795,7 @@
                 color: Cesium.ColorGeometryInstanceAttribute.fromColor(color)
             }
         });
-        const constructor = clamp ? GroundPrimitive$2 : Primitive$7;
+        const constructor = clamp ? GroundPrimitive$2 : Primitive$8;
         return new constructor({
             geometryInstances: [instance],
             appearance: new PerInstanceColorAppearance()
@@ -5822,11 +5822,11 @@
             }
             const mask = AnalysisUtil.getCartesians(options.mask);
             this._mask = [...mask, mask[0]];
-            if (this._mask instanceof Cartesian3$k) {
+            if (this._mask instanceof Cartesian3$l) {
                 this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
             }
-            this.excavatedColor = defaultValue$b(options.excavatedColor, Color$q.RED.withAlpha(0.5));
-            this.fillColor = defaultValue$b(options.fillColor, Color$q.GREEN.withAlpha(0.5));
+            this.excavatedColor = defaultValue$b(options.excavatedColor, Color$r.RED.withAlpha(0.5));
+            this.fillColor = defaultValue$b(options.fillColor, Color$r.GREEN.withAlpha(0.5));
             this._type = 'excavation-analysis';
             this._height = defaultValue$b(options.height, 0);
             this._samplerSize = options.samplerSize;
@@ -5898,12 +5898,12 @@
         }
         destroy() {
             this._viewer.scene.primitives.remove(this._root);
-            destroyObject$6(this);
+            destroyObject$7(this);
         }
     }
 
     const {
-        Cartographic: Cartographic$8
+        Cartographic: Cartographic$9
     } = Cesium;
 
     function computeHeight(positions, viewer, exclude = []) {
@@ -5963,7 +5963,7 @@
             const polygon = AnalysisUtil.getLonLats(this._mask);
             this.samplerSize = this._samplerSize || cellSize;
             const grid = AnalysisUtil.polygonToGrid(polygon, this.samplerSize);
-            const samplerPoints = grid.features.map(_ => Cartographic$8.fromDegrees(..._.geometry.coordinates));
+            const samplerPoints = grid.features.map(_ => Cartographic$9.fromDegrees(..._.geometry.coordinates));
             const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
             this.postDo.raise({
                 id: this._id,
@@ -5979,14 +5979,14 @@
     }
 
     const {
-      Cartesian3: Cartesian3$j,
-      Primitive: Primitive$6,
+      Cartesian3: Cartesian3$k,
+      Primitive: Primitive$7,
       Material: Material$i,
       Geometry: Geometry$1,
       MaterialAppearance: MaterialAppearance$6,
       GeometryAttribute: GeometryAttribute$1,
-      ComponentDatatype: ComponentDatatype$2,
-      PrimitiveType: PrimitiveType$3,
+      ComponentDatatype: ComponentDatatype$3,
+      PrimitiveType: PrimitiveType$4,
       BoundingSphere: BoundingSphere$8,
       VertexFormat: VertexFormat$4,
       defaultValue: defaultValue$a,
@@ -5994,7 +5994,7 @@
       Check,
     } = Cesium;
     const scratchVertexFormat$1 = new VertexFormat$4();
-    const scratchNormal = new Cartesian3$j();
+    const scratchNormal = new Cartesian3$k();
     class AxisPlaneGeometry {
       constructor(options = {}) {
         this._normal = options.normal;
@@ -6006,7 +6006,7 @@
         );
         this._vertexFormat = vertexFormat;
       }
-      static packedLength = VertexFormat$4.packedLength + Cartesian3$j.packedLength + 1;
+      static packedLength = VertexFormat$4.packedLength + Cartesian3$k.packedLength + 1;
       static pack(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object("value", value);
@@ -6017,8 +6017,8 @@
 
         VertexFormat$4.pack(value._vertexFormat, array, startingIndex);
         startingIndex += VertexFormat$4.packedLength;
-        Cartesian3$j.pack(value._normal, array, startingIndex);
-        startingIndex += Cartesian3$j.packedLength;
+        Cartesian3$k.pack(value._normal, array, startingIndex);
+        startingIndex += Cartesian3$k.packedLength;
         array[startingIndex++] = value._radius;
         return array;
       }
@@ -6035,8 +6035,8 @@
           scratchVertexFormat$1
         );
         startingIndex += VertexFormat$4.packedLength;
-        const normal = Cartesian3$j.unpack(array, startingIndex, scratchNormal);
-        startingIndex += Cartesian3$j.packedLength;
+        const normal = Cartesian3$k.unpack(array, startingIndex, scratchNormal);
+        startingIndex += Cartesian3$k.packedLength;
         const radius = array[startingIndex];
 
         if (!defined(result)) {
@@ -6051,7 +6051,7 @@
           vertexFormat,
           result._vertexFormat
         );
-        result._normal = Cartesian3$j.clone(normal, result._normal);
+        result._normal = Cartesian3$k.clone(normal, result._normal);
         result._radius = radius;
 
         return result;
@@ -6063,17 +6063,17 @@
         let normal = [];
         const { x, y, z } = planeGeometry._center;
         let center;
-        if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_X)) {
+        if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_X)) {
           positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
-          center = new Cartesian3$j(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$k(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
           normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
-        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Y)) {
+        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Y)) {
           positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
-          center = new Cartesian3$j((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$k((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
           normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
-        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Z)) {
+        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Z)) {
           positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
-          center = new Cartesian3$j((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
+          center = new Cartesian3$k((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
           normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
         }
         positions = new Float32Array([...positions]);
@@ -6082,23 +6082,23 @@
         return new Geometry$1({
           attributes: new GeometryAttributes$1({
             position: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.DOUBLE,
+              componentDatatype: ComponentDatatype$3.DOUBLE,
               componentsPerAttribute: 3,
               values: positions,
             }),
             normal: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentDatatype: ComponentDatatype$3.FLOAT,
               componentsPerAttribute: 3,
               values: normal,
             }),
             st: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$2.FLOAT,
+              componentDatatype: ComponentDatatype$3.FLOAT,
               componentsPerAttribute: 2,
               values: sts,
             }),
           }),
           indices: indices,
-          primitiveType: PrimitiveType$3.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
         });
       }
@@ -6123,7 +6123,7 @@
         const instance = new Cesium.GeometryInstance({
           geometry: AxisPlaneGeometry.createGeometry(planeGeometry),
         });
-        const primitive = new Primitive$6({
+        const primitive = new Primitive$7({
           asynchronous: false,
           geometryInstances: instance,
           modelMatrix: this._modelMatrix,
@@ -6264,7 +6264,7 @@
         RequestState: RequestState$1,
         AttributeCompression,
         BoundingSphere: BoundingSphere$7,
-        Cartesian3: Cartesian3$i,
+        Cartesian3: Cartesian3$j,
         Credit: Credit$2,
         defaultValue: defaultValue$9,
         defined: defined$b,
@@ -6273,12 +6273,12 @@
         WebMercatorTilingScheme: WebMercatorTilingScheme$1,
         getJsonFromTypedArray,
         HeightmapTerrainData,
-        IndexDatatype: IndexDatatype$1,
+        IndexDatatype: IndexDatatype$2,
         OrientedBoundingBox,
         QuantizedMeshTerrainData,
         Request: Request$1,
         RequestType: RequestType$1,
-        Resource: Resource$6,
+        Resource: Resource$7,
         RuntimeError: RuntimeError$2,
         TerrainProvider: TerrainProvider$1,
         TileAvailability,
@@ -6395,7 +6395,7 @@
       const overallAvailability = [];
       let overallMaxZoom = 0;
       this._readyPromise = Promise.resolve(options.url).then(function (url) {
-        const resource = Resource$6.createIfNeeded(url);
+        const resource = Resource$7.createIfNeeded(url);
         resource.appendForwardSlash();
         lastResource = resource;
         layerJsonResource = lastResource.getDerivedResource({
@@ -6820,7 +6820,7 @@
       let triangleLength = bytesPerIndex * triangleElements;
 
       const view = new DataView(buffer);
-      const center = new Cartesian3$i(
+      const center = new Cartesian3$j(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -6833,7 +6833,7 @@
       pos += Float32Array.BYTES_PER_ELEMENT;
 
       const boundingSphere = new BoundingSphere$7(
-        new Cartesian3$i(
+        new Cartesian3$j(
           view.getFloat64(pos, true),
           view.getFloat64(pos + 8, true),
           view.getFloat64(pos + 16, true)
@@ -6842,7 +6842,7 @@
       );
       pos += boundingSphereLength;
 
-      const horizonOcclusionPoint = new Cartesian3$i(
+      const horizonOcclusionPoint = new Cartesian3$j(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -6877,7 +6877,7 @@
 
       const triangleCount = view.getUint32(pos, true);
       pos += Uint32Array.BYTES_PER_ELEMENT;
-      const indices = IndexDatatype$1.createTypedArrayFromArrayBuffer(
+      const indices = IndexDatatype$2.createTypedArrayFromArrayBuffer(
         vertexCount,
         buffer,
         pos,
@@ -6900,7 +6900,7 @@
 
       const westVertexCount = view.getUint32(pos, true);
       pos += Uint32Array.BYTES_PER_ELEMENT;
-      const westIndices = IndexDatatype$1.createTypedArrayFromArrayBuffer(
+      const westIndices = IndexDatatype$2.createTypedArrayFromArrayBuffer(
         vertexCount,
         buffer,
         pos,
@@ -6910,7 +6910,7 @@
 
       const southVertexCount = view.getUint32(pos, true);
       pos += Uint32Array.BYTES_PER_ELEMENT;
-      const southIndices = IndexDatatype$1.createTypedArrayFromArrayBuffer(
+      const southIndices = IndexDatatype$2.createTypedArrayFromArrayBuffer(
         vertexCount,
         buffer,
         pos,
@@ -6920,7 +6920,7 @@
 
       const eastVertexCount = view.getUint32(pos, true);
       pos += Uint32Array.BYTES_PER_ELEMENT;
-      const eastIndices = IndexDatatype$1.createTypedArrayFromArrayBuffer(
+      const eastIndices = IndexDatatype$2.createTypedArrayFromArrayBuffer(
         vertexCount,
         buffer,
         pos,
@@ -6930,7 +6930,7 @@
 
       const northVertexCount = view.getUint32(pos, true);
       pos += Uint32Array.BYTES_PER_ELEMENT;
-      const northIndices = IndexDatatype$1.createTypedArrayFromArrayBuffer(
+      const northIndices = IndexDatatype$2.createTypedArrayFromArrayBuffer(
         vertexCount,
         buffer,
         pos,
@@ -7847,10 +7847,10 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$h,
-        Cartographic: Cartographic$7,
+        Cartesian3: Cartesian3$i,
+        Cartographic: Cartographic$8,
         PointPrimitive,
-        BoundingRectangle: BoundingRectangle$2,
+        BoundingRectangle: BoundingRectangle$3,
         SceneMode: SceneMode$4,
         EllipsoidalOccluder,
     } = Cesium;
@@ -7886,7 +7886,7 @@
         bbox.height += pixelRange * 2.0;
     }
     function getScreenBoundingBox(object, pixel) {
-        const bbox = new BoundingRectangle$2();
+        const bbox = new BoundingRectangle$3();
         PointPrimitive.getScreenSpaceBoundingBox(object, pixel, bbox);
         expandBoundingBox(bbox, this.pixelRange);
         return bbox;
@@ -7922,11 +7922,11 @@
                     continue
                 }
                 const bbox = this._getScreenBoundingBox(object, object.__pixel);
-                const totalBBox = BoundingRectangle$2.clone(bbox, new BoundingRectangle$2());
+                const totalBBox = BoundingRectangle$3.clone(bbox, new BoundingRectangle$3());
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$h.clone(object.position);
+                const clusterPosition = Cartesian3$i.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -7938,16 +7938,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$h.add(neighborObject.position, clusterPosition, clusterPosition);
-                    BoundingRectangle$2.union(totalBBox, neightborbox, totalBBox);
+                    Cartesian3$i.add(neighborObject.position, clusterPosition, clusterPosition);
+                    BoundingRectangle$3.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$h.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$i.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$h(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$i(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -18598,7 +18598,7 @@
         GeographicTilingScheme: GeographicTilingScheme$4,
         GeographicProjection: GeographicProjection$2,
         Rectangle: Rectangle$6,
-        Math: CesiumMath$5
+        Math: CesiumMath$6
     } = Cesium;
 
     class Geographic4490TilingScheme extends GeographicTilingScheme$4 {
@@ -18624,7 +18624,7 @@
                 });
                 var currentResolution = currentMatrix[0].resolution;
                 // return Math.round(360 / (this._tileInfo.rows * currentResolution))
-                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.rows * currentResolution));
+                return Math.round(CesiumMath$6.toDegrees(CesiumMath$6.TWO_PI * 2) / (this._tileInfo.rows * currentResolution));
             }
         };
         getNumberOfYTilesAtLevel(level) {
@@ -18636,7 +18636,7 @@
                 });
                 var currentResolution = currentMatrix[0].resolution;
                 // return Math.round(180 / (this._tileInfo.cols * currentResolution))
-                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.cols * currentResolution));
+                return Math.round(CesiumMath$6.toDegrees(CesiumMath$6.TWO_PI * 2) / (this._tileInfo.cols * currentResolution));
             }
         };
     }
@@ -18984,7 +18984,7 @@
         }
     }
 
-    const shader$l = 'uniform samplerCube u_cubeMap;\n\
+    const shader$n = 'uniform samplerCube u_cubeMap;\n\
   varying vec3 v_texCoord;\n\
   void main()\n\
   {\n\
@@ -18993,7 +18993,7 @@
   }\n\
   ';
 
-    const shader$k = 'attribute vec3 position;\n\
+    const shader$m = 'attribute vec3 position;\n\
   varying vec3 v_texCoord;\n\
   uniform mat3 u_rotateMatrix;\n\
   void main()\n\
@@ -19006,28 +19006,28 @@
 
     const {
         defaultValue: defaultValue$8,
-        destroyObject: destroyObject$5,
-        Matrix4: Matrix4$6,
-        DrawCommand: DrawCommand$2,
+        destroyObject: destroyObject$6,
+        Matrix4: Matrix4$7,
+        DrawCommand: DrawCommand$3,
         BoxGeometry,
-        Cartesian3: Cartesian3$g,
+        Cartesian3: Cartesian3$h,
         defined: defined$a,
         GeometryPipeline,
         Transforms: Transforms$6,
         VertexFormat: VertexFormat$3,
-        BufferUsage: BufferUsage$2,
+        BufferUsage: BufferUsage$3,
         CubeMap,
         loadCubeMap,
-        RenderState: RenderState$2,
-        VertexArray: VertexArray$2,
+        RenderState: RenderState$3,
+        VertexArray: VertexArray$3,
         BlendingState: BlendingState$1,
         SceneMode: SceneMode$3,
-        ShaderProgram: ShaderProgram$4,
-        ShaderSource: ShaderSource$4,
-        Matrix3: Matrix3$2,
+        ShaderProgram: ShaderProgram$5,
+        ShaderSource: ShaderSource$5,
+        Matrix3: Matrix3$3,
     } = Cesium;
-    const SkyBoxFS = shader$l;
-    const SkyBoxVS = shader$k;
+    const SkyBoxFS = shader$n;
+    const SkyBoxVS = shader$m;
     class GroundSkyBox {
         /**
          * A sky box around the scene to draw stars.  The sky box is defined using the True Equator Mean Equinox (TEME) axes.
@@ -19073,8 +19073,8 @@
              */
             this.show = defaultValue$8(options.show, true);
 
-            this._command = new DrawCommand$2({
-                modelMatrix: Matrix4$6.clone(Matrix4$6.IDENTITY),
+            this._command = new DrawCommand$3({
+                modelMatrix: Matrix4$7.clone(Matrix4$7.IDENTITY),
                 owner: this,
             });
             this._cubeMap = undefined;
@@ -19090,7 +19090,7 @@
          * <p>切勿主动调用该函数。</p>
          */
         update(frameState, useHdr) {
-            const skyboxMatrix3 = new Matrix3$2();
+            const skyboxMatrix3 = new Matrix3$3();
             const that = this;
 
             if (!this.show) {
@@ -19159,38 +19159,38 @@
                         return that._cubeMap;
                     },
                     u_rotateMatrix() {
-                        if (typeof Matrix4$6.getRotation === 'function') {
-                            return Matrix4$6.getRotation(command.modelMatrix, skyboxMatrix3);
+                        if (typeof Matrix4$7.getRotation === 'function') {
+                            return Matrix4$7.getRotation(command.modelMatrix, skyboxMatrix3);
                         }
-                        return Matrix4$6.getMatrix3(command.modelMatrix, skyboxMatrix3);
+                        return Matrix4$7.getMatrix3(command.modelMatrix, skyboxMatrix3);
                     },
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$g(2.0, 2.0, 2.0),
+                    dimensions: new Cartesian3$h(2.0, 2.0, 2.0),
                     vertexFormat: VertexFormat$3.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
                     .createAttributeLocations(geometry);
 
-                command.vertexArray = VertexArray$2.fromGeometry({
+                command.vertexArray = VertexArray$3.fromGeometry({
                     context,
                     geometry,
                     attributeLocations,
-                    bufferUsage: BufferUsage$2._DRAW,
+                    bufferUsage: BufferUsage$3._DRAW,
                 });
 
-                command.renderState = RenderState$2.fromCache({
+                command.renderState = RenderState$3.fromCache({
                     blending: BlendingState$1.ALPHA_BLEND,
                 });
             }
 
             if (!defined$a(command.shaderProgram) || this._useHdr !== useHdr) {
-                const fs = new ShaderSource$4({
+                const fs = new ShaderSource$5({
                     defines: [useHdr ? 'HDR' : ''],
                     sources: [SkyBoxFS],
                 });
-                command.shaderProgram = ShaderProgram$4.fromCache({
+                command.shaderProgram = ShaderProgram$5.fromCache({
                     context,
                     vertexShaderSource: SkyBoxVS,
                     fragmentShaderSource: fs,
@@ -19221,7 +19221,7 @@
             command.vertexArray = command.vertexArray && command.vertexArray.destroy();
             command.shaderProgram = command.shaderProgram && command.shaderProgram.destroy();
             this._cubeMap = this._cubeMap && this._cubeMap.destroy();
-            return destroyObject$5(this);
+            return destroyObject$6(this);
         }
     }
 
@@ -19492,7 +19492,7 @@
         destroy() {
             this._viewer.container.removeChild(this.root);
             this.removeEventListener();
-            destroyObject$6(this);
+            destroyObject$7(this);
         }
         get boundingSphere() {
             const pts = this.values._array.map(_ => LonLat.toCartesian(_.position));
@@ -19500,8 +19500,8 @@
         }
     }
 
-    const {Cartesian2: Cartesian2$5, Rectangle: Rectangle$5, GeographicProjection: GeographicProjection$1, Ellipsoid: Ellipsoid$1} = Cesium;
-    const CesiumMath$4 = Cesium.Math;
+    const {Cartesian2: Cartesian2$6, Rectangle: Rectangle$5, GeographicProjection: GeographicProjection$1, Ellipsoid: Ellipsoid$1} = Cesium;
+    const CesiumMath$5 = Cesium.Math;
 
     /**
      * A tiling scheme for geometry referenced to a simple {@link GeographicProjection} where
@@ -19618,8 +19618,8 @@
       // result.north = north;
       // return result;
       return {
-        lon: +CesiumMath$4.toDegrees(west).toFixed(5),
-        lat: +CesiumMath$4.toDegrees(north).toFixed(5)
+        lon: +CesiumMath$5.toDegrees(west).toFixed(5),
+        lat: +CesiumMath$5.toDegrees(north).toFixed(5)
       }
     };
 
@@ -19647,10 +19647,10 @@
       rectangle,
       result
     ) {
-      const west = CesiumMath$4.toDegrees(rectangle.west);
-      const south = CesiumMath$4.toDegrees(rectangle.south);
-      const east = CesiumMath$4.toDegrees(rectangle.east);
-      const north = CesiumMath$4.toDegrees(rectangle.north);
+      const west = CesiumMath$5.toDegrees(rectangle.west);
+      const south = CesiumMath$5.toDegrees(rectangle.south);
+      const east = CesiumMath$5.toDegrees(rectangle.east);
+      const north = CesiumMath$5.toDegrees(rectangle.north);
 
       if (!defined$c(result)) {
         return new Rectangle$5(west, south, east, north);
@@ -19682,10 +19682,10 @@
       result
     ) {
       const rectangleRadians = this.tileXYToRectangle(x, y, level, result);
-      rectangleRadians.west = CesiumMath$4.toDegrees(rectangleRadians.west);
-      rectangleRadians.south = CesiumMath$4.toDegrees(rectangleRadians.south);
-      rectangleRadians.east = CesiumMath$4.toDegrees(rectangleRadians.east);
-      rectangleRadians.north = CesiumMath$4.toDegrees(rectangleRadians.north);
+      rectangleRadians.west = CesiumMath$5.toDegrees(rectangleRadians.west);
+      rectangleRadians.south = CesiumMath$5.toDegrees(rectangleRadians.south);
+      rectangleRadians.east = CesiumMath$5.toDegrees(rectangleRadians.east);
+      rectangleRadians.north = CesiumMath$5.toDegrees(rectangleRadians.north);
       return rectangleRadians;
     };
 
@@ -19760,7 +19760,7 @@
 
       var longitude = position.longitude;
       if (rectangle.east < rectangle.west) {
-        longitude += CesiumMath$4.TWO_PI;
+        longitude += CesiumMath$5.TWO_PI;
       }
 
       var xTileCoordinate = ((longitude - rectangle.west) / xTileWidth) | 0;
@@ -19775,7 +19775,7 @@
       }
 
       if (!defined$c(result)) {
-        return new Cartesian2$5(xTileCoordinate, yTileCoordinate);
+        return new Cartesian2$6(xTileCoordinate, yTileCoordinate);
       }
 
       result.x = xTileCoordinate;
@@ -19786,11 +19786,11 @@
     const {
         CesiumTerrainProvider,
         TerrainProvider,
-        Resource: Resource$5,
+        Resource: Resource$6,
         CustomDataSource: CustomDataSource$2,
-        Cartesian3: Cartesian3$f,
+        Cartesian3: Cartesian3$g,
         Entity: Entity$2,
-        Color: Color$p,
+        Color: Color$q,
         Rectangle: Rectangle$4
     } = Cesium;
     function createBoundingRect(provider) {
@@ -19807,15 +19807,15 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$f.fromRadiansArray(positions),
-                material: Color$p.fromRandom({ alpha: 1 }),
+                positions: Cartesian3$g.fromRadiansArray(positions),
+                material: Color$q.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
         })
     }
     function bindBounding(provider, url) {
-        const resource = Resource$5.createIfNeeded(url);
+        const resource = Resource$6.createIfNeeded(url);
         resource.appendForwardSlash();
         const layerJsonResource = resource.getDerivedResource({
             url: "layer.json",
@@ -20328,7 +20328,7 @@
     }
 
     const {
-        Color: Color$o
+        Color: Color$p
     } = Cesium;
     class Selection{
         /**
@@ -20343,19 +20343,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$o.AQUA;
+        static pointColor = Color$p.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$o.AQUA;
+        static fillColor = Color$p.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$o.AQUA;
+        static strokeColor = Color$p.AQUA;
     }
 
     /**
@@ -20493,7 +20493,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         Transforms: Transforms$5,
-        Cartesian3: Cartesian3$e
+        Cartesian3: Cartesian3$f
     } = Cesium;
     let Model$1 = class Model{
         /**
@@ -20528,7 +20528,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         constructor(options = {}) {
             if(!defined$c(options.modelMatrix)&&defined$c(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$e) {
+                if(options.position instanceof Cartesian3$f) {
                     cartesian = options.position;
                 } else if(options.position instanceof LonLat) {
                     cartesian = options.position.toCartesian();
@@ -20901,69 +20901,69 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       PrimitiveCollection: PrimitiveCollection$3,
       PolylineCollection,
       Material: Material$h,
-      Color: Color$n,
+      Color: Color$o,
       defaultValue: defaultValue$7,
-      Cartesian3: Cartesian3$d,
-      Cartesian2: Cartesian2$4,
-      Matrix4: Matrix4$5,
-      Matrix3: Matrix3$1,
+      Cartesian3: Cartesian3$e,
+      Cartesian2: Cartesian2$5,
+      Matrix4: Matrix4$6,
+      Matrix3: Matrix3$2,
       Quaternion,
       PointPrimitiveCollection,
       ScreenSpaceEventHandler: ScreenSpaceEventHandler$1,
       ScreenSpaceEventType: ScreenSpaceEventType$1,
       Polyline,
-      Primitive: Primitive$5,
-      Math: CesiumMath$3,
-      Plane,
+      Primitive: Primitive$6,
+      Math: CesiumMath$4,
+      Plane: Plane$1,
       Model: CesiumModel,
       IntersectionTests: IntersectionTests$1,
       Transforms: Transforms$4
     } = Cesium;
-    const _offset = new Cartesian3$d();
+    const _offset = new Cartesian3$e();
     const _q = new Quaternion();
-    const rm3 = new Matrix3$1();
-    const cartesian3_1 = new Cartesian3$d();
-    new Cartesian3$d();
-    const mat4 = new Matrix4$5();
-    const mat4_1 = new Matrix4$5();
+    const rm3 = new Matrix3$2();
+    const cartesian3_1 = new Cartesian3$e();
+    new Cartesian3$e();
+    const mat4 = new Matrix4$6();
+    const mat4_1 = new Matrix4$6();
 
     function setColorForPrimitive(geometry, color) {
       if (geometry instanceof Polyline) {
         geometry.material.uniforms.color = color;
-      } else if (geometry instanceof Primitive$5) {
+      } else if (geometry instanceof Primitive$6) {
         geometry.appearance.material.uniforms.color = color;
       }
     }
     function projectInAxis(normal, vector) {
-      Cartesian2$4.normalize(normal, normal);
-      return Cartesian2$4.dot(normal, vector);
+      Cartesian2$5.normalize(normal, normal);
+      return Cartesian2$5.dot(normal, vector);
     }
     function getPositionInPlane(pixel, helper) {
-      const mousedownCartesian = new Cartesian3$d();
+      const mousedownCartesian = new Cartesian3$e();
       const ray = viewer.camera.getPickRay(pixel);
-      const plane = new Plane(Cartesian3$d.UNIT_X, 0.0);  Plane.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
-      Plane.transform(plane, helper._modelMatrix, plane);
+      const plane = new Plane$1(Cartesian3$e.UNIT_X, 0.0);  Plane$1.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
+      Plane$1.transform(plane, helper._modelMatrix, plane);
       IntersectionTests$1.rayPlane(ray, plane, mousedownCartesian);
-      Matrix4$5.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
+      Matrix4$6.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
       return mousedownCartesian;
     }
-    const cartesian2_1 = new Cartesian2$4();
-    const cartesian2_2 = new Cartesian2$4();
+    const cartesian2_1 = new Cartesian2$5();
+    const cartesian2_2 = new Cartesian2$5();
     function computeAngle(helper, startPosition, endPosition) {
       const center = helper.center;
       // const pixelCenter = LonLat.toPixel(center, helper._viewer);
-      Cartesian3$d.subtract(startPosition, center, startPosition);
-      Cartesian3$d.subtract(endPosition, center, endPosition);
-      const angle = Cartesian3$d.dot(Cartesian3$d.normalize(startPosition, startPosition),
-        Cartesian3$d.normalize(endPosition, endPosition));
+      Cartesian3$e.subtract(startPosition, center, startPosition);
+      Cartesian3$e.subtract(endPosition, center, endPosition);
+      const angle = Cartesian3$e.dot(Cartesian3$e.normalize(startPosition, startPosition),
+        Cartesian3$e.normalize(endPosition, endPosition));
       // 旋转起点和终点的向量
-      const v1 = Cartesian3$d.subtract(startPosition, endPosition, cartesian3_1);
+      const v1 = Cartesian3$e.subtract(startPosition, endPosition, cartesian3_1);
       const v2 = startPosition;
-      const cross = Cartesian3$d.cross(v1, v2, cartesian3_1);
+      const cross = Cartesian3$e.cross(v1, v2, cartesian3_1);
       const normal = helper.activePrimitive.normal;
       // 旋转平面的法线向量
       // const v2 = Cartesian2.subtract(center, normal, cartesian2_2);
-      const sign = CesiumMath$3.sign(Cartesian3$d.dot(cross, normal));
+      const sign = CesiumMath$4.sign(Cartesian3$e.dot(cross, normal));
       return Math.acos(angle) * sign;
     }
     function computeOffset(helper, startPosition, endPosition, offset) {
@@ -20978,12 +20978,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       for (let axis of activeAxis) {
         const positions = axis.positions;
         const cartList = positions.map((_) =>
-          Matrix4$5.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$d())
+          Matrix4$6.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$e())
         );
         const pixelList = cartList.map((_) => LonLat.toPixel(_, helper._viewer.scene));
         const length = projectInAxis(
-          Cartesian2$4.subtract(...pixelList, cartesian2_1),
-          Cartesian2$4.subtract(endPosition, startPosition, cartesian2_2)
+          Cartesian2$5.subtract(...pixelList, cartesian2_1),
+          Cartesian2$5.subtract(endPosition, startPosition, cartesian2_2)
         );
         offset[axis.axis.toLowerCase()] = length * delta;
       }
@@ -21033,11 +21033,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       constructor(options = {}) {
         this.lineWidth = defaultValue$7(options.lineWidth, 15);
-        this.xAxisColor = defaultValue$7(options.xAxisColor, Color$n.RED);
-        this.yAxisColor = defaultValue$7(options.yAxisColor, Color$n.GREEN);
-        this.zAxisColor = defaultValue$7(options.zAxisColor, Color$n.BLUE);
-        this.scaleAxisColor = defaultValue$7(options.scaleAxisColor, Color$n.WHITE);
-        this.activeAxisColor = defaultValue$7(options.activeAxisColor, Color$n.YELLOW);
+        this.xAxisColor = defaultValue$7(options.xAxisColor, Color$o.RED);
+        this.yAxisColor = defaultValue$7(options.yAxisColor, Color$o.GREEN);
+        this.zAxisColor = defaultValue$7(options.zAxisColor, Color$o.BLUE);
+        this.scaleAxisColor = defaultValue$7(options.scaleAxisColor, Color$o.WHITE);
+        this.activeAxisColor = defaultValue$7(options.activeAxisColor, Color$o.YELLOW);
         this._translateEnabled = defaultValue$7(options.translateEnabled, true);
         this._rotateEnabled = defaultValue$7(options.rotateEnabled, false);
         this._scaleEnabled = defaultValue$7(options.scaleEnabled, false);
@@ -21049,11 +21049,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.object = null;
         this._modelMatrix = undefined;
         this._primitives = [];
-        this._center = new Cartesian3$d();
+        this._center = new Cartesian3$e();
         this._radius = 0;
-        this._originOffset = defaultValue$7(options.originOffset, new Cartesian3$d());
+        this._originOffset = defaultValue$7(options.originOffset, new Cartesian3$e());
         this._selectedPrimitives = [];
-        this._offset = new Cartesian3$d(0, 0, 0);
+        this._offset = new Cartesian3$e(0, 0, 0);
         this._angle = 0;
         this.rotatePlaneRadius = options.rotatePlaneRadius;
         this._mode = EModel.N;
@@ -21130,7 +21130,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @type {Ceium.Cartesian3}
        */
       get center() {
-        return Cartesian3$d.add(this._center, this._originOffset, new Cartesian3$d());
+        return Cartesian3$e.add(this._center, this._originOffset, new Cartesian3$e());
       }
       /**
        * 模型矩阵
@@ -21146,7 +21146,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return;
         }
         this._modelMatrix = matrix;
-        this._inverseModelMatrix = Matrix4$5.inverse(matrix, new Matrix4$5);
+        this._inverseModelMatrix = Matrix4$6.inverse(matrix, new Matrix4$6);
       }
       /**
        * 创建XYZ坐标轴
@@ -21163,7 +21163,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.xAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$d(
+            new Cartesian3$e(
               defaultValue$7(this.xAxisLength, lineLength) + center.x,
               center.y,
               center.z
@@ -21182,7 +21182,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.yAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$d(
+            new Cartesian3$e(
               center.x,
               -(defaultValue$7(this.yAxisLength, lineLength) + center.y),
               center.z
@@ -21201,7 +21201,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.zAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$d(
+            new Cartesian3$e(
               center.x,
               center.y,
               defaultValue$7(this.zAxisLength, lineLength) + center.z
@@ -21230,7 +21230,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$d(0, 0, 1),
+            normal: new Cartesian3$e(0, 0, 1),
             axis: "XY",
           })
         );
@@ -21241,7 +21241,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$d(0, 1, 0),
+            normal: new Cartesian3$e(0, 1, 0),
             axis: "XZ",
           })
         );
@@ -21252,7 +21252,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$d(1, 0, 0),
+            normal: new Cartesian3$e(1, 0, 0),
             axis: "YZ",
           })
         );
@@ -21288,7 +21288,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
               source: polylineAntialiasingMaterial,
               uniforms: {
                 color: color,
-                gapColor: Color$n.TRANSPARENT,
+                gapColor: Color$o.TRANSPARENT,
                 dashLength: dashLength,
                 dashPattern: 255,
               },
@@ -21316,7 +21316,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$d(
+            new Cartesian3$e(
               center.x + radius * Math.cos(rad),
               center.y + radius * Math.sin(rad),
               center.z
@@ -21330,12 +21330,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.zRotate.axis = "RZ";
         this.zRotate.color = this.zAxisColor;
-        this.zRotate.normal = new Cartesian3$d(0, 0, 1);
+        this.zRotate.normal = new Cartesian3$e(0, 0, 1);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$d(
+            new Cartesian3$e(
               center.x + radius * Math.cos(rad),
               center.y,
               center.z + radius * Math.sin(rad)
@@ -21349,12 +21349,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.yRotate.axis = "RY";
         this.yRotate.color = this.yAxisColor;
-        this.yRotate.normal = new Cartesian3$d(0, 1, 0);
+        this.yRotate.normal = new Cartesian3$e(0, 1, 0);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$d(
+            new Cartesian3$e(
               center.x,
               center.y + radius * Math.cos(rad),
               center.z + radius * Math.sin(rad)
@@ -21368,7 +21368,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.xRotate.axis = "RX";
         this.xRotate.color = this.xAxisColor;
-        this.xRotate.normal = new Cartesian3$d(-1, 0, 0);
+        this.xRotate.normal = new Cartesian3$e(-1, 0, 0);
 
         this.rAxuStart = this.axisRoot.add({
           positions: [],
@@ -21393,7 +21393,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.scaleAxis = this.axisRoot.add({
           positions: [
             this._center,
-            new Cartesian3$d((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+            new Cartesian3$e((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
           ],
           width: this.lineWidth,
           material: this.getAxisMaterial(this.scaleAxisColor),
@@ -21421,8 +21421,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         this.modelMatrix = object.modelMatrix;
         object.readyPromise.then(() => {
-          const center = Cartesian3$d.clone(object.boundingSphere.center);
-          Matrix4$5.multiplyByPoint(this._inverseModelMatrix, center, this._center);
+          const center = Cartesian3$e.clone(object.boundingSphere.center);
+          Matrix4$6.multiplyByPoint(this._inverseModelMatrix, center, this._center);
           this._radius = object.boundingSphere.radius;
           this.createPrimitive();
         });
@@ -21436,12 +21436,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (typeof position.getValue === 'function') {
           position = position.getValue(this._viewer.clock.currentTime);
         }
-        if (position instanceof Cartesian3$d === false) {
+        if (position instanceof Cartesian3$e === false) {
           throw new CesiumProError$1('position is invalid')
         }
         this.modelMatrix = Transforms$4.eastNorthUpToFixedFrame(position);
-        this._center = new Cartesian3$d();
-        Cartesian3$d.clone(this.originOffset, this._center);
+        this._center = new Cartesian3$e();
+        Cartesian3$e.clone(this.originOffset, this._center);
         this._radius = 10;
         this.rotateEnabled = false;
         this.scaleEnabled = false;
@@ -21499,7 +21499,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           if (this._primitives.includes(feat.primitive)) {
             this._mousedownPixel = e.position;
             this.active(feat.primitive);
-            this._offset = new Cartesian3$d();
+            this._offset = new Cartesian3$e();
             this._angle = 0;
             handler.setInputAction((e) => {
               const { startPosition, endPosition } = e;
@@ -21596,17 +21596,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           this.rotate(angle);
         } else if (this._mode = EModel.S) {
           computeOffset(this, startPosition, endPosition, _offset);
-          const s = -_offset.sxyz / Cartesian3$d.distance(...this.scaleAxis.positions) + 1;
-          this.scale(new Cartesian3$d(s, s, s));
+          const s = -_offset.sxyz / Cartesian3$e.distance(...this.scaleAxis.positions) + 1;
+          this.scale(new Cartesian3$e(s, s, s));
         }
         this.postTransformEvent.raise(this.modelMatrix);
       }
       scale(scale) {
-        const scaleMatrix = Matrix4$5.fromScale(scale, mat4);
-        Matrix4$5.multiply(this._modelMatrix, scaleMatrix, this._modelMatrix);
+        const scaleMatrix = Matrix4$6.fromScale(scale, mat4);
+        Matrix4$6.multiply(this._modelMatrix, scaleMatrix, this._modelMatrix);
         this.modelMatrix = this._modelMatrix;
         for (let primitive of this.root._primitives) {
-          Matrix4$5.multiply(primitive.modelMatrix, scaleMatrix, primitive.modelMatrix);
+          Matrix4$6.multiply(primitive.modelMatrix, scaleMatrix, primitive.modelMatrix);
         }
       }
       /**
@@ -21617,17 +21617,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       rotate(angle) {
         this._angle += angle;
         const axis = this.activePrimitive.normal;
-        const translation = Matrix4$5.fromTranslation(this.center, mat4);
+        const translation = Matrix4$6.fromTranslation(this.center, mat4);
         const q = Quaternion.fromAxisAngle(axis, angle, _q);
-        const roateMatrix = Matrix3$1.fromQuaternion(q, rm3);
-        const inverseTranslation = Matrix4$5.fromTranslation(Cartesian3$d.negate(this.center, cartesian3_1), mat4_1);
-        Matrix4$5.multiply(this.modelMatrix, translation, this.modelMatrix);
-        Matrix4$5.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
-        Matrix4$5.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
+        const roateMatrix = Matrix3$2.fromQuaternion(q, rm3);
+        const inverseTranslation = Matrix4$6.fromTranslation(Cartesian3$e.negate(this.center, cartesian3_1), mat4_1);
+        Matrix4$6.multiply(this.modelMatrix, translation, this.modelMatrix);
+        Matrix4$6.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
+        Matrix4$6.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
         for (let primitive of this.root._primitives) {
-          Matrix4$5.multiply(primitive.modelMatrix, translation, primitive.modelMatrix);
-          Matrix4$5.multiplyByMatrix3(primitive.modelMatrix, roateMatrix, primitive.modelMatrix);
-          Matrix4$5.multiply(primitive.modelMatrix, inverseTranslation, primitive.modelMatrix);
+          Matrix4$6.multiply(primitive.modelMatrix, translation, primitive.modelMatrix);
+          Matrix4$6.multiplyByMatrix3(primitive.modelMatrix, roateMatrix, primitive.modelMatrix);
+          Matrix4$6.multiply(primitive.modelMatrix, inverseTranslation, primitive.modelMatrix);
         }
         this.modelMatrix = this._modelMatrix;
         this.createRotateAux(this._startLocalPosition, this._angle);
@@ -21652,12 +21652,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         offset.x = -offset.x;
         offset.z = -offset.z;
-        Cartesian3$d.add(this._offset, offset, this._offset);
-        const matrix = Matrix4$5.fromTranslation(offset);
-        Matrix4$5.multiply(this._modelMatrix, matrix, this._modelMatrix);
+        Cartesian3$e.add(this._offset, offset, this._offset);
+        const matrix = Matrix4$6.fromTranslation(offset);
+        Matrix4$6.multiply(this._modelMatrix, matrix, this._modelMatrix);
         this.modelMatrix = this._modelMatrix;
         for (let primitive of this.root._primitives) {
-          Matrix4$5.multiply(primitive.modelMatrix, matrix, primitive.modelMatrix);
+          Matrix4$6.multiply(primitive.modelMatrix, matrix, primitive.modelMatrix);
         }
         this.createAux(this._offset, matrix);
       }
@@ -21668,35 +21668,35 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       createAux(offset) {
         if (offset.x > 0) {
-          const p1 = Cartesian3$d.clone(this.xAxis.positions[0]);
-          const p2 = Cartesian3$d.clone(this.xAxis.positions[0]);
+          const p1 = Cartesian3$e.clone(this.xAxis.positions[0]);
+          const p2 = Cartesian3$e.clone(this.xAxis.positions[0]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$d.clone(this.xAxis.positions[1]);
-          const p2 = Cartesian3$d.clone(this.xAxis.positions[1]);
+          const p1 = Cartesian3$e.clone(this.xAxis.positions[1]);
+          const p2 = Cartesian3$e.clone(this.xAxis.positions[1]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         }
         if (offset.y < 0) {
-          const p1 = Cartesian3$d.clone(this.yAxis.positions[0]);
-          const p2 = Cartesian3$d.clone(this.yAxis.positions[0]);
+          const p1 = Cartesian3$e.clone(this.yAxis.positions[0]);
+          const p2 = Cartesian3$e.clone(this.yAxis.positions[0]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$d.clone(this.yAxis.positions[1]);
-          const p2 = Cartesian3$d.clone(this.yAxis.positions[1]);
+          const p1 = Cartesian3$e.clone(this.yAxis.positions[1]);
+          const p2 = Cartesian3$e.clone(this.yAxis.positions[1]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         }
         if (offset.z > 0) {
-          const p1 = Cartesian3$d.clone(this.zAxis.positions[0]);
-          const p2 = Cartesian3$d.clone(this.zAxis.positions[0]);
+          const p1 = Cartesian3$e.clone(this.zAxis.positions[0]);
+          const p2 = Cartesian3$e.clone(this.zAxis.positions[0]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$d.clone(this.zAxis.positions[1]);
-          const p2 = Cartesian3$d.clone(this.zAxis.positions[1]);
+          const p1 = Cartesian3$e.clone(this.zAxis.positions[1]);
+          const p2 = Cartesian3$e.clone(this.zAxis.positions[1]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         }
@@ -21713,11 +21713,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return;
         }
         const q = Quaternion.fromAxisAngle(this.activePrimitive.normal, -angle);
-        const matrix3 = Matrix3$1.fromQuaternion(q, rm3);
-        const rotation = Matrix4$5.fromRotation(matrix3, mat4);
-        let position = Cartesian3$d.subtract(startLocalPosition, this.center, cartesian3_1);
-        Matrix4$5.multiplyByPoint(rotation, position, position);
-        Cartesian3$d.add(this.center, position, position);
+        const matrix3 = Matrix3$2.fromQuaternion(q, rm3);
+        const rotation = Matrix4$6.fromRotation(matrix3, mat4);
+        let position = Cartesian3$e.subtract(startLocalPosition, this.center, cartesian3_1);
+        Matrix4$6.multiplyByPoint(rotation, position, position);
+        Cartesian3$e.add(this.center, position, position);
         this.rAxuEnd.positions = [this.center, position];
       }
     }
@@ -22014,14 +22014,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         EntityCluster,
         PinBuilder,
         createGuid: createGuid$2,
-        Cartesian3: Cartesian3$c,
+        Cartesian3: Cartesian3$d,
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$2,
-        Color: Color$m,
+        Color: Color$n,
         EntityCollection,
         HeightReference: HeightReference$2,
-        Resource: Resource$4,
+        Resource: Resource$5,
         describe,
         Event: Event$8
     } = Cesium;
@@ -22201,7 +22201,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (defined$9(properties)) {
             const cssColor = properties['point-color'];
             if (defined$9(cssColor)) {
-                color = Color$m.fromCssColorString(cssColor);
+                color = Color$n.fromCssColorString(cssColor);
             }
 
             size = defaultValue$6(sizes$1[properties['point-size']], size);
@@ -22245,7 +22245,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             let stroke = properties.stroke;
             if (defined$9(stroke)) {
-                color = Color$m.fromCssColorString(stroke);
+                color = Color$n.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$9(opacity) && opacity !== 1.0) {
@@ -22339,7 +22339,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             const stroke = properties.stroke;
             if (defined$9(stroke)) {
-                color = Color$m.fromCssColorString(stroke);
+                color = Color$n.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$9(opacity) && opacity !== 1.0) {
@@ -22356,7 +22356,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let fillColor;
             const fill = properties.fill;
             if (defined$9(fill)) {
-                fillColor = Color$m.fromCssColorString(fill);
+                fillColor = Color$n.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -22446,7 +22446,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
     }
     function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$c.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$d.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load$1(that, geoJson, options, sourceUri) {
         let name;
@@ -22571,21 +22571,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$m.ROYALBLUE;
+        static pointColor = Color$n.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$m.YELLOW;
+        static lineColor = Color$n.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$m.fromBytes(255, 255, 0, 100);
+        static fill = Color$n.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof GeoJsonDataSource
@@ -22599,7 +22599,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$m.YELLOW;
+        static outlineColor = Color$n.YELLOW;
         /**
          * 线要素的宽度
          * @memberof GeoJsonDataSource
@@ -22744,8 +22744,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === "string" || data instanceof Resource$4) {
-                data = Resource$4.createIfNeeded(data);
+            if (typeof data === "string" || data instanceof Resource$5) {
+                data = Resource$5.createIfNeeded(data);
                 promise = data.fetchJson();
                 sourceUri = defaultValue$6(sourceUri, data.getUrlComponent());
 
@@ -23260,13 +23260,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         PolygonGraphics,
         PolylineGraphics,
         createGuid: createGuid$1,
-        Cartesian3: Cartesian3$b,
+        Cartesian3: Cartesian3$c,
         PointGraphics,
         ArcType,
         PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$l,
+        Color: Color$m,
         HeightReference: HeightReference$1,
-        Resource: Resource$3,
+        Resource: Resource$4,
     } = Cesium;
     const sizes = {
         small: 24,
@@ -23431,7 +23431,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (defined$8(properties)) {
             const cssColor = properties['point-color'];
             if (defined$8(cssColor)) {
-                color = Color$l.fromCssColorString(cssColor);
+                color = Color$m.fromCssColorString(cssColor);
             }
 
             size = defaultValue$5(sizes[properties['point-size']], size);
@@ -23475,7 +23475,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             let stroke = properties.stroke;
             if (defined$8(stroke)) {
-                color = Color$l.fromCssColorString(stroke);
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$8(opacity) && opacity !== 1.0) {
@@ -23540,7 +23540,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             const stroke = properties.stroke;
             if (defined$8(stroke)) {
-                color = Color$l.fromCssColorString(stroke);
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$8(opacity) && opacity !== 1.0) {
@@ -23557,7 +23557,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let fillColor;
             const fill = properties.fill;
             if (defined$8(fill)) {
-                fillColor = Color$l.fromCssColorString(fill);
+                fillColor = Color$m.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -23690,7 +23690,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
     }
     function defaultCrsFunction(coordinates) {
-        return Cartesian3$b.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$c.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load(that, geoJson, options, sourceUri) {
         let name;
@@ -23802,21 +23802,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$l.ROYALBLUE;
+        static pointColor = Color$m.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$l.YELLOW;
+        static lineColor = Color$m.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$l.fromBytes(255, 255, 0, 100);
+        static fill = Color$m.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof ShapefileDataSource
@@ -23830,7 +23830,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$l.YELLOW;
+        static outlineColor = Color$m.YELLOW;
         /**
          * 线要素的宽度
          * @memberof ShapefileDataSource
@@ -23884,7 +23884,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
             let promise = data;
             let sourceUri = options.sourceUri;
-            if (typeof data === 'string' || (data instanceof Resource$3)) {
+            if (typeof data === 'string' || (data instanceof Resource$4)) {
                 promise = new Promise((resolve, reject) => {
                     open(data, dbfile, { encoding: options.encoding })
                         .then(source =>
@@ -24051,9 +24051,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         buildModuleUrl: buildModuleUrl$2,
-        Color: Color$k,
+        Color: Color$l,
         defined: defined$7,
-        destroyObject: destroyObject$4,
+        destroyObject: destroyObject$5,
         knockout,
         getElement,
         subscribeAndEvaluate,
@@ -24154,7 +24154,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                             var style = window.getComputedStyle(firstElementChild);
                             if (style !== null) {
                                 var backgroundColor = style["background-color"];
-                                var color = Color$k.fromCssColorString(backgroundColor);
+                                var color = Color$l.fromCssColorString(backgroundColor);
                                 if (defined$7(color) && color.alpha !== 0) {
                                     background = style["background-color"];
                                 }
@@ -24193,7 +24193,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 this._descriptionSubscription.dispose();
             }
         
-            return destroyObject$4(this);
+            return destroyObject$5(this);
         };
     }
 
@@ -25255,8 +25255,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         QuadtreeTileLoadState,
         Visibility,
         AssociativeArray: AssociativeArray$1,
-        Cartesian3: Cartesian3$a,
-        Cartographic: Cartographic$6,
+        Cartesian3: Cartesian3$b,
+        Cartographic: Cartographic$7,
         getTimestamp,
         RequestState
     } = Cesium;
@@ -25382,10 +25382,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (!(defined$c(object) && defined$c(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3$a) {
+            if (object.position instanceof Cartesian3$b) {
                 object.cartesian = object.position;
-            } else if (object.position instanceof Cartographic$6) {
-                object.cartesian = Cartographic$6.toCartesian(object.position);
+            } else if (object.position instanceof Cartographic$7) {
+                object.cartesian = Cartographic$7.toCartesian(object.position);
                 object.catographic = object.position;
             } else if (object.position instanceof LonLat) {
                 object.cartesian = object.position.toCartesian();
@@ -25394,7 +25394,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 object.cartesian = object.position;
             }
             if (!object.cartographic) {
-                object.cartographic = Cartographic$6.fromCartesian(object.cartesian);
+                object.cartographic = Cartographic$7.fromCartesian(object.cartesian);
             }
             if (Rectangle$3.contains(tile.rectangle, object.cartographic)) {
                 tileObject.push(object);
@@ -26358,7 +26358,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 #endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
 ";
 
-    const { BoundingSphere: BoundingSphere$6, buildModuleUrl: buildModuleUrl$1, Cartesian3: Cartesian3$9, Cartographic: Cartographic$5, Color: Color$j, defaultValue: defaultValue$4, defined: defined$6, destroyObject: destroyObject$3, DeveloperError: DeveloperError$3, Ellipsoid, EllipsoidTerrainProvider, Event: Event$6, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$2, Resource: Resource$2, ShaderSource: ShaderSource$3, Texture: Texture$1, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
+    const { BoundingSphere: BoundingSphere$6, buildModuleUrl: buildModuleUrl$1, Cartesian3: Cartesian3$a, Cartographic: Cartographic$6, Color: Color$k, defaultValue: defaultValue$4, defined: defined$6, destroyObject: destroyObject$4, DeveloperError: DeveloperError$3, Ellipsoid, EllipsoidTerrainProvider, Event: Event$6, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$2, Resource: Resource$3, ShaderSource: ShaderSource$4, Texture: Texture$2, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
     const GlobeVS = Cesium._shadersGlobeVS;
     // const GlobeFS = Cesium._shadersGlobeFS;
     const AtmosphereCommon = Cesium._shadersAtmosphereCommon;
@@ -26398,7 +26398,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       this._terrainProvider = terrainProvider;
       this._terrainProviderChanged = new Event$6();
 
-      this._undergroundColor = Color$j.clone(Color$j.BLACK);
+      this._undergroundColor = Color$k.clone(Color$k.BLACK);
       this._undergroundColorAlphaByDistance = new NearFarScalar(
         ellipsoid.maximumRadius / 1000.0,
         0.0,
@@ -26419,7 +26419,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       this.show = true;
 
       this._oceanNormalMapResourceDirty = true;
-      this._oceanNormalMapResource = new Resource$2({
+      this._oceanNormalMapResource = new Resource$3({
         url: buildModuleUrl$1("Assets/Textures/waterNormalsSmall.jpg"),
       });
 
@@ -26544,7 +26544,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(5.5e-6, 13.0e-6, 28.4e-6)
        */
-      this.atmosphereRayleighCoefficient = new Cartesian3$9(5.5e-6, 13.0e-6, 28.4e-6);
+      this.atmosphereRayleighCoefficient = new Cartesian3$a(5.5e-6, 13.0e-6, 28.4e-6);
 
       /**
        * The Mie scattering coefficient used in the atmospheric scattering equations for the ground atmosphere.
@@ -26552,7 +26552,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(21e-6, 21e-6, 21e-6)
        */
-      this.atmosphereMieCoefficient = new Cartesian3$9(21e-6, 21e-6, 21e-6);
+      this.atmosphereMieCoefficient = new Cartesian3$a(21e-6, 21e-6, 21e-6);
 
       /**
        * The Rayleigh scale height used in the atmospheric scattering equations for the ground atmosphere, in meters.
@@ -26913,7 +26913,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           return this._undergroundColor;
         },
         set: function (value) {
-          this._undergroundColor = Color$j.clone(value, this._undergroundColor);
+          this._undergroundColor = Color$k.clone(value, this._undergroundColor);
         },
       },
 
@@ -26987,12 +26987,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       }
       fragmentSources.push(GlobeFS);
 
-      globe._surfaceShaderSet.baseVertexShaderSource = new ShaderSource$3({
+      globe._surfaceShaderSet.baseVertexShaderSource = new ShaderSource$4({
         sources: [AtmosphereCommon, GroundAtmosphere, GlobeVS],
         defines: defines,
       });
 
-      globe._surfaceShaderSet.baseFragmentShaderSource = new ShaderSource$3({
+      globe._surfaceShaderSet.baseFragmentShaderSource = new ShaderSource$4({
         sources: fragmentSources,
         defines: defines,
       });
@@ -27077,7 +27077,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             surfaceTile.tileBoundingRegion.maximumHeight,
             boundingVolume
           );
-          Cartesian3$9.fromElements(
+          Cartesian3$a.fromElements(
             boundingVolume.center.z,
             boundingVolume.center.x,
             boundingVolume.center.y,
@@ -27123,7 +27123,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       return intersection;
     };
 
-    const cartoScratch = new Cartographic$5();
+    const cartoScratch = new Cartographic$6();
     /**
      * Find an intersection between a ray and the globe surface that was rendered. The ray must be given in world coordinates.
      *
@@ -27140,7 +27140,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     Globe.prototype.pick = function (ray, scene, result) {
       result = this.pickWorldCoordinates(ray, scene, true, result);
       if (defined$6(result) && scene.mode !== SceneMode$2.SCENE3D) {
-        result = Cartesian3$9.fromElements(result.y, result.z, result.x, result);
+        result = Cartesian3$a.fromElements(result.y, result.z, result.x, result);
         const carto = scene.mapProjection.unproject(result, cartoScratch);
         result = scene.globe.ellipsoid.cartographicToCartesian(carto, result);
       }
@@ -27148,9 +27148,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       return result;
     };
 
-    const scratchGetHeightCartesian = new Cartesian3$9();
-    const scratchGetHeightIntersection = new Cartesian3$9();
-    const scratchGetHeightCartographic = new Cartographic$5();
+    const scratchGetHeightCartesian = new Cartesian3$a();
+    const scratchGetHeightIntersection = new Cartesian3$a();
+    const scratchGetHeightCartographic = new Cartographic$6();
     const scratchGetHeightRay = new Ray();
 
     function tileIfContainsCartographic(tile, cartographic) {
@@ -27230,7 +27230,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       const ellipsoid = this._surface._tileProvider.tilingScheme.ellipsoid;
 
       //cartesian has to be on the ellipsoid surface for `ellipsoid.geodeticSurfaceNormal`
-      const cartesian = Cartesian3$9.fromRadians(
+      const cartesian = Cartesian3$a.fromRadians(
         cartographic.longitude,
         cartographic.latitude,
         0.0,
@@ -27263,12 +27263,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const magnitude = Math.min(defaultValue$4(minimumHeight, 0.0), -11500.0);
 
         // multiply by the *positive* value of the magnitude
-        const vectorToMinimumPoint = Cartesian3$9.multiplyByScalar(
+        const vectorToMinimumPoint = Cartesian3$a.multiplyByScalar(
           surfaceNormal,
           Math.abs(magnitude) + 1,
           scratchGetHeightIntersection
         );
-        Cartesian3$9.subtract(cartesian, vectorToMinimumPoint, ray.origin);
+        Cartesian3$a.subtract(cartesian, vectorToMinimumPoint, ray.origin);
       }
 
       const intersection = tile.data.pick(
@@ -27328,7 +27328,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
             that._oceanNormalMap =
               that._oceanNormalMap && that._oceanNormalMap.destroy();
-            that._oceanNormalMap = new Texture$1({
+            that._oceanNormalMap = new Texture$2({
               context: frameState.context,
               source: image,
             });
@@ -27451,11 +27451,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         this._surfaceShaderSet && this._surfaceShaderSet.destroy();
       this._surface = this._surface && this._surface.destroy();
       this._oceanNormalMap = this._oceanNormalMap && this._oceanNormalMap.destroy();
-      return destroyObject$3(this);
+      return destroyObject$4(this);
     };
 
     const {
-        ShaderProgram: ShaderProgram$3,
+        ShaderProgram: ShaderProgram$4,
         RuntimeError: RuntimeError$1,
         createUniform,
         defined: defined$5,
@@ -27871,24 +27871,24 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
     function override$1() {
-        const originPrototype = ShaderProgram$3.prototype;
-        ShaderProgram$3.prototype = {};
-        ShaderProgram$3.prototype._bind = function () {
+        const originPrototype = ShaderProgram$4.prototype;
+        ShaderProgram$4.prototype = {};
+        ShaderProgram$4.prototype._bind = function () {
             initialize(this);
             this._gl.useProgram(this._program);
         };
-        ShaderProgram$3.prototype.destroy = originPrototype.destroy;
-        ShaderProgram$3.prototype._setUniforms = function (uniformMap,
+        ShaderProgram$4.prototype.destroy = originPrototype.destroy;
+        ShaderProgram$4.prototype._setUniforms = function (uniformMap,
             uniformState,
             validate) {
             originPrototype._setUniforms.call(this, uniformMap,
                 uniformState,
                 validate);
         };
-        ShaderProgram$3.prototype.isDestroyed = originPrototype.isDestroyed;
-        ShaderProgram$3.prototype.finalDestroy = originPrototype.finalDestroy;
+        ShaderProgram$4.prototype.isDestroyed = originPrototype.isDestroyed;
+        ShaderProgram$4.prototype.finalDestroy = originPrototype.finalDestroy;
 
-        Object.defineProperties(ShaderProgram$3.prototype, {
+        Object.defineProperties(ShaderProgram$4.prototype, {
             vertexAttributes: {
                 get: function () {
                     initialize(this);
@@ -27922,18 +27922,18 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const CesiumScene = Cesium.Scene;
     const {
-        JulianDate: JulianDate$1,
+        JulianDate: JulianDate$2,
         defined: defined$4,
         RequestScheduler,
         PerformanceDisplay,
         Cesium3DTilePassState,
         Cesium3DTilePass,
         defaultValue: defaultValue$3,
-        Color: Color$i,
-        BoundingRectangle: BoundingRectangle$1,
-        Pass: Pass$2,
+        Color: Color$j,
+        BoundingRectangle: BoundingRectangle$2,
+        Pass: Pass$3,
         SunLight,
-        Cartesian3: Cartesian3$8
+        Cartesian3: Cartesian3$9
     } = Cesium;
     const preloadTilesetPassState = new Cesium3DTilePassState({
         pass: Cesium3DTilePass.PRELOAD,
@@ -27950,7 +27950,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     function updateFrameNumber(scene, frameNumber, time) {
         var frameState = scene._frameState;
         frameState.frameNumber = frameNumber;
-        frameState.time = JulianDate$1.clone(time, frameState.time);
+        frameState.time = JulianDate$2.clone(time, frameState.time);
     }
     function tryAndCatchError(scene, functionToExecute) {
         try {
@@ -28069,9 +28069,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.passes.postProcess = scene.postProcessStages.hasSelected;
         frameState.tilesetPassState = renderTilesetPassState;
 
-        var backgroundColor = defaultValue$3(scene.backgroundColor, Color$i.BLACK);
+        var backgroundColor = defaultValue$3(scene.backgroundColor, Color$j.BLACK);
         if (scene._hdr) {
-            backgroundColor = Color$i.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor = Color$j.clone(backgroundColor, scratchBackgroundColor);
             backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
             backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
             backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
@@ -28086,9 +28086,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         if (defined$4(shadowMap) && shadowMap.enabled) {
             if (!defined$4(scene.light) || scene.light instanceof SunLight) {
                 // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3$8.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+                Cartesian3$9.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
             } else {
-                Cartesian3$8.clone(scene.light.direction, scene._shadowMapCamera.direction);
+                Cartesian3$9.clone(scene.light.direction, scene._shadowMapCamera.direction);
             }
             frameState.shadowMaps.push(shadowMap);
         }
@@ -28106,7 +28106,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         passState.framebuffer = undefined;
         passState.blendingEnabled = undefined;
         passState.scissorTest = undefined;
-        passState.viewport = BoundingRectangle$1.clone(viewport, passState.viewport);
+        passState.viewport = BoundingRectangle$2.clone(viewport, passState.viewport);
 
         if (defined$4(scene.globe)) {
             scene.globe.beginFrame(frameState);
@@ -28133,7 +28133,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
     function executeOverlayCommands(scene, passState) {
         var us = scene.context.uniformState;
-        us.updatePass(Pass$2.OVERLAY);
+        us.updatePass(Pass$3.OVERLAY);
 
         var context = scene.context;
         var commandList = scene._overlayCommandList;
@@ -28149,7 +28149,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.newFrame = false;
 
         if (!defined$4(time)) {
-            time = JulianDate$1.now();
+            time = JulianDate$2.now();
         }
 
         // Determine if shouldRender
@@ -28167,13 +28167,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             defined$4(this._lastRenderTime)
         ) {
             var difference = Math.abs(
-                JulianDate$1.secondsDifference(this._lastRenderTime, time)
+                JulianDate$2.secondsDifference(this._lastRenderTime, time)
             );
             shouldRender = shouldRender || difference > this.maximumRenderTimeChange;
         }
 
         if (shouldRender) {
-            this._lastRenderTime = JulianDate$1.clone(time, this._lastRenderTime);
+            this._lastRenderTime = JulianDate$2.clone(time, this._lastRenderTime);
             this._renderRequested = false;
             this._logDepthBufferDirty = false;
             this._hdrDirty = false;
@@ -28239,17 +28239,17 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Primitive: Primitive$3,
-        ShaderProgram: ShaderProgram$2,
+        Primitive: Primitive$4,
+        ShaderProgram: ShaderProgram$3,
         defined: defined$3,
         DeveloperError: DeveloperError$2,
         defaultValue: defaultValue$2,
-        ShaderSource: ShaderSource$2 
+        ShaderSource: ShaderSource$3 
     } = Cesium;
 
-    const update$1 = Primitive$3.prototype.update;
+    const update$1 = Primitive$4.prototype.update;
     function appendPickToVertexShader(source) {
-        var renamedVS = ShaderSource$2.replaceMain(source, "czm_non_pick_main");
+        var renamedVS = ShaderSource$3.replaceMain(source, "czm_non_pick_main");
         var pickMain =
             "varying vec4 v_pickColor; \n" +
             "void main() \n" +
@@ -28339,7 +28339,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         modifiedVS = modifiedVS.replace(/attribute\s+vec2\s+st;/g, "");
         modifiedVS = modifiedVS.replace(/attribute\s+vec3\s+tangent;/g, "");
         modifiedVS = modifiedVS.replace(/attribute\s+vec3\s+bitangent;/g, "");
-        modifiedVS = ShaderSource$2.replaceMain(modifiedVS, "czm_non_compressed_main");
+        modifiedVS = ShaderSource$3.replaceMain(modifiedVS, "czm_non_compressed_main");
         var compressedMain =
             "void main() \n" +
             "{ \n" +
@@ -28379,7 +28379,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         //>>includeEnd('debug');
     }
     function depthClampVS(vertexShaderSource) {
-        var modifiedVS = ShaderSource$2.replaceMain(
+        var modifiedVS = ShaderSource$3.replaceMain(
             vertexShaderSource,
             "czm_non_depth_clamp_main"
         );
@@ -28391,7 +28391,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         return modifiedVS;
     }
     function depthClampFS(fragmentShaderSource) {
-        var modifiedFS = ShaderSource$2.replaceMain(
+        var modifiedFS = ShaderSource$3.replaceMain(
             fragmentShaderSource,
             "czm_non_depth_clamp_main"
         );
@@ -28421,21 +28421,21 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         let vs = primitive._batchTable.getVertexShaderCallback()(
             appearance.vertexShaderSource
         );
-        vs = Primitive$3._appendOffsetToShader(primitive, vs);
-        vs = Primitive$3._appendShowToShader(primitive, vs);
-        vs = Primitive$3._appendDistanceDisplayConditionToShader(
+        vs = Primitive$4._appendOffsetToShader(primitive, vs);
+        vs = Primitive$4._appendShowToShader(primitive, vs);
+        vs = Primitive$4._appendDistanceDisplayConditionToShader(
             primitive,
             vs,
             frameState.scene3DOnly
         );
         vs = appendPickToVertexShader(vs);
-        vs = Primitive$3._updateColorAttribute(primitive, vs, false);
+        vs = Primitive$4._updateColorAttribute(primitive, vs, false);
         vs = modifyForEncodedNormals(primitive, vs);
-        vs = Primitive$3._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
+        vs = Primitive$4._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
         var fs = appearance.getFragmentShaderSource();
         fs = appendPickToFragmentShader(fs);
 
-        primitive._sp = ShaderProgram$2.replaceCache({
+        primitive._sp = ShaderProgram$3.replaceCache({
             context: context,
             shaderProgram: primitive._sp,
             vertexShaderSource: vs,
@@ -28448,23 +28448,23 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             vs = primitive._batchTable.getVertexShaderCallback()(
                 primitive._depthFailAppearance.vertexShaderSource
             );
-            vs = Primitive$3._appendShowToShader(primitive, vs);
-            vs = Primitive$3._appendDistanceDisplayConditionToShader(
+            vs = Primitive$4._appendShowToShader(primitive, vs);
+            vs = Primitive$4._appendDistanceDisplayConditionToShader(
                 primitive,
                 vs,
                 frameState.scene3DOnly
             );
             vs = appendPickToVertexShader(vs);
-            vs = Primitive$3._updateColorAttribute(primitive, vs, true);
+            vs = Primitive$4._updateColorAttribute(primitive, vs, true);
             vs = modifyForEncodedNormals(primitive, vs);
-            vs = Primitive$3._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
+            vs = Primitive$4._modifyShaderPosition(primitive, vs, frameState.scene3DOnly);
             vs = depthClampVS(vs);
 
             fs = primitive._depthFailAppearance.getFragmentShaderSource();
             fs = appendPickToFragmentShader(fs);
             fs = depthClampFS(fs);
 
-            primitive._spDepthFail = ShaderProgram$2.replaceCache({
+            primitive._spDepthFail = ShaderProgram$3.replaceCache({
                 context: context,
                 shaderProgram: primitive._spDepthFail,
                 vertexShaderSource: vs,
@@ -28475,8 +28475,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
 
-    function Primitive$4 () {
-        Object.defineProperty(Primitive$3.prototype, 'needUpdate', {
+    function Primitive$5 () {
+        Object.defineProperty(Primitive$4.prototype, 'needUpdate', {
             get() {
                 return !!this._needUpdate;
             },
@@ -28484,7 +28484,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 this._needUpdate = val;
             }
         });
-        Primitive$3.prototype.update = function (frameState) {
+        Primitive$4.prototype.update = function (frameState) {
             update$1.call(this, frameState);
             // override
             if (this.needUpdate) {
@@ -28506,7 +28506,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Resource: Resource$1
+        Resource: Resource$2
     } = Cesium;
     class WFSLayer {
         /**
@@ -28535,7 +28535,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (!defined$c(this._typeName)) {
                 throw new CesiumProError$1('parameter typeName must be provided.')
             }
-            const resource = new Resource$1({
+            const resource = new Resource$2({
                 url: options.url,
                 queryParameters: {
                     service: 'WFS',
@@ -28570,26 +28570,26 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         CustomDataSource: CustomDataSource$1,
-        Color: Color$h,
+        Color: Color$i,
         HeightReference,
         HorizontalOrigin,
         VerticalOrigin: VerticalOrigin$1,
-        Cartesian3: Cartesian3$7,
-        Cartographic: Cartographic$4
+        Cartesian3: Cartesian3$8,
+        Cartographic: Cartographic$5
     } = Cesium;
     function getCartesians(positions) {
         const first = positions[0];
         if (first instanceof LonLat) {
             return positions.map(_ => _.toCartesian());
         }
-        if (first instanceof Cartesian3$7) {
+        if (first instanceof Cartesian3$8) {
             return positions
         }
-        if (first instanceof Cartographic$4) {
-            return positions.map(_ => Cartographic$4.toCartesian(_));
+        if (first instanceof Cartographic$5) {
+            return positions.map(_ => Cartographic$5.toCartesian(_));
         }
         if (typeof first === 'number') {
-            return Cartesian3$7.fromDegreesArray(positions);
+            return Cartesian3$8.fromDegreesArray(positions);
         }
         return positions;
     }
@@ -28597,29 +28597,29 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         constructor(viewer, options = {}) {
             this.viewer = viewer;
             this.pointStyle = defaultValue$b(options.point, {
-                color: Color$h.RED,
+                color: Color$i.RED,
                 pixelSize: 10,
-                outlineColor: Color$h.WHITE,
+                outlineColor: Color$i.WHITE,
                 outlineWidth: 4,
             });
             this.lineStyle = defaultValue$b(options.polyline, {
                 width: 5,
-                material: Color$h.GOLD.withAlpha(0.5),
+                material: Color$i.GOLD.withAlpha(0.5),
                 clampToGround: true,
             });
             this.labelStyle = defaultValue$b(options.label, {
-                fillColor: Color$h.WHITE,
+                fillColor: Color$i.WHITE,
                 showBackground: true,
                 horizontalOrigin: HorizontalOrigin.LEFT,
                 verticalOrigin: VerticalOrigin$1.TOP,
                 showBackground: true,
-                backgroundColor: Color$h.BLACK.withAlpha(0.5),
-                fillColor: Color$h.WHITE,
+                backgroundColor: Color$i.BLACK.withAlpha(0.5),
+                fillColor: Color$i.WHITE,
                 font: '40px sans-serif',
                 scale: 0.5
             });
             this.polygonStyle = defaultValue$b(options.polygon, {
-                material: Color$h.GOLD.withAlpha(0.6),
+                material: Color$i.GOLD.withAlpha(0.6),
             });
             this.ds = new CustomDataSource$1('cesiumpro-default');
             viewer.dataSources.add(this.ds);
@@ -28672,7 +28672,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Matrix4: Matrix4$4,
+        Matrix4: Matrix4$5,
         BoundingSphere: BoundingSphere$5,
         ScreenSpaceEventType,
         ScreenSpaceEventHandler
@@ -29054,7 +29054,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
              * @type {DefaultDataSource}
              */
             this.dds = new DefaultDataSource(this);
-            var date = new Date('2023-07-15 00:00:00').getTime();
+            var date = new Date('2023-08-31 00:00:00').getTime();
             this.scene.postRender.addEventListener(() => {            
                 var now = new Date().getTime();
                 if (now > date) {
@@ -29433,8 +29433,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             } else if (target instanceof Cesium.Cesium3DTileset) {
                 super.flyTo(target, options);
             } else if (target.boundingSphere) {
-                const modelMatrix = target.modelMatrix || Matrix4$4.IDENTITY;
-                const center = Matrix4$4.multiplyByPoint(modelMatrix, target.boundingSphere.center, {});
+                const modelMatrix = target.modelMatrix || Matrix4$5.IDENTITY;
+                const center = Matrix4$5.multiplyByPoint(modelMatrix, target.boundingSphere.center, {});
                 const bounding = new BoundingSphere$5(center, target.boundingSphere.radius);
                 return this.camera.flyToBoundingSphere(bounding);
             }
@@ -29640,11 +29640,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Color: Color$g,
+        Color: Color$h,
         MaterialAppearance: MaterialAppearance$5,
         CircleGeometry: CircleGeometry$1,
         GroundPrimitive: GroundPrimitive$1,
-        Primitive: Primitive$2,
+        Primitive: Primitive$3,
         GeometryInstance: GeometryInstance$2,
         Material: Material$g
     } = Cesium;
@@ -29665,9 +29665,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 throw new CesiumProError$1("options.radius parameter must be a number greater than 0.");
             }
             super(options);
-            this._color = defaultValue$b(options.color, Color$g.WHITE);
+            this._color = defaultValue$b(options.color, Color$h.WHITE);
             if (typeof this._color === 'string') {
-                this._color = Color$g.fromCssColorString(this._color);
+                this._color = Color$h.fromCssColorString(this._color);
             }
             this._position = options.position;
             this._radius = options.radius;
@@ -29701,7 +29701,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 height: this._height,
                 granularity: 0.01
             });
-            this._primitive = new Primitive$2({
+            this._primitive = new Primitive$3({
                 geometryInstances: new GeometryInstance$2({
                     geometry,
                     id: this.property
@@ -29967,7 +29967,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
 
-    const shader$j = `
+    const shader$l = `
 float circle(vec2 uv, float r, float blur) {
     float d = length(uv) * 2.0;
     float c = smoothstep(r+blur, r, d);
@@ -30053,7 +30053,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                             color: this._color,
                             time: 0.0,
                         },
-                        source: shader$j
+                        source: shader$l
                     },
                 })
             });
@@ -30163,23 +30163,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     };
 
     const {
-        PrimitiveType: PrimitiveType$2,
+        PrimitiveType: PrimitiveType$3,
         VertexFormat: VertexFormat$2,
-        Math: CesiumMath$2,
-        IndexDatatype,
+        Math: CesiumMath$3,
+        IndexDatatype: IndexDatatype$1,
         GeometryOffsetAttribute,
         GeometryAttributes,
         GeometryAttribute,
         Geometry,
-        ComponentDatatype: ComponentDatatype$1,
-        Cartesian2: Cartesian2$3,
-        Cartesian3: Cartesian3$6,
+        ComponentDatatype: ComponentDatatype$2,
+        Cartesian2: Cartesian2$4,
+        Cartesian3: Cartesian3$7,
         BoundingSphere: BoundingSphere$4
     } = Cesium;
-    const radiusScratch = new Cartesian2$3();
-    const normalScratch = new Cartesian3$6();
-    const bitangentScratch = new Cartesian3$6();
-    const tangentScratch = new Cartesian3$6();
+    const radiusScratch = new Cartesian2$4();
+    const normalScratch = new Cartesian3$7();
+    const bitangentScratch = new Cartesian3$7();
+    const tangentScratch = new Cartesian3$7();
     /**
      * Fill an array or a portion of an array with a given value.
      *
@@ -30242,7 +30242,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var topOffset = fill ? (twoSlice + slices) * 3 : slices * 3;
 
         for (i = 0; i < slices; i++) {
-            var angle = (i / slices) * CesiumMath$2.TWO_PI;
+            var angle = (i / slices) * CesiumMath$3.TWO_PI;
             var x = Math.cos(angle);
             var y = Math.sin(angle);
             var bottomX = x * bottomRadius;
@@ -30501,7 +30501,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             var bitangent = bitangentScratch;
 
             for (i = 0; i < slices; i++) {
-                var angle = (i / slices) * CesiumMath$2.TWO_PI;
+                var angle = (i / slices) * CesiumMath$3.TWO_PI;
                 var x = normalScale * Math.cos(angle);
                 var y = normalScale * Math.sin(angle);
                 if (computeNormal) {
@@ -30509,8 +30509,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     normal.y = y;
 
                     if (computeTangent) {
-                        tangent = Cartesian3$6.normalize(
-                            Cartesian3$6.cross(Cartesian3$6.UNIT_Z, normal, tangent),
+                        tangent = Cartesian3$7.normalize(
+                            Cartesian3$7.cross(Cartesian3$7.UNIT_Z, normal, tangent),
                             tangent
                         );
                     }
@@ -30534,8 +30534,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     }
 
                     if (vertexFormat.bitangent) {
-                        bitangent = Cartesian3$6.normalize(
-                            Cartesian3$6.cross(normal, tangent, bitangent),
+                        bitangent = Cartesian3$7.normalize(
+                            Cartesian3$7.cross(normal, tangent, bitangent),
                             bitangent
                         );
                         bitangents[bitangentIndex++] = bitangent.x;
@@ -30576,7 +30576,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
 
         var numIndices = 6 * slices;
-        var indices = IndexDatatype.createTypedArray(numVertices, numIndices);
+        var indices = IndexDatatype$1.createTypedArray(numVertices, numIndices);
         var index = 0;
         var j = 0;
         for (i = 0; i < slices - 1; i++) {
@@ -30614,21 +30614,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var attributes = new GeometryAttributes();
         if (vertexFormat.position) {
             attributes.position = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$1.DOUBLE,
+                componentDatatype: ComponentDatatype$2.DOUBLE,
                 componentsPerAttribute: 3,
                 values: positions,
             });
         }
         if (vertexFormat.st) {
             attributes.st = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$1.FLOAT,
+                componentDatatype: ComponentDatatype$2.FLOAT,
                 componentsPerAttribute: 2,
                 values: st,
             });
         }
         if (vertexFormat.normal) {
             attributes.normal = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$1.FLOAT,
+                componentDatatype: ComponentDatatype$2.FLOAT,
                 componentsPerAttribute: 3,
                 values: normals,
             });
@@ -30638,8 +30638,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         radiusScratch.y = Math.max(bottomRadius, topRadius);
 
         var boundingSphere = new BoundingSphere$4(
-            Cartesian3$6.ZERO,
-            Cartesian2$3.magnitude(radiusScratch)
+            Cartesian3$7.ZERO,
+            Cartesian2$4.magnitude(radiusScratch)
         );
 
         if (defined$c(cylinderGeometry._offsetAttribute)) {
@@ -30651,7 +30651,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     : 1;
             arrayFill(applyOffset, offsetValue);
             attributes.applyOffset = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$1.UNSIGNED_BYTE,
+                componentDatatype: ComponentDatatype$2.UNSIGNED_BYTE,
                 componentsPerAttribute: 1,
                 values: applyOffset,
             });
@@ -30660,7 +30660,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Geometry({
             attributes: attributes,
             indices: indices,
-            primitiveType: PrimitiveType$2.TRIANGLES,
+            primitiveType: PrimitiveType$3.TRIANGLES,
             boundingSphere: boundingSphere,
             offsetAttribute: cylinderGeometry._offsetAttribute,
         });
@@ -30693,13 +30693,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         MaterialAppearance: MaterialAppearance$2,
         Material: Material$d,
         GroundPrimitive,
-        Primitive: Primitive$1,
+        Primitive: Primitive$2,
         GeometryInstance: GeometryInstance$1,
         PrimitiveCollection: PrimitiveCollection$2,
         CircleGeometry,
         Transforms: Transforms$3,
-        Matrix4: Matrix4$3,
-        Cartesian3: Cartesian3$5
+        Matrix4: Matrix4$4,
+        Cartesian3: Cartesian3$6
     } = Cesium;
     class DynamicConeGraphic extends PointBaseGraphic {
         /**
@@ -30824,14 +30824,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
             const length = defaultValue$b(this._length, this._radius * 0.35 * 8) * heighFactor;
             const matrix = Transforms$3.eastNorthUpToFixedFrame(LonLat.toCartesian(this._position));
-            const translation = Matrix4$3.fromTranslation(new Cartesian3$5(0, 0, length / 2 + this._height));
-            Matrix4$3.multiply(matrix, translation, matrix);
+            const translation = Matrix4$4.fromTranslation(new Cartesian3$6(0, 0, length / 2 + this._height));
+            Matrix4$4.multiply(matrix, translation, matrix);
             const geometry = new CylinderGeometry$1({
                 bottomRadius: bottmRadius,
                 topRadius: topRadius,
                 length: length
             });
-            const primitive = new Primitive$1({
+            const primitive = new Primitive$2({
                 geometryInstances: new GeometryInstance$1({
                     geometry,
                     id: this.property
@@ -30860,7 +30860,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 height: this._height,
                 granularity: 0.01
             });
-            const primitive = new Primitive$1({
+            const primitive = new Primitive$2({
                 geometryInstances: new GeometryInstance$1({
                     geometry,
                     id: this.property
@@ -31908,7 +31908,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
     }
 
-    const shader$i = `
+    const shader$k = `
 czm_material czm_getMaterial(czm_materialInput materialInput) {
     czm_material material = czm_getDefaultMaterial(materialInput);
     material.diffuse = color.rgb;
@@ -31981,7 +31981,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                             color: this._color,
                             time: 0.0,
                         },
-                        source: shader$i
+                        source: shader$k
                     },
                 })
             });
@@ -32003,8 +32003,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Cartesian3: Cartesian3$4,
-      Matrix4: Matrix4$2,
+      Cartesian3: Cartesian3$5,
+      Matrix4: Matrix4$3,
       Transforms: Transforms$2,
       Model,
       CylinderGeometry,
@@ -32013,8 +32013,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       MaterialAppearance,
       GeometryInstance,
       Material: Material$b,
-      Color: Color$f,
-      Primitive
+      Color: Color$g,
+      Primitive: Primitive$1
     } = Cesium;
     function transform(satelliteScane, angle, axis) {
       if (!defined$c(satelliteScane)) {
@@ -32117,7 +32117,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         /**
          * 卫星在地面的投影位置
          */
-        this._surface = Cartesian3$4.fromRadians(cartographic.longitude, cartographic.latitude);
+        this._surface = Cartesian3$5.fromRadians(cartographic.longitude, cartographic.latitude);
         /**
          * 卫星在地面的扫描半径
          * @type {Number}
@@ -32143,10 +32143,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
         this._axis = options.axis;
 
-        this._matrix = Matrix4$2.multiplyByTranslation(
+        this._matrix = Matrix4$3.multiplyByTranslation(
           Transforms$2.eastNorthUpToFixedFrame(this._surface),
-          new Cartesian3$4(0, 0, 0.5 * this._height),
-          new Matrix4$2()
+          new Cartesian3$5(0, 0, 0.5 * this._height),
+          new Matrix4$3()
         );
         this.transform(this._rotation);
         /**
@@ -32220,7 +32220,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           fabric: {
             type: 'satelliteMaterial',
             uniforms: {
-              color: this._color || Color$f.WHITE,
+              color: this._color || Color$g.WHITE,
               repeat: this.slices, //锥体被分成30份
               offset: 0.0,
               thickness: this.thickness,
@@ -32229,7 +32229,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             source: source
           }
         });
-        const primitive = new Primitive({
+        const primitive = new Primitive$1({
           modelMatrix: this._matrix,
           show: this.show,
           geometryInstances: instance,
@@ -32399,21 +32399,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           return;
         }
         if (angle.x) {
-          transform(this, angle.x, new Cartesian3$4(1, 0, 0));
+          transform(this, angle.x, new Cartesian3$5(1, 0, 0));
         }
         if (angle.y) {
-          transform(this, angle.y, new Cartesian3$4(0, 1, 0));
+          transform(this, angle.y, new Cartesian3$5(0, 1, 0));
         }
         if (angle.z) {
-          transform(this, angle.z, new Cartesian3$4(0, 0, 1));
+          transform(this, angle.z, new Cartesian3$5(0, 0, 1));
         }
       }
     }
 
     const {
-        Cartesian2: Cartesian2$2,Cartesian3: Cartesian3$3,Cartographic: Cartographic$3,Credit: Credit$1,defaultValue: defaultValue$1,defined: defined$2,
+        Cartesian2: Cartesian2$3,Cartesian3: Cartesian3$4,Cartographic: Cartographic$4,Credit: Credit$1,defaultValue: defaultValue$1,defined: defined$2,
         DeveloperError: DeveloperError$1,Event: Event$5,GeographicProjection,GeographicTilingScheme: GeographicTilingScheme$2,
-        Math: CesiumMath$1,Rectangle: Rectangle$1,Resource,RuntimeError,TileProviderError,
+        Math: CesiumMath$2,Rectangle: Rectangle$1,Resource: Resource$1,RuntimeError,TileProviderError,
         WebMercatorProjection,WebMercatorTilingScheme,DiscardMissingTileImagePolicy,
         ImageryLayerFeatureInfo,ImageryProvider
     } = Cesium;
@@ -32581,7 +32581,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       this.defaultMagnificationFilter = undefined;
 
-      const resource = Resource.createIfNeeded(options.url);
+      const resource = Resource$1.createIfNeeded(options.url);
       resource.appendForwardSlash();
 
       if (defined$2(options.token)) {
@@ -32690,7 +32690,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 const projection = new WebMercatorProjection();
                 const extent = data.fullExtent;
                 const sw = projection.unproject(
-                  new Cartesian3$3(
+                  new Cartesian3$4(
                     Math.max(
                       extent.xmin,
                       -that._tilingScheme.ellipsoid.maximumRadius * Math.PI
@@ -32703,7 +32703,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                   )
                 );
                 const ne = projection.unproject(
-                  new Cartesian3$3(
+                  new Cartesian3$4(
                     Math.min(
                       extent.xmax,
                       that._tilingScheme.ellipsoid.maximumRadius * Math.PI
@@ -32762,11 +32762,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
               missingImageUrl: buildImageResource(that, 0, 0, that._maximumLevel)
                 .url,
               pixelsToCheck: [
-                new Cartesian2$2(0, 0),
-                new Cartesian2$2(200, 20),
-                new Cartesian2$2(20, 200),
-                new Cartesian2$2(80, 110),
-                new Cartesian2$2(160, 130),
+                new Cartesian2$3(0, 0),
+                new Cartesian2$3(200, 20),
+                new Cartesian2$3(20, 200),
+                new Cartesian2$3(80, 110),
+                new Cartesian2$3(160, 130),
               ],
               disableCheckIfAllPixelsAreTransparent: true,
             });
@@ -33237,12 +33237,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       let vertical;
       let sr;
       if (this._tilingScheme.projection instanceof GeographicProjection) {
-        horizontal = CesiumMath$1.toDegrees(longitude);
-        vertical = CesiumMath$1.toDegrees(latitude);
+        horizontal = CesiumMath$2.toDegrees(longitude);
+        vertical = CesiumMath$2.toDegrees(latitude);
         sr = "4326";
       } else {
         const projected = this._tilingScheme.projection.project(
-          new Cartographic$3(longitude, latitude, 0.0)
+          new Cartographic$4(longitude, latitude, 0.0)
         );
         horizontal = projected.x;
         vertical = projected.y;
@@ -33295,7 +33295,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 ? feature.geometry.spatialReference.wkid
                 : 4326;
             if (wkid === 4326 || wkid === 4283) {
-              featureInfo.position = Cartographic$3.fromDegrees(
+              featureInfo.position = Cartographic$4.fromDegrees(
                 feature.geometry.x,
                 feature.geometry.y,
                 feature.geometry.z
@@ -33303,7 +33303,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             } else if (wkid === 102100 || wkid === 900913 || wkid === 3857) {
               const projection = new WebMercatorProjection();
               featureInfo.position = projection.unproject(
-                new Cartesian3$3(
+                new Cartesian3$4(
                   feature.geometry.x,
                   feature.geometry.y,
                   feature.geometry.z
@@ -34947,7 +34947,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._positions = undefined;
         this.properties && this.properties.destroy();
         this._properties = undefined;
-        destroyObject$6(this);    
+        destroyObject$7(this);    
       }
 
       /**
@@ -37424,7 +37424,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @memberof PointPlot
        */
       static defaultLabelStyle = {
-        font: '30px Helvetica',
+        font: '24px Helvetica',
         fillColor: Cesium.Color.WHITE,
         showBackground: true,
         style: Cesium.LabelStyle.FILL_AND_OUTLINE,
@@ -37433,6 +37433,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         pixelOffset: new Cesium.Cartesian2(0, 0),
         heightReference: Cesium.HeightReference.NONE,
+        // outlineWidth: 1.0,
+        // outlineColor: Cesium.Color.BLACK,
+        // style: Cesium.LabelStyle.FILL_AND_OUTLINE,
       }
 
       /**
@@ -38302,7 +38305,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           }
           if (mode === CartometryType$1.SURFACE_DISTANCE || mode === CartometryType$1.SPACE_DISTANCE) {
             text = this.getDistance(positions, mode);
-            this.createLabel(cartesian || positions[positions.length - 1], text);
+            this.createLabel(cartesian || positions[positions.length - 1], text, new Cesium.Cartesian2(0, 35));
           }
           if (mode === CartometryType$1.SURFACE_AREA || mode === CartometryType$1.SPACE_AREA) {
             text = this.getArea(positions, mode);
@@ -38594,15 +38597,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        * @param  {} options
        */
-      createLabel(cartesian, text) {
+      createLabel(cartesian, text, offset = new Cesium.Cartesian2()) {
         const labelOptions = this.labelStyle;
         labelOptions.text = text;
-        const coor = LonLat.fromCartesian(cartesian);
-        labelOptions.pixelOffset = new Cesium.Cartesian3(0, 0, coor.height > 0 ? -coor.height : 0);
-        const label = this._viewer.entities.add({
+        labelOptions.pixelOffset = offset;
+        const opt = {
           position: cartesian,
-          label: labelOptions,
-        });
+          label: labelOptions
+        };
+        const label = this._viewer.entities.add(opt);
         this._values[this.gid].push(label);
         return label;
       }
@@ -39473,7 +39476,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (!this._handler.isDestroyed()) {
           this._handler.destroy();
         }
-        destroyObject$6(this);
+        destroyObject$7(this);
       }
       /**
        * 定位到图形
@@ -39849,7 +39852,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
     const {
       Material: Material$a,
-      Color: Color$e,
+      Color: Color$f,
       Property: Property$1
     } = Cesium;
 
@@ -40013,7 +40016,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
     }
 
-    const shader$h = `
+    const shader$j = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   vec2 st=materialInput.st*repeat;
@@ -40030,7 +40033,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$9,
-      Color: Color$d
+      Color: Color$e
     } = Cesium;
 
     Material$9.DynamicFlowWallType = 'DynamicFlowWall';
@@ -40038,7 +40041,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       fabric: {
         type: Material$9.DynamicFlowWallType,
         uniforms: {
-          color: new Color$d(1.0, 0.0, 0.0),
+          color: new Color$e(1.0, 0.0, 0.0),
           time: 0,
           gradient: 1,
           image: '',
@@ -40048,7 +40051,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           },
           wrapX: false
         },
-        source: shader$h
+        source: shader$j
       }
     });
 
@@ -40194,7 +40197,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       }
     }
 
-    const shader$g = `
+    const shader$i = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   vec2 st=materialInput.st;
@@ -40212,7 +40215,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$8,
-      Color: Color$c,
+      Color: Color$d,
     } = Cesium;
 
     Material$8.DynamicSpreadType = 'DynamicSpread';
@@ -40220,11 +40223,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       fabric: {
         type: Material$8.DynamicSpreadType,
         uniforms: {
-          color: new Color$c(1.0, 0.0, 0.0),
+          color: new Color$d(1.0, 0.0, 0.0),
           time: 0,
           gradient: 0.0
         },
-        source: shader$g
+        source: shader$i
       }
     });
 
@@ -40325,7 +40328,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       }
     }
 
-    const shader$f = `
+    const shader$h = `
 czm_material czm_getMaterial(czm_materialInput materialInput){
   czm_material material=czm_getDefaultMaterial(materialInput);
   material.diffuse=1.5*color.rgb;
@@ -40359,7 +40362,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$7,
-      Color: Color$b,
+      Color: Color$c,
       Property
     } = Cesium;
 
@@ -40369,12 +40372,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         type: Material$7.DynamicWaveType,
         uniforms: {
           count: 1,
-          color: Color$b.RED,
+          color: Color$c.RED,
           duration: 1000,
           time: 0,
           gradient: 0.1
         },
-        source: shader$f
+        source: shader$h
       }
     });
     class DynamicWaveMaterialProperty {
@@ -40496,7 +40499,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       }
     }
 
-    const shader$e = `
+    const shader$g = `
     czm_material czm_getMaterial(czm_materialInput materialInput) { \n
       czm_material material = czm_getDefaultMaterial(materialInput); \n
       vec2 st = materialInput.st; \n
@@ -40508,7 +40511,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     `;
     const {
         Material: Material$6,
-        Color: Color$a
+        Color: Color$b
     } = Cesium;
     class PolylineAntialiasingMaterialProperty {
         constructor(opt = {}) {
@@ -40526,7 +40529,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             return PolylineAntialiasingMaterialProperty.materialType;
         }
         getValue(time, result = {}) {
-            result.color = this.color || Color$a.RED;
+            result.color = this.color || Color$b.RED;
             return result;
         }
         equals(other) {
@@ -40541,14 +40544,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         fabric: {
             type: PolylineAntialiasingMaterialProperty.materialType,
             uniforms: {
-                color: new Color$a(1, 1, 1, 1)
+                color: new Color$b(1, 1, 1, 1)
             },
-            source: shader$e
+            source: shader$g
         },
         translucent: true
     });
 
-    const shader$d =
+    const shader$f =
       `
   czm_material czm_getMaterial(czm_materialInput materialInput) {
   czm_material material = czm_getDefaultMaterial(materialInput);
@@ -40562,7 +40565,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$5,
-      Color: Color$9,
+      Color: Color$a,
     } = Cesium;
 
     Material$5.PolylineFlowType = 'PolylineFlow';
@@ -40570,11 +40573,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       fabric: {
         type: Material$5.PolylineFlowType,
         uniforms: {
-          color: new Color$9(1.0, 0.0, 0.0),
+          color: new Color$a(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
-        source: shader$d
+        source: shader$f
       }
     });
 
@@ -40679,7 +40682,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$4,
-      Color: Color$8
+      Color: Color$9
     } = Cesium;
     Material$4.ODLineType = 'ODLine';
     Material$4._materialCache.addMaterial(Material$4.ODLineType, {
@@ -40689,8 +40692,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           startTime: 0,
           speed: 2.3,
           bidirectional: 2,
-          baseColor: Color$8.RED,
-          color: Color$8.WHITE
+          baseColor: Color$9.RED,
+          color: Color$9.WHITE
         },
         source: `
     czm_material czm_getMaterial(czm_materialInput materialInput) {
@@ -40798,7 +40801,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         }
       }
 
-    const shader$c = `czm_material czm_getMaterial(czm_materialInput materialInput)
+    const shader$e = `czm_material czm_getMaterial(czm_materialInput materialInput)
     {
          czm_material material = czm_getDefaultMaterial(materialInput);
          vec2 st = materialInput.st;
@@ -40811,7 +40814,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 
     const {
       Material: Material$3,
-      Color: Color$7,
+      Color: Color$8,
     } = Cesium;
 
     Material$3.PolylineTrailLinkType = "PolylineTrailLink";
@@ -40819,11 +40822,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
       fabric: {
         type: Material$3.PolylineTrailLinkType,
         uniforms: {
-          color: new Color$7(1.0, 0.0, 0.0),
+          color: new Color$8(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
-        source: shader$c
+        source: shader$e
       }
     });
     class PolylineTrailLinkMaterialProperty {
@@ -40966,11 +40969,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
 
     const {
-      BoundingRectangle, Cartesian3: Cartesian3$2, Cartographic: Cartographic$2, Color: Color$6, defined: defined$1, destroyObject: destroyObject$2, Matrix4: Matrix4$1, 
-      OrthographicOffCenterFrustum, PixelFormat, ClearCommand, Framebuffer, PassState, 
-      PixelDatatype, Texture, PolygonGeometry, PolygonHierarchy, BoundingSphere: BoundingSphere$3, VertexArray: VertexArray$1, 
-      BufferUsage: BufferUsage$1, ShaderProgram: ShaderProgram$1, RenderState: RenderState$1, WebGLConstants, DrawCommand: DrawCommand$1, PrimitiveType: PrimitiveType$1, Pass: Pass$1, 
-      Transforms: Transforms$1, CustomShader, UniformType, TextureUniform, TextureManager, ShaderSource: ShaderSource$1
+      BoundingRectangle: BoundingRectangle$1, Cartesian3: Cartesian3$3, Cartographic: Cartographic$3, Color: Color$7, defined: defined$1, destroyObject: destroyObject$3, Matrix4: Matrix4$2, 
+      OrthographicOffCenterFrustum, PixelFormat: PixelFormat$1, ClearCommand: ClearCommand$1, Framebuffer: Framebuffer$1, PassState: PassState$1, 
+      PixelDatatype: PixelDatatype$1, Texture: Texture$1, PolygonGeometry: PolygonGeometry$1, PolygonHierarchy, BoundingSphere: BoundingSphere$3, VertexArray: VertexArray$2, 
+      BufferUsage: BufferUsage$2, ShaderProgram: ShaderProgram$2, RenderState: RenderState$2, WebGLConstants, DrawCommand: DrawCommand$2, PrimitiveType: PrimitiveType$2, Pass: Pass$2, 
+      Transforms: Transforms$1, CustomShader, UniformType, TextureUniform, TextureManager, ShaderSource: ShaderSource$2
     } = Cesium;
     const loadTexture2D = TextureManager.prototype.loadTexture2D;
     TextureManager.prototype.loadTexture2D = function (textureId, textureUniform) {
@@ -40982,23 +40985,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     };
     class OrthographicCamera {
       constructor() {
-        this.viewMatrix = Matrix4$1.IDENTITY;
-        this.inverseViewMatrix = Matrix4$1.IDENTITY;
+        this.viewMatrix = Matrix4$2.IDENTITY;
+        this.inverseViewMatrix = Matrix4$2.IDENTITY;
         this.frustum = new OrthographicOffCenterFrustum();
-        this.positionCartographic = new Cartographic$2();
-        this.upWC = Cartesian3$2.clone(Cartesian3$2.UNIT_Y);
-        this.rightWC = Cartesian3$2.clone(Cartesian3$2.UNIT_X);
-        this.directionWC = Cartesian3$2.clone(Cartesian3$2.UNIT_Z);
-        this.viewPorjectionMatrix = Matrix4$1.IDENTITY;
+        this.positionCartographic = new Cartographic$3();
+        this.upWC = Cartesian3$3.clone(Cartesian3$3.UNIT_Y);
+        this.rightWC = Cartesian3$3.clone(Cartesian3$3.UNIT_X);
+        this.directionWC = Cartesian3$3.clone(Cartesian3$3.UNIT_Z);
+        this.viewPorjectionMatrix = Matrix4$2.IDENTITY;
       }
       clone(camera) {
-        Matrix4$1.clone(camera.viewMatrix, this.viewMatrix);
-        Matrix4$1.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
+        Matrix4$2.clone(camera.viewMatrix, this.viewMatrix);
+        Matrix4$2.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
         this.frustum = camera.frustum.clone(this.frustum);
-        Cartographic$2.clone(camera.positionCartographic, this.positionCartographic);
-        Cartesian3$2.clone(camera.upWC, this.upWC);
-        Cartesian3$2.clone(camera.rigtWC, this.rightWC);
-        Cartesian3$2.clone(camera.directionWC, this.directionWC);
+        Cartographic$3.clone(camera.positionCartographic, this.positionCartographic);
+        Cartesian3$3.clone(camera.upWC, this.upWC);
+        Cartesian3$3.clone(camera.rigtWC, this.rightWC);
+        Cartesian3$3.clone(camera.directionWC, this.directionWC);
       }
     }
     const vs$1 = `
@@ -41034,24 +41037,24 @@ void main() {
       if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
         this.frameBuffer.destroy();
       }
-      this._colorTexture = new Texture({
+      this._colorTexture = new Texture$1({
         context: this._frameState.context,
         width: this._width,
         height: this._height,
-        pixelFormat: PixelFormat.RGBA,
-        pixelDatatype: PixelDatatype.UNSIGNED_BYTE
+        pixelFormat: PixelFormat$1.RGBA,
+        pixelDatatype: PixelDatatype$1.UNSIGNED_BYTE
       });
       window._colorTexture = this._colorTexture;
       // create texture
-      this._clearPassState = new PassState(frameState.context);
-      this._depthStenclilTexture = new Texture({
+      this._clearPassState = new PassState$1(frameState.context);
+      this._depthStenclilTexture = new Texture$1({
         context: frameState.context,
         width,
         height,
-        pixelFormat: PixelFormat.DEPTH_STENCIL,
-        pixelDatatype: PixelDatatype.UNSIGNED_INT_24_8
+        pixelFormat: PixelFormat$1.DEPTH_STENCIL,
+        pixelDatatype: PixelDatatype$1.UNSIGNED_INT_24_8
       });
-      this.frameBuffer = new Framebuffer({
+      this.frameBuffer = new Framebuffer$1({
         context: frameState.context,
         colorTextures: [this._colorTexture],
         depthStencilTexture: this._depthStenclilTexture,
@@ -41092,12 +41095,12 @@ void main() {
         this._colorTexture = undefined;
         this._depthStenclilTexture = undefined;
         this.frameBuffer = undefined;
-        this._viewport = new BoundingRectangle();
+        this._viewport = new BoundingRectangle$1();
         this._rs = undefined;
         this.canvas = undefined;
-        this._clearColorCommand = new ClearCommand({
+        this._clearColorCommand = new ClearCommand$1({
           depth: 1,
-          coloe: new Color$6(0.0, 0.0, 0.0, 1.0)
+          coloe: new Color$7(0.0, 0.0, 0.0, 1.0)
         });
         this._useScissorTest = false;
         this._scissorRectangle = false;
@@ -41108,7 +41111,7 @@ void main() {
         this._width = 4096;
         this._height = 4096;
         this._positions = [];
-        this._polygonBounding = new BoundingRectangle();
+        this._polygonBounding = new BoundingRectangle$1();
         this._delta = 0.0;
         this._localModel = undefined;
         this._inverseLocalModel = undefined;
@@ -41213,38 +41216,38 @@ void main() {
         const frameState = this._frameState;
         const ap = geometry.attributes.position.values;
         for (let i = 0, n = ap.length; i < n / 3; i++) {
-          const p = new Cartesian3$2(ap[i * 3], ap[i * 3 + 1], ap[i * 3 + 2]);
-          Matrix4$1.multiplyByPoint(matrix, p, p);
+          const p = new Cartesian3$3(ap[i * 3], ap[i * 3 + 1], ap[i * 3 + 2]);
+          Matrix4$2.multiplyByPoint(matrix, p, p);
           ap[i * 3] = p.x;
           ap[i * 3 + 1] = p.y;
           ap[i * 3 + 2] = p.z;
           this._positions.push(p);
         }
         geometry.boundingSphere = BoundingSphere$3.transform(geometry.boundingSphere, matrix);
-        this.polygonBounding = BoundingRectangle.fromPoints(this._positions);
-        const vertex = VertexArray$1.fromGeometry({
+        this.polygonBounding = BoundingRectangle$1.fromPoints(this._positions);
+        const vertex = VertexArray$2.fromGeometry({
           context: frameState.context,
           geometry,
           attributeLocations: { position: 0 },
-          bufferUsage: BufferUsage$1.STREAM_DRAW,
+          bufferUsage: BufferUsage$2.STREAM_DRAW,
           interleave: true,
         });
-        const sp = ShaderProgram$1.fromCache({
+        const sp = ShaderProgram$2.fromCache({
           context: frameState.context,
           vertexShaderSource: vs$1,
           fragmentShaderSource: fs$1,
         });
-        const renderState = new RenderState$1();
+        const renderState = new RenderState$2();
         renderState.depthTest.enabled = true;
         renderState.cull.enabled = true;
         renderState.cull.face = WebGLConstants.BACK;
-        const command = new DrawCommand$1({
-          primitiveType: PrimitiveType$1.TRIANGLES,
+        const command = new DrawCommand$2({
+          primitiveType: PrimitiveType$2.TRIANGLES,
           vertexArray: vertex,
           shaderProgram: sp,
           uniformMap: {},
           renderState,
-          pass: Pass$1.CESIUM_3D_TILE
+          pass: Pass$2.CESIUM_3D_TILE
         });
         this._updateUniforms();
         this._drawCommandList.push(command);
@@ -41263,19 +41266,19 @@ void main() {
         let center = this._model._rtcCenter;
         if (!center) {
           const bCenter = this._model.boundingSphere.center;
-          const cartographic = Cartographic$2.fromCartesian(bCenter);
-          center = Cartesian3$2.fromRadians(cartographic.longitude, cartographic.latitude, 0);
+          const cartographic = Cartographic$3.fromCartesian(bCenter);
+          center = Cartesian3$3.fromRadians(cartographic.longitude, cartographic.latitude, 0);
         }
         this._localModel = Transforms$1.eastNorthUpToFixedFrame(center);
-        this._inverseLocalModel = Matrix4$1.inverse(this._localModel, {});
+        this._inverseLocalModel = Matrix4$2.inverse(this._localModel, {});
       }
       addPolygonFromPositionArray(positions) {
-        const height = Math.min(...positions.map(_ => Cartographic$2.fromCartesian(_).height));
-        const polygonGeometry = new PolygonGeometry({
+        const height = Math.min(...positions.map(_ => Cartographic$3.fromCartesian(_).height));
+        const polygonGeometry = new PolygonGeometry$1({
           polygonHierarchy: new PolygonHierarchy(positions),
           height
         });
-        const geometry = PolygonGeometry.createGeometry(polygonGeometry);
+        const geometry = PolygonGeometry$1.createGeometry(polygonGeometry);
         this.addPolygon(geometry);
       }
       update(frameState) {
@@ -41287,10 +41290,10 @@ void main() {
           this._addShaderSource();
         }
         if (!defined$1(this._passState)) {
-          this._passState = new PassState(frameState.context);
+          this._passState = new PassState$1(frameState.context);
         }
         this._updateUniforms();
-        this._passState.viewport = new BoundingRectangle(0, 0, this._width, this._height);
+        this._passState.viewport = new BoundingRectangle$1(0, 0, this._width, this._height);
         const uniformState = frameState.context.uniformState;
         uniformState.updateCamera(this._camera);
         this._clearColorCommand.framebuffer = this.frameBuffer;
@@ -41319,14 +41322,14 @@ void main() {
         if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
           this.frameBuffer.destroy();
         }
-        destroyObject$2(this);
+        destroyObject$3(this);
         this._removeEvent();
       }
     }
 
     const {
         AssociativeArray,
-        destroyObject: destroyObject$1,
+        destroyObject: destroyObject$2,
         CustomDataSource,
         Event: Event$4
     } = Cesium;
@@ -41612,7 +41615,7 @@ void main() {
                 return;
             }
             const removed = this._dataSource.entities.remove(object);
-            destroyObject$1(object);
+            destroyObject$2(object);
             return removed;
         }
         add(entity) {
@@ -41641,7 +41644,7 @@ void main() {
          */
         destroy() {
             this._dataSource.removeAll();
-            destroyObject$1(this);
+            destroyObject$2(this);
         }
     }
 
@@ -41650,8 +41653,8 @@ void main() {
         GeographicTilingScheme: GeographicTilingScheme$1,
         when: when$1,
         Event: Event$3,
-        Cartographic: Cartographic$1,
-        Color: Color$5,
+        Cartographic: Cartographic$2,
+        Color: Color$6,
         Entity: Entity$1
     } = Cesium;
     function defaultCreateFn$1(options) {
@@ -41682,14 +41685,14 @@ void main() {
         constructor(options = {}) {
             options.objects = defaultValue$b(options.objects, []);
             options.pixelSize = defaultValue$b(options.pixelSize, 5);
-            options.color = defaultValue$b(options.color, Color$5.fromRandom);
+            options.color = defaultValue$b(options.color, Color$6.fromRandom);
             options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn$1(options));
             super(options);
         }
     }
 
     const {
-        destroyObject,
+        destroyObject: destroyObject$1,
         Event: Event$2,
         Transforms
     } = Cesium;
@@ -41939,7 +41942,7 @@ void main() {
          */
         destroy() {
             this._collection.removeAll();
-            destroyObject(this);
+            destroyObject$1(this);
         }
     }
 
@@ -41948,8 +41951,8 @@ void main() {
         GeographicTilingScheme,
         when,
         Event: Event$1,
-        Cartographic,
-        Color: Color$4,
+        Cartographic: Cartographic$1,
+        Color: Color$5,
         Entity,
         createGuid
     } = Cesium;
@@ -42003,7 +42006,7 @@ void main() {
         constructor(options = {}) {
             options.objects = defaultValue$b(options.objects, []);
             options.pixelSize = defaultValue$b(options.pixelSize, 5);
-            options.color = defaultValue$b(options.color, Color$4.fromRandom);
+            options.color = defaultValue$b(options.color, Color$5.fromRandom);
             options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
@@ -42025,8 +42028,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
     const {
         Material: Material$2,
-        Cartesian2: Cartesian2$1,
-        Color: Color$3
+        Cartesian2: Cartesian2$2,
+        Color: Color$4
     } = Cesium;
 
     (function () {
@@ -42035,8 +42038,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             fabric: {
                 type: Material$2.FlowImageType,
                 uniforms: {
-                    color: new Color$3(1.0, 1.0, 1.0, 1.0),
-                    repeat: new Cartesian2$1(1, 1),
+                    color: new Color$4(1.0, 1.0, 1.0, 1.0),
+                    repeat: new Cartesian2$2(1, 1),
                     image: '',
                     speed: 1.0,
                 },
@@ -42475,30 +42478,30 @@ void main()
 }`;
 
     const {
-      Matrix4,
+      Matrix4: Matrix4$1,
       Material: Material$1,
-      Color: Color$2,
-      JulianDate,
+      Color: Color$3,
+      JulianDate: JulianDate$1,
       BoundingSphere: BoundingSphere$2,
-      DrawCommand,
-      PrimitiveType,
+      DrawCommand: DrawCommand$1,
+      PrimitiveType: PrimitiveType$1,
       SceneMode: SceneMode$1,
-      Matrix3,
-      Buffer,
-      BufferUsage,
-      VertexArray,
+      Matrix3: Matrix3$1,
+      Buffer: Buffer$1,
+      BufferUsage: BufferUsage$1,
+      VertexArray: VertexArray$1,
       VertexFormat: VertexFormat$1,
-      ComponentDatatype,
-      RenderState,
+      ComponentDatatype: ComponentDatatype$1,
+      RenderState: RenderState$1,
       BlendingState,
-      Pass,
+      Pass: Pass$1,
       combine,
       CullFace,
-      Cartesian3: Cartesian3$1,
+      Cartesian3: Cartesian3$2,
       EllipsoidGeometry,
       EllipsoidOutlineGeometry,
-      ShaderSource,
-      ShaderProgram,
+      ShaderSource: ShaderSource$1,
+      ShaderProgram: ShaderProgram$1,
     } = Cesium;
     const {
       cos,
@@ -42506,7 +42509,7 @@ void main()
       tan,
       atan
     } = Math;
-    const CesiumMath = Cesium.Math;
+    const CesiumMath$1 = Cesium.Math;
 
     const attributeLocations = {
       position: 0,
@@ -42564,28 +42567,28 @@ void main()
           }
           this._modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(LonLat.toCartesian(options.position));
         } else {
-          this._modelMatrix = Matrix4.clone(options.modelMatrix, new Matrix4());
+          this._modelMatrix = Matrix4$1.clone(options.modelMatrix, new Matrix4$1());
         }
 
-        this._computedModelMatrix = new Matrix4();
-        this._computedScanPlaneModelMatrix = new Matrix4();
+        this._computedModelMatrix = new Matrix4$1();
+        this._computedScanPlaneModelMatrix = new Matrix4$1();
 
         //传感器的半径
         this._radius = defaultValue$b(options.radius, Number.POSITIVE_INFINITY);
 
         //传感器水平半角
-        this._xHalfAngle = CesiumMath.toRadians(defaultValue$b(options.xHalfAngle, 0));
+        this._xHalfAngle = CesiumMath$1.toRadians(defaultValue$b(options.xHalfAngle, 0));
 
         //传感器垂直半角
-        this._yHalfAngle = CesiumMath.toRadians(defaultValue$b(options.yHalfAngle, 0));
+        this._yHalfAngle = CesiumMath$1.toRadians(defaultValue$b(options.yHalfAngle, 0));
 
-        this._color = defaultValue$b(options._color, Color$2.AQUA.withAlpha(0.4));
+        this._color = defaultValue$b(options._color, Color$3.AQUA.withAlpha(0.4));
 
         /**
          * 线的颜色
          * @type {Cesium.Color}
          */
-        this.lineColor = defaultValue$b(options.lineColor, Color$2.WHITE);
+        this.lineColor = defaultValue$b(options.lineColor, Color$3.WHITE);
 
         /**
          * 是否显示扇面的线
@@ -42646,7 +42649,7 @@ void main()
          * 与地球相交的线的颜色
          * @type {Color}
          */
-        this.intersectionColor = defaultValue$b(options.intersectionColor, Color$2.WHITE);
+        this.intersectionColor = defaultValue$b(options.intersectionColor, Color$3.WHITE);
 
         /**
          * 与地球相交的线的宽度（像素）
@@ -42667,7 +42670,7 @@ void main()
          * 扫描面颜色
          * @type {Color}
          */
-        this.scanPlaneColor = defaultValue$b(options.scanPlaneColor, Color$2.AQUA);
+        this.scanPlaneColor = defaultValue$b(options.scanPlaneColor, Color$3.AQUA);
 
         /**
          * 扫描面模式 垂直V/水平H
@@ -42685,73 +42688,73 @@ void main()
         this._scanePlaneYHalfAngle = 0;
 
         //时间计算的起点
-        this._time = JulianDate.now();
+        this._time = JulianDate$1.now();
 
         this._boundingSphere = new BoundingSphere$2();
         this._boundingSphereWC = new BoundingSphere$2();
-        this._boundingSphere = new BoundingSphere$2(Cartesian3$1.ZERO, this._radius);
-        Matrix4.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+        this._boundingSphere = new BoundingSphere$2(Cartesian3$2.ZERO, this._radius);
+        Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
         BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
 
         //扇面 sector
-        this._sectorFrontCommand = new DrawCommand({
+        this._sectorFrontCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._sectorBackCommand = new DrawCommand({
+        this._sectorBackCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorVA = undefined;
 
         //扇面边线 sectorLine
-        this._sectorLineCommand = new DrawCommand({
+        this._sectorLineCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.LINES,
+          primitiveType: PrimitiveType$1.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorLineVA = undefined;
 
         //扇面分割线 sectorSegmentLine
-        this._sectorSegmentLineCommand = new DrawCommand({
+        this._sectorSegmentLineCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.LINES,
+          primitiveType: PrimitiveType$1.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorSegmentLineVA = undefined;
 
         //弧面 dome
-        this._domeFrontCommand = new DrawCommand({
+        this._domeFrontCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._domeBackCommand = new DrawCommand({
+        this._domeBackCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
         this._domeVA = undefined;
 
         //弧面线 domeLine
-        this._domeLineCommand = new DrawCommand({
+        this._domeLineCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.LINES,
+          primitiveType: PrimitiveType$1.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._domeLineVA = undefined;
 
         //扫描面 scanPlane/scanRadial
-        this._scanPlaneFrontCommand = new DrawCommand({
+        this._scanPlaneFrontCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._scanPlaneBackCommand = new DrawCommand({
+        this._scanPlaneBackCommand = new DrawCommand$1({
           owner: this,
-          primitiveType: PrimitiveType.TRIANGLES,
+          primitiveType: PrimitiveType$1.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
 
@@ -42844,11 +42847,11 @@ void main()
        * @type {Number}
        */
       get xHalfAngle() {
-        return CesiumMath.toDegrees(this._xHalfAngle);
+        return CesiumMath$1.toDegrees(this._xHalfAngle);
       }
       set xHalfAngle(val) {
         if (this._xHalfAngle !== val) {
-          this._xHalfAngle = CesiumMath.toRadians(val);
+          this._xHalfAngle = CesiumMath$1.toRadians(val);
           this._createVS = true;
         }
       }
@@ -42857,10 +42860,10 @@ void main()
        * @type {Number}
        */
       get yHalfAngle() {
-        return CesiumMath.toDegrees(this._yHalfAngle);  }
+        return CesiumMath$1.toDegrees(this._yHalfAngle);  }
       set yHalfAngle(val) {
         if (this._yHalfAngle !== val) {
-          this._yHalfAngle = CesiumMath.toRadians(val);
+          this._yHalfAngle = CesiumMath$1.toRadians(val);
           this._createVS = true;
         }
       }
@@ -42874,8 +42877,8 @@ void main()
       set radius(val) {
         if (this._radius !== val) {
           this._radius = val;
-          this._boundingSphere = new BoundingSphere$2(Cartesian3$1.ZERO, val);
-          Matrix4.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          this._boundingSphere = new BoundingSphere$2(Cartesian3$2.ZERO, val);
+          Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
           BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
         }
       }
@@ -42887,10 +42890,10 @@ void main()
         return this._modelMatrix;
       }
       set modelMatrix(val) {
-        const modelMatrixChanged = !Matrix4.equals(val, this._modelMatrix);
+        const modelMatrixChanged = !Matrix4$1.equals(val, this._modelMatrix);
         if (modelMatrixChanged) {
-          Matrix4.clone(val, this._modelMatrix);
-          Matrix4.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          Matrix4$1.clone(val, this._modelMatrix);
+          Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
           BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
         }
       }
@@ -42953,9 +42956,9 @@ void main()
         }
         if (this.showScanPlane) {
           const time = frameState.time;
-          let timeDiff = JulianDate.secondsDifference(time, this._time);
+          let timeDiff = JulianDate$1.secondsDifference(time, this._time);
           if (timeDiff < 0) {
-            this._time = JulianDate.clone(time, this._time);
+            this._time = JulianDate$1.clone(time, this._time);
           }
           let percentage;
           if (this.speed <= 0) {
@@ -42965,7 +42968,7 @@ void main()
             percentage = Math.max(timeDiff % speet / speet, 0);
           }
           let angle;
-          const matrix3Scratch = new Matrix3;
+          const matrix3Scratch = new Matrix3$1;
 
           if (this.scanPlaneMode == 'H') {
             angle = 2 * yHalfAngle * percentage - yHalfAngle;
@@ -42975,7 +42978,7 @@ void main()
             const maxX = atan(cosYHalfAngle * tanXHalfAngle);
             this._scanePlaneXHalfAngle = maxX;
             this._scanePlaneYHalfAngle = angle;
-            Matrix3.fromRotationX(this._scanePlaneYHalfAngle, matrix3Scratch);
+            Matrix3$1.fromRotationX(this._scanePlaneYHalfAngle, matrix3Scratch);
           } else {
             angle = 2 * xHalfAngle * percentage - xHalfAngle;
             const tanYHalfAngle = tan(yHalfAngle);
@@ -42984,11 +42987,11 @@ void main()
             const maxY = atan(cosXHalfAngle * tanYHalfAngle);
             this._scanePlaneXHalfAngle = angle;
             this._scanePlaneYHalfAngle = maxY;
-            Matrix3.fromRotationY(this._scanePlaneXHalfAngle, matrix3Scratch);
+            Matrix3$1.fromRotationY(this._scanePlaneXHalfAngle, matrix3Scratch);
           }
 
-          Matrix4.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
-          Matrix4.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
+          Matrix4$1.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
+          Matrix4$1.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
         }
 
         if (this._createVS) {
@@ -43026,7 +43029,7 @@ void main()
         this._pickSP.destroy();
         this._sp = this._sp.destroy();
         this._scanePlaneSP && (this._scanePlaneSP = this._scanePlaneSP.destroy());
-        destroyObject$6(this);
+        destroyObject$7(this);
       }
     }
 
@@ -43062,7 +43065,7 @@ void main()
     function createCommands(primitive, translucent) {
       primitive._colorCommands.length = 0;
 
-      const pass = translucent ? Pass.TRANSLUCENT : Pass.OPAQUE;
+      const pass = translucent ? Pass$1.TRANSLUCENT : Pass$1.OPAQUE;
 
       //显示扇面
       if (primitive.showLateralSurfaces) {
@@ -43113,11 +43116,11 @@ void main()
       const context = frameState.context;
 
       const vs = sensorVS;
-      const fs = new ShaderSource({
+      const fs = new ShaderSource$1({
         sources: [sensorComm, material.shaderSource, sensorFS]
       });
 
-      primitive._sp = ShaderProgram.replaceCache({
+      primitive._sp = ShaderProgram$1.replaceCache({
         context: context,
         shaderProgram: primitive._sp,
         vertexShaderSource: vs,
@@ -43125,12 +43128,12 @@ void main()
         attributeLocations: attributeLocations
       });
 
-      const pickFS = new ShaderSource({
+      const pickFS = new ShaderSource$1({
         sources: [sensorComm, material.shaderSource, sensorFS],
         pickColorQualifier: 'uniform'
       });
 
-      primitive._pickSP = ShaderProgram.replaceCache({
+      primitive._pickSP = ShaderProgram$1.replaceCache({
         context: context,
         shaderProgram: primitive._pickSP,
         vertexShaderSource: vs,
@@ -43143,11 +43146,11 @@ void main()
       const context = frameState.context;
 
       const vs = sensorVS;
-      const fs = new ShaderSource({
+      const fs = new ShaderSource$1({
         sources: [sensorComm, material.shaderSource, scanPlaneFS]
       });
 
-      primitive._scanePlaneSP = ShaderProgram.replaceCache({
+      primitive._scanePlaneSP = ShaderProgram$1.replaceCache({
         context: context,
         shaderProgram: primitive._scanePlaneSP,
         vertexShaderSource: vs,
@@ -43166,7 +43169,7 @@ void main()
 
     function createRenderState(primitive, showThroughEllipsoid, translucent) {
       if (translucent) {
-        primitive._frontFaceRS = RenderState.fromCache({
+        primitive._frontFaceRS = RenderState$1.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -43178,7 +43181,7 @@ void main()
           }
         });
 
-        primitive._backFaceRS = RenderState.fromCache({
+        primitive._backFaceRS = RenderState$1.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -43190,7 +43193,7 @@ void main()
           }
         });
 
-        primitive._pickRS = RenderState.fromCache({
+        primitive._pickRS = RenderState$1.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -43198,14 +43201,14 @@ void main()
           blending: BlendingState.ALPHA_BLEND
         });
       } else {
-        primitive._frontFaceRS = RenderState.fromCache({
+        primitive._frontFaceRS = RenderState$1.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
           depthMask: true
         });
 
-        primitive._pickRS = RenderState.fromCache({
+        primitive._pickRS = RenderState$1.fromCache({
           depthTest: {
             enabled: true
           },
@@ -43229,13 +43232,13 @@ void main()
       const zoy = [];
       for (let i = 0; i < slice; i++) {
         const phi = 2 * maxY * i / (slice - 1) - maxY;
-        zoy.push(new Cartesian3$1(0, sin(phi), cos(phi)));
+        zoy.push(new Cartesian3$2(0, sin(phi), cos(phi)));
       }
       //zox面单位圆
       const zox = [];
       for (let i = 0; i < slice; i++) {
         const phi = 2 * maxX * i / (slice - 1) - maxX;
-        zox.push(new Cartesian3$1(sin(phi), 0, cos(phi)));
+        zox.push(new Cartesian3$2(sin(phi), 0, cos(phi)));
       }
 
       return {
@@ -43253,25 +43256,25 @@ void main()
       const positions = [];
 
       //zoy面沿y轴逆时针转xHalfAngle
-      const matrix3Scratch = new Matrix3();
-      let matrix3 = Matrix3.fromRotationY(xHalfAngle, matrix3Scratch);
+      const matrix3Scratch = new Matrix3$1();
+      let matrix3 = Matrix3$1.fromRotationY(xHalfAngle, matrix3Scratch);
       positions.push(zoy.map(function (p) {
-        return Matrix3.multiplyByVector(matrix3, p, new Cartesian3$1());
+        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
       }));
       //zox面沿x轴顺时针转yHalfAngle
-      matrix3 = Matrix3.fromRotationX(-yHalfAngle, matrix3Scratch);
+      matrix3 = Matrix3$1.fromRotationX(-yHalfAngle, matrix3Scratch);
       positions.push(zox.map(function (p) {
-        return Matrix3.multiplyByVector(matrix3, p, new Cartesian3$1());
+        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
       }).reverse());
       //zoy面沿y轴顺时针转xHalfAngle
-      matrix3 = Matrix3.fromRotationY(-xHalfAngle, matrix3Scratch);
+      matrix3 = Matrix3$1.fromRotationY(-xHalfAngle, matrix3Scratch);
       positions.push(zoy.map(function (p) {
-        return Matrix3.multiplyByVector(matrix3, p, new Cartesian3$1());
+        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
       }).reverse());
       //zox面沿x轴逆时针转yHalfAngle
-      matrix3 = Matrix3.fromRotationX(yHalfAngle, matrix3Scratch);
+      matrix3 = Matrix3$1.fromRotationX(yHalfAngle, matrix3Scratch);
       positions.push(zox.map(function (p) {
-        return Matrix3.multiplyByVector(matrix3, p, new Cartesian3$1());
+        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
       }));
       return positions;
     }
@@ -43290,8 +43293,8 @@ void main()
       let k = 0;
       for (let i = 0, len = positions.length; i < len; i++) {
         const planePositions = positions[i];
-        const nScratch = new Cartesian3$1();
-        const n = Cartesian3$1.normalize(Cartesian3$1.cross(planePositions[0],
+        const nScratch = new Cartesian3$2();
+        const n = Cartesian3$2.normalize(Cartesian3$2.cross(planePositions[0],
           planePositions[planePositions.length - 1], nScratch), nScratch);
         for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
           vertices[k++] = 0.0;
@@ -43317,10 +43320,10 @@ void main()
         }
       }
 
-      const vertexBuffer = Buffer.createVertexBuffer({
+      const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage.STATIC_DRAW
+        usage: BufferUsage$1.STATIC_DRAW
       });
 
       const stride = 2 * 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -43329,19 +43332,19 @@ void main()
         index: attributeLocations.position,
         vertexBuffer: vertexBuffer,
         componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype.FLOAT,
+        componentDatatype: ComponentDatatype$1.FLOAT,
         offsetInBytes: 0,
         strideInBytes: stride
       }, {
         index: attributeLocations.normal,
         vertexBuffer: vertexBuffer,
         componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype.FLOAT,
+        componentDatatype: ComponentDatatype$1.FLOAT,
         offsetInBytes: 3 * Float32Array.BYTES_PER_ELEMENT,
         strideInBytes: stride
       }];
 
-      return new VertexArray({
+      return new VertexArray$1({
         context: context,
         attributes: attributes
       });
@@ -43369,10 +43372,10 @@ void main()
         vertices[k++] = planePositions[0].z;
       }
 
-      const vertexBuffer = Buffer.createVertexBuffer({
+      const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage.STATIC_DRAW
+        usage: BufferUsage$1.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -43381,12 +43384,12 @@ void main()
         index: attributeLocations.position,
         vertexBuffer: vertexBuffer,
         componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype.FLOAT,
+        componentDatatype: ComponentDatatype$1.FLOAT,
         offsetInBytes: 0,
         strideInBytes: stride
       }];
 
-      return new VertexArray({
+      return new VertexArray$1({
         context: context,
         attributes: attributes
       });
@@ -43418,10 +43421,10 @@ void main()
         }
       }
 
-      const vertexBuffer = Buffer.createVertexBuffer({
+      const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage.STATIC_DRAW
+        usage: BufferUsage$1.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -43430,12 +43433,12 @@ void main()
         index: attributeLocations.position,
         vertexBuffer: vertexBuffer,
         componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype.FLOAT,
+        componentDatatype: ComponentDatatype$1.FLOAT,
         offsetInBytes: 0,
         strideInBytes: stride
       }];
 
-      return new VertexArray({
+      return new VertexArray$1({
         context: context,
         attributes: attributes
       });
@@ -43452,11 +43455,11 @@ void main()
         slicePartitions: 32
       }));
 
-      const vertexArray = VertexArray.fromGeometry({
+      const vertexArray = VertexArray$1.fromGeometry({
         context: context,
         geometry: geometry,
         attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage.STATIC_DRAW,
+        bufferUsage: BufferUsage$1.STATIC_DRAW,
         interleave: false
       });
       return vertexArray;
@@ -43473,11 +43476,11 @@ void main()
         slicePartitions: 32
       }));
 
-      const vertexArray = VertexArray.fromGeometry({
+      const vertexArray = VertexArray$1.fromGeometry({
         context: context,
         geometry: geometry,
         attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage.STATIC_DRAW,
+        bufferUsage: BufferUsage$1.STATIC_DRAW,
         interleave: false
       });
       return vertexArray;
@@ -43508,10 +43511,10 @@ void main()
         vertices[k++] = positions[i + 1].z;
       }
 
-      const vertexBuffer = Buffer.createVertexBuffer({
+      const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage.STATIC_DRAW
+        usage: BufferUsage$1.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -43520,12 +43523,12 @@ void main()
         index: attributeLocations.position,
         vertexBuffer: vertexBuffer,
         componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype.FLOAT,
+        componentDatatype: ComponentDatatype$1.FLOAT,
         offsetInBytes: 0,
         strideInBytes: stride
       }];
 
-      return new VertexArray({
+      return new VertexArray$1({
         context: context,
         attributes: attributes
       });
@@ -43566,10 +43569,10 @@ void main()
       if (primitive.showScanPlane) {
 
         if (primitive.scanPlaneMode == 'H') {
-          const unitScanPlanePositions = computeUnitPosiiton(primitive, CesiumMath.PI_OVER_TWO, 0);
+          const unitScanPlanePositions = computeUnitPosiiton(primitive, CesiumMath$1.PI_OVER_TWO, 0);
           primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zox);
         } else {
-          const unitScanPlanePositions = computeUnitPosiiton(primitive, 0, CesiumMath.PI_OVER_TWO);
+          const unitScanPlanePositions = computeUnitPosiiton(primitive, 0, CesiumMath$1.PI_OVER_TWO);
           primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zoy);
         }
       }
@@ -43775,7 +43778,7 @@ void main()
 
     }
 
-    const shader$b = `
+    const shader$d = `
 #extension GL_OES_standard_derivatives : enable
 uniform sampler2D colorTexture;
 uniform sampler2D depthTexture;
@@ -43846,7 +43849,7 @@ void main(){
        */
       constructor(options) {
         super(options);
-        this._fragmentShader = defaultValue$b(this._options.fragmentShader, shader$b);
+        this._fragmentShader = defaultValue$b(this._options.fragmentShader, shader$d);
         this._thickness = defaultValue$b(this._options.thickness, 0.5);
         this._density = defaultValue$b(this._options.density, 10.0);
         this._speed = defaultValue$b(this._options.speed, 350);
@@ -44102,7 +44105,7 @@ void main(){
 
     const {
       Material,
-      Color: Color$1
+      Color: Color$2
     } = Cesium;
 
     class WaterFaceAppearance {
@@ -44159,6 +44162,724 @@ void main(){
       get fragmentShaderSource() {
         const fs$1 = fs.replace(/{alpha}/g, this._alpha);
         return fs$1;
+      }
+    }
+
+    const shader$c = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+#else
+    precision mediump float;
+#endif
+uniform sampler2D u_normalMap;
+uniform sampler2D u_refractMap;
+uniform sampler2D u_reflectMap;
+uniform vec4 u_waterColor;
+uniform vec4 u_refractColor;
+uniform int u_useRefractTex;
+uniform vec4 u_reflectColor;
+uniform int u_reflection;
+uniform vec2 u_flowDirection;
+varying vec3 eyeDir;
+varying vec2 texCoord;
+varying float myTime;
+varying vec4 projectionCoord;
+
+void main (void)
+{
+    float texScale = 35.0;
+    float texScale2 = 10.0;
+    float myangle;
+    float transp;
+    vec3 myNormal;
+    vec2 mytexFlowCoord = texCoord * texScale;
+    vec2 ff = abs(2.0*(fract(mytexFlowCoord)) - 1.0) -0.5;
+    ff = 0.5-4.0*ff*ff*ff;
+    vec2 ffscale = sqrt(ff*ff + (1.0-ff)*(1.0-ff));
+    vec2 Tcoord = texCoord  * texScale2;
+    vec2 offset = vec2(myTime,0.0);
+    vec3 sample = vec3(u_flowDirection, 1.0);
+    vec2 flowdir = sample.xy -0.5;
+    flowdir *= sample.b;
+    mat2 rotmat = mat2(flowdir.x, -flowdir.y, flowdir.y ,flowdir.x);
+    vec2 NormalT0 = texture2D(u_normalMap, rotmat * Tcoord - offset).rg;
+    sample = vec3(u_flowDirection, 1.0);
+    flowdir = sample.b * (sample.xy - 0.5);
+    rotmat = mat2(flowdir.x, -flowdir.y, flowdir.y ,flowdir.x);
+    vec2 NormalT1 = texture2D(u_normalMap, rotmat * Tcoord - offset*1.06+0.62).rg;
+    vec2 NormalTAB = ff.x * NormalT0 + (1.0-ff.x) * NormalT1;
+    sample = vec3(u_flowDirection, 1.0);
+    flowdir = sample.b * (sample.xy - 0.5);
+    rotmat = mat2(flowdir.x, -flowdir.y, flowdir.y ,flowdir.x);
+    NormalT0 = texture2D(u_normalMap, rotmat * Tcoord - offset*1.33+0.27).rg;
+    sample = vec3(u_flowDirection, 1.0);
+    flowdir = sample.b * (sample.xy - 0.5);
+    rotmat = mat2(flowdir.x, -flowdir.y, flowdir.y ,flowdir.x);
+    NormalT1 = texture2D(u_normalMap, rotmat * Tcoord - offset*1.24).rg ;
+
+    vec2 NormalTCD = ff.x * NormalT0 + (1.0-ff.x) * NormalT1;
+    vec2 NormalT = ff.y * NormalTAB + (1.0-ff.y) * NormalTCD;
+    NormalT = (NormalT - 0.5) / (ffscale.y * ffscale.x);
+    NormalT *= 0.3;
+    transp = 1.0;
+    NormalT *= transp*transp;
+    myNormal = vec3(NormalT,sqrt(1.0-NormalT.x*NormalT.x - NormalT.y*NormalT.y));
+    vec3 envColor = u_reflectColor.rgb;
+    if (u_reflection == 1)
+    {
+        vec2 final = projectionCoord.xy / projectionCoord.w;
+        final = final * 0.5 + 0.5;
+        final.y = 1.0 - final.y;
+        envColor = texture2D(u_reflectMap, final + myNormal.xy/texScale2*transp).rgb;
+    }
+    myangle = dot(myNormal,normalize(eyeDir));
+    myangle = 0.95-0.6*myangle*myangle;
+    vec3 base = u_refractColor.rgb;
+    if (u_useRefractTex == 1)
+        base = texture2D(u_refractMap,(texCoord + myNormal.xy/texScale2*0.03*transp)*32.0).rgb;
+    base = mix(base, u_waterColor.rgb, u_waterColor.a);
+    gl_FragColor = vec4(mix(base, envColor, myangle*transp), 1.0);
+}
+`;
+
+    const shader$b = `
+attribute vec3 position;
+attribute vec2 st;
+uniform mat4 u_modelViewProjectionMatrix;
+uniform mat4 u_modelViewMatrix;
+uniform mat4 u_invWorldViewMatrix;
+uniform vec2 u_texCoordOffset;
+uniform vec2 u_texCoordScale;
+uniform float u_frameTime;
+uniform int u_clampToGroud;
+uniform vec3 u_camPosition;
+uniform vec3 u_scale;
+varying vec3 eyeDir;
+varying vec2 texCoord;
+varying float myTime;
+varying vec4 projectionCoord;
+void main(void)
+{
+
+	gl_Position = u_modelViewProjectionMatrix * vec4(position.xyz,1.0);
+	if (u_clampToGroud == 1)
+	{
+	  eyeDir = (u_camPosition - position.xyz) * u_scale;
+	} else {
+	  vec4 pos = u_modelViewMatrix * vec4(position.xyz,1.0);
+	  eyeDir = vec3(u_invWorldViewMatrix*vec4(pos.xyz,0.0));
+	  projectionCoord = gl_Position;
+	}
+	texCoord = (st+u_texCoordOffset)*u_texCoordScale;
+	myTime = 0.01 * u_frameTime;
+}
+`;
+
+    const {
+      Color: Color$1,
+      Resource,
+      Texture,
+      TextureWrap,
+      Sampler,
+      Cartographic,
+      Cartesian2: Cartesian2$1,
+      Cartesian3: Cartesian3$1,
+      Camera,
+      Framebuffer,
+      Renderbuffer,
+      PassState,
+      BoundingRectangle,
+      PixelFormat,
+      RenderbufferFormat,
+      Matrix4,
+      Matrix3,
+      JulianDate,
+      ShaderProgram,
+      RenderState,
+      PolygonGeometry,
+      Buffer,
+      BufferUsage,
+      IndexDatatype,
+      ComponentDatatype,
+      VertexArray,
+      DrawCommand,
+      PrimitiveType,
+      Pass,
+      Plane,
+      Cartesian4,
+      ClearCommand,
+      Primitive,
+      destroyObject,
+      ShaderSource,
+      PixelDatatype
+    } = Cesium;
+
+    const CesiumMath = Cesium.Math;
+
+    function executeCommand(command, frameState, context, passState, debugFramebuffer) {
+      if (command instanceof ClearCommand) {
+        command.execute(context, passState);
+        return;
+      }
+
+      if (frameState.useLogDepth && defined$c(command.derivedCommands.logDepth)) {
+        command = command.derivedCommands.logDepth.command;
+      }
+
+      var passes = frameState.passes;
+      if (
+        !passes.pick &&
+        !passes.depth &&
+        defined$c(command.derivedCommands) &&
+        defined$c(command.derivedCommands.hdr)
+      ) {
+        command = command.derivedCommands.hdr.command;
+      }
+
+      if (passes.pick || passes.depth) {
+        if (
+          passes.pick &&
+          !passes.depth &&
+          defined$c(command.derivedCommands.picking)
+        ) {
+          command = command.derivedCommands.picking.pickCommand;
+          command.execute(context, passState);
+          return;
+        } else if (defined$c(command.derivedCommands.depth)) {
+          command = command.derivedCommands.depth.depthOnlyCommand;
+          command.execute(context, passState);
+          return;
+        }
+      }
+
+      if (
+        frameState.shadowState.lightShadowsEnabled &&
+        command.receiveShadows &&
+        defined$c(command.derivedCommands.shadows)
+      ) {
+        // If the command receives shadows, execute the derived shadows command.
+        // Some commands, such as OIT derived commands, do not have derived shadow commands themselves
+        // and instead shadowing is built-in. In this case execute the command regularly below.
+        command.derivedCommands.shadows.receiveCommand.execute(context, passState);
+      } else {
+        command.execute(context, passState);
+      }
+    }
+    class WaterFacePrimitive {
+      /**
+       * 提供一个模拟水面的自定义图元
+       * @see {@link https://www.cnblogs.com/wanghui2011/articles/13100925.html|基于Cesium实现逼真的水特效}
+       * @extends CustomPrimitive
+       * @param {Object} options 具有以下属性
+       * @param {PolygonGeometry} options.waterPolygon 定义水面范围，为水面提供顶点信息
+       * @param {Color} [options.waterColor=Cesium.Color.DARKCYAN] 水面颜色
+       * @param {Color} [options.reflectColor=new Color(.439, .564, .788, 0)] 反射光颜色
+       * @param {Color} [options.refractColor=new Color(0, 0, 0, 0)] 散射光颜色
+       * @param {Number} [options.waveWidth=5] 波纹宽度
+       * @param {Number} [options.flowDirection=45] 流动方向，单位：度
+       * @param {Number} [options.flowDirection=3] 流动速度
+       * @param {String} [options.normalTexture] 提供水面法线的纹理图片
+       * @param {Bool} [options.show=true] 是否显示该图元
+       *
+       */
+      constructor(options) {
+        options = defaultValue$b(options, {});
+        this._pointsToCartographic = [];
+        this._waterPolygon = options.waterPolygon;
+        if (!defined$c(this._waterPolygon)) {
+          throw new CesiumProError$1('paramater options.waterPolygon must be provided.')
+        }
+        this._waterColor = defaultValue$b(options.waterColor, Cesium.Color.DARKCYAN);
+        this._refractColor = defaultValue$b(options.refractColor, new Color$1(0, 0, 0, 0));
+        this._reflectColor = defaultValue$b(options.reflectColor, new Color$1(.439, .564, .788, 0));
+        this._waveWidth = defaultValue$b(options.waveWidth, 5);
+        this._flowDirection = defaultValue$b(options.flowDirection, 45);
+        this._flowSpeed = defaultValue$b(options.flowSpeed, 3);
+        this._normalTexture = defaultValue$b(options.normalTexture, Url$1.buildModuleUrl('./assets/images/waterNormal2.png'));
+        this._m_startTime = 0;
+        this._reflectCamera = undefined;
+        this._reflectPassState = undefined;
+        this._ready = false;
+        this._drawCommand = undefined;
+        this._show = defaultValue$b(options.show, true);
+
+      }
+      /**
+       * 是否渲染该图元
+       * @type {Bool}
+       */
+      get show() {
+        return this._show;
+      }
+      set show(val) {
+        this._show = val;
+      }
+      /**
+       * 定义水面范围，为水面提供顶点信息
+       * @type {PolygonGeometry}
+       */
+      get waterPolygon() {
+        return this._waterPolygon;
+      }
+      set waterPolygon(val) {
+        if (defined$c(val)) {
+          this._waterPolygon = val;
+        }
+      }
+      /**
+       * 水面颜色
+       * @type {Color}
+       */
+      get waterColor() {
+        return this._waterColor;
+      }
+      set waterColor(val) {
+        this._waterColor = val;
+      }
+      /**
+       * 散射光颜色
+       * @type {Color}
+       */
+      get refractColor() {
+        return this._refractColor();
+      }
+      set refractColor(val) {
+        this._refractColor = val;
+      }
+      /**
+       * 水流动速度
+       * @type {Number}
+       */
+      get flowSpeed() {
+        return this._flowSpeed;
+      }
+      set flowSpeed(val) {
+        this._flowSpeed = val;
+      }
+      /**
+       * 水流动方向,单位：度。0表示正北方向
+       * @type {Number}
+       */
+      get flowDirection() {
+        return this._flowDirection;
+      }
+      set flowDirection(val) {
+        this._flowDirection = val;
+      }
+      /**
+       * 波纹大小
+       * @type {Number}
+       */
+      get waveWidth() {
+        return this._waveWidth;
+      }
+      set waveWidth(val) {
+        this._waveWidth = val;
+      }
+      /**
+       * 是否渲染该图元
+       * @type {Bool}
+       */
+      get show() {
+        return this._show;
+      }
+      set show(val) {
+        this._show = val;
+      }
+      /**
+       * @private
+       */
+      computeBoundingRectangle() {
+        const positions = this._waterPolygon._polygonHierarchy.positions;
+        if (positions.length < 1) {
+          throw new CesiumProError$1('The positions of water polygon hierarchy is empty.')
+        }
+        const firstCartographic = Cartographic.fromCartesian(positions[0]);
+        let minX = CesiumMath.toDegrees(firstCartographic.longitude);
+        let minY = CesiumMath.toDegrees(firstCartographic.latitude);
+        let maxX = CesiumMath.toDegrees(firstCartographic.longitude);
+        let maxY = CesiumMath.toDegrees(firstCartographic.latitude);
+        this._zFactor = firstCartographic.height;
+        for (let i = 0, length = positions.length; i < length; i++) {
+          const cartographic = Cartographic.fromCartesian(positions[i]);
+          const lon = CesiumMath.toDegrees(cartographic.longitude);
+          const lat = CesiumMath.toDegrees(cartographic.latitude);
+          const coordinate = new Cartesian2$1(lon, lat);
+          this._pointsToCartographic.push(coordinate);
+          if (lon > maxX) {
+            maxX = lon;
+          }
+          if (lon < minX) {
+            minX = lon;
+          }
+          if (lat > maxY) {
+            maxY = lat;
+          }
+          if (lat < minY) {
+            minY = lat;
+          }
+          this._lonMin = minX;
+          this._latMin = minY;
+          this._waterCenterPos = Cartesian3$1.fromDegrees((minX + maxX) / 2, (minY + maxY) / 2, this._zFactor);
+        }
+      }
+      initialize(frameState) {
+        const {
+          context,
+          camera
+        } = frameState;
+        if (!defined$c(this._reflectCamera)) {
+          this._reflectCamera = Camera.clone(camera);
+        }
+        if (!defined$c(this._reflectPassState)) {
+          const framebuffer = new Framebuffer({
+            context,
+            colorTextures: [new Texture({
+              context,
+              width: 512,
+              height: 512,
+              pixelFormat: PixelFormat.RGBA
+            })],
+            depthRenderbuffer: new Renderbuffer({
+              context,
+              format: RenderbufferFormat.DEPTH_COMPONENT16,
+              width: 512,
+              height: 512
+            })
+          });
+          this._reflectPassState = new PassState(context);
+          this._reflectPassState.viewport = new BoundingRectangle(0, 0, 512, 512);
+          this._reflectPassState.framebuffer = framebuffer;
+        }
+        const me = this;
+        this.m_spNormalTexture = frameState.context.defaultTexture;
+        Resource.fetchImage({
+          url: me._normalTexture
+        }).then(e => {
+          me.m_spNormalTexture = new Texture({
+            context: context,
+            width: e.width,
+            height: e.height,
+            source: e,
+            sampler: new Sampler({
+              wrapS: TextureWrap.REPEAT,
+              wrapT: TextureWrap.REPEAT
+            })
+          });
+        });
+        this._ready = true;
+        this.computeBoundingRectangle();
+      }
+      /**
+       *
+       * 当Scene渲染每一帧时会自动调用该方法，不要直接调用该方法。
+       * @override
+       * @param {Cesium.FrameState} framestate
+       */
+      update(frameState) {
+        if (!this.show) {
+          return;
+        }
+        const camera = frameState.camera;
+        this._ready || this.initialize(frameState);
+        const context = frameState.context;
+        this._fScale = 1 / (.001 * this._waveWidth);
+        Matrix4.IDENTITY;
+        const center = Cartesian3$1.clone(this._waterCenterPos);
+        const centerCartographic = Cartographic.fromCartesian(this._waterCenterPos);
+        const lon = CesiumMath.toDegrees(centerCartographic.longitude);
+        const lat = CesiumMath.toDegrees(centerCartographic.latitude);
+        const surface = Cartesian3$1.fromDegrees(lon, lat, 0);
+        const normalSurface = new Cartesian3$1();
+        Cartesian3$1.normalize(surface, normalSurface);
+        const north = new Cartesian3$1(0, 1, 0);
+        const east = new Cartesian3$1();
+        Cartesian3$1.cross(north, normalSurface, east);
+        Cartesian3$1.normalize(east, east);
+        Cartesian3$1.cross(normalSurface, east, north);
+        const matrix = new Matrix3;
+        Matrix3.setRow(matrix, 0, east, matrix);
+        Matrix3.setRow(matrix, 1, north, matrix);
+        Matrix3.setRow(matrix, 2, normalSurface, matrix);
+        const transpose = new Matrix3();
+        Matrix3.transpose(matrix, transpose);
+        const carteisan3 = new Cartesian3$1;
+        const center1 = new Cartesian3$1(-center.x, -center.y, -center.z);
+        Matrix3.multiplyByVector(matrix, center1, carteisan3);
+        const worldMatrix = new Matrix4();
+        Matrix4.fromRotationTranslation(matrix, carteisan3, worldMatrix);
+        this.invWorldViewMatrix = new Matrix4();
+        Matrix4.multiply(worldMatrix, camera.inverseViewMatrix, this.invWorldViewMatrix);
+        this.modelMatrix = new Matrix4();
+        Matrix4.fromTranslation(center, this.modelMatrix);
+
+        this.modelViewMatrix = new Matrix4();
+        this.modeiViewProjection = new Matrix4();
+        this.modelViewMatrix = Matrix4.multiply(camera.viewMatrix, this.modelMatrix,
+          this.modelViewMatrix);
+        this.modeiViewProjection = Matrix4.multiply(camera.frustum.projectionMatrix,
+          this.modelViewMatrix, this.modeiViewProjection);
+        if (!this._m_startTime) {
+          this._m_startTime = (JulianDate.now()).secondsOfDay;
+        }
+        this._fElapse = (JulianDate.now()).secondsOfDay - this._m_startTime;
+        this._frameTime = this._fElapse * this.flowSpeed;
+        this._flowAngle = CesiumMath.toRadians(this._flowDirection);
+        const shaderProgram = ShaderProgram.fromCache({
+          context,
+          vertexShaderSource: shader$b,
+          fragmentShaderSource: shader$c
+        });
+        const renderState = RenderState.fromCache({
+          depthTest: {
+            enabled: true
+          }
+        });
+        const me = this;
+        this._uniformMap = {
+          u_bgColor: function() {
+            return me._waterColor
+          },
+          u_texCoordOffset: function() {
+            return new Cartesian2$1(-me._lonMin, -me._latMin)
+          },
+          u_texCoordScale: function() {
+            return new Cartesian2$1(me._fScale, me._fScale)
+          },
+          u_scale: function() {
+            return new Cartesian3$1(3, 3, 3)
+          },
+          u_camPosition: function() {
+            return new Cartesian3$1(3, 3, 3)
+          },
+          u_modelViewProjectionMatrix: function() {
+            return me.modeiViewProjection
+          },
+          u_modelViewMatrix: function() {
+            return me.modelViewMatrix
+          },
+          u_clampToGroud: function() {
+            return false;
+          },
+          u_invWorldViewMatrix: function() {
+            return me.invWorldViewMatrix
+          },
+          u_frameTime: function() {
+            return me._frameTime
+          },
+          u_normalMap: function() {
+            return me.m_spNormalTexture
+          },
+          u_refractMap: function() {
+            return me.m_spNormalTexture
+          },
+          u_useRefractTex: function() {
+            return false
+          },
+          u_reflectMap: function() {
+            return me._reflectPassState.framebuffer.getColorTexture(0)
+          },
+          u_reflection: function() {
+            return 1
+          },
+          u_waterColor: function() {
+            return me._waterColor
+          },
+          u_refractColor: function() {
+            return me._refractColor
+          },
+          u_reflectColor: function() {
+            return me._reflectColor
+          },
+          u_flowDirection: function() {
+            return new Cartesian2$1(.5 * Math.sin(me._flowAngle) + .5, .5 *
+              Math.cos(me._flowAngle) + .5)
+          }
+        };
+        this._waterGeometry = PolygonGeometry.createGeometry(this._waterPolygon);
+        const indices = this._waterGeometry.indices;
+        const posValue = this._waterGeometry.attributes.position.values;
+        const packedCenter = [];
+        Cartesian3$1.pack(center, packedCenter);
+        for (let i = 0; i < posValue.length; i++) {
+          posValue[i] += -packedCenter[i % 3];
+        }
+        const positionArray = [];
+        for (let j = 0, length = this._pointsToCartographic.length; j < length; j++) {
+          positionArray.push(this._pointsToCartographic[j].x,
+            this._pointsToCartographic[j].y);
+        }
+        const indexBuffer = Buffer.createIndexBuffer({
+          context,
+          typedArray: new Uint32Array(indices),
+          usage: BufferUsage.STATIC_DRAW,
+          indexDatatype: PixelDatatype.UNSIGNED_INT
+        });
+        const vertexBuffer = Buffer.createVertexBuffer({
+          context,
+          typedArray: ComponentDatatype.createTypedArray(ComponentDatatype.FLOAT, posValue),
+          usage: BufferUsage.STATIC_DRAW
+        });
+        const surfaceBuffer = Buffer.createVertexBuffer({
+          context,
+          typedArray: ComponentDatatype.createTypedArray(ComponentDatatype.FLOAT, positionArray),
+          usage: BufferUsage.STATIC_DRAW
+        });
+        const attributes = [];
+        attributes.push({
+          index: 0,
+          vertexBuffer: vertexBuffer,
+          componentDatatype: ComponentDatatype.FLOAT,
+          componentsPerAttribute: 3,
+          normalize: false
+        });
+        attributes.push({
+          index: 1,
+          vertexBuffer: surfaceBuffer,
+          componentDatatype: ComponentDatatype.FLOAT,
+          componentsPerAttribute: 2,
+          normalize: false
+        });
+        const vertexArray = new VertexArray({
+          context,
+          attributes,
+          indexBuffer: indexBuffer
+        });
+        this.updateReflectTexture(frameState);
+        this._drawCommand = new DrawCommand({
+          boundingVolume: this._waterGeometry.boundingSphere,
+          primitiveType: PrimitiveType.TRIANGLES,
+          vertexArray: vertexArray,
+          shaderProgram,
+          castShadows: false,
+          receiveShadows: false,
+          uniformMap: this._uniformMap,
+          renderState,
+          pass: Pass.OPAQUE
+        });
+        frameState.commandList.push(this._drawCommand);
+      }
+      updateReflectTexture(frameState) {
+        const context = frameState.context;
+        const camera = frameState.camera;
+        // var t = e._context;
+        this.modelViewMatrix = Matrix4.multiply(camera.viewMatrix, this.modelMatrix,
+          this.modelViewMatrix);
+        this.modeiViewProjection = Matrix4.multiply(camera.frustum.projectionMatrix,
+          this.modelViewMatrix, this.modeiViewProjection);
+        const center = Cartesian3$1.clone(this._waterCenterPos);
+        const normal = new Cartesian3$1();
+        Cartesian3$1.normalize(center, normal);
+        const plane = Plane.fromPointNormal(center, normal);
+        const dot = -Cartesian3$1.dot(normal, center);
+        const matrix = new Matrix4(-2 * normal.x * normal.x + 1,
+          -2 * normal.x * normal.y,
+          -2 * normal.x * normal.z,
+          -2 * normal.x * dot,
+          -2 * normal.y * normal.x, -2 * normal.y * normal.y + 1,
+          -2 * normal.y * normal.z, -2 * normal.y * dot,
+          -2 * normal.z * normal.x, -2 * normal.z * normal.y,
+          -2 * normal.z * normal.z + 1, -2 * normal.z * dot, 0, 0, 0, 1);
+        const direction = new Cartesian3$1();
+        Cartesian3$1.clone(camera.direction, direction);
+        const scalarNormal = new Cartesian3$1();
+        const direction_m = new Cartesian3$1();
+        Cartesian3$1.multiplyByScalar(normal,
+          2 * Cartesian3$1.dot(direction, normal),
+          scalarNormal);
+        Cartesian3$1.subtract(direction, scalarNormal, direction_m);
+        Cartesian3$1.normalize(direction_m, direction_m);
+        const up = new Cartesian3$1;
+        Cartesian3$1.clone(camera.up, up);
+        const up_m = new Cartesian3$1;
+        const scalarNormal1 = new Cartesian3$1();
+        const dot1 = Cartesian3$1.dot(up, normal);
+        Cartesian3$1.multiplyByScalar(normal, 2 * dot1, scalarNormal1),
+          Cartesian3$1.add(up, scalarNormal1, up_m);
+        Cartesian3$1.normalize(up_m, up_m);
+        const rc_up = new Cartesian3$1(-up_m.x, -up_m.y, -up_m.z);
+        const camePos = new Cartesian4;
+        Cartesian3$1.clone(camera.position, camePos);
+        const rc_position = new Cartesian3$1();
+        Matrix4.multiplyByPoint(matrix, camePos, rc_position);
+        const cameraProjMatrix = new Matrix4();
+        camera.frustum.far = 1e8,
+          Matrix4.clone(camera.frustum.projectionMatrix, cameraProjMatrix);
+        this._reflectCamera.direction = direction_m,
+          dot1 < 0.5 && (this._reflectCamera.up = rc_up);
+        dot1 >= .5 && (this._reflectCamera.up = up_m);
+        this._reflectCamera.position = rc_position;
+        const inverseVM = new Matrix4();
+        Matrix4.inverse(this._reflectCamera.viewMatrix, inverseVM),
+          Matrix4.transpose(inverseVM, inverseVM);
+        const vector = new Cartesian4(
+          plane.normal.x,
+          plane.normal.y,
+          plane.normal.z,
+          -Cartesian3$1.dot(normal, normal)
+        );
+        Matrix4.multiplyByVector(inverseVM, vector, vector);
+        const w = vector.w / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+        const vectorPoint = new Cartesian3$1(vector.x, vector.y, vector.z);
+        Cartesian3$1.normalize(vectorPoint, vectorPoint);
+        const vector1 = new Cartesian4;
+        vector1.x = (Math.asin(vectorPoint.x) + cameraProjMatrix[8]) / cameraProjMatrix[0];
+        vector1.y = (Math.asin(vectorPoint.y) + cameraProjMatrix[9]) / cameraProjMatrix[5],
+          vector1.z = -1;
+        vector1.w = (1 + cameraProjMatrix[10]) / cameraProjMatrix[14];
+        const vector_m = new Cartesian4(vectorPoint.x, vectorPoint.y, vectorPoint.z, w);
+        const camPos_m = new Cartesian3$1();
+        Cartesian4.multiplyByScalar(vector_m, 2 / Cartesian4.dot(vector_m, vector1), camPos_m);
+        cameraProjMatrix[2] = camPos_m.x, cameraProjMatrix[6] = camPos_m.y;
+        cameraProjMatrix[10] = camPos_m.z + 1;
+        cameraProjMatrix[14] = camPos_m.w;
+        Matrix4.clone(cameraProjMatrix, this._reflectCamera.frustum.projectionMatrix);
+        const clear = new ClearCommand({
+          color: Color$1.fromBytes(14, 33, 60, 255),
+          depth: 1,
+          framebuffer: this._reflectPassState.framebuffer
+        });
+        clear.execute(context, this._reflectPassState);
+        this.updateTexture(frameState, this._reflectPassState, this._reflectCamera);
+      }
+      updateTexture(frameState, passState, camera) {
+        // const frameState = this.frameState;
+        const context = frameState.context;
+        const uniformState = context.uniformState;
+        const sceneCamera = frameState.camera;
+        frameState.camera = camera;
+        uniformState.updateCamera(camera);
+
+        const commands = frameState.commandList;
+        const length = commands.length;
+        // const eState=this._viewer.scene._environmentState;
+        // eState.isSkyAtmosphereVisible&&executeCommand(
+        //   eState.skyAtmosphereCommand,frameState,context,passState
+        // );
+        const Pass = Cesium.Pass;
+        for (let i = 0; i < length; i++) {
+          const cmd = commands[i];
+          cmd.pass !== Pass.GLOBE &&
+            cmd.pass !== Pass.CESIUM_3D_TILE &&
+            cmd.pass !== Pass.OPAQUE &&
+            cmd.pass !== Pass.TRANSLUCENT &&
+            cmd.pass !== Pass.ENVIRONMENT &&
+            cmd.pass !== Pass.OVERLAY ||
+            (uniformState.updatePass(cmd.pass),
+              executeCommand(cmd, frameState, context, passState));
+        }
+        uniformState.updateCamera(sceneCamera);
+        // o.updateFrustum(this._camera.workingFrustums[0]),
+        frameState.camera = sceneCamera;
+      }
+      /**
+       * 销毁对象并释放WebGL资源
+       */
+      destroy() {
+        if (this._drawCommand) {
+          this._drawCommand = this._drawCommand && this._drawCommand.shaderProgram.destroy();
+        }
+        return destroyObject(this)
       }
     }
 
@@ -47066,7 +47787,7 @@ void main() {
       destroy() {
         this.remove();
         this.removeEventListener && this.removeEventListener();
-        destroyObject$6(this);
+        destroyObject$7(this);
       }
     }
 
@@ -47622,7 +48343,7 @@ void main(){
     exports.PolylinePlot = PolylinePlot;
     exports.PolylineTrailLinkMaterialProperty = PolylineTrailLinkMaterialProperty;
     exports.PostProcessing = PostProcessing;
-    exports.Primitive = Primitive$4;
+    exports.Primitive = Primitive$5;
     exports.Properties = Properties;
     exports.RadarScanGraphic = RadarScanGraphic;
     exports.RectangularSensorPrimitive = RectangularSensorPrimitive;
@@ -47650,29 +48371,30 @@ void main(){
     exports.WMSLayer = WMSLayer;
     exports.WMTSLayer = WMTSLayer;
     exports.WaterFaceAppearance = WaterFaceAppearance;
+    exports.WaterFacePrimitive = WaterFacePrimitive;
     exports.WindField = WindField;
     exports.XYZLayer = XYZLayer;
     exports._shaderBloom = shader$5;
     exports._shaderBuildUniforms = buildShader;
     exports._shaderCircleScan = glsl$2;
-    exports._shaderCircleSpread = shader$j;
+    exports._shaderCircleSpread = shader$l;
     exports._shaderDynamicConeMaterial = glsl$1;
-    exports._shaderDynamicSpreadMaterial = shader$g;
-    exports._shaderDynamicSpreadWallMaterial = shader$h;
-    exports._shaderDynamicWaveMaterial = shader$f;
+    exports._shaderDynamicSpreadMaterial = shader$i;
+    exports._shaderDynamicSpreadWallMaterial = shader$j;
+    exports._shaderDynamicWaveMaterial = shader$h;
     exports._shaderEllipsoid = czm_ellipsoid;
     exports._shaderFlowImage = glsl;
     exports._shaderFog = shader$4;
     exports._shaderGetDepth = shader$9;
     exports._shaderGetWgs84EllipsoidEC = shader$8;
     exports._shaderGlobeFS = GlobeFS;
-    exports._shaderGroundSkyBoxFS = shader$l;
-    exports._shaderGroundSkyBoxVS = shader$k;
+    exports._shaderGroundSkyBoxFS = shader$n;
+    exports._shaderGroundSkyBoxVS = shader$m;
     exports._shaderPhong = shader$6;
     exports._shaderPolylineAntialiasingMaterial = polylineAntialiasingMaterial;
-    exports._shaderPolylineFlowMaterial = shader$d;
-    exports._shaderPolylineTrailLinkMaterial = shader$c;
-    exports._shaderRadarScan = shader$i;
+    exports._shaderPolylineFlowMaterial = shader$f;
+    exports._shaderPolylineTrailLinkMaterial = shader$e;
+    exports._shaderRadarScan = shader$k;
     exports._shaderRain = shader$3;
     exports._shaderRectangularSensorComm = sensorComm;
     exports._shaderRectangularSensorFS = sensorFS;
@@ -47680,12 +48402,14 @@ void main(){
     exports._shaderRectangularSensorVS = sensorVS;
     exports._shaderSelected = shader$2;
     exports._shaderSeperableBlur = shader$1;
-    exports._shaderSnow = shader$b;
+    exports._shaderSnow = shader$d;
     exports._shaderSpecularReflection = shader;
     exports._shaderToEye = shader$a;
     exports._shaderTranslucentPhong = shader$7;
     exports._shaderWaterAppearanceFS = fs;
     exports._shaderWaterAppearanceVS = vs;
+    exports._shaderWaterFaceFS = shader$c;
+    exports._shaderWaterFaceVS = shader$b;
     exports.abstract = abstract;
     exports.checkViewer = checkViewer;
     exports.clone = clone;
@@ -47699,7 +48423,7 @@ void main(){
     exports.dateFormat = dateFormat;
     exports.defaultValue = defaultValue$b;
     exports.defined = defined$c;
-    exports.destroyObject = destroyObject$6;
+    exports.destroyObject = destroyObject$7;
     exports.getParabolaPoints = getParabolaPoints;
     exports.guid = guid;
     exports.index = overrideCesium;

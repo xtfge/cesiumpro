@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-      SatelliteScan - CesiumPro Documentation
+      WaterFacePrimitive - CesiumPro Documentation
     </title>
 
     <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
 
       <h1 class="page-title">
         <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
-        SatelliteScan
+        WaterFacePrimitive
         <div class="titleCenterer"></div>
       </h1>
 
@@ -44,13 +44,13 @@
       
       
 <div class="nameContainer">
-  <h4 class="name" id="SatelliteScan">
-    <a href="#SatelliteScan" class="doc-link"></a>
-    new CesiumPro.SatelliteScan<span class="signature">(options)</span>
+  <h4 class="name" id="WaterFacePrimitive">
+    <a href="#WaterFacePrimitive" class="doc-link"></a>
+    new CesiumPro.WaterFacePrimitive<span class="signature">(options)</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L100">geometry/SatelliteScanGraphic.js 100</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L114">scene/WaterFacePrimitive.js 114</a>
 </div>
 
 
@@ -62,7 +62,7 @@
 
 
 <div class="description">
-  卫星扫描
+  提供一个模拟水面的自定义图元
 </div>
 
 
@@ -76,6 +76,46 @@
 
 
 
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Object</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                具有以下属性
+                
 
 <table class="params">
     <thead>
@@ -99,14 +139,14 @@
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>waterPolygon</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">
-  *</span>
+  PolygonGeometry</span>
 
 
             
@@ -125,27 +165,266 @@
 
                 
             
-                具有以下属性
+                定义水面范围，为水面提供顶点信息</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waterColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Color</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">Cesium.Color.DARKCYAN</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
                 
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
+                
+            
+                水面颜色</td>
+        </tr>
 
-        <th>Type</th>
+    
 
-        
-        <th>Default</th>
-        
+        <tr>
+            
+                <td class="name"><code>reflectColor</code></td>
+            
 
-        <th class="last">Description</th>
-    </tr>
-    </thead>
+            <td class="type">
+            
+                
+<span class="param-type">
+  Color</span>
 
-    <tbody>
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Color(.439, .564, .788, 0)</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                反射光颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>refractColor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Color</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">new Color(0, 0, 0, 0)</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                散射光颜色</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>waveWidth</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">5</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                波纹宽度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>flowDirection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">45</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                流动方向，单位：度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>flowDirection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                    <code class="language-javascript">3</code>
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                流动速度</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>normalTexture</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  String</span>
+
+
+            
+            </td>
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">
+            
+                
+                        <span class="optional">optional</span>
+                
+                
+
+                
+            
+                提供水面法线的纹理图片</td>
+        </tr>
+
     
 
         <tr>
@@ -180,482 +459,13 @@
 
                 
             
-                是否可见</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>position</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cartesian3</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星的位置</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>path</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Entity</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星运动轨道,该属性将覆盖position</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>radius</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星在地面的扫描半径</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>inverse</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Bool</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">false</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                扫描方向，该值为true卫星将从下向上扫描</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>tracked</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Bool</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">false</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                是否跟踪卫星</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>color</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Color</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                扫描波颜色</td>
+                是否显示该图元</td>
         </tr>
 
     
     </tbody>
 </table>
             </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>option.image</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Bool</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星图标，如果定义了model该属性将不生效</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options.model</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Bool</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">false</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星模型</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>option.axis</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Cartesian3</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">Cartesian3(1,0,0)</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                卫星扫描方向偏转的坐标轴</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options.rotation</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                扫描波在方向偏转角度</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>option.animate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  Bool</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">true</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                是否动态扫描</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options.thickness</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  number</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">0.3</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                扫描波每一片的厚度</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options.slices</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">
-  number</span>
-
-
-            
-            </td>
-
-            
-                <td class="default">
-                
-                    <code class="language-javascript">20</code>
-                
-                </td>
-            
-
-            <td class="description last">
-            
-                
-                        <span class="optional">optional</span>
-                
-                
-
-                
-            
-                扫描波的分片数量</td>
         </tr>
 
     
@@ -704,12 +514,28 @@
     
 
     
+    <h5>See:</h5>
+    <ul class="see-list">
+        <li><a href="https://www.cnblogs.com/wanghui2011/articles/13100925.html">基于Cesium实现逼真的水特效</a></li>
+    </ul>
+    
 
     
 </dl>
 
       
     </div>
+
+    
+    <h3 class="subsection-title">Extends</h3>
+
+    
+
+
+    <ul>
+        <li>CustomPrimitive</li>
+    </ul>
+
 
     
 
@@ -727,13 +553,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="_height">
-    <a href="#_height" class="doc-link"></a>
-    _height<span class="type-signature"></span>
+  <h4 class="name" id="flowDirection">
+    <a href="#flowDirection" class="doc-link"></a>
+    flowDirection<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L117">geometry/SatelliteScanGraphic.js 117</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L192">scene/WaterFacePrimitive.js 192</a>
 </div>
 
 
@@ -744,7 +570,7 @@
 
 
 <div class="description">
-  卫星所在的高度
+  水流动方向,单位：度。0表示正北方向
 </div>
 
 
@@ -786,13 +612,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="_surface">
-    <a href="#_surface" class="doc-link"></a>
-    _surface<span class="type-signature"></span>
+  <h4 class="name" id="flowSpeed">
+    <a href="#flowSpeed" class="doc-link"></a>
+    flowSpeed<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L121">geometry/SatelliteScanGraphic.js 121</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L182">scene/WaterFacePrimitive.js 182</a>
 </div>
 
 
@@ -803,7 +629,7 @@
 
 
 <div class="description">
-  卫星在地面的投影位置
+  水流动速度
 </div>
 
 
@@ -845,13 +671,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="animation">
-    <a href="#animation" class="doc-link"></a>
-    animation<span class="type-signature"> : Boolean</span>
+  <h4 class="name" id="refractColor">
+    <a href="#refractColor" class="doc-link"></a>
+    refractColor<span class="type-signature"> : Color</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L350">geometry/SatelliteScanGraphic.js 350</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L172">scene/WaterFacePrimitive.js 172</a>
 </div>
 
 
@@ -862,7 +688,7 @@
 
 
 <div class="description">
-  是否动态扫描
+  散射光颜色
 </div>
 
 
@@ -904,13 +730,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="axis">
-    <a href="#axis" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> axis<span class="type-signature"> : Cartesian3</span>
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Bool</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L320">geometry/SatelliteScanGraphic.js 320</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L140">scene/WaterFacePrimitive.js 140</a>
 </div>
 
 
@@ -921,7 +747,7 @@
 
 
 <div class="description">
-  卫星扫描该向偏转轴
+  是否渲染该图元
 </div>
 
 
@@ -963,13 +789,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="color">
-    <a href="#color" class="doc-link"></a>
-    color<span class="type-signature"> : Cesium.Color</span>
+  <h4 class="name" id="show">
+    <a href="#show" class="doc-link"></a>
+    show<span class="type-signature"> : Bool</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L339">geometry/SatelliteScanGraphic.js 339</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L212">scene/WaterFacePrimitive.js 212</a>
 </div>
 
 
@@ -980,7 +806,7 @@
 
 
 <div class="description">
-  扫描波颜色
+  是否渲染该图元
 </div>
 
 
@@ -1022,13 +848,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="image">
-    <a href="#image" class="doc-link"></a>
-    image<span class="type-signature"> : String|Boolean</span>
+  <h4 class="name" id="waterColor">
+    <a href="#waterColor" class="doc-link"></a>
+    waterColor<span class="type-signature"> : Color</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L157">geometry/SatelliteScanGraphic.js 157</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L162">scene/WaterFacePrimitive.js 162</a>
 </div>
 
 
@@ -1039,7 +865,7 @@
 
 
 <div class="description">
-  表示卫星的图标,false表示不显示图标
+  水面颜色
 </div>
 
 
@@ -1081,13 +907,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="inverse">
-    <a href="#inverse" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> inverse<span class="type-signature"> : Boolean</span>
+  <h4 class="name" id="waterPolygon">
+    <a href="#waterPolygon" class="doc-link"></a>
+    waterPolygon<span class="type-signature"> : PolygonGeometry</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L267">geometry/SatelliteScanGraphic.js 267</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L150">scene/WaterFacePrimitive.js 150</a>
 </div>
 
 
@@ -1098,7 +924,7 @@
 
 
 <div class="description">
-  是否反方向扫描，true表示从下向上扫描
+  定义水面范围，为水面提供顶点信息
 </div>
 
 
@@ -1140,13 +966,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="model">
-    <a href="#model" class="doc-link"></a>
-    model<span class="type-signature"> : String|Boolean</span>
+  <h4 class="name" id="waveWidth">
+    <a href="#waveWidth" class="doc-link"></a>
+    waveWidth<span class="type-signature"> : Number</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L162">geometry/SatelliteScanGraphic.js 162</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L202">scene/WaterFacePrimitive.js 202</a>
 </div>
 
 
@@ -1157,302 +983,7 @@
 
 
 <div class="description">
-  表示卫星的模型,false表示不显示模型
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="path">
-    <a href="#path" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> path<span class="type-signature"> : Entity</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L139">geometry/SatelliteScanGraphic.js 139</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  卫星运动轨迹
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="radius">
-    <a href="#radius" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> radius<span class="type-signature"> : Number</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L127">geometry/SatelliteScanGraphic.js 127</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  卫星在地面的扫描半径
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="rotation">
-    <a href="#rotation" class="doc-link"></a>
-    <span class="type-signature attribute-readonly">readonly</span> rotation<span class="type-signature"> : Cesium.Cartesian3</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L308">geometry/SatelliteScanGraphic.js 308</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  卫星扫描波在各方向的偏转角度
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="thickness">
-    <a href="#thickness" class="doc-link"></a>
-    thickness<span class="type-signature"> : number</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L289">geometry/SatelliteScanGraphic.js 289</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  厚度,有效值0~1
-</div>
-
-
-
-
-
-<dl class="details">
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-    
-    
-<div class="nameContainer">
-  <h4 class="name" id="tracked">
-    <a href="#tracked" class="doc-link"></a>
-    tracked<span class="type-signature"> : Bool</span>
-    
-
-<div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L327">geometry/SatelliteScanGraphic.js 327</a>
-</div>
-
-
-  </h4>
-
-</div>
-
-
-
-<div class="description">
-  是否追踪卫星
+  波纹大小
 </div>
 
 
@@ -1500,13 +1031,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="trackSatellite">
-    <a href="#trackSatellite" class="doc-link"></a>
-    trackSatellite<span class="signature">()</span>
+  <h4 class="name" id="destroy">
+    <a href="#destroy" class="doc-link"></a>
+    destroy<span class="signature">()</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L250">geometry/SatelliteScanGraphic.js 250</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L607">scene/WaterFacePrimitive.js 607</a>
 </div>
 
 
@@ -1518,7 +1049,7 @@
 
 
 <div class="description">
-  使相视视角一直跟要卫星
+  销毁对象并释放WebGL资源
 </div>
 
 
@@ -1580,13 +1111,13 @@
     
     
 <div class="nameContainer">
-  <h4 class="name" id="zoomTo">
-    <a href="#zoomTo" class="doc-link"></a>
-    zoomTo<span class="signature">()</span>
+  <h4 class="name" id="update">
+    <a href="#update" class="doc-link"></a>
+    update<span class="signature">(framestate)</span>
     
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/geometry/SatelliteScanGraphic.js#L389">geometry/SatelliteScanGraphic.js 389</a>
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/scene/WaterFacePrimitive.js#L308">scene/WaterFacePrimitive.js 308</a>
 </div>
 
 
@@ -1598,7 +1129,7 @@
 
 
 <div class="description">
-  定位到扫描波所在的位置
+  当Scene渲染每一帧时会自动调用该方法，不要直接调用该方法。
 </div>
 
 
@@ -1610,6 +1141,52 @@
 
 
 
+
+
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>framestate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">
+  Cesium.FrameState</span>
+
+
+            
+            </td>
+
+            
+
+            <td class="description last">
+            
+                </td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 

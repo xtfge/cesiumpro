@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-      guid - CesiumPro Documentation
+      getNodesAndHeight - CesiumPro Documentation
     </title>
 
     <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
 
       <h1 class="page-title">
         <a href="index.html"><img src="./icons/CesiumLogo.png" class="cesiumLogo"></a>
-        guid
+        getNodesAndHeight
         <div class="titleCenterer"></div>
       </h1>
 
@@ -43,61 +43,20 @@
 
       
       
-<div class="nameContainer">
-  <h4 class="name" id="guid">
-    <a href="#guid" class="doc-link"></a>
-    guid<span class="signature">()</span> &rarr; <span class="type-signature returnType">String</span>
-    
 
 <div class="source-link rightLinks">
-    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/core/guid.js#L6">core/guid.js 6</a>
-</div>
-
-
-  </h4>
-
+    <a href="https://github.com/CesiumGS/cesium/blob/undefined/Source/analysis/FillAnalysis.js#L25">analysis/FillAnalysis.js 25</a>
 </div>
 
 
 
+      
+      <div class="description">
+        获得三角形顶点
+      </div>
+      
 
-<div class="description">
-  生成符合RFC4122 v4的guid
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-
-<div class="param-desc">
-    guid
-</div>
-
-
-
-
-
-
-
+      
 <dl class="details">
 
 
