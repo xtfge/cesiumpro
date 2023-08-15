@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+  <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+  <script src='/build/CesiumPro.js'></script>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body,
+    html {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div id='toolbar'></div>
+  <script>
+    var viewer = new CesiumPro.Viewer('map');
+    const model = new CesiumPro.Tileset({
+      url: '../data/tileset/dayanta/tileset.json'
+    })
+    viewer.addModel(model)
+    // 观测点，相机所在的位置
+    const observe = Cesium.Cartesian3.fromRadians(1.9017007584537704,
+      0.597247588122315,
+      485.960238722396);
+    viewer.entities.add({
+      position: observe,
+      point: {
+        pixelSize: 20,
+        clampToGround: true,
+        color: Cesium.Color.GOLD
+      }
+    })
+    const view = Cesium.Cartesian3.fromDegrees(108.95936189365446, 34.21873449675988, 421.49619504080385);
+    viewer.entities.add({
+      position: view,
+      point: {
+        pixelSize: 20,
+        clampToGround: true,
+        color: Cesium.Color.RED
+      }
+    })
+    // 观察方向
+    const direction = Cesium.Cartesian3.subtract(view, observe, new Cesium.Cartesian3);
+    const viewshed = new CesiumPro.ViewShedAnalysis(viewer, {
+      observe,
+      viewPosition: view,
+      size: 2048 * 2,
+      near: 1,
+      fov: 120,
+      aspectRatio: 1.5,
+      debug: true
+    })
+
+    viewshed.do();
+    // 开启深度监测
+    viewer.depthTest = true;
+    viewer.flyTo(model);
+    const far = viewshed.far;
+    const gui = new GUI();
+    let xRotation = 0;
+    let yRotation = 0;
+    const object = {
+      near: 1,
+      far,
+      fov: 120,
+      heading: viewshed.heading,
+      pitch: viewshed.pitch,
+      debug: true,
+      xRotation,
+      yRotation,
+      vAngle: 120 / 1.5 // aspectRatio是水平角与垂直角的比
+    }
+    gui.add(object, 'near', 0.5, 2, 0.1).name('近截面').onChange(() => {
+      viewshed.near = object.near;
+    })
+    gui.add(object, 'far', far - 100, far + 100, 1).name('远截面').onChange(() => {
+      viewshed.far = object.far;
+    })
+    gui.add(object, 'fov', 60, 120, 1).name('水平夹角').onChange(() => {
+      viewshed.fov = object.fov;
+    })
+    gui.add(object, 'vAngle', 30, 90, 1).name('垂直夹角').onChange(() => {
+      viewshed.aspectRatio = viewshed.fov / object.vAngle;
+    })
+    gui.add(object, 'xRotation', -45, 45, 1).name('水平方向旋转').onChange(() => {
+      const delta = object.xRotation - xRotation;
+      viewshed.rotateLeft(delta);
+      xRotation = object.xRotation
+    })
+    gui.add(object, 'yRotation', -45, 45, 1).name('垂直方向旋转').onChange(() => {
+      const delta = object.yRotation - yRotation;
+      viewshed.rotateUp(delta)
+      yRotation = object.yRotation
+    })
+    gui.add(object, 'debug').name('调试').onChange(() => {
+      viewshed.debug = object.debug;
+    })
+  </script>
+</body>
+
+</html>

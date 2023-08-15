@@ -66,7 +66,7 @@ class HeightAnalysis extends BaseAnalysis {
         const grid = AnalysisUtil.polygonToGrid(polygon, this.samplerSize);
         const samplerPoints = grid.features.map(_ => Cartographic.fromDegrees(..._.geometry.coordinates));
         const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
-        this.postDo.raise({
+        this.postAnalysis.raise({
             id: this._id,
             mask: this._mask,
             samplerSize: this.samplerSize

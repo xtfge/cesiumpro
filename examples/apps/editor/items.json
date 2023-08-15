@@ -385,11 +385,11 @@
           {
             "label": "水面模拟",
             "value": "4.2.4waterMaterial",
-            "thumb": "./images/4.2.4waterMaterial"
+            "thumb": "./images/4.2.4waterMaterial.png"
           }, {
             "label": "水面倒影",
             "value": "4.2.5waterFace1",
-            "thumb": "./images/4.2.5waterFace1"
+            "thumb": "./images/4.2.5waterFace1.png"
           }
         ]
       }
@@ -494,6 +494,11 @@
             "label": "淹没分析",
             "value": "hiy",
             "thumb": "./assets/images/gif.gif"
+          },
+          {
+            "label": "可视域分析",
+            "value": "2.1.5viewshed",
+            "thumb": "./assets/images/2.1.5viewshed.png"
           }
         ]
       },

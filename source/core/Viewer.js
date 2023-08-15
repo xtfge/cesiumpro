@@ -959,7 +959,7 @@ class Viewer extends Cesium.Viewer {
     /**
      * 鼠标事件监听
      * @param {Function} fn 回调函数
-     * @param {String} [event = 'LEFT_CLICK'] 事件类型
+     * @param {String} [event = 'LEFT_CLICK'] 事件类型, 该参数应该是Cesium.ScreenSpaceEventType的属性
      * @param {Element} [target = this.canvas] 触发事件的元素，默认为球的canvas
      * @returns 取消事件监听的函数
      * @example

@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-07-14
+ * @datetime 2023-08-15
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -4813,7 +4813,7 @@
      * @example
      * param = CesiumPro.defaultValue(param, 'default');
      */
-    function defaultValue$b(a, b) {
+    function defaultValue$c(a, b) {
         if (a !== undefined && a !== null) {
             return a;
         }
@@ -4826,7 +4826,7 @@
      * @exports defined
      * @returns {Boolean} value是否被定义
      */
-     function defined$c(value) {
+     function defined$d(value) {
         return value !== undefined && value !== null;
       }
 
@@ -4838,15 +4838,15 @@
          * @param {Number} alt 海拔，单位：米
          */
         constructor(lon, lat, alt) {
-            if (!defined$c(lon)) {
+            if (!defined$d(lon)) {
                 throw new CesiumProError$1('longitude is required.')
             }
-            if (!defined$c(lat)) {
+            if (!defined$d(lat)) {
                 throw new CesiumProError$1('latitude is required.')
             }
             this.lon = lon;
             this.lat = lat;
-            this.alt = defaultValue$b(alt, 0);
+            this.alt = defaultValue$c(alt, 0);
         }
         get height() {
             return this.alt;
@@ -4926,7 +4926,7 @@
             if (viewer instanceof Cesium.Viewer === false) {
                 throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
-            if (!defined$c(point)) {
+            if (!defined$d(point)) {
                 return false;
             }
             const position = LonLat.toCartesian(point);
@@ -4940,7 +4940,7 @@
                     return false;
                 }
                 const windowPosition = LonLat.toPixel(point, viewer.scene);
-                if (!defined$c(windowPosition)) {
+                if (!defined$d(windowPosition)) {
                     return false;
                 }
                 const width = viewer.canvas.width || viewer.canvas.clientWidth;
@@ -4967,15 +4967,15 @@
          */
         static toPixel(point, scene) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(scene)) {
+            if (!defined$d(scene)) {
                 throw new CesiumProError$1('scene未定义。')
             }        
             //>>includeEnd('debug', pragmas.debug);
-            if (!defined$c(point)) {
+            if (!defined$d(point)) {
                 return undefined
             }
             const cartesian = LonLat.toCartesian(point);
-            if (!defined$c(cartesian)) {
+            if (!defined$d(cartesian)) {
                 return undefined;
             }
             return Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -4990,7 +4990,7 @@
          */
         static toCartographic(point, viewer) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(point)) {
+            if (!defined$d(point)) {
                 throw new CesiumProError$1('point is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -5013,7 +5013,7 @@
          */
         static toCartesian(point, viewer) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(point)) {
+            if (!defined$d(point)) {
                 return undefined;
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -5042,12 +5042,12 @@
          */
         static fromCartesian(cartesian) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(cartesian)) {
+            if (!defined$d(cartesian)) {
                 return undefined
             }
             //>>includeEnd('debug', pragmas.debug);
             const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-            if (!defined$c(cartographic)) {
+            if (!defined$d(cartographic)) {
                 return undefined;
             }
             return LonLat.fromCartographic(cartographic)
@@ -5059,7 +5059,7 @@
          */
         static fromCartographic(cartographic) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(cartographic)) {
+            if (!defined$d(cartographic)) {
                 throw new CesiumProError$1('cartographic is not defined.')
             }
             //>>includeEnd('debug', pragmas.debug);
@@ -5080,7 +5080,7 @@
                 return undefined;
             }
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(pixel)) {
+            if (!defined$d(pixel)) {
                 throw new CesiumProError$1('pixel is not defined.')
             }
             if (viewer instanceof Cesium.Viewer === false) {
@@ -5089,7 +5089,7 @@
             //>>includeEnd('debug', pragmas.debug);
             const ray = viewer.scene.camera.getPickRay(pixel);
             const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-            if (!defined$c(cartesian)) {
+            if (!defined$d(cartesian)) {
                 return undefined;
             }
             return LonLat.fromCartesian(cartesian);
@@ -5181,25 +5181,25 @@
          */
         static isValid(v) {
             if (v instanceof LonLat) {
-                if (!defined$c(v.lon)) {
+                if (!defined$d(v.lon)) {
                     return false;
                 }
-                if (!defined$c(v.lat)) {
+                if (!defined$d(v.lat)) {
                     return false;
                 }
-                if (!defined$c(v.alt)) {
+                if (!defined$d(v.alt)) {
                     return false;
                 }
                 return true
             }
             if (v instanceof Cesium.Cartesian3) {
-                if (!defined$c(v.x)) {
+                if (!defined$d(v.x)) {
                     return false;
                 }
-                if (!defined$c(v.y)) {
+                if (!defined$d(v.y)) {
                     return false;
                 }
-                if (!defined$c(v.z)) {
+                if (!defined$d(v.z)) {
                     return false;
                 }
                 return true;
@@ -5221,8 +5221,8 @@
     }
 
     const {
-        Cartographic: Cartographic$b,
-        Cartesian3: Cartesian3$m
+        Cartographic: Cartographic$c,
+        Cartesian3: Cartesian3$n
     } = Cesium;
     /**
      * 空间分析工具集
@@ -5283,14 +5283,14 @@
         if (first instanceof LonLat) {
             return positions.map(_ => _.toCartesian());
         }
-        if (first instanceof Cartesian3$m) {
+        if (first instanceof Cartesian3$n) {
             return positions
         }
-        if (first instanceof Cartographic$b) {
-            return positions.map(_ => Cartographic$b.toCartesian(_));
+        if (first instanceof Cartographic$c) {
+            return positions.map(_ => Cartographic$c.toCartesian(_));
         }
         if (typeof first === 'number') {
-            return Cartesian3$m.fromDegreesArray(positions);
+            return Cartesian3$n.fromDegreesArray(positions);
         }
         return positions;
     };
@@ -5299,10 +5299,10 @@
         if (first instanceof LonLat) {
             return positions
         }
-        if (first instanceof Cartesian3$m) {
+        if (first instanceof Cartesian3$n) {
             return positions.map(_ => LonLat.fromCartesian(_));
         }
-        if (first instanceof Cartographic$b) {
+        if (first instanceof Cartographic$c) {
             return positions.map(_ => LonLat.fromCartographic(_));
         }
         if (typeof first === 'number') {
@@ -5501,7 +5501,7 @@
          */
         constructor(viewer, options = {}) {
             checkViewer(viewer);
-            this._id = defaultValue$b(options.id, guid());
+            this._id = defaultValue$c(options.id, guid());
             this.options = options;
             this._viewer = viewer;
             this._doing = false;
@@ -5510,13 +5510,24 @@
              * @type {Event}
              * @readonly
              */
-            this.preDo = new Event$9();
+            this.preAnalysis = new Event$9();
+            /**
+             * @deprecated
+             * 请使用preAnalysis
+             */
+            this.preDo = this.preAnalysis;
             /**
              * 分析完成后触发的事件
              * @type {Event}
              * @readonly
              */
-            this.postDo = new Event$9();
+            this.postAnalysis = new Event$9();
+            /**
+             * @deprecated
+             * 请使用postAnalysis
+             */
+            this.postDo = this.postDo;
+
         }
         /**
          * @readonly
@@ -5724,8 +5735,8 @@
      *
      * @see CesiumProError
      */
-    function destroyObject$7(object, message) {
-      message = defaultValue$b(
+    function destroyObject$8(object, message) {
+      message = defaultValue$c(
         message,
         "This object was destroyed, i.e., destroy() was called."
       );
@@ -5751,16 +5762,16 @@
     }
 
     const {
-        Color: Color$r,
-        Cartesian3: Cartesian3$l,
-        Cartographic: Cartographic$a,
+        Color: Color$s,
+        Cartesian3: Cartesian3$m,
+        Cartographic: Cartographic$b,
         PrimitiveCollection: PrimitiveCollection$5,
         PolygonGeometry: PolygonGeometry$2,
         PolygonHierarchy: PolygonHierarchy$3,
-        GeometryInstance: GeometryInstance$3,
-        Primitive: Primitive$8,
+        GeometryInstance: GeometryInstance$4,
+        Primitive: Primitive$9,
         GroundPrimitive: GroundPrimitive$2,
-        PerInstanceColorAppearance
+        PerInstanceColorAppearance: PerInstanceColorAppearance$1
     } = Cesium;
     /**
      * 获得三角形顶点
@@ -5771,10 +5782,10 @@
         const area = AnalysisUtil.getArea(points);
         for (let i = 0; i < 3; i++) {
             const point = points[i];
-            const carto = Cartographic$a.fromDegrees(...point);
+            const carto = Cartographic$b.fromDegrees(...point);
             const height = viewer.scene.sampleHeight(carto, exclude);
             h += height;
-            const cartesian = Cartesian3$l.fromDegrees(point[0], point[1], height);
+            const cartesian = Cartesian3$m.fromDegrees(point[0], point[1], height);
             positions.push(cartesian);
         }
         return {
@@ -5789,16 +5800,16 @@
             perPositionHeight: true,
             extrudedHeight: height
         });
-        const instance = new GeometryInstance$3({
+        const instance = new GeometryInstance$4({
             geometry: polygon,
             attributes: {
                 color: Cesium.ColorGeometryInstanceAttribute.fromColor(color)
             }
         });
-        const constructor = clamp ? GroundPrimitive$2 : Primitive$8;
+        const constructor = clamp ? GroundPrimitive$2 : Primitive$9;
         return new constructor({
             geometryInstances: [instance],
-            appearance: new PerInstanceColorAppearance()
+            appearance: new PerInstanceColorAppearance$1()
         })
     }
     class FillAnalysis extends BaseAnalysis {
@@ -5822,16 +5833,16 @@
             }
             const mask = AnalysisUtil.getCartesians(options.mask);
             this._mask = [...mask, mask[0]];
-            if (this._mask instanceof Cartesian3$l) {
+            if (this._mask instanceof Cartesian3$m) {
                 this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
             }
-            this.excavatedColor = defaultValue$b(options.excavatedColor, Color$r.RED.withAlpha(0.5));
-            this.fillColor = defaultValue$b(options.fillColor, Color$r.GREEN.withAlpha(0.5));
+            this.excavatedColor = defaultValue$c(options.excavatedColor, Color$s.RED.withAlpha(0.5));
+            this.fillColor = defaultValue$c(options.fillColor, Color$s.GREEN.withAlpha(0.5));
             this._type = 'excavation-analysis';
-            this._height = defaultValue$b(options.height, 0);
+            this._height = defaultValue$c(options.height, 0);
             this._samplerSize = options.samplerSize;
-            this._excludeObject = defaultValue$b(options.excludeObject, []);
-            this._renderToViewer = defaultValue$b(options.renderToViewer, true);
+            this._excludeObject = defaultValue$c(options.excludeObject, []);
+            this._renderToViewer = defaultValue$c(options.renderToViewer, true);
         }
         /**
          * 建议采样间距
@@ -5885,7 +5896,7 @@
                 excavaVolume,
                 graphicCollection: this._root
             };
-            this.postDo.raise(data);
+            this.postAnalysis.raise(data);
             this._doing = false;
             return data;
 
@@ -5898,12 +5909,12 @@
         }
         destroy() {
             this._viewer.scene.primitives.remove(this._root);
-            destroyObject$7(this);
+            destroyObject$8(this);
         }
     }
 
     const {
-        Cartographic: Cartographic$9
+        Cartographic: Cartographic$a
     } = Cesium;
 
     function computeHeight(positions, viewer, exclude = []) {
@@ -5963,9 +5974,9 @@
             const polygon = AnalysisUtil.getLonLats(this._mask);
             this.samplerSize = this._samplerSize || cellSize;
             const grid = AnalysisUtil.polygonToGrid(polygon, this.samplerSize);
-            const samplerPoints = grid.features.map(_ => Cartographic$9.fromDegrees(..._.geometry.coordinates));
+            const samplerPoints = grid.features.map(_ => Cartographic$a.fromDegrees(..._.geometry.coordinates));
             const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
-            this.postDo.raise({
+            this.postAnalysis.raise({
                 id: this._id,
                 mask: this._mask,
                 samplerSize: this.samplerSize
@@ -5974,27 +5985,3753 @@
         }
     }
 
+    class ViewShadowPrimitive {
+      /**
+       * 视域分析图元
+       * @private
+       * @extends CustomPrimitive
+       * @param {Cesium.ShadowMap} shadowMap 视域阴影
+       */
+      constructor(shadowMap) {
+        if (!defined$d(shadowMap)) {
+          throw new CesiumProError$1('parameter shadowMap is required.')
+        }
+        this._shadowMap = shadowMap;
+      }
+      /**
+       * 是否渲染该图元
+       * @type {Bool}
+       */
+      get show() {
+        return this._show;
+      }
+      set show(val) {
+        this._show = val;
+      }
+      /**
+       * 场景渲染时scene会自动调用该方法，请勿主动调用。
+       * @override
+       * @param  {FrameState} frameState
+       */
+      update(frameState) {
+        frameState.shadowMaps.push(this._shadowMap);
+      }
+      /**
+       * 销毁对象并释放WebGL资源
+       */
+      destroy() {
+        if (this._shadowMap && !this._shadowMap.isDestroyed()) {
+          this._shadowMap.destroy();
+        }
+        destroyObject$8(this);
+      }
+
+    }
+
+    const BoundingRectangle$4 = Cesium.BoundingRectangle;
+    const BoundingSphere$9 = Cesium.BoundingSphere;
+    const BoxOutlineGeometry = Cesium.BoxOutlineGeometry;
+    const Cartesian2$7 = Cesium.Cartesian2;
+    const Cartesian3$l = Cesium.Cartesian3;
+    const Cartesian4$1 = Cesium.Cartesian4;
+    const Cartographic$9 = Cesium.Cartographic;
+    const Color$r = Cesium.Color;
+    const ColorGeometryInstanceAttribute = Cesium.ColorGeometryInstanceAttribute;
+    const combine$1 = Cesium.combine;
+    const CullingVolume = Cesium.CullingVolume;
+    const defaultValue$b = Cesium.defaultValue;
+    const defined$c = Cesium.defined;
+    const defineProperties$1 = Object.defineProperties;
+    const destroyObject$7 = Cesium.destroyObject;
+    const DeveloperError$5 = Cesium.DeveloperError;
+    const FeatureDetection$1 = Cesium.FeatureDetection;
+    const GeometryInstance$3 = Cesium.GeometryInstance;
+    const Intersect = Cesium.Intersect;
+    const CesiumMath$8 = Cesium.Math;
+    const Matrix4$8 = Cesium.Matrix4;
+    const OrthographicOffCenterFrustum$1 = Cesium.OrthographicOffCenterFrustum;
+    const PerspectiveFrustum = Cesium.PerspectiveFrustum;
+    const PixelFormat$2 = Cesium.PixelFormat;
+    const Quaternion$1 = Cesium.Quaternion;
+    const SphereOutlineGeometry = Cesium.SphereOutlineGeometry;
+    const WebGLConstants$2 = Cesium.WebGLConstants;
+    const ClearCommand$2 = Cesium.ClearCommand;
+    const ContextLimits = Cesium.ContextLimits;
+    const CubeMap$1 = Cesium.CubeMap;
+    const DrawCommand$4 = Cesium.DrawCommand;
+    const Framebuffer$2 = Cesium.Framebuffer;
+    const Pass$4 = Cesium.Pass;
+    const PassState$2 = Cesium.PassState;
+    const PixelDatatype$2 = Cesium.PixelDatatype;
+    const Renderbuffer$1 = Cesium.Renderbuffer;
+    const RenderbufferFormat$1 = Cesium.RenderbufferFormat;
+    const RenderState$4 = Cesium.RenderState;
+    const Sampler$1 = Cesium.Sampler;
+    const Texture$3 = Cesium.Texture;
+    const TextureMagnificationFilter = Cesium.TextureMagnificationFilter;
+    const TextureMinificationFilter = Cesium.TextureMinificationFilter;
+    const TextureWrap$1 = Cesium.TextureWrap;
+    const Camera$1 = Cesium.Camera;
+    const CullFace$1 = Cesium.CullFace;
+    const DebugCameraPrimitive = Cesium.DebugCameraPrimitive;
+    const PerInstanceColorAppearance = Cesium.PerInstanceColorAppearance;
+    const Primitive$8 = Cesium.Primitive;
+    const ShadowMapShader = Cesium.ShadowMapShader;
+    const ShaderSource$6 = Cesium.ShaderSource;
+
+    /**
+     * Use {@link Viewer#shadowMap} to get the scene's shadow map originating from the sun. Do not construct this directly.
+     *
+     * <p>
+     * The normalOffset bias pushes the shadows forward slightly, and may be disabled
+     * for applications that require ultra precise shadows.
+     * </p>
+     *
+     * @alias ViewshedMap
+     * @private
+     * @internalConstructor
+     * @class
+     *
+     * @param {Object} options An object containing the following properties:
+     * @param {Camera} options.lightCamera A camera representing the light source.
+     * @param {Boolean} [options.enabled=true] Whether the shadow map is enabled.
+     * @param {Boolean} [options.isPointLight=false] Whether the light source is a point light. Point light shadows do not use cascades.
+     * @param {Boolean} [options.pointLightRadius=100.0] Radius of the point light.
+     * @param {Boolean} [options.cascadesEnabled=true] Use multiple shadow maps to cover different partitions of the view frustum.
+     * @param {Number} [options.numberOfCascades=4] The number of cascades to use for the shadow map. Supported values are one and four.
+     * @param {Number} [options.maximumDistance=5000.0] The maximum distance used for generating cascaded shadows. Lower values improve shadow quality.
+     * @param {Number} [options.size=2048] The width and height, in pixels, of each shadow map.
+     * @param {Boolean} [options.softShadows=false] Whether percentage-closer-filtering is enabled for producing softer shadows.
+     * @param {Number} [options.darkness=0.3] The shadow darkness.
+     * @param {Boolean} [options.normalOffset=true] Whether a normal bias is applied to shadows.
+     *
+     * @exception {DeveloperError} Only one or four cascades are supported.
+     *
+     * @demo {@link https://cesiumjs.org/Cesium/Apps/Sandcastle/index.html?src=Shadows.html|Cesium Sandcastle Shadows Demo}
+     */
+    function ViewshedMap(options) {
+      options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
+      // options.context is an undocumented option
+      var context = options.context;
+
+      //>>includeStart('debug', pragmas.debug);
+      if (!defined$c(context)) {
+        throw new DeveloperError$5("context is required.");
+      }
+      if (!defined$c(options.lightCamera)) {
+        throw new DeveloperError$5("lightCamera is required.");
+      }
+      if (defined$c(options.numberOfCascades) && (options.numberOfCascades !== 1 && options.numberOfCascades !== 4)) {
+        throw new DeveloperError$5("Only one or four cascades are supported.");
+      }
+      //>>includeEnd('debug');
+
+      this._enabled = defaultValue$b(options.enabled, true);
+      this._softShadows = defaultValue$b(options.softShadows, false);
+      this._normalOffset = defaultValue$b(options.normalOffset, true);
+      this.dirty = true;
+
+      /**
+       * Specifies whether the shadow map originates from a light source. Shadow maps that are used for analytical
+       * purposes should set this to false so as not to affect scene rendering.
+       *
+       * @private
+       */
+      this.fromLightSource = defaultValue$b(options.fromLightSource, true);
+
+      /**
+       * Determines the darkness of the shadows.
+       *
+       * @type {Number}
+       * @default 0.3
+       */
+      this.darkness = 0.0;
+      this._darkness = this.darkness;
+
+      /**
+       * Determines the maximum distance of the shadow map. Only applicable for cascaded shadows. Larger distances may result in lower quality shadows.
+       *
+       * @type {Number}
+       * @default 5000.0
+       */
+      this.maximumDistance = defaultValue$b(options.maximumDistance, 5000.0);
+
+      this._outOfView = false;
+      this._outOfViewPrevious = false;
+      this._needsUpdate = true;
+
+      // In IE11 and Edge polygon offset is not functional.
+      // TODO : Also disabled for instances of Firefox and Chrome running ANGLE that do not support depth textures.
+      // Re-enable once https://github.com/AnalyticalGraphicsInc/cesium/issues/4560 is resolved.
+      var polygonOffsetSupported = true;
+      if (
+        FeatureDetection$1.isInternetExplorer() ||
+        FeatureDetection$1.isEdge() ||
+        ((FeatureDetection$1.isChrome() || FeatureDetection$1.isFirefox()) &&
+          FeatureDetection$1.isWindows() &&
+          !context.depthTexture)
+      ) {
+        polygonOffsetSupported = false;
+      }
+      this._polygonOffsetSupported = polygonOffsetSupported;
+
+      this._terrainBias = {
+        polygonOffset: polygonOffsetSupported,
+        polygonOffsetFactor: 1.1,
+        polygonOffsetUnits: 4.0,
+        normalOffset: this._normalOffset,
+        normalOffsetScale: 0.5,
+        normalShading: true,
+        normalShadingSmooth: 0.3,
+        depthBias: 0.0001
+      };
+
+      this._primitiveBias = {
+        polygonOffset: polygonOffsetSupported,
+        polygonOffsetFactor: 1.1,
+        polygonOffsetUnits: 4.0,
+        normalOffset: this._normalOffset,
+        normalOffsetScale: 0.1,
+        normalShading: true,
+        normalShadingSmooth: 0.05,
+        depthBias: 0.00002
+      };
+
+      this._pointBias = {
+        polygonOffset: false,
+        polygonOffsetFactor: 1.1,
+        polygonOffsetUnits: 4.0,
+        normalOffset: this._normalOffset,
+        normalOffsetScale: 0.0,
+        normalShading: true,
+        normalShadingSmooth: 0.1,
+        depthBias: 0.0005
+      };
+
+      // Framebuffer resources
+      this._depthAttachment = undefined;
+      this._colorAttachment = undefined;
+
+      // Uniforms
+      this._shadowMapMatrix = new Matrix4$8();
+      this._shadowMapTexture = undefined;
+      this._lightDirectionEC = new Cartesian3$l();
+      this._lightPositionEC = new Cartesian4$1();
+      this._distance = 0.0;
+
+      this._lightCamera = options.lightCamera;
+      this._shadowMapCamera = new ShadowMapCamera();
+      this._shadowMapCullingVolume = undefined;
+      this._sceneCamera = undefined;
+      // this._boundingSphere = new BoundingSphere();
+      this._boundingSphere = defaultValue$b(options.boundingSphere, new BoundingSphere$9());
+
+      this._isPointLight = defaultValue$b(options.isPointLight, false);
+      this._pointLightRadius = defaultValue$b(options.pointLightRadius, 100.0);
+
+      this._cascadesEnabled = false;
+      this._numberOfCascades = !this._cascadesEnabled ? 0 : defaultValue$b(options.numberOfCascades, 4);
+      this._fitNearFar = true;
+      this._maximumCascadeDistances = [25.0, 150.0, 700.0, Number.MAX_VALUE];
+
+      this._textureSize = new Cartesian2$7();
+
+      this._isSpotLight = false;
+      if (this._cascadesEnabled) {
+        // Cascaded shadows are always orthographic. The frustum dimensions are calculated on the fly.
+        this._shadowMapCamera.frustum = new OrthographicOffCenterFrustum$1();
+      } else if (defined$c(this._lightCamera.frustum.fov)) {
+        // If the light camera uses a perspective frustum, then the light source is a spot light
+        this._isSpotLight = true;
+      }
+
+      // Uniforms
+      this._cascadeSplits = [new Cartesian4$1(), new Cartesian4$1()];
+      this._cascadeMatrices = [new Matrix4$8(), new Matrix4$8(), new Matrix4$8(), new Matrix4$8()];
+      this._cascadeDistances = new Cartesian4$1();
+
+      var numberOfPasses;
+      if (this._isPointLight) {
+        numberOfPasses = 6; // One shadow map for each direction
+      } else if (!this._cascadesEnabled) {
+        numberOfPasses = 1;
+      } else {
+        numberOfPasses = this._numberOfCascades;
+      }
+
+      this._passes = new Array(numberOfPasses);
+      for (var i = 0; i < numberOfPasses; ++i) {
+        this._passes[i] = new ShadowPass(context);
+      }
+
+      this.debugShow = false;
+      this.debugFreezeFrame = false;
+      this._debugFreezeFrame = false;
+      this._debugCascadeColors = false;
+      this._debugLightFrustum = undefined;
+      this._debugCameraFrustum = undefined;
+      this._debugCascadeFrustums = new Array(this._numberOfCascades);
+      this._debugShadowViewCommand = undefined;
+
+      this._usesDepthTexture = context.depthTexture;
+
+      if (this._isPointLight) {
+        this._usesDepthTexture = false;
+      }
+
+      // Create render states for shadow casters
+      this._primitiveRenderState = undefined;
+      this._terrainRenderState = undefined;
+      this._pointRenderState = undefined;
+      createRenderStates(this);
+
+      // For clearing the shadow map texture every frame
+      this._clearCommand = new ClearCommand$2({
+        depth: 1.0,
+        color: new Color$r()
+      });
+
+      this._clearPassState = new PassState$2(context);
+
+      this._size = defaultValue$b(options.size, 2048);
+      this.size = this._size;
+    }
+
+    /**
+     * Global maximum shadow distance used to prevent far off receivers from extending
+     * the shadow far plane. This helps set a tighter near/far when viewing objects from space.
+     *
+     * @private
+     */
+    ViewshedMap.MAXIMUM_DISTANCE = 20000.0;
+
+    function ShadowPass(context) {
+      this.camera = new ShadowMapCamera();
+      this.passState = new PassState$2(context);
+      this.framebuffer = undefined;
+      this.textureOffsets = undefined;
+      this.commandList = [];
+      this.cullingVolume = undefined;
+    }
+
+    function createRenderState$1(colorMask, bias) {
+      return RenderState$4.fromCache({
+        cull: {
+          enabled: true,
+          face: CullFace$1.BACK
+        },
+        depthTest: {
+          enabled: true
+        },
+        colorMask: {
+          red: colorMask,
+          green: colorMask,
+          blue: colorMask,
+          alpha: colorMask
+        },
+        depthMask: true,
+        polygonOffset: {
+          enabled: bias.polygonOffset,
+          factor: bias.polygonOffsetFactor,
+          units: bias.polygonOffsetUnits
+        }
+      });
+    }
+
+    function createRenderStates(shadowMap) {
+      // Enable the color mask if the shadow map is backed by a color texture, e.g. when depth textures aren't supported
+      var colorMask = !shadowMap._usesDepthTexture;
+      shadowMap._primitiveRenderState = createRenderState$1(colorMask, shadowMap._primitiveBias);
+      shadowMap._terrainRenderState = createRenderState$1(colorMask, shadowMap._terrainBias);
+      shadowMap._pointRenderState = createRenderState$1(colorMask, shadowMap._pointBias);
+    }
+
+    /**
+     * @private
+     */
+    ViewshedMap.prototype.debugCreateRenderStates = function() {
+      createRenderStates(this);
+    };
+
+    defineProperties$1(ViewshedMap.prototype, {
+      /**
+       * Determines if the shadow map will be shown.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @default true
+       */
+      enabled: {
+        get: function() {
+          return this._enabled;
+        },
+        set: function(value) {
+          this.dirty = this._enabled !== value;
+          this._enabled = value;
+        }
+      },
+      isViewShed: {
+        get: function() {
+          return true;
+        }
+      },
+
+      /**
+       * Determines if a normal bias will be applied to shadows.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @default true
+       */
+      normalOffset: {
+        get: function() {
+          return this._normalOffset;
+        },
+        set: function(value) {
+          this.dirty = this._normalOffset !== value;
+          this._normalOffset = value;
+          this._terrainBias.normalOffset = value;
+          this._primitiveBias.normalOffset = value;
+          this._pointBias.normalOffset = value;
+        }
+      },
+
+      /**
+       * Determines if soft shadows are enabled. Uses pcf filtering which requires more texture reads and may hurt performance.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @default false
+       */
+      softShadows: {
+        get: function() {
+          return this._softShadows;
+        },
+        set: function(value) {
+          this.dirty = this._softShadows !== value;
+          this._softShadows = value;
+        }
+      },
+
+      /**
+       * The width and height, in pixels, of each shadow map.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Number}
+       * @default 2048
+       */
+      size: {
+        get: function() {
+          return this._size;
+        },
+        set: function(value) {
+          resize(this, value);
+        }
+      },
+
+      /**
+       * Whether the shadow map is out of view of the scene camera.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @readonly
+       * @private
+       */
+      outOfView: {
+        get: function() {
+          return this._outOfView;
+        }
+      },
+
+      /**
+       * The culling volume of the shadow frustum.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {CullingVolume}
+       * @readonly
+       * @private
+       */
+      shadowMapCullingVolume: {
+        get: function() {
+          return this._shadowMapCullingVolume;
+        }
+      },
+
+      /**
+       * The passes used for rendering shadows. Each face of a point light or each cascade for a cascaded shadow map is a separate pass.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {ShadowPass[]}
+       * @readonly
+       * @private
+       */
+      passes: {
+        get: function() {
+          return this._passes;
+        }
+      },
+
+      /**
+       * Whether the light source is a point light.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @readonly
+       * @private
+       */
+      isPointLight: {
+        get: function() {
+          return this._isPointLight;
+        }
+      },
+
+      /**
+       * Debug option for visualizing the cascades by color.
+       *
+       * @memberof ViewshedMap.prototype
+       * @type {Boolean}
+       * @default false
+       * @private
+       */
+      debugCascadeColors: {
+        get: function() {
+          return this._debugCascadeColors;
+        },
+        set: function(value) {
+          this.dirty = this._debugCascadeColors !== value;
+          this._debugCascadeColors = value;
+        }
+      }
+    });
+
+    function destroyFramebuffer(shadowMap) {
+      var length = shadowMap._passes.length;
+      for (var i = 0; i < length; ++i) {
+        var pass = shadowMap._passes[i];
+        var framebuffer = pass.framebuffer;
+        if (defined$c(framebuffer) && !framebuffer.isDestroyed()) {
+          framebuffer.destroy();
+        }
+        pass.framebuffer = undefined;
+      }
+
+      // Destroy the framebuffer attachments
+      shadowMap._depthAttachment = shadowMap._depthAttachment && shadowMap._depthAttachment.destroy();
+      shadowMap._colorAttachment = shadowMap._colorAttachment && shadowMap._colorAttachment.destroy();
+    }
+
+    function createSampler() {
+      return new Sampler$1({
+        wrapS: TextureWrap$1.CLAMP_TO_EDGE,
+        wrapT: TextureWrap$1.CLAMP_TO_EDGE,
+        minificationFilter: TextureMinificationFilter.NEAREST,
+        magnificationFilter: TextureMagnificationFilter.NEAREST
+      });
+    }
+
+    function createFramebufferColor(shadowMap, context) {
+      var depthRenderbuffer = new Renderbuffer$1({
+        context: context,
+        width: shadowMap._textureSize.x,
+        height: shadowMap._textureSize.y,
+        format: RenderbufferFormat$1.DEPTH_COMPONENT16
+      });
+
+      var colorTexture = new Texture$3({
+        context: context,
+        width: shadowMap._textureSize.x,
+        height: shadowMap._textureSize.y,
+        pixelFormat: PixelFormat$2.RGBA,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_BYTE,
+        sampler: createSampler()
+      });
+
+      var framebuffer = new Framebuffer$2({
+        context: context,
+        depthRenderbuffer: depthRenderbuffer,
+        colorTextures: [colorTexture],
+        destroyAttachments: false
+      });
+
+      var length = shadowMap._passes.length;
+      for (var i = 0; i < length; ++i) {
+        var pass = shadowMap._passes[i];
+        pass.framebuffer = framebuffer;
+        pass.passState.framebuffer = framebuffer;
+      }
+
+      shadowMap._shadowMapTexture = colorTexture;
+      shadowMap._depthAttachment = depthRenderbuffer;
+      shadowMap._colorAttachment = colorTexture;
+    }
+
+    function createFramebufferDepth(shadowMap, context) {
+      var depthStencilTexture = new Texture$3({
+        context: context,
+        width: shadowMap._textureSize.x,
+        height: shadowMap._textureSize.y,
+        pixelFormat: PixelFormat$2.DEPTH_STENCIL,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_INT_24_8,
+        sampler: createSampler()
+      });
+
+      var framebuffer = new Framebuffer$2({
+        context: context,
+        depthStencilTexture: depthStencilTexture,
+        destroyAttachments: false
+      });
+
+      var length = shadowMap._passes.length;
+      for (var i = 0; i < length; ++i) {
+        var pass = shadowMap._passes[i];
+        pass.framebuffer = framebuffer;
+        pass.passState.framebuffer = framebuffer;
+      }
+
+      shadowMap._shadowMapTexture = depthStencilTexture;
+      shadowMap._depthAttachment = depthStencilTexture;
+    }
+
+    function createFramebufferCube(shadowMap, context) {
+      var depthRenderbuffer = new Renderbuffer$1({
+        context: context,
+        width: shadowMap._textureSize.x,
+        height: shadowMap._textureSize.y,
+        format: RenderbufferFormat$1.DEPTH_COMPONENT16
+      });
+
+      var cubeMap = new CubeMap$1({
+        context: context,
+        width: shadowMap._textureSize.x,
+        height: shadowMap._textureSize.y,
+        pixelFormat: PixelFormat$2.RGBA,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_BYTE,
+        sampler: createSampler()
+      });
+
+      var faces = [
+        cubeMap.negativeX,
+        cubeMap.negativeY,
+        cubeMap.negativeZ,
+        cubeMap.positiveX,
+        cubeMap.positiveY,
+        cubeMap.positiveZ
+      ];
+
+      for (var i = 0; i < 6; ++i) {
+        var framebuffer = new Framebuffer$2({
+          context: context,
+          depthRenderbuffer: depthRenderbuffer,
+          colorTextures: [faces[i]],
+          destroyAttachments: false
+        });
+        var pass = shadowMap._passes[i];
+        pass.framebuffer = framebuffer;
+        pass.passState.framebuffer = framebuffer;
+      }
+
+      shadowMap._shadowMapTexture = cubeMap;
+      shadowMap._depthAttachment = depthRenderbuffer;
+      shadowMap._colorAttachment = cubeMap;
+    }
+
+    function createFramebuffer$1(shadowMap, context) {
+      if (shadowMap._isPointLight) {
+        createFramebufferCube(shadowMap, context);
+      } else if (shadowMap._usesDepthTexture) {
+        createFramebufferDepth(shadowMap, context);
+      } else {
+        createFramebufferColor(shadowMap, context);
+      }
+    }
+
+    function checkFramebuffer(shadowMap, context) {
+      // Attempt to make an FBO with only a depth texture. If it fails, fallback to a color texture.
+      if (
+        shadowMap._usesDepthTexture &&
+        shadowMap._passes[0].framebuffer.status !== WebGLConstants$2.FRAMEBUFFER_COMPLETE
+      ) {
+        shadowMap._usesDepthTexture = false;
+        createRenderStates(shadowMap);
+        destroyFramebuffer(shadowMap);
+        createFramebuffer$1(shadowMap, context);
+      }
+    }
+
+    function updateFramebuffer$1(shadowMap, context) {
+      if (!defined$c(shadowMap._passes[0].framebuffer) || shadowMap._shadowMapTexture.width !== shadowMap._textureSize.x) {
+        destroyFramebuffer(shadowMap);
+        createFramebuffer$1(shadowMap, context);
+        checkFramebuffer(shadowMap, context);
+        clearFramebuffer(shadowMap, context);
+      }
+    }
+
+    function clearFramebuffer(shadowMap, context, shadowPass) {
+      shadowPass = defaultValue$b(shadowPass, 0);
+      if (shadowMap._isPointLight || shadowPass === 0) {
+        shadowMap._clearCommand.framebuffer = shadowMap._passes[shadowPass].framebuffer;
+        shadowMap._clearCommand.execute(context, shadowMap._clearPassState);
+      }
+    }
+
+    function resize(shadowMap, size) {
+      shadowMap._size = size;
+      var passes = shadowMap._passes;
+      var numberOfPasses = passes.length;
+      var textureSize = shadowMap._textureSize;
+
+      if (shadowMap._isPointLight) {
+        size = ContextLimits.maximumCubeMapSize >= size ? size : ContextLimits.maximumCubeMapSize;
+        textureSize.x = size;
+        textureSize.y = size;
+        var faceViewport = new BoundingRectangle$4(0, 0, size, size);
+        passes[0].passState.viewport = faceViewport;
+        passes[1].passState.viewport = faceViewport;
+        passes[2].passState.viewport = faceViewport;
+        passes[3].passState.viewport = faceViewport;
+        passes[4].passState.viewport = faceViewport;
+        passes[5].passState.viewport = faceViewport;
+      } else if (numberOfPasses === 1) {
+        // +----+
+        // |  1 |
+        // +----+
+        size = ContextLimits.maximumTextureSize >= size ? size : ContextLimits.maximumTextureSize;
+        textureSize.x = size;
+        textureSize.y = size;
+        passes[0].passState.viewport = new BoundingRectangle$4(0, 0, size, size);
+      } else if (numberOfPasses === 4) {
+        // +----+----+
+        // |  3 |  4 |
+        // +----+----+
+        // |  1 |  2 |
+        // +----+----+
+        size = ContextLimits.maximumTextureSize >= size * 2 ? size : ContextLimits.maximumTextureSize / 2;
+        textureSize.x = size * 2;
+        textureSize.y = size * 2;
+        passes[0].passState.viewport = new BoundingRectangle$4(0, 0, size, size);
+        passes[1].passState.viewport = new BoundingRectangle$4(size, 0, size, size);
+        passes[2].passState.viewport = new BoundingRectangle$4(0, size, size, size);
+        passes[3].passState.viewport = new BoundingRectangle$4(size, size, size, size);
+      }
+
+      // Update clear pass state
+      shadowMap._clearPassState.viewport = new BoundingRectangle$4(0, 0, textureSize.x, textureSize.y);
+
+      // Transforms shadow coordinates [0, 1] into the pass's region of the texture
+      for (var i = 0; i < numberOfPasses; ++i) {
+        var pass = passes[i];
+        var viewport = pass.passState.viewport;
+        var biasX = viewport.x / textureSize.x;
+        var biasY = viewport.y / textureSize.y;
+        var scaleX = viewport.width / textureSize.x;
+        var scaleY = viewport.height / textureSize.y;
+        pass.textureOffsets = new Matrix4$8(
+          scaleX,
+          0.0,
+          0.0,
+          biasX,
+          0.0,
+          scaleY,
+          0.0,
+          biasY,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        );
+      }
+    }
+
+    var scratchViewport = new BoundingRectangle$4();
+
+    function createDebugShadowViewCommand(shadowMap, context) {
+      var fs;
+      if (shadowMap._isPointLight) {
+        fs =
+          "uniform samplerCube shadowMap_textureCube; \n" +
+          "varying vec2 v_textureCoordinates; \n" +
+          "void main() \n" +
+          "{ \n" +
+          "    vec2 uv = v_textureCoordinates; \n" +
+          "    vec3 dir; \n" +
+          " \n" +
+          "    if (uv.y < 0.5) \n" +
+          "    { \n" +
+          "        if (uv.x < 0.333) \n" +
+          "        { \n" +
+          "            dir.x = -1.0; \n" +
+          "            dir.y = uv.x * 6.0 - 1.0; \n" +
+          "            dir.z = uv.y * 4.0 - 1.0; \n" +
+          "        } \n" +
+          "        else if (uv.x < 0.666) \n" +
+          "        { \n" +
+          "            dir.y = -1.0; \n" +
+          "            dir.x = uv.x * 6.0 - 3.0; \n" +
+          "            dir.z = uv.y * 4.0 - 1.0; \n" +
+          "        } \n" +
+          "        else \n" +
+          "        { \n" +
+          "            dir.z = -1.0; \n" +
+          "            dir.x = uv.x * 6.0 - 5.0; \n" +
+          "            dir.y = uv.y * 4.0 - 1.0; \n" +
+          "        } \n" +
+          "    } \n" +
+          "    else \n" +
+          "    { \n" +
+          "        if (uv.x < 0.333) \n" +
+          "        { \n" +
+          "            dir.x = 1.0; \n" +
+          "            dir.y = uv.x * 6.0 - 1.0; \n" +
+          "            dir.z = uv.y * 4.0 - 3.0; \n" +
+          "        } \n" +
+          "        else if (uv.x < 0.666) \n" +
+          "        { \n" +
+          "            dir.y = 1.0; \n" +
+          "            dir.x = uv.x * 6.0 - 3.0; \n" +
+          "            dir.z = uv.y * 4.0 - 3.0; \n" +
+          "        } \n" +
+          "        else \n" +
+          "        { \n" +
+          "            dir.z = 1.0; \n" +
+          "            dir.x = uv.x * 6.0 - 5.0; \n" +
+          "            dir.y = uv.y * 4.0 - 3.0; \n" +
+          "        } \n" +
+          "    } \n" +
+          " \n" +
+          "    float shadow = czm_unpackDepth(textureCube(shadowMap_textureCube, dir)); \n" +
+          "    gl_FragColor = vec4(vec3(shadow), 1.0); \n" +
+          "} \n";
+      } else {
+        fs =
+          "uniform sampler2D shadowMap_texture; \n" +
+          "varying vec2 v_textureCoordinates; \n" +
+          "void main() \n" +
+          "{ \n" +
+          (shadowMap._usesDepthTexture ?
+            "    float shadow = texture2D(shadowMap_texture, v_textureCoordinates).r; \n" :
+            "    float shadow = czm_unpackDepth(texture2D(shadowMap_texture, v_textureCoordinates)); \n") +
+          "    gl_FragColor = vec4(vec3(shadow), 1.0); \n" +
+          "} \n";
+      }
+
+      var drawCommand = context.createViewportQuadCommand(fs, {
+        uniformMap: {
+          shadowMap_texture: function() {
+            return shadowMap._shadowMapTexture;
+          },
+          shadowMap_textureCube: function() {
+            return shadowMap._shadowMapTexture;
+          }
+        }
+      });
+      drawCommand.pass = Pass$4.OVERLAY;
+      return drawCommand;
+    }
+
+    function updateDebugShadowViewCommand(shadowMap, frameState) {
+      // Draws the shadow map on the bottom-right corner of the screen
+      var context = frameState.context;
+      var screenWidth = frameState.context.drawingBufferWidth;
+      var screenHeight = frameState.context.drawingBufferHeight;
+      var size = Math.min(screenWidth, screenHeight) * 0.3;
+
+      var viewport = scratchViewport;
+      viewport.x = screenWidth - size;
+      viewport.y = 0;
+      viewport.width = size;
+      viewport.height = size;
+
+      var debugCommand = shadowMap._debugShadowViewCommand;
+      if (!defined$c(debugCommand)) {
+        debugCommand = createDebugShadowViewCommand(shadowMap, context);
+        shadowMap._debugShadowViewCommand = debugCommand;
+      }
+
+      // Get a new RenderState for the updated viewport size
+      if (!defined$c(debugCommand.renderState) || !BoundingRectangle$4.equals(debugCommand.renderState.viewport, viewport)) {
+        debugCommand.renderState = RenderState$4.fromCache({
+          viewport: BoundingRectangle$4.clone(viewport)
+        });
+      }
+
+      frameState.commandList.push(shadowMap._debugShadowViewCommand);
+    }
+
+    var frustumCornersNDC = new Array(8);
+    frustumCornersNDC[0] = new Cartesian4$1(-1.0, -1.0, -1.0, 1.0);
+    frustumCornersNDC[1] = new Cartesian4$1(1.0, -1.0, -1.0, 1.0);
+    frustumCornersNDC[2] = new Cartesian4$1(1.0, 1.0, -1.0, 1.0);
+    frustumCornersNDC[3] = new Cartesian4$1(-1.0, 1.0, -1.0, 1.0);
+    frustumCornersNDC[4] = new Cartesian4$1(-1.0, -1.0, 1.0, 1.0);
+    frustumCornersNDC[5] = new Cartesian4$1(1.0, -1.0, 1.0, 1.0);
+    frustumCornersNDC[6] = new Cartesian4$1(1.0, 1.0, 1.0, 1.0);
+    frustumCornersNDC[7] = new Cartesian4$1(-1.0, 1.0, 1.0, 1.0);
+
+    var scratchMatrix = new Matrix4$8();
+    var scratchFrustumCorners = new Array(8);
+    for (var i = 0; i < 8; ++i) {
+      scratchFrustumCorners[i] = new Cartesian4$1();
+    }
+
+    function createDebugPointLight(modelMatrix, color) {
+      var box = new GeometryInstance$3({
+        geometry: new BoxOutlineGeometry({
+          minimum: new Cartesian3$l(-0.5, -0.5, -0.5),
+          maximum: new Cartesian3$l(0.5, 0.5, 0.5)
+        }),
+        attributes: {
+          color: ColorGeometryInstanceAttribute.fromColor(color)
+        }
+      });
+
+      var sphere = new GeometryInstance$3({
+        geometry: new SphereOutlineGeometry({
+          radius: 0.5
+        }),
+        attributes: {
+          color: ColorGeometryInstanceAttribute.fromColor(color)
+        }
+      });
+
+      return new Primitive$8({
+        geometryInstances: [box, sphere],
+        appearance: new PerInstanceColorAppearance({
+          translucent: false,
+          flat: true
+        }),
+        asynchronous: false,
+        modelMatrix: modelMatrix
+      });
+    }
+
+    var debugOutlineColors = [Color$r.RED, Color$r.GREEN, Color$r.BLUE, Color$r.MAGENTA];
+    var scratchScale = new Cartesian3$l();
+
+    function applyDebugSettings(shadowMap, frameState) {
+      updateDebugShadowViewCommand(shadowMap, frameState);
+
+      var enterFreezeFrame = shadowMap.debugFreezeFrame && !shadowMap._debugFreezeFrame;
+      shadowMap._debugFreezeFrame = shadowMap.debugFreezeFrame;
+
+      // Draw scene camera in freeze frame mode
+      if (shadowMap.debugFreezeFrame) {
+        if (enterFreezeFrame) {
+          // Recreate debug camera when entering freeze frame mode
+          shadowMap._debugCameraFrustum = shadowMap._debugCameraFrustum && shadowMap._debugCameraFrustum.destroy();
+          shadowMap._debugCameraFrustum = new DebugCameraPrimitive({
+            camera: shadowMap._sceneCamera,
+            color: Color$r.CYAN,
+            updateOnChange: false
+          });
+        }
+        shadowMap._debugCameraFrustum.update(frameState);
+      }
+
+      if (shadowMap._cascadesEnabled) {
+        // Draw cascades only in freeze frame mode
+        if (shadowMap.debugFreezeFrame) {
+          if (enterFreezeFrame) {
+            // Recreate debug frustum when entering freeze frame mode
+            shadowMap._debugLightFrustum = shadowMap._debugLightFrustum && shadowMap._debugLightFrustum.destroy();
+            shadowMap._debugLightFrustum = new DebugCameraPrimitive({
+              camera: shadowMap._shadowMapCamera,
+              color: Color$r.YELLOW,
+              updateOnChange: false
+            });
+          }
+          shadowMap._debugLightFrustum.update(frameState);
+
+          for (var i = 0; i < shadowMap._numberOfCascades; ++i) {
+            if (enterFreezeFrame) {
+              // Recreate debug frustum when entering freeze frame mode
+              shadowMap._debugCascadeFrustums[i] =
+                shadowMap._debugCascadeFrustums[i] && shadowMap._debugCascadeFrustums[i].destroy();
+              shadowMap._debugCascadeFrustums[i] = new DebugCameraPrimitive({
+                camera: shadowMap._passes[i].camera,
+                color: debugOutlineColors[i],
+                updateOnChange: false
+              });
+            }
+            shadowMap._debugCascadeFrustums[i].update(frameState);
+          }
+        }
+      } else if (shadowMap._isPointLight) {
+        if (!defined$c(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
+          var translation = shadowMap._shadowMapCamera.positionWC;
+          var rotation = Quaternion$1.IDENTITY;
+          var uniformScale = shadowMap._pointLightRadius * 2.0;
+          var scale = Cartesian3$l.fromElements(uniformScale, uniformScale, uniformScale, scratchScale);
+          var modelMatrix = Matrix4$8.fromTranslationQuaternionRotationScale(
+            translation,
+            rotation,
+            scale,
+            scratchMatrix
+          );
+
+          shadowMap._debugLightFrustum = shadowMap._debugLightFrustum && shadowMap._debugLightFrustum.destroy();
+          shadowMap._debugLightFrustum = createDebugPointLight(modelMatrix, Color$r.YELLOW);
+        }
+        shadowMap._debugLightFrustum.update(frameState);
+      } else {
+        if (!defined$c(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
+          shadowMap._debugLightFrustum = new DebugCameraPrimitive({
+            camera: shadowMap._shadowMapCamera,
+            color: Color$r.YELLOW,
+            updateOnChange: false
+          });
+        }
+        shadowMap._debugLightFrustum.update(frameState);
+      }
+    }
+
+    function ShadowMapCamera() {
+      this.viewMatrix = new Matrix4$8();
+      this.inverseViewMatrix = new Matrix4$8();
+      this.frustum = undefined;
+      this.positionCartographic = new Cartographic$9();
+      this.positionWC = new Cartesian3$l();
+      this.directionWC = Cartesian3$l.clone(Cartesian3$l.UNIT_Z);
+      this.upWC = Cartesian3$l.clone(Cartesian3$l.UNIT_Y);
+      this.rightWC = Cartesian3$l.clone(Cartesian3$l.UNIT_X);
+      this.viewProjectionMatrix = new Matrix4$8();
+    }
+
+    ShadowMapCamera.prototype.clone = function(camera) {
+      Matrix4$8.clone(camera.viewMatrix, this.viewMatrix);
+      Matrix4$8.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
+      this.frustum = camera.frustum.clone(this.frustum);
+      Cartographic$9.clone(camera.positionCartographic, this.positionCartographic);
+      Cartesian3$l.clone(camera.positionWC, this.positionWC);
+      Cartesian3$l.clone(camera.directionWC, this.directionWC);
+      Cartesian3$l.clone(camera.upWC, this.upWC);
+      Cartesian3$l.clone(camera.rightWC, this.rightWC);
+    };
+
+    // Converts from NDC space to texture space
+    var scaleBiasMatrix = new Matrix4$8(0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0);
+
+    ShadowMapCamera.prototype.getViewProjection = function() {
+      var view = this.viewMatrix;
+      var projection = this.frustum.projectionMatrix;
+      Matrix4$8.multiply(projection, view, this.viewProjectionMatrix);
+      Matrix4$8.multiply(scaleBiasMatrix, this.viewProjectionMatrix, this.viewProjectionMatrix);
+      return this.viewProjectionMatrix;
+    };
+
+    var scratchSplits = new Array(5);
+    var scratchFrustum = new PerspectiveFrustum();
+    var scratchCascadeDistances = new Array(4);
+    var scratchMin = new Cartesian3$l();
+    var scratchMax = new Cartesian3$l();
+
+    function computeCascades(shadowMap, frameState) {
+      var shadowMapCamera = shadowMap._shadowMapCamera;
+      var sceneCamera = shadowMap._sceneCamera;
+      var cameraNear = sceneCamera.frustum.near;
+      var cameraFar = sceneCamera.frustum.far;
+      var numberOfCascades = shadowMap._numberOfCascades;
+
+      // Split cascades. Use a mix of linear and log splits.
+      var i;
+      var range = cameraFar - cameraNear;
+      var ratio = cameraFar / cameraNear;
+
+      var lambda = 0.9;
+      var clampCascadeDistances = false;
+
+      // When the camera is close to a relatively small model, provide more detail in the closer cascades.
+      // If the camera is near or inside a large model, such as the root tile of a city, then use the default values.
+      // To get the most accurate cascade splits we would need to find the min and max values from the depth texture.
+      if (frameState.shadowState.closestObjectSize < 200.0) {
+        clampCascadeDistances = true;
+        lambda = 0.9;
+      }
+
+      var cascadeDistances = scratchCascadeDistances;
+      var splits = scratchSplits;
+      splits[0] = cameraNear;
+      splits[numberOfCascades] = cameraFar;
+
+      // Find initial splits
+      for (i = 0; i < numberOfCascades; ++i) {
+        var p = (i + 1) / numberOfCascades;
+        var logScale = cameraNear * Math.pow(ratio, p);
+        var uniformScale = cameraNear + range * p;
+        var split = CesiumMath$8.lerp(uniformScale, logScale, lambda);
+        splits[i + 1] = split;
+        cascadeDistances[i] = split - splits[i];
+      }
+
+      if (clampCascadeDistances) {
+        // Clamp each cascade to its maximum distance
+        for (i = 0; i < numberOfCascades; ++i) {
+          cascadeDistances[i] = Math.min(cascadeDistances[i], shadowMap._maximumCascadeDistances[i]);
+        }
+
+        // Recompute splits
+        var distance = splits[0];
+        for (i = 0; i < numberOfCascades - 1; ++i) {
+          distance += cascadeDistances[i];
+          splits[i + 1] = distance;
+        }
+      }
+
+      Cartesian4$1.unpack(splits, 0, shadowMap._cascadeSplits[0]);
+      Cartesian4$1.unpack(splits, 1, shadowMap._cascadeSplits[1]);
+      Cartesian4$1.unpack(cascadeDistances, 0, shadowMap._cascadeDistances);
+
+      var shadowFrustum = shadowMapCamera.frustum;
+      var left = shadowFrustum.left;
+      var right = shadowFrustum.right;
+      var bottom = shadowFrustum.bottom;
+      var top = shadowFrustum.top;
+      var near = shadowFrustum.near;
+      var far = shadowFrustum.far;
+
+      var position = shadowMapCamera.positionWC;
+      var direction = shadowMapCamera.directionWC;
+      var up = shadowMapCamera.upWC;
+
+      var cascadeSubFrustum = sceneCamera.frustum.clone(scratchFrustum);
+      var shadowViewProjection = shadowMapCamera.getViewProjection();
+
+      for (i = 0; i < numberOfCascades; ++i) {
+        // Find the bounding box of the camera sub-frustum in shadow map texture space
+        cascadeSubFrustum.near = splits[i];
+        cascadeSubFrustum.far = splits[i + 1];
+        var viewProjection = Matrix4$8.multiply(
+          cascadeSubFrustum.projectionMatrix,
+          sceneCamera.viewMatrix,
+          scratchMatrix
+        );
+        var inverseViewProjection = Matrix4$8.inverse(viewProjection, scratchMatrix);
+        var shadowMapMatrix = Matrix4$8.multiply(shadowViewProjection, inverseViewProjection, scratchMatrix);
+
+        // Project each corner from camera NDC space to shadow map texture space. Min and max will be from 0 to 1.
+        var min = Cartesian3$l.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
+        var max = Cartesian3$l.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
+
+        for (var k = 0; k < 8; ++k) {
+          var corner = Cartesian4$1.clone(frustumCornersNDC[k], scratchFrustumCorners[k]);
+          Matrix4$8.multiplyByVector(shadowMapMatrix, corner, corner);
+          Cartesian3$l.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
+          Cartesian3$l.minimumByComponent(corner, min, min);
+          Cartesian3$l.maximumByComponent(corner, max, max);
+        }
+
+        // Limit light-space coordinates to the [0, 1] range
+        min.x = Math.max(min.x, 0.0);
+        min.y = Math.max(min.y, 0.0);
+        min.z = 0.0; // Always start cascade frustum at the top of the light frustum to capture objects in the light's path
+        max.x = Math.min(max.x, 1.0);
+        max.y = Math.min(max.y, 1.0);
+        max.z = Math.min(max.z, 1.0);
+
+        var pass = shadowMap._passes[i];
+        var cascadeCamera = pass.camera;
+        cascadeCamera.clone(shadowMapCamera); // PERFORMANCE_IDEA : could do a shallow clone for all properties except the frustum
+
+        var frustum = cascadeCamera.frustum;
+        frustum.left = left + min.x * (right - left);
+        frustum.right = left + max.x * (right - left);
+        frustum.bottom = bottom + min.y * (top - bottom);
+        frustum.top = bottom + max.y * (top - bottom);
+        frustum.near = near + min.z * (far - near);
+        frustum.far = near + max.z * (far - near);
+
+        pass.cullingVolume = cascadeCamera.frustum.computeCullingVolume(position, direction, up);
+
+        // Transforms from eye space to the cascade's texture space
+        var cascadeMatrix = shadowMap._cascadeMatrices[i];
+        Matrix4$8.multiply(cascadeCamera.getViewProjection(), sceneCamera.inverseViewMatrix, cascadeMatrix);
+        Matrix4$8.multiply(pass.textureOffsets, cascadeMatrix, cascadeMatrix);
+      }
+    }
+
+    var scratchLightView = new Matrix4$8();
+    var scratchRight = new Cartesian3$l();
+    var scratchUp = new Cartesian3$l();
+    var scratchTranslation = new Cartesian3$l();
+
+    function fitShadowMapToScene(shadowMap, frameState) {
+      var shadowMapCamera = shadowMap._shadowMapCamera;
+      var sceneCamera = shadowMap._sceneCamera;
+
+      // 1. First find a tight bounding box in light space that contains the entire camera frustum.
+      var viewProjection = Matrix4$8.multiply(sceneCamera.frustum.projectionMatrix, sceneCamera.viewMatrix, scratchMatrix);
+      var inverseViewProjection = Matrix4$8.inverse(viewProjection, scratchMatrix);
+
+      // Start to construct the light view matrix. Set translation later once the bounding box is found.
+      var lightDir = shadowMapCamera.directionWC;
+      var lightUp = sceneCamera.directionWC; // Align shadows to the camera view.
+      var lightRight = Cartesian3$l.cross(lightDir, lightUp, scratchRight);
+      lightUp = Cartesian3$l.cross(lightRight, lightDir, scratchUp); // Recalculate up now that right is derived
+      Cartesian3$l.normalize(lightUp, lightUp);
+      Cartesian3$l.normalize(lightRight, lightRight);
+      var lightPosition = Cartesian3$l.fromElements(0.0, 0.0, 0.0, scratchTranslation);
+
+      var lightView = Matrix4$8.computeView(lightPosition, lightDir, lightUp, lightRight, scratchLightView);
+      var cameraToLight = Matrix4$8.multiply(lightView, inverseViewProjection, scratchMatrix);
+
+      // Project each corner from NDC space to light view space, and calculate a min and max in light view space
+      var min = Cartesian3$l.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
+      var max = Cartesian3$l.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
+
+      for (var i = 0; i < 8; ++i) {
+        var corner = Cartesian4$1.clone(frustumCornersNDC[i], scratchFrustumCorners[i]);
+        Matrix4$8.multiplyByVector(cameraToLight, corner, corner);
+        Cartesian3$l.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
+        Cartesian3$l.minimumByComponent(corner, min, min);
+        Cartesian3$l.maximumByComponent(corner, max, max);
+      }
+
+      // 2. Set bounding box back to include objects in the light's view
+      max.z += 1000.0; // Note: in light space, a positive number is behind the camera
+      min.z -= 10.0; // Extend the shadow volume forward slightly to avoid problems right at the edge
+
+      // 3. Adjust light view matrix so that it is centered on the bounding volume
+      var translation = scratchTranslation;
+      translation.x = -(0.5 * (min.x + max.x));
+      translation.y = -(0.5 * (min.y + max.y));
+      translation.z = -max.z;
+
+      var translationMatrix = Matrix4$8.fromTranslation(translation, scratchMatrix);
+      lightView = Matrix4$8.multiply(translationMatrix, lightView, lightView);
+
+      // 4. Create an orthographic frustum that covers the bounding box extents
+      var halfWidth = 0.5 * (max.x - min.x);
+      var halfHeight = 0.5 * (max.y - min.y);
+      var depth = max.z - min.z;
+
+      var frustum = shadowMapCamera.frustum;
+      frustum.left = -halfWidth;
+      frustum.right = halfWidth;
+      frustum.bottom = -halfHeight;
+      frustum.top = halfHeight;
+      frustum.near = 0.01;
+      frustum.far = depth;
+
+      // 5. Update the shadow map camera
+      Matrix4$8.clone(lightView, shadowMapCamera.viewMatrix);
+      Matrix4$8.inverse(lightView, shadowMapCamera.inverseViewMatrix);
+      Matrix4$8.getTranslation(shadowMapCamera.inverseViewMatrix, shadowMapCamera.positionWC);
+      frameState.mapProjection.ellipsoid.cartesianToCartographic(
+        shadowMapCamera.positionWC,
+        shadowMapCamera.positionCartographic
+      );
+      Cartesian3$l.clone(lightDir, shadowMapCamera.directionWC);
+      Cartesian3$l.clone(lightUp, shadowMapCamera.upWC);
+      Cartesian3$l.clone(lightRight, shadowMapCamera.rightWC);
+    }
+
+    var directions = [
+      new Cartesian3$l(-1.0, 0.0, 0.0),
+      new Cartesian3$l(0.0, -1.0, 0.0),
+      new Cartesian3$l(0.0, 0.0, -1.0),
+      new Cartesian3$l(1.0, 0.0, 0.0),
+      new Cartesian3$l(0.0, 1.0, 0.0),
+      new Cartesian3$l(0.0, 0.0, 1.0)
+    ];
+
+    var ups = [
+      new Cartesian3$l(0.0, -1.0, 0.0),
+      new Cartesian3$l(0.0, 0.0, -1.0),
+      new Cartesian3$l(0.0, -1.0, 0.0),
+      new Cartesian3$l(0.0, -1.0, 0.0),
+      new Cartesian3$l(0.0, 0.0, 1.0),
+      new Cartesian3$l(0.0, -1.0, 0.0)
+    ];
+
+    var rights = [
+      new Cartesian3$l(0.0, 0.0, 1.0),
+      new Cartesian3$l(1.0, 0.0, 0.0),
+      new Cartesian3$l(-1.0, 0.0, 0.0),
+      new Cartesian3$l(0.0, 0.0, -1.0),
+      new Cartesian3$l(1.0, 0.0, 0.0),
+      new Cartesian3$l(1.0, 0.0, 0.0)
+    ];
+
+    function computeOmnidirectional(shadowMap, frameState) {
+      // All sides share the same frustum
+      var frustum = new PerspectiveFrustum();
+      frustum.fov = CesiumMath$8.PI_OVER_TWO;
+      frustum.near = 1.0;
+      frustum.far = shadowMap._pointLightRadius;
+      frustum.aspectRatio = 1.0;
+
+      for (var i = 0; i < 6; ++i) {
+        var camera = shadowMap._passes[i].camera;
+        camera.positionWC = shadowMap._shadowMapCamera.positionWC;
+        camera.positionCartographic = frameState.mapProjection.ellipsoid.cartesianToCartographic(
+          camera.positionWC,
+          camera.positionCartographic
+        );
+        camera.directionWC = directions[i];
+        camera.upWC = ups[i];
+        camera.rightWC = rights[i];
+
+        Matrix4$8.computeView(camera.positionWC, camera.directionWC, camera.upWC, camera.rightWC, camera.viewMatrix);
+        Matrix4$8.inverse(camera.viewMatrix, camera.inverseViewMatrix);
+
+        camera.frustum = frustum;
+      }
+    }
+
+    var scratchCartesian1 = new Cartesian3$l();
+    var scratchCartesian2 = new Cartesian3$l();
+    var scratchBoundingSphere = new BoundingSphere$9();
+    var scratchCenter = scratchBoundingSphere.center;
+
+    function checkVisibility(shadowMap, frameState) {
+      var sceneCamera = shadowMap._sceneCamera;
+      var shadowMapCamera = shadowMap._shadowMapCamera;
+
+      var boundingSphere = scratchBoundingSphere;
+
+      // Check whether the shadow map is in view and needs to be updated
+      if (shadowMap._cascadesEnabled) {
+        // If the nearest shadow receiver is further than the shadow map's maximum distance then the shadow map is out of view.
+        if (sceneCamera.frustum.near >= shadowMap.maximumDistance) {
+          shadowMap._outOfView = true;
+          shadowMap._needsUpdate = false;
+          return;
+        }
+
+        // If the light source is below the horizon then the shadow map is out of view
+        var surfaceNormal = frameState.mapProjection.ellipsoid.geodeticSurfaceNormal(
+          sceneCamera.positionWC,
+          scratchCartesian1
+        );
+        var lightDirection = Cartesian3$l.negate(shadowMapCamera.directionWC, scratchCartesian2);
+        var dot = Cartesian3$l.dot(surfaceNormal, lightDirection);
+
+        // Shadows start to fade out once the light gets closer to the horizon.
+        // At this point the globe uses vertex lighting alone to darken the surface.
+        var darknessAmount = CesiumMath$8.clamp(dot / 0.1, 0.0, 1.0);
+        shadowMap._darkness = CesiumMath$8.lerp(1.0, shadowMap.darkness, darknessAmount);
+
+        if (dot < 0.0) {
+          shadowMap._outOfView = true;
+          shadowMap._needsUpdate = false;
+          return;
+        }
+
+        // By default cascaded shadows need to update and are always in view
+        shadowMap._needsUpdate = true;
+        shadowMap._outOfView = false;
+      } else if (shadowMap._isPointLight) {
+        // Sphere-frustum intersection test
+        boundingSphere.center = shadowMapCamera.positionWC;
+        boundingSphere.radius = shadowMap._pointLightRadius;
+        shadowMap._outOfView = frameState.cullingVolume.computeVisibility(boundingSphere) === Intersect.OUTSIDE;
+        shadowMap._needsUpdate = !shadowMap._outOfView && !shadowMap._boundingSphere.equals(boundingSphere);
+        BoundingSphere$9.clone(boundingSphere, shadowMap._boundingSphere);
+      } else {
+        // Simplify frustum-frustum intersection test as a sphere-frustum test
+        var frustumRadius = shadowMapCamera.frustum.far / 2.0;
+        var frustumCenter = Cartesian3$l.add(
+          shadowMapCamera.positionWC,
+          Cartesian3$l.multiplyByScalar(shadowMapCamera.directionWC, frustumRadius, scratchCenter),
+          scratchCenter
+        );
+        boundingSphere.center = frustumCenter;
+        boundingSphere.radius = frustumRadius;
+        shadowMap._outOfView = frameState.cullingVolume.computeVisibility(boundingSphere) === Intersect.OUTSIDE;
+        shadowMap._needsUpdate = !shadowMap._outOfView && !shadowMap._boundingSphere.equals(boundingSphere);
+        BoundingSphere$9.clone(boundingSphere, shadowMap._boundingSphere);
+      }
+    }
+
+    function updateCameras(shadowMap, frameState) {
+      var camera = frameState.camera; // The actual camera in the scene
+      var lightCamera = shadowMap._lightCamera; // The external camera representing the light source
+      var sceneCamera = shadowMap._sceneCamera; // Clone of camera, with clamped near and far planes
+      var shadowMapCamera = shadowMap._shadowMapCamera; // Camera representing the shadow volume, initially cloned from lightCamera
+
+      // Clone light camera into the shadow map camera
+      if (shadowMap._cascadesEnabled) {
+        Cartesian3$l.clone(lightCamera.directionWC, shadowMapCamera.directionWC);
+      } else if (shadowMap._isPointLight) {
+        Cartesian3$l.clone(lightCamera.positionWC, shadowMapCamera.positionWC);
+      } else {
+        shadowMapCamera.clone(lightCamera);
+      }
+
+      // Get the light direction in eye coordinates
+      var lightDirection = shadowMap._lightDirectionEC;
+      Matrix4$8.multiplyByPointAsVector(camera.viewMatrix, shadowMapCamera.directionWC, lightDirection);
+      Cartesian3$l.normalize(lightDirection, lightDirection);
+      Cartesian3$l.negate(lightDirection, lightDirection);
+
+      // Get the light position in eye coordinates
+      Matrix4$8.multiplyByPoint(camera.viewMatrix, shadowMapCamera.positionWC, shadowMap._lightPositionEC);
+      shadowMap._lightPositionEC.w = shadowMap._pointLightRadius;
+
+      // Get the near and far of the scene camera
+      var near;
+      var far;
+      if (shadowMap.isViewShed) {
+        near = lightCamera.frustum.near;
+        far = lightCamera.frustum.far;
+      } else if (shadowMap._fitNearFar) {
+        // shadowFar can be very large, so limit to shadowMap.maximumDistance
+        // Push the far plane slightly further than the near plane to avoid degenerate frustum
+        near = Math.min(frameState.shadowState.nearPlane, shadowMap.maximumDistance);
+        far = Math.min(frameState.shadowState.farPlane, shadowMap.maximumDistance + 1.0);
+      } else {
+        near = camera.frustum.near;
+        far = shadowMap.maximumDistance;
+      }
+
+      shadowMap._sceneCamera = Camera$1.clone(camera, sceneCamera);
+      camera.frustum.clone(shadowMap._sceneCamera.frustum);
+      shadowMap._sceneCamera.frustum.near = near;
+      shadowMap._sceneCamera.frustum.far = far;
+      shadowMap._distance = far - near;
+
+      checkVisibility(shadowMap, frameState);
+
+      if (!shadowMap._outOfViewPrevious && shadowMap._outOfView) {
+        shadowMap._needsUpdate = true;
+      }
+      shadowMap._outOfViewPrevious = shadowMap._outOfView;
+    }
+
+    /**
+     * @private
+     */
+    ViewshedMap.prototype.update = function(frameState) {
+      updateCameras(this, frameState);
+
+      if (this._needsUpdate) {
+        updateFramebuffer$1(this, frameState.context);
+
+        if (this._isPointLight) {
+          computeOmnidirectional(this, frameState);
+        }
+
+        if (this._cascadesEnabled) {
+          fitShadowMapToScene(this, frameState);
+
+          if (this._numberOfCascades > 1) {
+            computeCascades(this, frameState);
+          }
+        }
+
+        if (!this._isPointLight) {
+          // Compute the culling volume
+          var shadowMapCamera = this._shadowMapCamera;
+          var position = shadowMapCamera.positionWC;
+          var direction = shadowMapCamera.directionWC;
+          var up = shadowMapCamera.upWC;
+          this._shadowMapCullingVolume = shadowMapCamera.frustum.computeCullingVolume(position, direction, up);
+
+          if (this._passes.length === 1) {
+            // Since there is only one pass, use the shadow map camera as the pass camera.
+            this._passes[0].camera.clone(shadowMapCamera);
+          }
+        } else {
+          this._shadowMapCullingVolume = CullingVolume.fromBoundingSphere(this._boundingSphere);
+        }
+      }
+
+      if (this._passes.length === 1) {
+        // Transforms from eye space to shadow texture space.
+        // Always requires an update since the scene camera constantly changes.
+        var inverseView = this._sceneCamera.inverseViewMatrix;
+        Matrix4$8.multiply(this._shadowMapCamera.getViewProjection(), inverseView, this._shadowMapMatrix);
+      }
+
+      if (this.debugShow) {
+        applyDebugSettings(this, frameState);
+      }
+    };
+
+    /**
+     * @private
+     */
+    ViewshedMap.prototype.updatePass = function(context, shadowPass) {
+      clearFramebuffer(this, context, shadowPass);
+    };
+
+    var scratchTexelStepSize = new Cartesian2$7();
+
+    function combineUniforms(shadowMap, uniforms, isTerrain) {
+      var bias = shadowMap._isPointLight ?
+        shadowMap._pointBias :
+        isTerrain ?
+        shadowMap._terrainBias :
+        shadowMap._primitiveBias;
+
+      var mapUniforms = {
+        shadowMap_texture: function() {
+          return shadowMap._shadowMapTexture;
+        },
+        shadowMap_textureCube: function() {
+          return shadowMap._shadowMapTexture;
+        },
+        shadowMap_matrix: function() {
+          return shadowMap._shadowMapMatrix;
+        },
+        shadowMap_cascadeSplits: function() {
+          return shadowMap._cascadeSplits;
+        },
+        shadowMap_cascadeMatrices: function() {
+          return shadowMap._cascadeMatrices;
+        },
+        shadowMap_lightDirectionEC: function() {
+          return shadowMap._lightDirectionEC;
+        },
+        shadowMap_lightPositionEC: function() {
+          return shadowMap._lightPositionEC;
+        },
+        shadowMap_cascadeDistances: function() {
+          return shadowMap._cascadeDistances;
+        },
+        shadowMap_texelSizeDepthBiasAndNormalShadingSmooth: function() {
+          var texelStepSize = scratchTexelStepSize;
+          texelStepSize.x = 1.0 / shadowMap._textureSize.x;
+          texelStepSize.y = 1.0 / shadowMap._textureSize.y;
+
+          return Cartesian4$1.fromElements(
+            texelStepSize.x,
+            texelStepSize.y,
+            bias.depthBias,
+            bias.normalShadingSmooth,
+            this.combinedUniforms1
+          );
+        },
+        shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness: function() {
+          return Cartesian4$1.fromElements(
+            bias.normalOffsetScale,
+            shadowMap._distance,
+            shadowMap.maximumDistance,
+            shadowMap._darkness,
+            this.combinedUniforms2
+          );
+        },
+
+        combinedUniforms1: new Cartesian4$1(),
+        combinedUniforms2: new Cartesian4$1()
+      };
+
+      return combine$1(uniforms, mapUniforms, false);
+    }
+
+    function getShadowReceiveShaderKeyword(shadowMap, castShadows, isTerrain, hasTerrainNormal) {
+      var usesDepthTexture = shadowMap._usesDepthTexture;
+      var polygonOffsetSupported = shadowMap._polygonOffsetSupported;
+      var isPointLight = shadowMap._isPointLight;
+      var isSpotLight = shadowMap._isSpotLight;
+      var hasCascades = shadowMap._numberOfCascades > 1;
+      var debugCascadeColors = shadowMap.debugCascadeColors;
+      var softShadows = shadowMap.softShadows;
+
+      return (
+        "view receiveShadow " +
+        usesDepthTexture +
+        polygonOffsetSupported +
+        isPointLight +
+        isSpotLight +
+        hasCascades +
+        debugCascadeColors +
+        softShadows +
+        castShadows +
+        isTerrain +
+        hasTerrainNormal
+      );
+    }
+
+    function createShadowReceiveFragmentShader(fs, shadowMap, castShadows, isTerrain, hasTerrainNormal) {
+      var normalVaryingName = ShaderSource$6.findNormalVarying(fs);
+      var hasNormalVarying = (!isTerrain && defined$c(normalVaryingName)) || (isTerrain && hasTerrainNormal);
+
+      var positionVaryingName = ShaderSource$6.findPositionVarying(fs);
+      var hasPositionVarying = defined$c(positionVaryingName);
+
+      var usesDepthTexture = shadowMap._usesDepthTexture;
+      var polygonOffsetSupported = shadowMap._polygonOffsetSupported;
+      var isPointLight = shadowMap._isPointLight;
+      var isSpotLight = shadowMap._isSpotLight;
+      var hasCascades = shadowMap._numberOfCascades > 1;
+      var debugCascadeColors = shadowMap.debugCascadeColors;
+      var softShadows = shadowMap.softShadows;
+      var bias = isPointLight ? shadowMap._pointBias : isTerrain ? shadowMap._terrainBias : shadowMap._primitiveBias;
+
+      var defines = fs.defines.slice(0);
+      var sources = fs.sources.slice(0);
+
+      var length = sources.length;
+      for (var i = 0; i < length; ++i) {
+        sources[i] = ShaderSource$6.replaceMain(sources[i], "czm_shadow_receive_main");
+      }
+
+      if (isPointLight) {
+        defines.push("USE_CUBE_MAP_SHADOW");
+      } else if (usesDepthTexture) {
+        defines.push("USE_SHADOW_DEPTH_TEXTURE");
+      }
+
+      if (softShadows && !isPointLight) {
+        defines.push("USE_SOFT_SHADOWS");
+      }
+
+      // Enable day-night shading so that the globe is dark when the light is below the horizon
+      if (hasCascades && castShadows && isTerrain) {
+        if (hasNormalVarying) {
+          defines.push("ENABLE_VERTEX_LIGHTING");
+        } else {
+          defines.push("ENABLE_DAYNIGHT_SHADING");
+        }
+      }
+
+      if (castShadows && bias.normalShading && hasNormalVarying) {
+        defines.push("USE_NORMAL_SHADING");
+        if (bias.normalShadingSmooth > 0.0) {
+          defines.push("USE_NORMAL_SHADING_SMOOTH");
+        }
+      }
+
+      var fsSource = "";
+
+      if (isPointLight) {
+        fsSource += "uniform samplerCube shadowMap_textureCube; \n";
+      } else {
+        fsSource += "uniform sampler2D shadowMap_texture; \n";
+      }
+
+      var returnPositionEC;
+      if (hasPositionVarying) {
+        returnPositionEC = "    return vec4(" + positionVaryingName + ", 1.0); \n";
+      } else {
+        returnPositionEC =
+          "#ifndef LOG_DEPTH \n" +
+          "    return czm_windowToEyeCoordinates(gl_FragCoord); \n" +
+          "#else \n" +
+          "    return vec4(v_logPositionEC, 1.0); \n" +
+          "#endif \n";
+      }
+
+      fsSource +=
+        "uniform mat4 shadowMap_matrix; \n" +
+        "uniform vec3 shadowMap_lightDirectionEC; \n" +
+        "uniform vec4 shadowMap_lightPositionEC; \n" +
+        "uniform vec4 shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness; \n" +
+        "uniform vec4 shadowMap_texelSizeDepthBiasAndNormalShadingSmooth; \n" +
+        "#ifdef LOG_DEPTH \n" +
+        "varying vec3 v_logPositionEC; \n" +
+        "#endif \n" +
+        "vec4 getPositionEC() \n" +
+        "{ \n" +
+        returnPositionEC +
+        "} \n" +
+        "vec3 getNormalEC() \n" +
+        "{ \n" +
+        (hasNormalVarying ? "    return normalize(" + normalVaryingName + "); \n" : "    return vec3(1.0); \n") +
+        "} \n" +
+        // Offset the shadow position in the direction of the normal for perpendicular and back faces
+        "void applyNormalOffset(inout vec4 positionEC, vec3 normalEC, float nDotL) \n" +
+        "{ \n" +
+        (bias.normalOffset && hasNormalVarying ?
+          "    float normalOffset = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.x; \n" +
+          "    float normalOffsetScale = 1.0 - nDotL; \n" +
+          "    vec3 offset = normalOffset * normalOffsetScale * normalEC; \n" +
+          "    positionEC.xyz += offset; \n" :
+          "") +
+        "} \n";
+
+      fsSource +=
+        "void main() \n" +
+        "{ \n" +
+        "    czm_shadow_receive_main(); \n" +
+        "    vec4 positionEC = getPositionEC(); \n" +
+        "    vec3 normalEC = getNormalEC(); \n" +
+        "    float depth = -positionEC.z; \n";
+
+      fsSource +=
+        "    czm_shadowParameters shadowParameters; \n" +
+        "    shadowParameters.texelStepSize = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.xy; \n" +
+        "    shadowParameters.depthBias = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.z; \n" +
+        "    shadowParameters.normalShadingSmooth = shadowMap_texelSizeDepthBiasAndNormalShadingSmooth.w; \n" +
+        "    shadowParameters.darkness = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.w; \n";
+
+      if (isTerrain) {
+        // Scale depth bias based on view distance to reduce z-fighting in distant terrain
+        fsSource += "    shadowParameters.depthBias *= max(depth * 0.01, 1.0); \n";
+      } else if (!polygonOffsetSupported) {
+        // If polygon offset isn't supported push the depth back based on view, however this
+        // causes light leaking at further away views
+        fsSource += "    shadowParameters.depthBias *= mix(1.0, 100.0, depth * 0.0015); \n";
+      }
+
+      if (isPointLight) {
+        fsSource +=
+          "    vec3 directionEC = positionEC.xyz - shadowMap_lightPositionEC.xyz; \n" +
+          "    float distance = length(directionEC); \n" +
+          "    directionEC = normalize(directionEC); \n" +
+          "    float radius = shadowMap_lightPositionEC.w; \n" +
+          "    // Stop early if the fragment is beyond the point light radius \n" +
+          "    if (distance > radius) \n" +
+          "    { \n" +
+          "        return; \n" +
+          "    } \n" +
+          "    vec3 directionWC  = czm_inverseViewRotation * directionEC; \n" +
+          "    shadowParameters.depth = distance / radius; \n" +
+          "    shadowParameters.nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0); \n" +
+          "    shadowParameters.texCoords = directionWC; \n" +
+          "    float visibility = czm_shadowVisibility(shadowMap_textureCube, shadowParameters); \n";
+      } else if (isSpotLight) {
+        fsSource +=
+          "    vec3 directionEC1 = positionEC.xyz - shadowMap_lightPositionEC.xyz; \n" +
+          "    float distance = length(directionEC1); \n" +
+          "    if (distance > shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.y) \n" +
+          "    { \n" +
+          "        return; \n" +
+          "    } \n" +
+          "    vec3 directionEC = normalize(positionEC.xyz - shadowMap_lightPositionEC.xyz); \n" +
+          "    float nDotL = clamp(dot(normalEC, -directionEC), 0.0, 1.0); \n" +
+          "    applyNormalOffset(positionEC, normalEC, nDotL); \n" +
+          "    vec4 shadowPosition = shadowMap_matrix * positionEC; \n" +
+          "    // Spot light uses a perspective projection, so perform the perspective divide \n" +
+          "    shadowPosition /= shadowPosition.w; \n" +
+          "    // Stop early if the fragment is not in the shadow bounds \n" +
+          "    if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))) \n" +
+          "    { \n" +
+          "        return; \n" +
+          "    } \n" +
+          "    shadowParameters.texCoords = shadowPosition.xy; \n" +
+          "    shadowParameters.depth = shadowPosition.z; \n" +
+          "    shadowParameters.nDotL = nDotL; \n" +
+          "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n";
+      } else if (hasCascades) {
+        fsSource +=
+          "    float maxDepth = shadowMap_cascadeSplits[1].w; \n" +
+          "    // Stop early if the eye depth exceeds the last cascade \n" +
+          "    if (depth > maxDepth) \n" +
+          "    { \n" +
+          "        return; \n" +
+          "    } \n" +
+          "    // Get the cascade based on the eye-space depth \n" +
+          "    vec4 weights = czm_cascadeWeights(depth); \n" +
+          "    // Apply normal offset \n" +
+          "    float nDotL = clamp(dot(normalEC, shadowMap_lightDirectionEC), 0.0, 1.0); \n" +
+          "    applyNormalOffset(positionEC, normalEC, nDotL); \n" +
+          "    // Transform position into the cascade \n" +
+          "    vec4 shadowPosition = czm_cascadeMatrix(weights) * positionEC; \n" +
+          "    // Get visibility \n" +
+          "    shadowParameters.texCoords = shadowPosition.xy; \n" +
+          "    shadowParameters.depth = shadowPosition.z; \n" +
+          "    shadowParameters.nDotL = nDotL; \n" +
+          "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n" +
+          "    // Fade out shadows that are far away \n" +
+          "    float shadowMapMaximumDistance = shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness.z; \n" +
+          "    float fade = max((depth - shadowMapMaximumDistance * 0.8) / (shadowMapMaximumDistance * 0.2), 0.0); \n" +
+          "    visibility = mix(visibility, 1.0, fade); \n" +
+          (debugCascadeColors ?
+            "    // Draw cascade colors for debugging \n" + "    gl_FragColor *= czm_cascadeColor(weights); \n" :
+            "");
+      } else {
+        fsSource +=
+          "    float nDotL = clamp(dot(normalEC, shadowMap_lightDirectionEC), 0.0, 1.0); \n" +
+          "    applyNormalOffset(positionEC, normalEC, nDotL); \n" +
+          "    vec4 shadowPosition = shadowMap_matrix * positionEC; \n" +
+          "    // Stop early if the fragment is not in the shadow bounds \n" +
+          "    if (any(lessThan(shadowPosition.xyz, vec3(0.0))) || any(greaterThan(shadowPosition.xyz, vec3(1.0)))) \n" +
+          "    { \n" +
+          "        return; \n" +
+          "    } \n" +
+          "    shadowParameters.texCoords = shadowPosition.xy; \n" +
+          "    shadowParameters.depth = shadowPosition.z; \n" +
+          "    shadowParameters.nDotL = nDotL; \n" +
+          "    float visibility = czm_shadowVisibility(shadowMap_texture, shadowParameters); \n";
+      }
+
+      fsSource +=
+        "   if(visibility==0.0) \n" +
+        "   {\n" +
+        "        gl_FragColor.rgb *= vec3(0.8,0.0,0.0);\n" +
+        "   }else{\n" +
+        "        gl_FragColor.rgb *= vec3(0.0,0.8,0.0) * visibility;\n" +
+        "   } \n " +
+        "} \n ";
+
+      sources.push(fsSource);
+
+      return new ShaderSource$6({
+        defines: defines,
+        sources: sources
+      });
+    }
+
+    Cesium.ShadowMap.createReceiveDerivedCommand = function(lightShadowMaps, command, shadowsDirty, context, result) {
+      if (!defined$c(result)) {
+        result = {};
+      }
+
+      var lightShadowMapsEnabled = lightShadowMaps.length > 0;
+      var shaderProgram = command.shaderProgram;
+      var vertexShaderSource = shaderProgram.vertexShaderSource;
+      var fragmentShaderSource = shaderProgram.fragmentShaderSource;
+      var isTerrain = command.pass === Pass$4.GLOBE;
+
+      var hasTerrainNormal = false;
+      if (isTerrain) {
+        hasTerrainNormal = command.owner.data.renderedMesh.encoding.hasVertexNormals;
+      }
+
+      if (command.receiveShadows && lightShadowMapsEnabled) {
+        // Only generate a receiveCommand if there is a shadow map originating from a light source.
+        var receiveShader;
+        var receiveUniformMap;
+        if (defined$c(result.receiveCommand)) {
+          receiveShader = result.receiveCommand.shaderProgram;
+          receiveUniformMap = result.receiveCommand.uniformMap;
+        }
+
+        result.receiveCommand = DrawCommand$4.shallowClone(command, result.receiveCommand);
+        result.castShadows = false;
+        result.receiveShadows = true;
+
+        // If castShadows changed, recompile the receive shadows shader. The normal shading technique simulates
+        // self-shadowing so it should be turned off if castShadows is false.
+        var castShadowsDirty = result.receiveShaderCastShadows !== command.castShadows;
+        var shaderDirty = result.receiveShaderProgramId !== command.shaderProgram.id;
+
+        if (!defined$c(receiveShader) || shaderDirty || shadowsDirty || castShadowsDirty) {
+          var keyword;
+          if (lightShadowMaps[0].isViewShed) {
+            keyword = getShadowReceiveShaderKeyword(
+              lightShadowMaps[0],
+              command.castShadows,
+              isTerrain,
+              hasTerrainNormal
+            );
+          } else {
+            keyword = ShadowMapShader.getShadowReceiveShaderKeyword(
+              lightShadowMaps[0],
+              command.castShadows,
+              isTerrain,
+              hasTerrainNormal
+            );
+          }
+          receiveShader = context.shaderCache.getDerivedShaderProgram(shaderProgram, keyword);
+          if (!defined$c(receiveShader)) {
+            var receiveVS = ShadowMapShader.createShadowReceiveVertexShader(
+              vertexShaderSource,
+              isTerrain,
+              hasTerrainNormal
+            );
+            var receiveFS;
+            if (lightShadowMaps[0].isViewShed) {
+              receiveFS = createShadowReceiveFragmentShader(
+                fragmentShaderSource,
+                lightShadowMaps[0],
+                command.castShadows,
+                isTerrain,
+                hasTerrainNormal
+              );
+            } else {
+              receiveFS = ShadowMapShader.createShadowReceiveFragmentShader(
+                fragmentShaderSource,
+                lightShadowMaps[0],
+                command.castShadows,
+                isTerrain,
+                hasTerrainNormal
+              );
+            }
+
+            receiveShader = context.shaderCache.createDerivedShaderProgram(shaderProgram, keyword, {
+              vertexShaderSource: receiveVS,
+              fragmentShaderSource: receiveFS,
+              attributeLocations: shaderProgram._attributeLocations
+            });
+          }
+
+          receiveUniformMap = combineUniforms(lightShadowMaps[0], command.uniformMap, isTerrain);
+        }
+
+        result.receiveCommand.shaderProgram = receiveShader;
+        result.receiveCommand.uniformMap = receiveUniformMap;
+        result.receiveShaderProgramId = command.shaderProgram.id;
+        result.receiveShaderCastShadows = command.castShadows;
+      }
+
+      return result;
+    };
+
+    /**
+     * @private
+     */
+    ViewshedMap.prototype.isDestroyed = function() {
+      return false;
+    };
+
+    /**
+     * @private
+     */
+    ViewshedMap.prototype.destroy = function() {
+      destroyFramebuffer(this);
+
+      this._debugLightFrustum = this._debugLightFrustum && this._debugLightFrustum.destroy();
+      this._debugCameraFrustum = this._debugCameraFrustum && this._debugCameraFrustum.destroy();
+      this._debugShadowViewCommand =
+        this._debugShadowViewCommand &&
+        this._debugShadowViewCommand.shaderProgram &&
+        this._debugShadowViewCommand.shaderProgram.destroy();
+
+      for (var i = 0; i < this._numberOfCascades; ++i) {
+        this._debugCascadeFrustums[i] = this._debugCascadeFrustums[i] && this._debugCascadeFrustums[i].destroy();
+      }
+
+      return destroyObject$7(this);
+    };
+
+    var scanPlaneFS = `#ifdef GL_OES_standard_derivatives
+  #extension GL_OES_standard_derivatives : enable
+#endif
+
+uniform bool u_showIntersection;
+uniform bool u_showThroughEllipsoid;
+
+uniform float u_radius;
+uniform float u_xHalfAngle;
+uniform float u_yHalfAngle;
+uniform float u_normalDirection;
+uniform vec4 u_color;
+
+varying vec3 v_position;
+varying vec3 v_positionWC;
+varying vec3 v_positionEC;
+varying vec3 v_normalEC;
+
+vec4 getColor(float sensorRadius, vec3 pointEC)
+{
+  czm_materialInput materialInput;
+
+  vec3 pointMC = (czm_inverseModelView * vec4(pointEC, 1.0)).xyz;
+  materialInput.st = sensor2dTextureCoordinates(sensorRadius, pointMC);
+  materialInput.str = pointMC / sensorRadius;
+
+  vec3 positionToEyeEC = -v_positionEC;
+  materialInput.positionToEyeEC = positionToEyeEC;
+
+  vec3 normalEC = normalize(v_normalEC);
+  materialInput.normalEC = u_normalDirection * normalEC;
+
+  czm_material material = czm_getMaterial(materialInput);
+
+  material.diffuse = u_color.rgb;
+  material.alpha = u_color.a;
+
+  return mix(czm_phong(normalize(positionToEyeEC), material), vec4(material.diffuse, material.alpha), 0.4);
+
+}
+
+bool isOnBoundary(float value, float epsilon)
+{
+  float width = getIntersectionWidth();
+  float tolerance = width * epsilon;
+
+#ifdef GL_OES_standard_derivatives
+  float delta = max(abs(dFdx(value)), abs(dFdy(value)));
+  float pixels = width * delta;
+  float temp = abs(value);
+  // There are a couple things going on here.
+  // First we test the value at the current fragment to see if it is within the tolerance.
+  // We also want to check if the value of an adjacent pixel is within the tolerance,
+  // but we don't want to admit points that are obviously not on the surface.
+  // For example, if we are looking for "value" to be close to 0, but value is 1 and the adjacent value is 2,
+  // then the delta would be 1 and "temp - delta" would be "1 - 1" which is zero even though neither of
+  // the points is close to zero.
+  return temp < tolerance && temp < pixels || (delta < 10.0 * tolerance && temp - delta < tolerance && temp < pixels);
+#else
+  return abs(value) < tolerance;
+#endif
+}
+
+vec4 shade(bool isOnBoundary)
+{
+  if (u_showIntersection && isOnBoundary)
+  {
+      return getIntersectionColor();
+  }
+  return getColor(u_radius, v_positionEC);
+}
+
+float ellipsoidSurfaceFunction(czm_ellipsoid ellipsoid, vec3 point)
+{
+  vec3 scaled = ellipsoid.inverseRadii * point;
+  return dot(scaled, scaled) - 1.0;
+}
+
+void main()
+{
+  vec3 sensorVertexWC = czm_model[3].xyz;      // (0.0, 0.0, 0.0) in model coordinates
+  vec3 sensorVertexEC = czm_modelView[3].xyz;  // (0.0, 0.0, 0.0) in model coordinates
+
+  //vec3 pixDir = normalize(v_position);
+  float positionX = v_position.x;
+  float positionY = v_position.y;
+  float positionZ = v_position.z;
+
+  vec3 zDir = vec3(0.0, 0.0, 1.0);
+  vec3 lineX = vec3(positionX, 0 ,positionZ);
+  vec3 lineY = vec3(0, positionY, positionZ);
+  float resX = dot(normalize(lineX), zDir);
+  if(resX < cos(u_xHalfAngle) - 0.0001){
+      discard;
+  }
+  float resY = dot(normalize(lineY), zDir);
+  if(resY < cos(u_yHalfAngle)- 0.0001){
+      discard;
+  }
+
+
+  czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();
+  float ellipsoidValue = ellipsoidSurfaceFunction(ellipsoid, v_positionWC);
+
+  // Occluded by the ellipsoid?
+if (!u_showThroughEllipsoid)
+{
+    // Discard if in the ellipsoid
+    // PERFORMANCE_IDEA: A coarse check for ellipsoid intersection could be done on the CPU first.
+    if (ellipsoidValue < 0.0)
+    {
+          discard;
+    }
+
+    // Discard if in the sensor's shadow
+    if (inSensorShadow(sensorVertexWC, ellipsoid, v_positionWC))
+    {
+        discard;
+    }
+  }
+
+  // Notes: Each surface functions should have an associated tolerance based on the floating point error.
+  bool isOnEllipsoid = isOnBoundary(ellipsoidValue, czm_epsilon3);
+  gl_FragColor = shade(isOnEllipsoid);
+
+}`;
+
+    var sensorComm = `
+uniform vec4 u_intersectionColor;
+uniform float u_intersectionWidth;
+uniform vec4 u_lineColor;
+bool inSensorShadow(vec3 coneVertexWC, czm_ellipsoid ellipsoidEC, vec3 pointWC)
+{
+  // Diagonal matrix from the unscaled ellipsoid space to the scaled space.
+  vec3 D = ellipsoidEC.inverseRadii;
+
+  // Sensor vertex in the scaled ellipsoid space
+  vec3 q = D * coneVertexWC;
+  float qMagnitudeSquared = dot(q, q);
+  float test = qMagnitudeSquared - 1.0;
+
+  // Sensor vertex to fragment vector in the ellipsoid's scaled space
+  vec3 temp = D * pointWC - q;
+  float d = dot(temp, q);
+
+  // Behind silhouette plane and inside silhouette cone
+  return (d < -test) && (d / length(temp) < -sqrt(test));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+vec4 getLineColor()
+{
+  return u_lineColor;
+}
+
+vec4 getIntersectionColor()
+{
+  return u_intersectionColor;
+}
+
+float getIntersectionWidth()
+{
+  return u_intersectionWidth;
+}
+
+vec2 sensor2dTextureCoordinates(float sensorRadius, vec3 pointMC)
+{
+  // (s, t) both in the range [0, 1]
+  float t = pointMC.z / sensorRadius;
+  float s = 1.0 + (atan(pointMC.y, pointMC.x) / czm_twoPi);
+  s = s - floor(s);
+
+  return vec2(s, t);
+}`;
+
+    var sensorFS = `
+#ifdef GL_OES_standard_derivatives
+  #extension GL_OES_standard_derivatives : enable
+#endif
+
+uniform bool u_showIntersection;
+uniform bool u_showThroughEllipsoid;
+
+uniform float u_radius;
+uniform float u_xHalfAngle;
+uniform float u_yHalfAngle;
+uniform float u_normalDirection;
+uniform float u_type;
+
+varying vec3 v_position;
+varying vec3 v_positionWC;
+varying vec3 v_positionEC;
+varying vec3 v_normalEC;
+
+vec4 getColor(float sensorRadius, vec3 pointEC)
+{
+  czm_materialInput materialInput;
+
+  vec3 pointMC = (czm_inverseModelView * vec4(pointEC, 1.0)).xyz;
+  materialInput.st = sensor2dTextureCoordinates(sensorRadius, pointMC);
+  materialInput.str = pointMC / sensorRadius;
+
+  vec3 positionToEyeEC = -v_positionEC;
+  materialInput.positionToEyeEC = positionToEyeEC;
+
+  vec3 normalEC = normalize(v_normalEC);
+  materialInput.normalEC = u_normalDirection * normalEC;
+
+  czm_material material = czm_getMaterial(materialInput);
+
+  return mix(czm_phong(normalize(positionToEyeEC), material), vec4(material.diffuse, material.alpha), 0.4);
+
+}
+
+bool isOnBoundary(float value, float epsilon)
+{
+  float width = getIntersectionWidth();
+  float tolerance = width * epsilon;
+
+#ifdef GL_OES_standard_derivatives
+  float delta = max(abs(dFdx(value)), abs(dFdy(value)));
+  float pixels = width * delta;
+  float temp = abs(value);
+  // There are a couple things going on here.
+  // First we test the value at the current fragment to see if it is within the tolerance.
+  // We also want to check if the value of an adjacent pixel is within the tolerance,
+  // but we don't want to admit points that are obviously not on the surface.
+  // For example, if we are looking for "value" to be close to 0, but value is 1 and the adjacent value is 2,
+  // then the delta would be 1 and "temp - delta" would be "1 - 1" which is zero even though neither of
+  // the points is close to zero.
+  return temp < tolerance && temp < pixels || (delta < 10.0 * tolerance && temp - delta < tolerance && temp < pixels);
+#else
+  return abs(value) < tolerance;
+#endif
+}
+
+vec4 shade(bool isOnBoundary)
+{
+  if (u_showIntersection && isOnBoundary)
+  {
+      return getIntersectionColor();
+  }
+  if(u_type == 1.0){
+      return getLineColor();
+  }
+  return getColor(u_radius, v_positionEC);
+}
+
+float ellipsoidSurfaceFunction(czm_ellipsoid ellipsoid, vec3 point)
+{
+  vec3 scaled = ellipsoid.inverseRadii * point;
+  return dot(scaled, scaled) - 1.0;
+}
+
+void main()
+{
+  vec3 sensorVertexWC = czm_model[3].xyz;      // (0.0, 0.0, 0.0) in model coordinates
+  vec3 sensorVertexEC = czm_modelView[3].xyz;  // (0.0, 0.0, 0.0) in model coordinates
+
+  //vec3 pixDir = normalize(v_position);
+  float positionX = v_position.x;
+  float positionY = v_position.y;
+  float positionZ = v_position.z;
+
+  vec3 zDir = vec3(0.0, 0.0, 1.0);
+  vec3 lineX = vec3(positionX, 0 ,positionZ);
+  vec3 lineY = vec3(0, positionY, positionZ);
+  float resX = dot(normalize(lineX), zDir);
+  if(resX < cos(u_xHalfAngle)-0.00001){
+      discard;
+  }
+  float resY = dot(normalize(lineY), zDir);
+  if(resY < cos(u_yHalfAngle)-0.00001){
+      discard;
+  }
+
+
+  czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();
+  float ellipsoidValue = ellipsoidSurfaceFunction(ellipsoid, v_positionWC);
+
+  // Occluded by the ellipsoid?
+if (!u_showThroughEllipsoid)
+{
+    // Discard if in the ellipsoid
+    // PERFORMANCE_IDEA: A coarse check for ellipsoid intersection could be done on the CPU first.
+    if (ellipsoidValue < 0.0)
+    {
+          discard;
+    }
+
+    // Discard if in the sensor's shadow
+    if (inSensorShadow(sensorVertexWC, ellipsoid, v_positionWC))
+    {
+        discard;
+    }
+  }
+
+  // Notes: Each surface functions should have an associated tolerance based on the floating point error.
+  bool isOnEllipsoid = isOnBoundary(ellipsoidValue, czm_epsilon3);
+  //isOnEllipsoid = false;
+  //if((resX >= 0.8 && resX <= 0.81)||(resY >= 0.8 && resY <= 0.81)){
+  /*if(false){
+      gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+  }else{
+      gl_FragColor = shade(isOnEllipsoid);
+  }
+*/
+  gl_FragColor = shade(isOnEllipsoid);
+
+}`;
+
+    var sensorVS = `attribute vec4 position;
+attribute vec3 normal;
+
+varying vec3 v_position;
+varying vec3 v_positionWC;
+varying vec3 v_positionEC;
+varying vec3 v_normalEC;
+
+void main()
+{
+  gl_Position = czm_modelViewProjection * position;
+  v_position = vec3(position);
+  v_positionWC = (czm_model * position).xyz;
+  v_positionEC = (czm_modelView * position).xyz;
+  v_normalEC = czm_normal * normal;
+}`;
+
+    const {
+      Matrix4: Matrix4$7,
+      Material: Material$i,
+      Color: Color$q,
+      JulianDate: JulianDate$2,
+      BoundingSphere: BoundingSphere$8,
+      DrawCommand: DrawCommand$3,
+      PrimitiveType: PrimitiveType$4,
+      SceneMode: SceneMode$4,
+      Matrix3: Matrix3$3,
+      Buffer: Buffer$1,
+      BufferUsage: BufferUsage$3,
+      VertexArray: VertexArray$3,
+      VertexFormat: VertexFormat$4,
+      ComponentDatatype: ComponentDatatype$3,
+      RenderState: RenderState$3,
+      BlendingState: BlendingState$1,
+      Pass: Pass$3,
+      combine,
+      CullFace,
+      Cartesian3: Cartesian3$k,
+      EllipsoidGeometry,
+      EllipsoidOutlineGeometry,
+      ShaderSource: ShaderSource$5,
+      ShaderProgram: ShaderProgram$5,
+    } = Cesium;
+    const {
+      cos,
+      sin,
+      tan,
+      atan
+    } = Math;
+    const CesiumMath$7 = Cesium.Math;
+
+    const attributeLocations = {
+      position: 0,
+      normal: 1
+    };
+
+    class RectangularSensorPrimitive {
+      /**
+       * 模拟相控阵雷达。
+       * @param {Object} options 具有以下属性
+       * @param {Boolean} [options.show] 是否显示
+       * @param {Cartesian3|LonLat} [options.position] 图形位置
+       * @param {Matrix4} [options.modelMatrix] 模型矩阵,如果定义，则覆盖position属性
+       * @param {Number} [options.slice=32] 切分程度
+       * @param {Number} [options.radius=1] 半径
+       * @param {Color} [options.lineColor=Color.RED] 线的颜色
+       * @param {Number} [options.xHalfAngle] 水平半夹角,单位度
+       * @param {Number} [options.xyHalfAngle] 垂直半夹角，单位度
+       * @param {Boolean} [options.showSectorLines=true] 是否显示扇面线
+       * @param {Boolean} [options.showSectorSegmentLines=true] 是否显示扇面和圆顶面连接线
+       * @param {Boolean} [options.showLateralSurfaces=true] 是否显示侧面
+       * @param {Material} [options.material=Material.ColorType] 材质
+       * @param {Material} [options.lateralSurfaceMaterial=Material.ColorType] 侧面材质
+       * @param {Boolean} [options.showDomeSurfaces=true] 是否显示圆弧顶表面
+       * @param {Material} [options.domeSurfaceMaterial=Material.ColorType] 圆弧顶表面材质
+       * @param {Boolean} [options.showDomeLines=true] 是否显示圆弧顶表面线
+       * @param {Boolean} [options.showIntersection = false] 是否显示与地球相交的线
+       * @param {Color} [options.intersectionColor] 与地球相交的线的颜色
+       * @param {Number} [options.intersectionWidth=5] 与地球相交的线的宽度
+       * @param {Boolean} [options.showThroughEllipsoid=false] 是否穿过地球
+       * @param {Boolean} [options.showScanPlane=true] 是否显示扫描面
+       * @param {Color} [options.scanPlaneColor=Color.WHITE] 扫描面颜色
+       * @param {String} [options.scanPlaneMode='H'] 扫描方向，H表示水平扫描，V表示垂直扫描
+       * @param {Number} [options.speed=10] 扫描速度，值越大，扫描越快
+       */
+      constructor(options) {
+        options = defaultValue$c(options, defaultValue$c.EMPTY_OBJECT);
+        const self = this;
+        this._createVS = true;
+        this._createRS = true;
+        this._createSP = true;
+        /**
+         * 是否显示
+         * @type {Boolean}
+         */
+        this.show = defaultValue$c(options.show, true);
+
+        //切分程度
+        this.slice = defaultValue$c(options.slice, 32);
+
+        //传感器的模型矩阵
+        if (!options.modelMatrix) {
+          if (!options.position) {
+            throw new CesiumProError$1('parameter position or modelMatrix must be provided.')
+          }
+          this._modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(LonLat.toCartesian(options.position));
+        } else {
+          this._modelMatrix = Matrix4$7.clone(options.modelMatrix, new Matrix4$7());
+        }
+
+        this._computedModelMatrix = new Matrix4$7();
+        this._computedScanPlaneModelMatrix = new Matrix4$7();
+
+        //传感器的半径
+        this._radius = defaultValue$c(options.radius, Number.POSITIVE_INFINITY);
+
+        //传感器水平半角
+        this._xHalfAngle = CesiumMath$7.toRadians(defaultValue$c(options.xHalfAngle, 0));
+
+        //传感器垂直半角
+        this._yHalfAngle = CesiumMath$7.toRadians(defaultValue$c(options.yHalfAngle, 0));
+
+        this._color = defaultValue$c(options._color, Color$q.AQUA.withAlpha(0.4));
+
+        /**
+         * 线的颜色
+         * @type {Cesium.Color}
+         */
+        this.lineColor = defaultValue$c(options.lineColor, Color$q.WHITE);
+
+        /**
+         * 是否显示扇面的线
+         * @type {Boolean}
+         */
+        this.showSectorLines = defaultValue$c(options.showSectorLines, true);
+
+        /**
+         * 是否显示扇面和圆顶面连接的线
+         * @type {Boolean}
+         */
+        this.showSectorSegmentLines = defaultValue$c(options.showSectorSegmentLines, true);
+
+        /**
+         * 是否显示侧面
+         * @type {Boolean}
+         */
+        this.showLateralSurfaces = defaultValue$c(options.showLateralSurfaces, true);
+
+        //目前用的统一材质
+        this._material = defined$d(options.material) ? options.material : Material$i.fromType(Material$i.ColorType);
+        this._material.uniforms.color = this._color;
+        this._translucent = undefined;
+
+        /**
+         * 侧面材质
+         * @type {Material}
+         */
+        this.lateralSurfaceMaterial = defined$d(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material$i.fromType(Material$i.ColorType);
+        this._lateralSurfaceMaterial = undefined;
+        this._lateralSurfaceTranslucent = undefined;
+
+        /**
+         * 是否显示圆顶表面
+         * @type {Boolean}
+         */
+        this.showDomeSurfaces = defaultValue$c(options.showDomeSurfaces, true);
+
+        /**
+         * 圆顶表面材质
+         * @type {Material}
+         */
+        this.domeSurfaceMaterial = defined$d(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material$i.fromType(Material$i.ColorType);
+
+        /**
+         * 是否显示圆顶面线
+         * @type {Boolean}
+         */
+        this.showDomeLines = defaultValue$c(options.showDomeLines, true);
+
+        /**
+         * 是否显示与地球相交的线
+         * @type {Boolean}
+         */
+        this.showIntersection = defaultValue$c(options.showIntersection, false);
+
+        /**
+         * 与地球相交的线的颜色
+         * @type {Color}
+         */
+        this.intersectionColor = defaultValue$c(options.intersectionColor, Color$q.WHITE);
+
+        /**
+         * 与地球相交的线的宽度（像素）
+         * @type {Number}
+         */
+        this.intersectionWidth = defaultValue$c(options.intersectionWidth, 5.0);
+
+        //是否穿过地球
+        this._showThroughEllipsoid = defaultValue$c(options.showThroughEllipsoid, false);
+
+        /**
+         * 是否显示扫描面
+         * @type {Boolean}
+         */
+        this.showScanPlane = defaultValue$c(options.showScanPlane, true);
+
+        /**
+         * 扫描面颜色
+         * @type {Color}
+         */
+        this.scanPlaneColor = defaultValue$c(options.scanPlaneColor, Color$q.AQUA);
+
+        /**
+         * 扫描面模式 垂直V/水平H
+         * @type {String}
+         */
+        this.scanPlaneMode = defaultValue$c(options.scanPlaneMode, 'H');
+
+        /**
+         * 扫描速率，值越大，扫描越慢
+         * @type {Number}
+         */
+        this.speed = defaultValue$c(options.speed, 10);
+
+        this._scanePlaneXHalfAngle = 0;
+        this._scanePlaneYHalfAngle = 0;
+
+        //时间计算的起点
+        this._time = JulianDate$2.now();
+
+        this._boundingSphere = new BoundingSphere$8();
+        this._boundingSphereWC = new BoundingSphere$8();
+        this._boundingSphere = new BoundingSphere$8(Cartesian3$k.ZERO, this._radius);
+        Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+        BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+
+        //扇面 sector
+        this._sectorFrontCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._sectorBackCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._sectorVA = undefined;
+
+        //扇面边线 sectorLine
+        this._sectorLineCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.LINES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._sectorLineVA = undefined;
+
+        //扇面分割线 sectorSegmentLine
+        this._sectorSegmentLineCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.LINES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._sectorSegmentLineVA = undefined;
+
+        //弧面 dome
+        this._domeFrontCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._domeBackCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._domeVA = undefined;
+
+        //弧面线 domeLine
+        this._domeLineCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.LINES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._domeLineVA = undefined;
+
+        //扫描面 scanPlane/scanRadial
+        this._scanPlaneFrontCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+        this._scanPlaneBackCommand = new DrawCommand$3({
+          owner: this,
+          primitiveType: PrimitiveType$4.TRIANGLES,
+          boundingVolume: this._boundingSphereWC
+        });
+
+        this._scanRadialCommand = undefined;
+
+        this._colorCommands = [];
+
+        this._frontFaceRS = undefined;
+        this._backFaceRS = undefined;
+        this._sp = undefined;
+
+        this._uniforms = {
+          u_type: function u_type() {
+            return 0; //面
+          },
+          u_xHalfAngle: function u_xHalfAngle() {
+            return self._xHalfAngle;
+          },
+          u_yHalfAngle: function u_yHalfAngle() {
+            return self._yHalfAngle;
+          },
+          u_radius: function u_radius() {
+            return self.radius;
+          },
+          u_showThroughEllipsoid: function u_showThroughEllipsoid() {
+            return self.showThroughEllipsoid;
+          },
+          u_showIntersection: function u_showIntersection() {
+            return self.showIntersection;
+          },
+          u_intersectionColor: function u_intersectionColor() {
+            return self.intersectionColor;
+          },
+          u_intersectionWidth: function u_intersectionWidth() {
+            return self.intersectionWidth;
+          },
+          u_normalDirection: function u_normalDirection() {
+            return 1.0;
+          },
+          u_lineColor: function u_lineColor() {
+            return self.lineColor;
+          }
+        };
+
+        this._scanUniforms = {
+          u_xHalfAngle: function u_xHalfAngle() {
+            return self._scanePlaneXHalfAngle;
+          },
+          u_yHalfAngle: function u_yHalfAngle() {
+            return self._scanePlaneYHalfAngle;
+          },
+          u_radius: function u_radius() {
+            return self.radius;
+          },
+          u_color: function u_color() {
+            return self.scanPlaneColor;
+          },
+          u_showThroughEllipsoid: function u_showThroughEllipsoid() {
+            return self.showThroughEllipsoid;
+          },
+          u_showIntersection: function u_showIntersection() {
+            return self.showIntersection;
+          },
+          u_intersectionColor: function u_intersectionColor() {
+            return self.intersectionColor;
+          },
+          u_intersectionWidth: function u_intersectionWidth() {
+            return self.intersectionWidth;
+          },
+          u_normalDirection: function u_normalDirection() {
+            return 1.0;
+          },
+          u_lineColor: function u_lineColor() {
+            return self.lineColor;
+          }
+        };
+      }
+      get color() {
+        return this._color;
+      }
+      set color(val) {
+        this._color = val;
+        this._material.uniforms.color = val;
+      }
+      get boundingSphere() {
+        return this._boundingSphere;
+      }
+      /**
+       * 水平面半夹角,单位：度
+       * @type {Number}
+       */
+      get xHalfAngle() {
+        return CesiumMath$7.toDegrees(this._xHalfAngle);
+      }
+      set xHalfAngle(val) {
+        if (this._xHalfAngle !== val) {
+          this._xHalfAngle = CesiumMath$7.toRadians(val);
+          this._createVS = true;
+        }
+      }
+      /**
+       * 垂直面半夹角,单位：度
+       * @type {Number}
+       */
+      get yHalfAngle() {
+        return CesiumMath$7.toDegrees(this._yHalfAngle);  }
+      set yHalfAngle(val) {
+        if (this._yHalfAngle !== val) {
+          this._yHalfAngle = CesiumMath$7.toRadians(val);
+          this._createVS = true;
+        }
+      }
+      /**
+       * 传感器半径
+       * @type {Number}
+       */
+      get radius() {
+        return this._radius;
+      }
+      set radius(val) {
+        if (this._radius !== val) {
+          this._radius = val;
+          this._boundingSphere = new BoundingSphere$8(Cartesian3$k.ZERO, val);
+          Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+        }
+      }
+      /**
+       * 传感器模型矩阵
+       * @type {Matrix4}
+       */
+      get modelMatrix() {
+        return this._modelMatrix;
+      }
+      set modelMatrix(val) {
+        const modelMatrixChanged = !Matrix4$7.equals(val, this._modelMatrix);
+        if (modelMatrixChanged) {
+          Matrix4$7.clone(val, this._modelMatrix);
+          Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+        }
+      }
+      /**
+       * 是否传过地球
+       * @type {Boolean}
+       */
+      get showThroughEllipsoid() {
+        return this._showThroughEllipsoid;
+      }
+      set showThroughEllipsoid(val) {
+        if (this._showThroughEllipsoid !== val) {
+          this._showThroughEllipsoid = val;
+          this._createRS = true;
+        }
+      }
+      /**
+       * 材质
+       * @type {Material}
+       */
+      get material() {
+        return this._material
+      }
+      set material(val) {
+        this._material = val;
+        this._createRS = true;
+        this._createSP = true;
+      }
+
+      /**
+       * 每一帧在渲染时Cesium会自动调用该方法。不要主动调用该方法
+       * @override
+       * @param  {frameState} frameState
+       */
+      update(frameState) {
+        const mode = frameState.mode;
+        if (!this.show || mode !== SceneMode$4.SCENE3D) {
+          return;
+        }
+        const xHalfAngle = this._xHalfAngle;
+        const yHalfAngle = this._yHalfAngle;
+
+        if (xHalfAngle < 0.0 || yHalfAngle < 0.0) {
+          throw new CesiumProError$1('halfAngle must be greater than or equal to zero.');
+        }
+        if (xHalfAngle == 0.0 || yHalfAngle == 0.0) {
+          return;
+        }
+
+        const radius = this.radius;
+        if (radius < 0.0) {
+          throw new CesiumProError$1('this.radius must be greater than or equal to zero.');
+        }
+        const showThroughEllipsoid = this.showThroughEllipsoid;
+        const material = this.material;
+        const translucent = material.isTranslucent();
+        if (this._translucent !== translucent) {
+          this._translucent = translucent;
+          this._createRS = true;
+        }
+        if (this.showScanPlane) {
+          const time = frameState.time;
+          let timeDiff = JulianDate$2.secondsDifference(time, this._time);
+          if (timeDiff < 0) {
+            this._time = JulianDate$2.clone(time, this._time);
+          }
+          let percentage;
+          if (this.speed <= 0) {
+            percentage = 0;
+          } else {
+            const speet = 10 / this.speed;
+            percentage = Math.max(timeDiff % speet / speet, 0);
+          }
+          let angle;
+          const matrix3Scratch = new Matrix3$3;
+
+          if (this.scanPlaneMode == 'H') {
+            angle = 2 * yHalfAngle * percentage - yHalfAngle;
+            const cosYHalfAngle = cos(angle);
+            const tanXHalfAngle = tan(xHalfAngle);
+
+            const maxX = atan(cosYHalfAngle * tanXHalfAngle);
+            this._scanePlaneXHalfAngle = maxX;
+            this._scanePlaneYHalfAngle = angle;
+            Matrix3$3.fromRotationX(this._scanePlaneYHalfAngle, matrix3Scratch);
+          } else {
+            angle = 2 * xHalfAngle * percentage - xHalfAngle;
+            const tanYHalfAngle = tan(yHalfAngle);
+            const cosXHalfAngle = cos(angle);
+
+            const maxY = atan(cosXHalfAngle * tanYHalfAngle);
+            this._scanePlaneXHalfAngle = angle;
+            this._scanePlaneYHalfAngle = maxY;
+            Matrix3$3.fromRotationY(this._scanePlaneXHalfAngle, matrix3Scratch);
+          }
+
+          Matrix4$7.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
+          Matrix4$7.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
+        }
+
+        if (this._createVS) {
+          createVertexArray(this, frameState);
+        }
+        if (this._createRS) {
+          createRenderState(this, showThroughEllipsoid, translucent);
+        }
+        if (this._createSP) {
+          createShaderProgram$1(this, frameState, material);
+        }
+        if (this._createRS || this._createSP) {
+          createCommands(this, translucent);
+        }
+
+        const commandList = frameState.commandList;
+        const passes = frameState.passes;
+        const colorCommands = this._colorCommands;
+        if (passes.render) {
+          for (let i = 0, len = colorCommands.length; i < len; i++) {
+            const colorCommand = colorCommands[i];
+            commandList.push(colorCommand);
+          }
+        }
+      }
+      /**
+       * 销毁对象并翻译WebGL资源
+       * @example
+       * const radar=new CesiumPro.RectangularSensorPrimitive();
+       * if(!radar.isDestroyed()){
+       *    radar.destroy();
+       * }
+       */
+      destroy() {
+        this._pickSP.destroy();
+        this._sp = this._sp.destroy();
+        this._scanePlaneSP && (this._scanePlaneSP = this._scanePlaneSP.destroy());
+        destroyObject$8(this);
+      }
+    }
+
+
+    function createCommand(primitive, frontCommand, backCommand, frontFaceRS, backFaceRS, sp, va, uniforms, modelMatrix, translucent, pass, isLine) {
+      if (translucent && backCommand) {
+        backCommand.vertexArray = va;
+        backCommand.renderState = backFaceRS;
+        backCommand.shaderProgram = sp;
+        backCommand.uniformMap = combine(uniforms, primitive._material._uniforms);
+        backCommand.uniformMap.u_normalDirection = function () {
+          return -1.0;
+        };
+        backCommand.pass = pass;
+        backCommand.modelMatrix = modelMatrix;
+        primitive._colorCommands.push(backCommand);
+      }
+
+      frontCommand.vertexArray = va;
+      frontCommand.renderState = frontFaceRS;
+      frontCommand.shaderProgram = sp;
+      frontCommand.uniformMap = combine(uniforms, primitive._material._uniforms);
+      if (isLine) {
+        frontCommand.uniformMap.u_type = function () {
+          return 1;
+        };
+      }
+      frontCommand.pass = pass;
+      frontCommand.modelMatrix = modelMatrix;
+      primitive._colorCommands.push(frontCommand);
+    }
+
+    function createCommands(primitive, translucent) {
+      primitive._colorCommands.length = 0;
+
+      const pass = translucent ? Pass$3.TRANSLUCENT : Pass$3.OPAQUE;
+
+      //显示扇面
+      if (primitive.showLateralSurfaces) {
+        createCommand(primitive, primitive._sectorFrontCommand, primitive._sectorBackCommand,
+          primitive._frontFaceRS, primitive._backFaceRS, primitive._sp, primitive._sectorVA,
+          primitive._uniforms, primitive._computedModelMatrix, translucent,
+          pass);
+      }
+      //显示扇面线
+      if (primitive.showSectorLines) {
+        createCommand(primitive, primitive._sectorLineCommand, undefined, primitive._frontFaceRS,
+          primitive._backFaceRS, primitive._sp, primitive._sectorLineVA, primitive._uniforms,
+          primitive._computedModelMatrix, translucent, pass, true);
+      }
+
+      //显示扇面交接线
+      if (primitive.showSectorSegmentLines) {
+        createCommand(primitive, primitive._sectorSegmentLineCommand, undefined, primitive._frontFaceRS,
+          primitive._backFaceRS, primitive._sp, primitive._sectorSegmentLineVA, primitive._uniforms,
+          primitive._computedModelMatrix, translucent, pass,
+          true);
+      }
+
+      //显示弧面
+      if (primitive.showDomeSurfaces) {
+        createCommand(primitive, primitive._domeFrontCommand, primitive._domeBackCommand,
+          primitive._frontFaceRS, primitive._backFaceRS, primitive._sp, primitive._domeVA,
+          primitive._uniforms, primitive._computedModelMatrix, translucent, pass);
+      }
+
+      //显示弧面线
+      if (primitive.showDomeLines) {
+        createCommand(primitive, primitive._domeLineCommand, undefined, primitive._frontFaceRS,
+          primitive._backFaceRS, primitive._sp, primitive._domeLineVA, primitive._uniforms,
+          primitive._computedModelMatrix, translucent, pass, true);
+      }
+      //显示扫描面
+      if (primitive.showScanPlane) {
+        createCommand(primitive, primitive._scanPlaneFrontCommand, primitive._scanPlaneBackCommand,
+          primitive._frontFaceRS, primitive._backFaceRS, primitive._scanePlaneSP, primitive._scanPlaneVA,
+          primitive._scanUniforms, primitive
+          ._computedScanPlaneModelMatrix, translucent, pass);
+      }
+      return
+    }
+
+    function createCommonShaderProgram(primitive, frameState, material) {
+      const context = frameState.context;
+
+      const vs = sensorVS;
+      const fs = new ShaderSource$5({
+        sources: [sensorComm, material.shaderSource, sensorFS]
+      });
+
+      primitive._sp = ShaderProgram$5.replaceCache({
+        context: context,
+        shaderProgram: primitive._sp,
+        vertexShaderSource: vs,
+        fragmentShaderSource: fs,
+        attributeLocations: attributeLocations
+      });
+
+      const pickFS = new ShaderSource$5({
+        sources: [sensorComm, material.shaderSource, sensorFS],
+        pickColorQualifier: 'uniform'
+      });
+
+      primitive._pickSP = ShaderProgram$5.replaceCache({
+        context: context,
+        shaderProgram: primitive._pickSP,
+        vertexShaderSource: vs,
+        fragmentShaderSource: pickFS,
+        attributeLocations: attributeLocations
+      });
+    }
+
+    function createScanPlaneShaderProgram(primitive, frameState, material) {
+      const context = frameState.context;
+
+      const vs = sensorVS;
+      const fs = new ShaderSource$5({
+        sources: [sensorComm, material.shaderSource, scanPlaneFS]
+      });
+
+      primitive._scanePlaneSP = ShaderProgram$5.replaceCache({
+        context: context,
+        shaderProgram: primitive._scanePlaneSP,
+        vertexShaderSource: vs,
+        fragmentShaderSource: fs,
+        attributeLocations: attributeLocations
+      });
+    }
+
+    function createShaderProgram$1(primitive, frameState, material) {
+      createCommonShaderProgram(primitive, frameState, material);
+
+      if (primitive.showScanPlane) {
+        createScanPlaneShaderProgram(primitive, frameState, material);
+      }
+    }
+
+    function createRenderState(primitive, showThroughEllipsoid, translucent) {
+      if (translucent) {
+        primitive._frontFaceRS = RenderState$3.fromCache({
+          depthTest: {
+            enabled: !showThroughEllipsoid
+          },
+          depthMask: false,
+          blending: BlendingState$1.ALPHA_BLEND,
+          cull: {
+            enabled: true,
+            face: CullFace.BACK
+          }
+        });
+
+        primitive._backFaceRS = RenderState$3.fromCache({
+          depthTest: {
+            enabled: !showThroughEllipsoid
+          },
+          depthMask: false,
+          blending: BlendingState$1.ALPHA_BLEND,
+          cull: {
+            enabled: true,
+            face: CullFace.FRONT
+          }
+        });
+
+        primitive._pickRS = RenderState$3.fromCache({
+          depthTest: {
+            enabled: !showThroughEllipsoid
+          },
+          depthMask: false,
+          blending: BlendingState$1.ALPHA_BLEND
+        });
+      } else {
+        primitive._frontFaceRS = RenderState$3.fromCache({
+          depthTest: {
+            enabled: !showThroughEllipsoid
+          },
+          depthMask: true
+        });
+
+        primitive._pickRS = RenderState$3.fromCache({
+          depthTest: {
+            enabled: true
+          },
+          depthMask: true
+        });
+      }
+    }
+
+    function computeUnitPosiiton(primitive, xHalfAngle, yHalfAngle) {
+      const slice = primitive.slice;
+      //以中心为角度
+      const cosYHalfAngle = cos(yHalfAngle);
+      const tanYHalfAngle = tan(yHalfAngle);
+      const cosXHalfAngle = cos(xHalfAngle);
+      const tanXHalfAngle = tan(xHalfAngle);
+
+      const maxY = atan(cosXHalfAngle * tanYHalfAngle);
+      const maxX = atan(cosYHalfAngle * tanXHalfAngle);
+
+      //ZOY面单位圆
+      const zoy = [];
+      for (let i = 0; i < slice; i++) {
+        const phi = 2 * maxY * i / (slice - 1) - maxY;
+        zoy.push(new Cartesian3$k(0, sin(phi), cos(phi)));
+      }
+      //zox面单位圆
+      const zox = [];
+      for (let i = 0; i < slice; i++) {
+        const phi = 2 * maxX * i / (slice - 1) - maxX;
+        zox.push(new Cartesian3$k(sin(phi), 0, cos(phi)));
+      }
+
+      return {
+        zoy: zoy,
+        zox: zox
+      };
+    }
+
+
+    function computeSectorPositions(primitive, unitPosition) {
+      const xHalfAngle = primitive._xHalfAngle,
+        yHalfAngle = primitive._yHalfAngle,
+        zoy = unitPosition.zoy,
+        zox = unitPosition.zox;
+      const positions = [];
+
+      //zoy面沿y轴逆时针转xHalfAngle
+      const matrix3Scratch = new Matrix3$3();
+      let matrix3 = Matrix3$3.fromRotationY(xHalfAngle, matrix3Scratch);
+      positions.push(zoy.map(function (p) {
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$k());
+      }));
+      //zox面沿x轴顺时针转yHalfAngle
+      matrix3 = Matrix3$3.fromRotationX(-yHalfAngle, matrix3Scratch);
+      positions.push(zox.map(function (p) {
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$k());
+      }).reverse());
+      //zoy面沿y轴顺时针转xHalfAngle
+      matrix3 = Matrix3$3.fromRotationY(-xHalfAngle, matrix3Scratch);
+      positions.push(zoy.map(function (p) {
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$k());
+      }).reverse());
+      //zox面沿x轴逆时针转yHalfAngle
+      matrix3 = Matrix3$3.fromRotationX(yHalfAngle, matrix3Scratch);
+      positions.push(zox.map(function (p) {
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$k());
+      }));
+      return positions;
+    }
+    /**
+     * 创建扇面顶点
+     * @private
+     * @param context
+     * @param positions
+     * @returns {*}
+     */
+
+    function createSectorVertexArray(context, positions) {
+      const planeLength = Array.prototype.concat.apply([], positions).length - positions.length;
+      const vertices = new Float32Array(2 * 3 * 3 * planeLength);
+
+      let k = 0;
+      for (let i = 0, len = positions.length; i < len; i++) {
+        const planePositions = positions[i];
+        const nScratch = new Cartesian3$k();
+        const n = Cartesian3$k.normalize(Cartesian3$k.cross(planePositions[0],
+          planePositions[planePositions.length - 1], nScratch), nScratch);
+        for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
+          vertices[k++] = 0.0;
+          vertices[k++] = 0.0;
+          vertices[k++] = 0.0;
+          vertices[k++] = -n.x;
+          vertices[k++] = -n.y;
+          vertices[k++] = -n.z;
+
+          vertices[k++] = planePositions[j].x;
+          vertices[k++] = planePositions[j].y;
+          vertices[k++] = planePositions[j].z;
+          vertices[k++] = -n.x;
+          vertices[k++] = -n.y;
+          vertices[k++] = -n.z;
+
+          vertices[k++] = planePositions[j + 1].x;
+          vertices[k++] = planePositions[j + 1].y;
+          vertices[k++] = planePositions[j + 1].z;
+          vertices[k++] = -n.x;
+          vertices[k++] = -n.y;
+          vertices[k++] = -n.z;
+        }
+      }
+
+      const vertexBuffer = Buffer$1.createVertexBuffer({
+        context: context,
+        typedArray: vertices,
+        usage: BufferUsage$3.STATIC_DRAW
+      });
+
+      const stride = 2 * 3 * Float32Array.BYTES_PER_ELEMENT;
+
+      const attributes = [{
+        index: attributeLocations.position,
+        vertexBuffer: vertexBuffer,
+        componentsPerAttribute: 3,
+        componentDatatype: ComponentDatatype$3.FLOAT,
+        offsetInBytes: 0,
+        strideInBytes: stride
+      }, {
+        index: attributeLocations.normal,
+        vertexBuffer: vertexBuffer,
+        componentsPerAttribute: 3,
+        componentDatatype: ComponentDatatype$3.FLOAT,
+        offsetInBytes: 3 * Float32Array.BYTES_PER_ELEMENT,
+        strideInBytes: stride
+      }];
+
+      return new VertexArray$3({
+        context: context,
+        attributes: attributes
+      });
+    }
+
+    /**
+     * 创建扇面边线顶点
+     * @param context
+     * @param positions
+     * @returns {*}
+     */
+    function createSectorLineVertexArray(context, positions) {
+      const planeLength = positions.length;
+      const vertices = new Float32Array(3 * 3 * planeLength);
+
+      let k = 0;
+      for (let i = 0, len = positions.length; i < len; i++) {
+        const planePositions = positions[i];
+        vertices[k++] = 0.0;
+        vertices[k++] = 0.0;
+        vertices[k++] = 0.0;
+
+        vertices[k++] = planePositions[0].x;
+        vertices[k++] = planePositions[0].y;
+        vertices[k++] = planePositions[0].z;
+      }
+
+      const vertexBuffer = Buffer$1.createVertexBuffer({
+        context: context,
+        typedArray: vertices,
+        usage: BufferUsage$3.STATIC_DRAW
+      });
+
+      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
+
+      const attributes = [{
+        index: attributeLocations.position,
+        vertexBuffer: vertexBuffer,
+        componentsPerAttribute: 3,
+        componentDatatype: ComponentDatatype$3.FLOAT,
+        offsetInBytes: 0,
+        strideInBytes: stride
+      }];
+
+      return new VertexArray$3({
+        context: context,
+        attributes: attributes
+      });
+    }
+
+    /**
+     * 创建扇面圆顶面连接线顶点
+     * @private
+     * @param context
+     * @param positions
+     * @returns {*}
+     */
+    function createSectorSegmentLineVertexArray(context, positions) {
+      const planeLength = Array.prototype.concat.apply([], positions).length - positions.length;
+      const vertices = new Float32Array(3 * 3 * planeLength);
+
+      let k = 0;
+      for (let i = 0, len = positions.length; i < len; i++) {
+        const planePositions = positions[i];
+
+        for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
+          vertices[k++] = planePositions[j].x;
+          vertices[k++] = planePositions[j].y;
+          vertices[k++] = planePositions[j].z;
+
+          vertices[k++] = planePositions[j + 1].x;
+          vertices[k++] = planePositions[j + 1].y;
+          vertices[k++] = planePositions[j + 1].z;
+        }
+      }
+
+      const vertexBuffer = Buffer$1.createVertexBuffer({
+        context: context,
+        typedArray: vertices,
+        usage: BufferUsage$3.STATIC_DRAW
+      });
+
+      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
+
+      const attributes = [{
+        index: attributeLocations.position,
+        vertexBuffer: vertexBuffer,
+        componentsPerAttribute: 3,
+        componentDatatype: ComponentDatatype$3.FLOAT,
+        offsetInBytes: 0,
+        strideInBytes: stride
+      }];
+
+      return new VertexArray$3({
+        context: context,
+        attributes: attributes
+      });
+    }
+
+    /**
+     * 创建圆顶面顶点
+     * @param context
+     */
+    function createDomeVertexArray(context) {
+      const geometry = EllipsoidGeometry.createGeometry(new EllipsoidGeometry({
+        vertexFormat: VertexFormat$4.POSITION_ONLY,
+        stackPartitions: 32,
+        slicePartitions: 32
+      }));
+
+      const vertexArray = VertexArray$3.fromGeometry({
+        context: context,
+        geometry: geometry,
+        attributeLocations: attributeLocations,
+        bufferUsage: BufferUsage$3.STATIC_DRAW,
+        interleave: false
+      });
+      return vertexArray;
+    }
+
+    /**
+     * 创建圆顶面连线顶点
+     * @param context
+     */
+    function createDomeLineVertexArray(context) {
+      const geometry = EllipsoidOutlineGeometry.createGeometry(new EllipsoidOutlineGeometry({
+        vertexFormat: VertexFormat$4.POSITION_ONLY,
+        stackPartitions: 32,
+        slicePartitions: 32
+      }));
+
+      const vertexArray = VertexArray$3.fromGeometry({
+        context: context,
+        geometry: geometry,
+        attributeLocations: attributeLocations,
+        bufferUsage: BufferUsage$3.STATIC_DRAW,
+        interleave: false
+      });
+      return vertexArray;
+    }
+
+    /**
+     * 创建扫描面顶点
+     * @param context
+     * @param positions
+     * @returns {*}
+     */
+    function createScanPlaneVertexArray(context, positions) {
+      const planeLength = positions.length - 1;
+      const vertices = new Float32Array(3 * 3 * planeLength);
+
+      let k = 0;
+      for (let i = 0; i < planeLength; i++) {
+        vertices[k++] = 0.0;
+        vertices[k++] = 0.0;
+        vertices[k++] = 0.0;
+
+        vertices[k++] = positions[i].x;
+        vertices[k++] = positions[i].y;
+        vertices[k++] = positions[i].z;
+
+        vertices[k++] = positions[i + 1].x;
+        vertices[k++] = positions[i + 1].y;
+        vertices[k++] = positions[i + 1].z;
+      }
+
+      const vertexBuffer = Buffer$1.createVertexBuffer({
+        context: context,
+        typedArray: vertices,
+        usage: BufferUsage$3.STATIC_DRAW
+      });
+
+      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
+
+      const attributes = [{
+        index: attributeLocations.position,
+        vertexBuffer: vertexBuffer,
+        componentsPerAttribute: 3,
+        componentDatatype: ComponentDatatype$3.FLOAT,
+        offsetInBytes: 0,
+        strideInBytes: stride
+      }];
+
+      return new VertexArray$3({
+        context: context,
+        attributes: attributes
+      });
+    }
+
+    function createVertexArray(primitive, frameState) {
+      const context = frameState.context;
+
+      const unitSectorPositions = computeUnitPosiiton(primitive, primitive._xHalfAngle, primitive._yHalfAngle);
+      const positions = computeSectorPositions(primitive, unitSectorPositions);
+
+      //显示扇面
+      if (primitive.showLateralSurfaces) {
+        primitive._sectorVA = createSectorVertexArray(context, positions);
+      }
+
+      //显示扇面线
+      if (primitive.showSectorLines) {
+        primitive._sectorLineVA = createSectorLineVertexArray(context, positions);
+      }
+
+      //显示扇面圆顶面的交线
+      if (primitive.showSectorSegmentLines) {
+        primitive._sectorSegmentLineVA = createSectorSegmentLineVertexArray(context, positions);
+      }
+
+      //显示弧面
+      if (primitive.showDomeSurfaces) {
+        primitive._domeVA = createDomeVertexArray(context);
+      }
+
+      //显示弧面线
+      if (primitive.showDomeLines) {
+        primitive._domeLineVA = createDomeLineVertexArray(context);
+      }
+
+      //显示扫描面
+      if (primitive.showScanPlane) {
+
+        if (primitive.scanPlaneMode == 'H') {
+          const unitScanPlanePositions = computeUnitPosiiton(primitive, CesiumMath$7.PI_OVER_TWO, 0);
+          primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zox);
+        } else {
+          const unitScanPlanePositions = computeUnitPosiiton(primitive, 0, CesiumMath$7.PI_OVER_TWO);
+          primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zoy);
+        }
+      }
+    }
+
+    const CesiumMath$6 = Cesium.Math;
+
+    function getHeading(direction, up) {
+      var heading;
+      if (
+        !CesiumMath$6.equalsEpsilon(Math.abs(direction.z), 1.0, CesiumMath$6.EPSILON3)
+      ) {
+        heading = Math.atan2(direction.y, direction.x) - CesiumMath$6.PI_OVER_TWO;
+      } else {
+        heading = Math.atan2(up.y, up.x) - CesiumMath$6.PI_OVER_TWO;
+      }
+
+      return CesiumMath$6.TWO_PI - CesiumMath$6.zeroToTwoPi(heading);
+    }
+
+    function getPitch(direction) {
+      return CesiumMath$6.PI_OVER_TWO - CesiumMath$6.acosClamped(direction.z);
+    }
+
+
+    function getRoll(direction, up, right) {
+      var roll = 0.0;
+      if (
+        !CesiumMath$6.equalsEpsilon(Math.abs(direction.z), 1.0, CesiumMath$6.EPSILON3)
+      ) {
+        roll = Math.atan2(-right.z, up.z);
+        roll = CesiumMath$6.zeroToTwoPi(roll + CesiumMath$6.TWO_PI);
+      }
+
+      return roll;
+    }
+    class ViewShedAnalysis extends BaseAnalysis {
+      /**
+       * <p>视域分析</p>
+       * <b>Note:使用视域分析时需要关闭场景的阴影.</b>
+       * @extends Analysis
+       * @param {Cesium.Viewer} viewer  viewer对象
+       * @param {Object} options 具有以下属性
+       * @param {Cesium.Cartesian3} options.observe 观察位置，即视点所在的位置
+       * @param {Cesium.Cartesian3} options.viewPosition 相机方法向视锥机远裁剪面的交点
+       * @param {Number} [options.far] 远裁剪面的距离
+       * @param {Number} [options.near=0.001*options.far] 近裁剪面的距离
+       * @param {Number} [options.aspectRatio=1.5] 视锥宽高比
+       * @param {Number} [options.fov=120] 视锥体的水面夹角,单位度
+       *
+       */
+      constructor(viewer, options) {
+        super(viewer);
+        options = defaultValue$c(options, {});
+        this._options = options;
+        if (!defined$d(options.observe)) {
+          throw new CesiumProError$1('parameter options.observe is required.')
+        }
+        if (!defined$d(options.viewPosition)) {
+          throw new CesiumProError$1('parameter options.viewPosition is required.')
+        }
+        this._observe = options.observe;
+        this._viewPosition = options.viewPosition;
+        this._debug = defaultValue$c(options.debug, false);
+        this._far = defaultValue$c(options.far, Cesium.Cartesian3.distance(this._observe, this._viewPosition));
+        this._near = defaultValue$c(options.near, 0.001 * this._far);
+        this._aspectRatio = defaultValue$c(options.aspectRatio, 1.5);
+        this._fov = defaultValue$c(options.fov, 120);
+        const direction = Cesium.Cartesian3.subtract(this._viewPosition, this._observe, new Cesium.Cartesian3);
+        this._direction = Cesium.Cartesian3.normalize(direction, direction);
+        this._up = viewer.scene.mapProjection.ellipsoid.geodeticSurfaceNormal(this._observe, new Cesium.Cartesian3);
+        this._heading = undefined;
+        this._pitch = undefined;
+        this._roll = undefined;
+      }
+      do() {
+        this.preAnalysis.raise();
+        this.update();
+        this.postAnalysis.raise();
+      }
+      clear() {
+        this._viewer.scene.primitives.remove(this._frustum);
+        this._viewer.scene.primitives.remove(this._shadowMap);
+      }
+      destroy() {
+        this.clear();
+        if (this._frustum && !this._frustum.isDestroyed()) {
+          this._frustum.destroy();
+        }
+        if (this._shadowMap && !this._shadowMap.isDestroyed()) {
+          this._shadowMap.destroy();
+        }
+        super.destroy(this);
+      }
+      /**
+       * 视锥体
+       * @type {any}
+       */
+      get frustum() {
+        return this._frustum;
+      }
+      /**
+       * 是否显示辅助调试的元素
+       * @type {Boolean}
+       */
+      get debug() {
+        return this._debug;
+      }
+      set debug(val) {
+        if (this._debug !== val) {
+          this._debug = val;
+          this._frustum.show = val;
+          // this.createOrUpdateFrustum();
+        }
+      }
+      /**
+       * 观察位置，即相机所在的位置
+       * @type {Cesium.Cartesian3}
+       */
+      get observe() {
+        return this._observe;
+      }
+      set observe(val) {
+        if (this._observe !== val) {
+          this._observe = val;
+          this.update();
+        }
+      }
+      /**
+       * 相机方法向视锥机远裁剪面的交点
+       * @type {Cesium.Cartesian3}
+       */
+      get viewPosition() {
+        return this._viewPosition;
+      }
+      set viewPosition(val) {
+        if (this._viewPosition !== val) {
+          this._viewPosition = val;
+          this.update();
+        }
+      }
+
+      /**
+       * 相机方向，由viewPosition和observe决定
+       * @readonly
+       * @type {Cesium.Cartesian3}
+       */
+      get direction() {
+        return this._direction;
+      }
+      /**
+       * 相机远裁剪面到视点的距离
+       * @type {Number}
+       */
+      get far() {
+        return this._far;
+      }
+      set far(val) {
+        if (this._far !== val) {
+          this._far = val;
+          this.update();
+        }
+      }
+      /**
+       * 相机近裁剪面到视点的距离
+       * @type {Number}
+       */
+      get near() {
+        return this._near;
+      }
+      set near(val) {
+        if (this._near !== val) {
+          this._near = val;
+          this.update();
+        }
+      }
+      /**
+       * 视锥体水平夹角，单位：度
+       * @type {Number}
+       */
+      get fov() {
+        return this._fov;
+      }
+      set fov(val) {
+        if (this._fov !== val) {
+          this._fov = val;
+          this.update();
+        }
+      }
+      /**
+       * 视锥宽高比
+       *  @type {Number}
+       */
+      get aspectRatio() {
+        return this._aspectRatio;
+      }
+      set aspectRatio(val) {
+        if (this._aspectRatio !== val) {
+          this._aspectRatio = val;
+          this.update();
+        }
+      }
+      /**
+       * 旋转角，单位：度
+       * @type {Number}
+       * @readonly
+       */
+      get heading() {
+        this.updateHeadingPitchRoll();
+        return Cesium.Math.toDegrees(this._heading);
+      }
+      /**
+       * 俯仰角，单位：度
+       * @type {Number}
+       * @readonly
+       */
+      get pitch() {
+        this.updateHeadingPitchRoll();
+        return Cesium.Math.toDegrees(this._pitch);
+      }
+      /**
+       * 翻滚角，单位：度
+       * @type {Number}
+       * @readonly
+       */
+      get roll() {
+        this.updateHeadingPitchRoll();
+        return Cesium.Math.toDegrees(this._roll);
+      }
+
+      update() {
+        this.createOrupdateCamera();
+        this.createOrUpdateFrustum();
+        this.createOrUpdateShadowMap();
+      }
+      createOrupdateCamera() {
+        if (!defined$d(this._viewCamera)) {
+          this._viewCamera = new Cesium.Camera(viewer.scene);
+        }
+        this._viewCamera.frustum.near = this._near;
+        this._viewCamera.frustum.far = this._far;
+        this._viewCamera.frustum.aspectRatio = this._aspectRatio;
+        this._viewCamera.frustum.fov = Cesium.Math.toRadians(this.fov);    this._viewCamera.direction = Cesium.Cartesian3.normalize(this._direction, this._viewCamera.direction);
+        this._viewCamera.position = Cesium.Cartesian3.clone(this._observe, this._viewCamera.position);
+        this._viewCamera.up = this._up;
+        this._viewCamera.right = Cesium.Cartesian3.cross(this._viewCamera.up, this._viewCamera.direction, new Cesium.Cartesian3);
+        //
+        // const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+        //   this._viewCamera.position, this._viewCamera._projection.ellipsoid
+        // );
+        // this._viewCamera._setTransform(transform);
+        if (!defined$d(this._heading) && !defined$d(this._pitch) && !defined$d(this._roll)) {
+          this.updateHeadingPitchRoll();
+        }
+      }
+      updateHeadingPitchRoll() {
+        const oldTransform = Cesium.Matrix4.clone(this._viewCamera._transform, new Cesium.Matrix4);
+        const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+          this._viewCamera.positionWC, this._viewCamera._projection.ellipsoid
+        );
+        this._viewCamera._setTransform(transform);
+        this._pitch = getPitch(this._viewCamera.direction);
+        this._heading = getHeading(this._viewCamera.direction, this._viewCamera.up);
+        this._roll = getRoll(this._viewCamera.direction, this._viewCamera.up, this._viewCamera.right);
+
+        this._viewCamera._setTransform(oldTransform);
+      }
+      /**
+       * 相机向左旋转
+       * @param  {Number} angle 旋转角度，单位：度
+       */
+      rotateLeft(angle) {
+        const oldTransform = Cesium.Matrix4.clone(this._viewCamera._transform, new Cesium.Matrix4);
+        const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+          this._viewCamera.position, this._viewCamera._projection.ellipsoid
+        );
+        this._viewCamera._setTransform(transform);
+        this._viewCamera.rotateLeft(Cesium.Math.toRadians(angle));
+        this._viewCamera._setTransform(oldTransform);
+        Cesium.Cartesian3.clone(this._viewCamera.directionWC, this._direction);
+        this.update();
+      }
+      /**
+       * 相机向右旋转
+       * @param  {Number} angle 旋转角度，单位：度
+       */
+      rotateRight(angle) {
+        this.rotateLeft(-angle);
+      }
+      /**
+       * 相机向下旋转
+       * @param  {Number} angle 旋转角度，单位：度
+       */
+      rotateDown(angle) {
+        const oldTransform = Cesium.Matrix4.clone(this._viewCamera._transform, new Cesium.Matrix4);
+        const transform = Cesium.Transforms.eastNorthUpToFixedFrame(
+          this._viewCamera.position, this._viewCamera._projection.ellipsoid
+        );
+        this._viewCamera._setTransform(transform);
+        this._viewCamera.rotateDown(Cesium.Math.toRadians(angle));
+        this._viewCamera._setTransform(oldTransform);
+        Cesium.Cartesian3.clone(this._viewCamera.directionWC, this._direction);
+        this.update();
+      }
+      /**
+       * 相机向上旋转
+       * @param  {Number} angle 旋转角度，单位：度
+       */
+      rotateUp(angle) {
+        this.rotateDown(-angle);
+      }
+      createOrUpdateFrustum() {
+        const position = this._viewCamera.positionWC;
+        const rotation = new Cesium.Matrix3;
+        const up = this._up;
+        const direction = this.direction;
+        // this._up = viewer.scene.mapProjection.ellipsoid.geodeticSurfaceNormal(this._observe, new Cesium.Cartesian3);
+        const right = Cesium.Cartesian3.cross(up, direction, new Cesium.Cartesian3);
+        Cesium.Matrix3.setColumn(rotation, 0, right, rotation);
+        Cesium.Matrix3.setColumn(rotation, 1, up, rotation);
+        Cesium.Matrix3.setColumn(rotation, 2, direction, rotation);
+
+        // const hpr = new Cesium.HeadingPitchRoll(this._heading, this._pitch, this._roll);
+        // const orientation = Cesium.Quaternion.fromHeadingPitchRoll(hpr, new Cesium.Quaternion);
+        const orientation = Cesium.Quaternion.fromRotationMatrix(rotation, new Cesium.Quaternion);
+        const modelMatrix = Cesium.Matrix4.fromTranslationQuaternionRotationScale(
+          position,
+          orientation,
+          new Cesium.Cartesian3(1, 1, 1),
+          new Cesium.Matrix4
+        );
+        if (this._frustum) {
+          // this._viewer.scene.primitives.remove(this._frustum);
+          this._frustum.modelMatrix = modelMatrix;
+          this._frustum.xHalfAngle = this._fov / 2;
+          this._frustum.yHalfAngle = this._fov / 2 / this._aspectRatio;
+          this._frustum.radius = this._far;
+          return;
+        }
+
+        // const frustum = new Cesium.GeometryInstance({
+        //   geometry: new Cesium.FrustumOutlineGeometry({
+        //     frustum: this._viewCamera.frustum,
+        //     origin: position,
+        //     orientation: orientation
+        //   }),
+        //   attributes: {
+        //     color: Cesium.ColorGeometryInstanceAttribute.fromColor(new Cesium.Color(0, 1, 0, 1)),
+        //     show: new Cesium.ShowGeometryInstanceAttribute(true)
+        //   }
+        // })
+        // this._frustum = new Cesium.Primitive({
+        //   id: 'viewshed',
+        //   geometryInstances: frustum,
+        //   appearance: new Cesium.PerInstanceColorAppearance({
+        //     translucent: false,
+        //     flat: true
+        //   })
+        // })
+        this._frustum = new RectangularSensorPrimitive({
+          radius: this._far,
+          modelMatrix,
+          xHalfAngle: this._fov / 2,
+          yHalfAngle: this._fov / 2 / this._aspectRatio,
+          showScanPlane: false,
+          showLateralSurfaces: false,
+          material: Cesium.Material.fromType(Cesium.Material.ColorType, {
+            color: Cesium.Color.AQUA.withAlpha(0.3)
+          }),
+          show: this.debug
+        });
+        this._viewer.scene.primitives.add(this._frustum);
+        return this._frustum
+      }
+      createOrUpdateShadowMap() {
+        if (defined$d(this._shadowMap)) {
+          this._viewer.scene.primitives.remove(this._shadowMap);
+        }
+        if (!(this._viewCamera && this._frustum._boundingSphereWC)) {
+          return
+        }
+        this._frustum._boundingSphereWC;
+        const options = this._options;
+        options.lightCamera = this._viewCamera;
+        options.context = this._viewer.scene.context;
+        // options.cascadesEnabled = false;
+        // options.darkness = 0.0;
+        // options.boundingShpere = boundingShpere
+        const shadowMap = new ViewshedMap(options);
+        const primitive = new ViewShadowPrimitive(shadowMap);
+        this._shadowMap = this._viewer.scene.primitives.add(primitive);
+        return this._shadowMap
+      }
+    }
+
     function abstract() {
       throw new CesiumProError$1('抽象方法无法被调用。');
     }
 
     const {
-      Cartesian3: Cartesian3$k,
+      Cartesian3: Cartesian3$j,
       Primitive: Primitive$7,
-      Material: Material$i,
+      Material: Material$h,
       Geometry: Geometry$1,
       MaterialAppearance: MaterialAppearance$6,
       GeometryAttribute: GeometryAttribute$1,
-      ComponentDatatype: ComponentDatatype$3,
-      PrimitiveType: PrimitiveType$4,
-      BoundingSphere: BoundingSphere$8,
-      VertexFormat: VertexFormat$4,
+      ComponentDatatype: ComponentDatatype$2,
+      PrimitiveType: PrimitiveType$3,
+      BoundingSphere: BoundingSphere$7,
+      VertexFormat: VertexFormat$3,
       defaultValue: defaultValue$a,
       GeometryAttributes: GeometryAttributes$1,
       Check,
     } = Cesium;
-    const scratchVertexFormat$1 = new VertexFormat$4();
-    const scratchNormal = new Cartesian3$k();
+    const scratchVertexFormat$1 = new VertexFormat$3();
+    const scratchNormal = new Cartesian3$j();
     class AxisPlaneGeometry {
       constructor(options = {}) {
         this._normal = options.normal;
@@ -6002,11 +9739,11 @@
         this._center = options.center;
         const vertexFormat = defaultValue$a(
           options.vertexFormat,
-          VertexFormat$4.DEFAULT
+          VertexFormat$3.DEFAULT
         );
         this._vertexFormat = vertexFormat;
       }
-      static packedLength = VertexFormat$4.packedLength + Cartesian3$k.packedLength + 1;
+      static packedLength = VertexFormat$3.packedLength + Cartesian3$j.packedLength + 1;
       static pack(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object("value", value);
@@ -6015,10 +9752,10 @@
 
         startingIndex = defaultValue$a(startingIndex, 0);
 
-        VertexFormat$4.pack(value._vertexFormat, array, startingIndex);
-        startingIndex += VertexFormat$4.packedLength;
-        Cartesian3$k.pack(value._normal, array, startingIndex);
-        startingIndex += Cartesian3$k.packedLength;
+        VertexFormat$3.pack(value._vertexFormat, array, startingIndex);
+        startingIndex += VertexFormat$3.packedLength;
+        Cartesian3$j.pack(value._normal, array, startingIndex);
+        startingIndex += Cartesian3$j.packedLength;
         array[startingIndex++] = value._radius;
         return array;
       }
@@ -6029,14 +9766,14 @@
 
         startingIndex = defaultValue$a(startingIndex, 0);
 
-        const vertexFormat = VertexFormat$4.unpack(
+        const vertexFormat = VertexFormat$3.unpack(
           array,
           startingIndex,
           scratchVertexFormat$1
         );
-        startingIndex += VertexFormat$4.packedLength;
-        const normal = Cartesian3$k.unpack(array, startingIndex, scratchNormal);
-        startingIndex += Cartesian3$k.packedLength;
+        startingIndex += VertexFormat$3.packedLength;
+        const normal = Cartesian3$j.unpack(array, startingIndex, scratchNormal);
+        startingIndex += Cartesian3$j.packedLength;
         const radius = array[startingIndex];
 
         if (!defined(result)) {
@@ -6047,11 +9784,11 @@
           });
         }
 
-        result._vertexFormat = VertexFormat$4.clone(
+        result._vertexFormat = VertexFormat$3.clone(
           vertexFormat,
           result._vertexFormat
         );
-        result._normal = Cartesian3$k.clone(normal, result._normal);
+        result._normal = Cartesian3$j.clone(normal, result._normal);
         result._radius = radius;
 
         return result;
@@ -6063,17 +9800,17 @@
         let normal = [];
         const { x, y, z } = planeGeometry._center;
         let center;
-        if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_X)) {
+        if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_X)) {
           positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
-          center = new Cartesian3$k(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$j(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
           normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
-        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Y)) {
+        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Y)) {
           positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
-          center = new Cartesian3$k((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$j((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
           normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
-        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Z)) {
+        } else if (Cartesian3$j.equals(planeGeometry._normal, Cartesian3$j.UNIT_Z)) {
           positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
-          center = new Cartesian3$k((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
+          center = new Cartesian3$j((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
           normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
         }
         positions = new Float32Array([...positions]);
@@ -6082,24 +9819,24 @@
         return new Geometry$1({
           attributes: new GeometryAttributes$1({
             position: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$3.DOUBLE,
+              componentDatatype: ComponentDatatype$2.DOUBLE,
               componentsPerAttribute: 3,
               values: positions,
             }),
             normal: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$3.FLOAT,
+              componentDatatype: ComponentDatatype$2.FLOAT,
               componentsPerAttribute: 3,
               values: normal,
             }),
             st: new GeometryAttribute$1({
-              componentDatatype: ComponentDatatype$3.FLOAT,
+              componentDatatype: ComponentDatatype$2.FLOAT,
               componentsPerAttribute: 2,
               values: sts,
             }),
           }),
           indices: indices,
-          primitiveType: PrimitiveType$4.TRIANGLES,
-          boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
+          primitiveType: PrimitiveType$3.TRIANGLES,
+          boundingSphere: new BoundingSphere$7(center, (v1 + v2) / 2),
         });
       }
     }
@@ -6117,7 +9854,7 @@
         const planeGeometry = new AxisPlaneGeometry({
           normal: this._normal,
           radius: radius,
-          vertexFormat: VertexFormat$4.DEFAULT,
+          vertexFormat: VertexFormat$3.DEFAULT,
           center: this._center,
         });
         const instance = new Cesium.GeometryInstance({
@@ -6128,7 +9865,7 @@
           geometryInstances: instance,
           modelMatrix: this._modelMatrix,
           appearance: new MaterialAppearance$6({
-            material: Material$i.fromType("Color", {
+            material: Material$h.fromType("Color", {
               color: this._color,
             }),
           }),
@@ -6263,8 +10000,8 @@
     const {
         RequestState: RequestState$1,
         AttributeCompression,
-        BoundingSphere: BoundingSphere$7,
-        Cartesian3: Cartesian3$j,
+        BoundingSphere: BoundingSphere$6,
+        Cartesian3: Cartesian3$i,
         Credit: Credit$2,
         defaultValue: defaultValue$9,
         defined: defined$b,
@@ -6820,7 +10557,7 @@
       let triangleLength = bytesPerIndex * triangleElements;
 
       const view = new DataView(buffer);
-      const center = new Cartesian3$j(
+      const center = new Cartesian3$i(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -6832,8 +10569,8 @@
       const maximumHeight = view.getFloat32(pos, true);
       pos += Float32Array.BYTES_PER_ELEMENT;
 
-      const boundingSphere = new BoundingSphere$7(
-        new Cartesian3$j(
+      const boundingSphere = new BoundingSphere$6(
+        new Cartesian3$i(
           view.getFloat64(pos, true),
           view.getFloat64(pos + 8, true),
           view.getFloat64(pos + 16, true)
@@ -6842,7 +10579,7 @@
       );
       pos += boundingSphereLength;
 
-      const horizonOcclusionPoint = new Cartesian3$j(
+      const horizonOcclusionPoint = new Cartesian3$i(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -7595,7 +11332,7 @@
         return object;
       }
 
-      deep = defaultValue$b(deep, false);
+      deep = defaultValue$c(deep, false);
 
       const result = new object.constructor();
       for (const propertyName in object) {
@@ -7621,7 +11358,7 @@
         return url;
       }
 
-      if (!defined$c(a$1)) {
+      if (!defined$d(a$1)) {
         a$1 = document.createElement('a');
       }
       a$1.href = url;
@@ -7652,7 +11389,7 @@
     }
 
     function getCesiumProBaseUrl$1() {
-      if (defined$c(baseResource$1)) {
+      if (defined$d(baseResource$1)) {
         return baseResource$1;
       }
 
@@ -7661,7 +11398,7 @@
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$c(window.define.amd)
+        && defined$d(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -7672,13 +11409,13 @@
         baseUrlString = getBaseUrlFromCesiumScript$1();
       }
       // >>includeStart('debug');
-      if (!defined$c(baseUrlString)) {
+      if (!defined$d(baseUrlString)) {
         throw new CesiumProError$1(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$c(baseUrlString)) {
+      if(!defined$d(baseUrlString)) {
           baseUrlString = '';
       }
       baseResource$1 = new Cesium.Resource({
@@ -7697,11 +11434,11 @@
     }
 
     function buildModuleUrl$3(relativeUrl) {
-      if (!defined$c(implementation$1)) {
+      if (!defined$d(implementation$1)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$c(window.define.amd)
+          && defined$d(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
           implementation$1 = buildModuleUrlFromRequireToUrl$1;
@@ -7794,14 +11531,14 @@
     }
     let bootstrapperUrlResult;
     function getBootstrapperUrl() {
-        if (!defined$c(bootstrapperUrlResult)) {
+        if (!defined$d(bootstrapperUrlResult)) {
             bootstrapperUrlResult = getWorkerUrl("Workers/cesiumWorkerBootstrapper.js");
         }
         return bootstrapperUrlResult;
     }
     function createWorker(processor) {
         const worker = new Worker(getBootstrapperUrl());
-        worker.postMessage = defaultValue$b(
+        worker.postMessage = defaultValue$c(
             worker.webkitPostMessage,
             worker.postMessage
         );
@@ -7847,11 +11584,11 @@
 
     const {
         kdbush,
-        Cartesian3: Cartesian3$i,
+        Cartesian3: Cartesian3$h,
         Cartographic: Cartographic$8,
         PointPrimitive,
         BoundingRectangle: BoundingRectangle$3,
-        SceneMode: SceneMode$4,
+        SceneMode: SceneMode$3,
         EllipsoidalOccluder,
     } = Cesium;
     function computedScreenPosition(objects, scene) {
@@ -7861,7 +11598,7 @@
             if (!object.position) {
                 continue;
             }
-            if (scene.mode === SceneMode$4.SCENE3D && !occluder.isPointVisible(object.position)) {
+            if (scene.mode === SceneMode$3.SCENE3D && !occluder.isPointVisible(object.position)) {
                 continue;
             }
             object.__pixel = Cesium.SceneTransforms.wgs84ToWindowCoordinates(
@@ -7893,8 +11630,8 @@
     }
     class Cluster {
         constructor(scene, options = {}) {
-            this._objects = defaultValue$b(options.objects, []);
-            this._getScreenBoundingBox = defaultValue$b(options.getScreenBoundingBox, getScreenBoundingBox);
+            this._objects = defaultValue$c(options.objects, []);
+            this._getScreenBoundingBox = defaultValue$c(options.getScreenBoundingBox, getScreenBoundingBox);
             this._scene = scene;
             this.clusterSize = 3;
             this.pixelRange = 50;
@@ -7926,7 +11663,7 @@
                 object.cluster = true;
                 const neighbors = index.range(bbox.x, bbox.y, bbox.x + bbox.width, bbox.y + bbox.height);
                 const neighborLength = neighbors.length;
-                const clusterPosition = Cartesian3$i.clone(object.position);
+                const clusterPosition = Cartesian3$h.clone(object.position);
                 let numPoints = 1, lastObject = undefined;
                 const ids = [];
                 for (let i = 0; i < neighborLength; i++) {
@@ -7938,16 +11675,16 @@
                     ids.push(neighborObject.id);
                     neighborObject.cluster = true;
                     const neightborbox = this._getScreenBoundingBox(neighborObject, neighborObject.__pixel);
-                    Cartesian3$i.add(neighborObject.position, clusterPosition, clusterPosition);
+                    Cartesian3$h.add(neighborObject.position, clusterPosition, clusterPosition);
                     BoundingRectangle$3.union(totalBBox, neightborbox, totalBBox);
                     numPoints++;
                     lastObject = neighborObject;
 
                 }
                 if (numPoints >= this.clusterSize) {
-                    Cartesian3$i.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
+                    Cartesian3$h.multiplyByScalar(clusterPosition, 1.0 / numPoints, clusterPosition);
                     this._clusterObjects.push({
-                        position: new Cartesian3$i(clusterPosition.x, clusterPosition.y, clusterPosition.z),
+                        position: new Cartesian3$h(clusterPosition.x, clusterPosition.y, clusterPosition.z),
                         number: numPoints,
                         ids,
                         id: lastObject.id + numPoints
@@ -7973,7 +11710,7 @@
         }
         const now = Cesium.getTimestamp();
         const scene = viewer.scene;
-        if (defined$c(lastUpdateTime) && now - lastUpdateTime < 250) {
+        if (defined$d(lastUpdateTime) && now - lastUpdateTime < 250) {
             return;
         }
         lastUpdateTime = now;
@@ -7984,7 +11721,7 @@
         const endRay = scene.camera.getPickRay(new Cesium.Cartesian2(width / 2 + 1, height / 2));
         const startPosition = scene.globe.pick(startRay, scene);
         const endPosition = scene.globe.pick(endRay, scene);
-        if (!(defined$c(startPosition) && defined$c(endPosition))) {
+        if (!(defined$d(startPosition) && defined$d(endPosition))) {
             return;
         }
         const geodesic = new Cesium.EllipsoidGeodesic(
@@ -8017,7 +11754,7 @@
         }
         if (viewer.scene.mode === Cesium.SceneMode.SCENE3D) {
             const rect = viewer.camera.computeViewRectangle();
-            if(!defined$c(rect)) {
+            if(!defined$d(rect)) {
                 return undefined;
             }
             return {
@@ -8054,12 +11791,12 @@
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$b(options, {});
-        const items = defaultValue$b(options.items, []);
+        options = defaultValue$c(options, {});
+        const items = defaultValue$c(options.items, []);
         this._items = new Cesium.AssociativeArray();
         this._position = options.position;
 
-        this._container = defaultValue$b(options.container, viewer.container);
+        this._container = defaultValue$c(options.container, viewer.container);
         this._root = this.createMenu();
         this.createItems(items);
         this._show = true;
@@ -18431,13 +22168,13 @@
           jQuery(`#${id}`).remove();
         }
         const tooltip = document.createElement('div');
-        tooltip.id = defaultValue$b(id, guid());
+        tooltip.id = defaultValue$c(id, guid());
         tooltip.className = 'cursor-tip-class';
         tooltip.innerHTML = text;
         const target = viewer ? viewer.container : document.body;
         target.appendChild(tooltip);
         this.ele = tooltip;
-        this._show = defaultValue$b(options.show, true);
+        this._show = defaultValue$c(options.show, true);
         this._isDestryoed = false;
         this._target = target;
         this._id = tooltip.id;
@@ -18598,7 +22335,7 @@
         GeographicTilingScheme: GeographicTilingScheme$4,
         GeographicProjection: GeographicProjection$2,
         Rectangle: Rectangle$6,
-        Math: CesiumMath$6
+        Math: CesiumMath$5
     } = Cesium;
 
     class Geographic4490TilingScheme extends GeographicTilingScheme$4 {
@@ -18609,14 +22346,14 @@
         constructor(options = {}) {
             super(options);
             this._tileInfo = options.tileInfo;
-            this._ellipsoid = defaultValue$b(options.ellipsoid, Ellipsoid$2.CGCS2000);
-            this._rectangle = defaultValue$b(options.rectangle, Rectangle$6.fromDegrees(-180, -90, 180, 90));
-            this._numberOfLevelZeroTilesX = defaultValue$b(options.numberOfLevelZeroTilesX, 4);
-            this._numberOfLevelZeroTilesY = defaultValue$b(options.numberOfLevelZeroTilesY, 2);
+            this._ellipsoid = defaultValue$c(options.ellipsoid, Ellipsoid$2.CGCS2000);
+            this._rectangle = defaultValue$c(options.rectangle, Rectangle$6.fromDegrees(-180, -90, 180, 90));
+            this._numberOfLevelZeroTilesX = defaultValue$c(options.numberOfLevelZeroTilesX, 4);
+            this._numberOfLevelZeroTilesY = defaultValue$c(options.numberOfLevelZeroTilesY, 2);
             this._projection = new GeographicProjection$2(this._ellipsoid);
         }
         getNumberOfXTilesAtLevel(level) {
-            if (!defined$c(this._tileInfo)) {
+            if (!defined$d(this._tileInfo)) {
                 return super.getNumberOfXTilesAtLevel(level);
             } else { // 使用切片矩阵计算
                 var currentMatrix = this._tileInfo.lods.filter(function (item) {
@@ -18624,11 +22361,11 @@
                 });
                 var currentResolution = currentMatrix[0].resolution;
                 // return Math.round(360 / (this._tileInfo.rows * currentResolution))
-                return Math.round(CesiumMath$6.toDegrees(CesiumMath$6.TWO_PI * 2) / (this._tileInfo.rows * currentResolution));
+                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.rows * currentResolution));
             }
         };
         getNumberOfYTilesAtLevel(level) {
-            if (!defined$c(this._tileInfo)) {
+            if (!defined$d(this._tileInfo)) {
                 return super.getNumberOfYTilesAtLevel(level);
             } else { // 使用切片矩阵计算
                 var currentMatrix = this._tileInfo.lods.filter(function (item) {
@@ -18636,7 +22373,7 @@
                 });
                 var currentResolution = currentMatrix[0].resolution;
                 // return Math.round(180 / (this._tileInfo.cols * currentResolution))
-                return Math.round(CesiumMath$6.toDegrees(CesiumMath$6.TWO_PI * 2) / (this._tileInfo.cols * currentResolution));
+                return Math.round(CesiumMath$5.toDegrees(CesiumMath$5.TWO_PI * 2) / (this._tileInfo.cols * currentResolution));
             }
         };
     }
@@ -18692,16 +22429,16 @@
          * 所有CesiumPro自定义图形基类
         */
         constructor(options) {
-            this._options = defaultValue$b(options, {});
-            this._id = defaultValue$b(options.id, createGuid$3());
+            this._options = defaultValue$c(options, {});
+            this._id = defaultValue$c(options.id, createGuid$3());
             this._primitive = null;
             this._oldPrimitive = null;
             this._definedChanged = new Event$9();
             this._loadEvent = new Event$9();
-            this._clampToGround = defaultValue$b(!!options.clampToGround, false);
-            this._show = defaultValue$b(options.show, true);
+            this._clampToGround = defaultValue$c(!!options.clampToGround, false);
+            this._show = defaultValue$c(options.show, true);
             this._removed = false;
-            this._allowPicking = defaultValue$b(options.allowPicking, true);
+            this._allowPicking = defaultValue$c(options.allowPicking, true);
             this._property = options.property;
         }
         /**
@@ -18816,7 +22553,7 @@
             }
         }
         toJson() {
-            if (!defined$c(this.primitive)) {
+            if (!defined$d(this.primitive)) {
                 return;
             }
             return JSON.parse(JSON.stringify(this._options))
@@ -18854,7 +22591,7 @@
          * @param {Viewer} viewer viewer对象
          */
         addTo(viewer) {
-            if (!defined$c(this.primitive)) {
+            if (!defined$d(this.primitive)) {
                 return;
             }
             viewer.graphicGroup.add(this);
@@ -18865,7 +22602,7 @@
          * @returns 被移除的要素
          */
         remove() {
-            if (!defined$c(this.primitive)) {
+            if (!defined$d(this.primitive)) {
                 return;
             }
             if (this.group) {
@@ -19007,24 +22744,24 @@
     const {
         defaultValue: defaultValue$8,
         destroyObject: destroyObject$6,
-        Matrix4: Matrix4$7,
-        DrawCommand: DrawCommand$3,
+        Matrix4: Matrix4$6,
+        DrawCommand: DrawCommand$2,
         BoxGeometry,
-        Cartesian3: Cartesian3$h,
+        Cartesian3: Cartesian3$g,
         defined: defined$a,
         GeometryPipeline,
         Transforms: Transforms$6,
-        VertexFormat: VertexFormat$3,
-        BufferUsage: BufferUsage$3,
+        VertexFormat: VertexFormat$2,
+        BufferUsage: BufferUsage$2,
         CubeMap,
         loadCubeMap,
-        RenderState: RenderState$3,
-        VertexArray: VertexArray$3,
-        BlendingState: BlendingState$1,
-        SceneMode: SceneMode$3,
-        ShaderProgram: ShaderProgram$5,
-        ShaderSource: ShaderSource$5,
-        Matrix3: Matrix3$3,
+        RenderState: RenderState$2,
+        VertexArray: VertexArray$2,
+        BlendingState,
+        SceneMode: SceneMode$2,
+        ShaderProgram: ShaderProgram$4,
+        ShaderSource: ShaderSource$4,
+        Matrix3: Matrix3$2,
     } = Cesium;
     const SkyBoxFS = shader$n;
     const SkyBoxVS = shader$m;
@@ -19073,8 +22810,8 @@
              */
             this.show = defaultValue$8(options.show, true);
 
-            this._command = new DrawCommand$3({
-                modelMatrix: Matrix4$7.clone(Matrix4$7.IDENTITY),
+            this._command = new DrawCommand$2({
+                modelMatrix: Matrix4$6.clone(Matrix4$6.IDENTITY),
                 owner: this,
             });
             this._cubeMap = undefined;
@@ -19090,15 +22827,15 @@
          * <p>切勿主动调用该函数。</p>
          */
         update(frameState, useHdr) {
-            const skyboxMatrix3 = new Matrix3$3();
+            const skyboxMatrix3 = new Matrix3$2();
             const that = this;
 
             if (!this.show) {
                 return undefined;
             }
 
-            if ((frameState.mode !== SceneMode$3.SCENE3D)
-                && (frameState.mode !== SceneMode$3.MORPHING)) {
+            if ((frameState.mode !== SceneMode$2.SCENE3D)
+                && (frameState.mode !== SceneMode$2.MORPHING)) {
                 return undefined;
             }
 
@@ -19159,38 +22896,38 @@
                         return that._cubeMap;
                     },
                     u_rotateMatrix() {
-                        if (typeof Matrix4$7.getRotation === 'function') {
-                            return Matrix4$7.getRotation(command.modelMatrix, skyboxMatrix3);
+                        if (typeof Matrix4$6.getRotation === 'function') {
+                            return Matrix4$6.getRotation(command.modelMatrix, skyboxMatrix3);
                         }
-                        return Matrix4$7.getMatrix3(command.modelMatrix, skyboxMatrix3);
+                        return Matrix4$6.getMatrix3(command.modelMatrix, skyboxMatrix3);
                     },
                 };
 
                 const geometry = BoxGeometry.createGeometry(BoxGeometry.fromDimensions({
-                    dimensions: new Cartesian3$h(2.0, 2.0, 2.0),
-                    vertexFormat: VertexFormat$3.POSITION_ONLY,
+                    dimensions: new Cartesian3$g(2.0, 2.0, 2.0),
+                    vertexFormat: VertexFormat$2.POSITION_ONLY,
                 }));
                 const attributeLocations = this._attributeLocations = GeometryPipeline
                     .createAttributeLocations(geometry);
 
-                command.vertexArray = VertexArray$3.fromGeometry({
+                command.vertexArray = VertexArray$2.fromGeometry({
                     context,
                     geometry,
                     attributeLocations,
-                    bufferUsage: BufferUsage$3._DRAW,
+                    bufferUsage: BufferUsage$2._DRAW,
                 });
 
-                command.renderState = RenderState$3.fromCache({
-                    blending: BlendingState$1.ALPHA_BLEND,
+                command.renderState = RenderState$2.fromCache({
+                    blending: BlendingState.ALPHA_BLEND,
                 });
             }
 
             if (!defined$a(command.shaderProgram) || this._useHdr !== useHdr) {
-                const fs = new ShaderSource$5({
+                const fs = new ShaderSource$4({
                     defines: [useHdr ? 'HDR' : ''],
                     sources: [SkyBoxFS],
                 });
-                command.shaderProgram = ShaderProgram$5.fromCache({
+                command.shaderProgram = ShaderProgram$4.fromCache({
                     context,
                     vertexShaderSource: SkyBoxVS,
                     fragmentShaderSource: fs,
@@ -19365,7 +23102,7 @@
         constructor(viewer, options = {}) {
             super(viewer);
             this._viewer = viewer;
-            this._allowPicking = defaultValue$b(options.allowPicking, false);
+            this._allowPicking = defaultValue$c(options.allowPicking, false);
             this._createRoot();
             this._addEventListener();
             /**
@@ -19492,7 +23229,7 @@
         destroy() {
             this._viewer.container.removeChild(this.root);
             this.removeEventListener();
-            destroyObject$7(this);
+            destroyObject$8(this);
         }
         get boundingSphere() {
             const pts = this.values._array.map(_ => LonLat.toCartesian(_.position));
@@ -19501,7 +23238,7 @@
     }
 
     const {Cartesian2: Cartesian2$6, Rectangle: Rectangle$5, GeographicProjection: GeographicProjection$1, Ellipsoid: Ellipsoid$1} = Cesium;
-    const CesiumMath$5 = Cesium.Math;
+    const CesiumMath$4 = Cesium.Math;
 
     /**
      * A tiling scheme for geometry referenced to a simple {@link GeographicProjection} where
@@ -19521,14 +23258,14 @@
      * the tile tree.
      */
     function LonlatTilingScheme(options) {
-      options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
+      options = defaultValue$c(options, defaultValue$c.EMPTY_OBJECT);
 
-      this._ellipsoid = defaultValue$b(options.ellipsoid, Ellipsoid$1.WGS84);
-      this._rectangle = defaultValue$b(options.rectangle, Rectangle$5.MAX_VALUE);
+      this._ellipsoid = defaultValue$c(options.ellipsoid, Ellipsoid$1.WGS84);
+      this._rectangle = defaultValue$c(options.rectangle, Rectangle$5.MAX_VALUE);
       this._projection = new GeographicProjection$1(this._ellipsoid);
       this._numberOfLevelZeroTilesX = 36;
       this._numberOfLevelZeroTilesY = 18;
-      this._intervalOfZeorLevel = defaultValue$b(options.intervalOfZeorLevel, 16);
+      this._intervalOfZeorLevel = defaultValue$c(options.intervalOfZeorLevel, 16);
     }
 
     Object.defineProperties(LonlatTilingScheme.prototype, {
@@ -19618,8 +23355,8 @@
       // result.north = north;
       // return result;
       return {
-        lon: +CesiumMath$5.toDegrees(west).toFixed(5),
-        lat: +CesiumMath$5.toDegrees(north).toFixed(5)
+        lon: +CesiumMath$4.toDegrees(west).toFixed(5),
+        lat: +CesiumMath$4.toDegrees(north).toFixed(5)
       }
     };
 
@@ -19647,12 +23384,12 @@
       rectangle,
       result
     ) {
-      const west = CesiumMath$5.toDegrees(rectangle.west);
-      const south = CesiumMath$5.toDegrees(rectangle.south);
-      const east = CesiumMath$5.toDegrees(rectangle.east);
-      const north = CesiumMath$5.toDegrees(rectangle.north);
+      const west = CesiumMath$4.toDegrees(rectangle.west);
+      const south = CesiumMath$4.toDegrees(rectangle.south);
+      const east = CesiumMath$4.toDegrees(rectangle.east);
+      const north = CesiumMath$4.toDegrees(rectangle.north);
 
-      if (!defined$c(result)) {
+      if (!defined$d(result)) {
         return new Rectangle$5(west, south, east, north);
       }
 
@@ -19682,10 +23419,10 @@
       result
     ) {
       const rectangleRadians = this.tileXYToRectangle(x, y, level, result);
-      rectangleRadians.west = CesiumMath$5.toDegrees(rectangleRadians.west);
-      rectangleRadians.south = CesiumMath$5.toDegrees(rectangleRadians.south);
-      rectangleRadians.east = CesiumMath$5.toDegrees(rectangleRadians.east);
-      rectangleRadians.north = CesiumMath$5.toDegrees(rectangleRadians.north);
+      rectangleRadians.west = CesiumMath$4.toDegrees(rectangleRadians.west);
+      rectangleRadians.south = CesiumMath$4.toDegrees(rectangleRadians.south);
+      rectangleRadians.east = CesiumMath$4.toDegrees(rectangleRadians.east);
+      rectangleRadians.north = CesiumMath$4.toDegrees(rectangleRadians.north);
       return rectangleRadians;
     };
 
@@ -19719,7 +23456,7 @@
       var north = rectangle.north - y * yTileHeight;
       var south = rectangle.north - (y + 1) * yTileHeight;
 
-      if (!defined$c(result)) {
+      if (!defined$d(result)) {
         result = new Rectangle$5(west, south, east, north);
       }
 
@@ -19760,7 +23497,7 @@
 
       var longitude = position.longitude;
       if (rectangle.east < rectangle.west) {
-        longitude += CesiumMath$5.TWO_PI;
+        longitude += CesiumMath$4.TWO_PI;
       }
 
       var xTileCoordinate = ((longitude - rectangle.west) / xTileWidth) | 0;
@@ -19774,7 +23511,7 @@
         yTileCoordinate = yTiles - 1;
       }
 
-      if (!defined$c(result)) {
+      if (!defined$d(result)) {
         return new Cartesian2$6(xTileCoordinate, yTileCoordinate);
       }
 
@@ -19788,9 +23525,9 @@
         TerrainProvider,
         Resource: Resource$6,
         CustomDataSource: CustomDataSource$2,
-        Cartesian3: Cartesian3$g,
+        Cartesian3: Cartesian3$f,
         Entity: Entity$2,
-        Color: Color$q,
+        Color: Color$p,
         Rectangle: Rectangle$4
     } = Cesium;
     function createBoundingRect(provider) {
@@ -19807,8 +23544,8 @@
         }
         return new Entity$2({
             polyline: {
-                positions: Cartesian3$g.fromRadiansArray(positions),
-                material: Color$q.fromRandom({ alpha: 1 }),
+                positions: Cartesian3$f.fromRadiansArray(positions),
+                material: Color$p.fromRandom({ alpha: 1 }),
                 width: 3,
                 clampToGround: true
             }
@@ -19861,9 +23598,9 @@
             this._hasWaterMask = false;
             this._hasVertexNormals = false;
             this._ellipsoid = options.ellipsoid;
-            this._requestVertexNormals = defaultValue$b(options.requestVertexNormals, false);
-            this._requestWaterMask = defaultValue$b(options.requestWaterMask, false);
-            this._requestMetadata = defaultValue$b(options.requestMetadata, true);
+            this._requestVertexNormals = defaultValue$c(options.requestVertexNormals, false);
+            this._requestWaterMask = defaultValue$c(options.requestWaterMask, false);
+            this._requestMetadata = defaultValue$c(options.requestMetadata, true);
             this._errorEvent = new Event$9();
 
             this._terrainProviders = [];
@@ -20222,7 +23959,7 @@
        * @fires Properties#definitionChanged
        */
       addProperty(key, value) {
-        if (!defined$c(key)) {
+        if (!defined$d(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -20239,7 +23976,7 @@
        * @fires Properties#definitionChanged
        */
       removeProperty(key) {
-        if (!defined$c(key)) {
+        if (!defined$d(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         if (this.propertyNames.includes(key)) {
@@ -20278,7 +24015,7 @@
        * @return {Boolean}
        */
       hasProperty(key) {
-        if (!defined$c(key)) {
+        if (!defined$d(key)) {
           throw new CesiumProError$1('key is reqiured.');
         }
         return this.propertyNames.includes(key);
@@ -20328,7 +24065,7 @@
     }
 
     const {
-        Color: Color$p
+        Color: Color$o
     } = Cesium;
     class Selection{
         /**
@@ -20343,19 +24080,19 @@
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static pointColor = Color$p.AQUA;
+        static pointColor = Color$o.AQUA;
         /**
          * 被选中的面要素的填充色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static fillColor = Color$p.AQUA;
+        static fillColor = Color$o.AQUA;
         /**
          * 被选中的线要素的颜色
          * @memberof Selection
          * @default Cesium.Color.AQUA
          */
-        static strokeColor = Color$p.AQUA;
+        static strokeColor = Color$o.AQUA;
     }
 
     /**
@@ -20493,7 +24230,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         Transforms: Transforms$5,
-        Cartesian3: Cartesian3$f
+        Cartesian3: Cartesian3$e
     } = Cesium;
     let Model$1 = class Model{
         /**
@@ -20526,9 +24263,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * viewer.addModel(model)
          */
         constructor(options = {}) {
-            if(!defined$c(options.modelMatrix)&&defined$c(options.position)) {
+            if(!defined$d(options.modelMatrix)&&defined$d(options.position)) {
                 let cartesian;
-                if(options.position instanceof Cartesian3$f) {
+                if(options.position instanceof Cartesian3$e) {
                     cartesian = options.position;
                 } else if(options.position instanceof LonLat) {
                     cartesian = options.position.toCartesian();
@@ -20537,9 +24274,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     options.modelMatrix = Transforms$5.eastNorthUpToFixedFrame(cartesian);
                 }
             }
-            if(defined$c(options.gltf)) {
+            if(defined$d(options.gltf)) {
                 this.delegate = new Cesium.Model(options);
-            } else if(defined$c(options.url)) {
+            } else if(defined$d(options.url)) {
                 this.delegate = Cesium.Model.fromGltf(options);
             } else {
                 throw new CesiumProError$1('one of parameters url or gltf must be provided.')
@@ -20900,32 +24637,32 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const {
       PrimitiveCollection: PrimitiveCollection$3,
       PolylineCollection,
-      Material: Material$h,
-      Color: Color$o,
+      Material: Material$g,
+      Color: Color$n,
       defaultValue: defaultValue$7,
-      Cartesian3: Cartesian3$e,
+      Cartesian3: Cartesian3$d,
       Cartesian2: Cartesian2$5,
-      Matrix4: Matrix4$6,
-      Matrix3: Matrix3$2,
+      Matrix4: Matrix4$5,
+      Matrix3: Matrix3$1,
       Quaternion,
       PointPrimitiveCollection,
       ScreenSpaceEventHandler: ScreenSpaceEventHandler$1,
       ScreenSpaceEventType: ScreenSpaceEventType$1,
       Polyline,
       Primitive: Primitive$6,
-      Math: CesiumMath$4,
+      Math: CesiumMath$3,
       Plane: Plane$1,
       Model: CesiumModel,
       IntersectionTests: IntersectionTests$1,
       Transforms: Transforms$4
     } = Cesium;
-    const _offset = new Cartesian3$e();
+    const _offset = new Cartesian3$d();
     const _q = new Quaternion();
-    const rm3 = new Matrix3$2();
-    const cartesian3_1 = new Cartesian3$e();
-    new Cartesian3$e();
-    const mat4 = new Matrix4$6();
-    const mat4_1 = new Matrix4$6();
+    const rm3 = new Matrix3$1();
+    const cartesian3_1 = new Cartesian3$d();
+    new Cartesian3$d();
+    const mat4 = new Matrix4$5();
+    const mat4_1 = new Matrix4$5();
 
     function setColorForPrimitive(geometry, color) {
       if (geometry instanceof Polyline) {
@@ -20939,12 +24676,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       return Cartesian2$5.dot(normal, vector);
     }
     function getPositionInPlane(pixel, helper) {
-      const mousedownCartesian = new Cartesian3$e();
+      const mousedownCartesian = new Cartesian3$d();
       const ray = viewer.camera.getPickRay(pixel);
-      const plane = new Plane$1(Cartesian3$e.UNIT_X, 0.0);  Plane$1.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
+      const plane = new Plane$1(Cartesian3$d.UNIT_X, 0.0);  Plane$1.fromPointNormal(helper.center, helper.activePrimitive.normal, plane);
       Plane$1.transform(plane, helper._modelMatrix, plane);
       IntersectionTests$1.rayPlane(ray, plane, mousedownCartesian);
-      Matrix4$6.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
+      Matrix4$5.multiplyByPoint(helper._inverseModelMatrix, mousedownCartesian, mousedownCartesian);
       return mousedownCartesian;
     }
     const cartesian2_1 = new Cartesian2$5();
@@ -20952,18 +24689,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     function computeAngle(helper, startPosition, endPosition) {
       const center = helper.center;
       // const pixelCenter = LonLat.toPixel(center, helper._viewer);
-      Cartesian3$e.subtract(startPosition, center, startPosition);
-      Cartesian3$e.subtract(endPosition, center, endPosition);
-      const angle = Cartesian3$e.dot(Cartesian3$e.normalize(startPosition, startPosition),
-        Cartesian3$e.normalize(endPosition, endPosition));
+      Cartesian3$d.subtract(startPosition, center, startPosition);
+      Cartesian3$d.subtract(endPosition, center, endPosition);
+      const angle = Cartesian3$d.dot(Cartesian3$d.normalize(startPosition, startPosition),
+        Cartesian3$d.normalize(endPosition, endPosition));
       // 旋转起点和终点的向量
-      const v1 = Cartesian3$e.subtract(startPosition, endPosition, cartesian3_1);
+      const v1 = Cartesian3$d.subtract(startPosition, endPosition, cartesian3_1);
       const v2 = startPosition;
-      const cross = Cartesian3$e.cross(v1, v2, cartesian3_1);
+      const cross = Cartesian3$d.cross(v1, v2, cartesian3_1);
       const normal = helper.activePrimitive.normal;
       // 旋转平面的法线向量
       // const v2 = Cartesian2.subtract(center, normal, cartesian2_2);
-      const sign = CesiumMath$4.sign(Cartesian3$e.dot(cross, normal));
+      const sign = CesiumMath$3.sign(Cartesian3$d.dot(cross, normal));
       return Math.acos(angle) * sign;
     }
     function computeOffset(helper, startPosition, endPosition, offset) {
@@ -20978,7 +24715,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       for (let axis of activeAxis) {
         const positions = axis.positions;
         const cartList = positions.map((_) =>
-          Matrix4$6.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$e())
+          Matrix4$5.multiplyByPoint(helper._modelMatrix, _, new Cartesian3$d())
         );
         const pixelList = cartList.map((_) => LonLat.toPixel(_, helper._viewer.scene));
         const length = projectInAxis(
@@ -21033,11 +24770,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       constructor(options = {}) {
         this.lineWidth = defaultValue$7(options.lineWidth, 15);
-        this.xAxisColor = defaultValue$7(options.xAxisColor, Color$o.RED);
-        this.yAxisColor = defaultValue$7(options.yAxisColor, Color$o.GREEN);
-        this.zAxisColor = defaultValue$7(options.zAxisColor, Color$o.BLUE);
-        this.scaleAxisColor = defaultValue$7(options.scaleAxisColor, Color$o.WHITE);
-        this.activeAxisColor = defaultValue$7(options.activeAxisColor, Color$o.YELLOW);
+        this.xAxisColor = defaultValue$7(options.xAxisColor, Color$n.RED);
+        this.yAxisColor = defaultValue$7(options.yAxisColor, Color$n.GREEN);
+        this.zAxisColor = defaultValue$7(options.zAxisColor, Color$n.BLUE);
+        this.scaleAxisColor = defaultValue$7(options.scaleAxisColor, Color$n.WHITE);
+        this.activeAxisColor = defaultValue$7(options.activeAxisColor, Color$n.YELLOW);
         this._translateEnabled = defaultValue$7(options.translateEnabled, true);
         this._rotateEnabled = defaultValue$7(options.rotateEnabled, false);
         this._scaleEnabled = defaultValue$7(options.scaleEnabled, false);
@@ -21049,11 +24786,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.object = null;
         this._modelMatrix = undefined;
         this._primitives = [];
-        this._center = new Cartesian3$e();
+        this._center = new Cartesian3$d();
         this._radius = 0;
-        this._originOffset = defaultValue$7(options.originOffset, new Cartesian3$e());
+        this._originOffset = defaultValue$7(options.originOffset, new Cartesian3$d());
         this._selectedPrimitives = [];
-        this._offset = new Cartesian3$e(0, 0, 0);
+        this._offset = new Cartesian3$d(0, 0, 0);
         this._angle = 0;
         this.rotatePlaneRadius = options.rotatePlaneRadius;
         this._mode = EModel.N;
@@ -21130,7 +24867,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @type {Ceium.Cartesian3}
        */
       get center() {
-        return Cartesian3$e.add(this._center, this._originOffset, new Cartesian3$e());
+        return Cartesian3$d.add(this._center, this._originOffset, new Cartesian3$d());
       }
       /**
        * 模型矩阵
@@ -21146,7 +24883,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return;
         }
         this._modelMatrix = matrix;
-        this._inverseModelMatrix = Matrix4$6.inverse(matrix, new Matrix4$6);
+        this._inverseModelMatrix = Matrix4$5.inverse(matrix, new Matrix4$5);
       }
       /**
        * 创建XYZ坐标轴
@@ -21163,7 +24900,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.xAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$e(
+            new Cartesian3$d(
               defaultValue$7(this.xAxisLength, lineLength) + center.x,
               center.y,
               center.z
@@ -21182,7 +24919,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.yAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$e(
+            new Cartesian3$d(
               center.x,
               -(defaultValue$7(this.yAxisLength, lineLength) + center.y),
               center.z
@@ -21201,7 +24938,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.zAxis = plc.add({
           positions: [
             center,
-            new Cartesian3$e(
+            new Cartesian3$d(
               center.x,
               center.y,
               defaultValue$7(this.zAxisLength, lineLength) + center.z
@@ -21230,7 +24967,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$e(0, 0, 1),
+            normal: new Cartesian3$d(0, 0, 1),
             axis: "XY",
           })
         );
@@ -21241,7 +24978,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$e(0, 1, 0),
+            normal: new Cartesian3$d(0, 1, 0),
             axis: "XZ",
           })
         );
@@ -21252,7 +24989,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             modelMatrix: this.modelMatrix,
             center: this.center,
             radius: this._radius,
-            normal: new Cartesian3$e(1, 0, 0),
+            normal: new Cartesian3$d(1, 0, 0),
             axis: "YZ",
           })
         );
@@ -21282,20 +25019,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       getAxisMaterial(color, dash = false, dashLength = 16) {
         if (dash) {
-          return new Material$h({
+          return new Material$g({
             fabric: {
               type: "dasharrow",
               source: polylineAntialiasingMaterial,
               uniforms: {
                 color: color,
-                gapColor: Color$o.TRANSPARENT,
+                gapColor: Color$n.TRANSPARENT,
                 dashLength: dashLength,
                 dashPattern: 255,
               },
             },
           });
         } else {
-          return new Material$h({
+          return new Material$g({
             fabric: {
               type: "PolylineArrow",
               uniforms: {
@@ -21316,7 +25053,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$e(
+            new Cartesian3$d(
               center.x + radius * Math.cos(rad),
               center.y + radius * Math.sin(rad),
               center.z
@@ -21330,12 +25067,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.zRotate.axis = "RZ";
         this.zRotate.color = this.zAxisColor;
-        this.zRotate.normal = new Cartesian3$e(0, 0, 1);
+        this.zRotate.normal = new Cartesian3$d(0, 0, 1);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$e(
+            new Cartesian3$d(
               center.x + radius * Math.cos(rad),
               center.y,
               center.z + radius * Math.sin(rad)
@@ -21349,12 +25086,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.yRotate.axis = "RY";
         this.yRotate.color = this.yAxisColor;
-        this.yRotate.normal = new Cartesian3$e(0, 1, 0);
+        this.yRotate.normal = new Cartesian3$d(0, 1, 0);
         pts.splice(0);
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
           pts.push(
-            new Cartesian3$e(
+            new Cartesian3$d(
               center.x,
               center.y + radius * Math.cos(rad),
               center.z + radius * Math.sin(rad)
@@ -21368,7 +25105,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.xRotate.axis = "RX";
         this.xRotate.color = this.xAxisColor;
-        this.xRotate.normal = new Cartesian3$e(-1, 0, 0);
+        this.xRotate.normal = new Cartesian3$d(-1, 0, 0);
 
         this.rAxuStart = this.axisRoot.add({
           positions: [],
@@ -21393,7 +25130,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this.scaleAxis = this.axisRoot.add({
           positions: [
             this._center,
-            new Cartesian3$e((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+            new Cartesian3$d((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
           ],
           width: this.lineWidth,
           material: this.getAxisMaterial(this.scaleAxisColor),
@@ -21421,8 +25158,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         this.modelMatrix = object.modelMatrix;
         object.readyPromise.then(() => {
-          const center = Cartesian3$e.clone(object.boundingSphere.center);
-          Matrix4$6.multiplyByPoint(this._inverseModelMatrix, center, this._center);
+          const center = Cartesian3$d.clone(object.boundingSphere.center);
+          Matrix4$5.multiplyByPoint(this._inverseModelMatrix, center, this._center);
           this._radius = object.boundingSphere.radius;
           this.createPrimitive();
         });
@@ -21436,12 +25173,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (typeof position.getValue === 'function') {
           position = position.getValue(this._viewer.clock.currentTime);
         }
-        if (position instanceof Cartesian3$e === false) {
+        if (position instanceof Cartesian3$d === false) {
           throw new CesiumProError$1('position is invalid')
         }
         this.modelMatrix = Transforms$4.eastNorthUpToFixedFrame(position);
-        this._center = new Cartesian3$e();
-        Cartesian3$e.clone(this.originOffset, this._center);
+        this._center = new Cartesian3$d();
+        Cartesian3$d.clone(this.originOffset, this._center);
         this._radius = 10;
         this.rotateEnabled = false;
         this.scaleEnabled = false;
@@ -21499,7 +25236,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           if (this._primitives.includes(feat.primitive)) {
             this._mousedownPixel = e.position;
             this.active(feat.primitive);
-            this._offset = new Cartesian3$e();
+            this._offset = new Cartesian3$d();
             this._angle = 0;
             handler.setInputAction((e) => {
               const { startPosition, endPosition } = e;
@@ -21596,17 +25333,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           this.rotate(angle);
         } else if (this._mode = EModel.S) {
           computeOffset(this, startPosition, endPosition, _offset);
-          const s = -_offset.sxyz / Cartesian3$e.distance(...this.scaleAxis.positions) + 1;
-          this.scale(new Cartesian3$e(s, s, s));
+          const s = -_offset.sxyz / Cartesian3$d.distance(...this.scaleAxis.positions) + 1;
+          this.scale(new Cartesian3$d(s, s, s));
         }
         this.postTransformEvent.raise(this.modelMatrix);
       }
       scale(scale) {
-        const scaleMatrix = Matrix4$6.fromScale(scale, mat4);
-        Matrix4$6.multiply(this._modelMatrix, scaleMatrix, this._modelMatrix);
+        const scaleMatrix = Matrix4$5.fromScale(scale, mat4);
+        Matrix4$5.multiply(this._modelMatrix, scaleMatrix, this._modelMatrix);
         this.modelMatrix = this._modelMatrix;
         for (let primitive of this.root._primitives) {
-          Matrix4$6.multiply(primitive.modelMatrix, scaleMatrix, primitive.modelMatrix);
+          Matrix4$5.multiply(primitive.modelMatrix, scaleMatrix, primitive.modelMatrix);
         }
       }
       /**
@@ -21617,17 +25354,17 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
       rotate(angle) {
         this._angle += angle;
         const axis = this.activePrimitive.normal;
-        const translation = Matrix4$6.fromTranslation(this.center, mat4);
+        const translation = Matrix4$5.fromTranslation(this.center, mat4);
         const q = Quaternion.fromAxisAngle(axis, angle, _q);
-        const roateMatrix = Matrix3$2.fromQuaternion(q, rm3);
-        const inverseTranslation = Matrix4$6.fromTranslation(Cartesian3$e.negate(this.center, cartesian3_1), mat4_1);
-        Matrix4$6.multiply(this.modelMatrix, translation, this.modelMatrix);
-        Matrix4$6.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
-        Matrix4$6.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
+        const roateMatrix = Matrix3$1.fromQuaternion(q, rm3);
+        const inverseTranslation = Matrix4$5.fromTranslation(Cartesian3$d.negate(this.center, cartesian3_1), mat4_1);
+        Matrix4$5.multiply(this.modelMatrix, translation, this.modelMatrix);
+        Matrix4$5.multiplyByMatrix3(this.modelMatrix, roateMatrix, this.modelMatrix);
+        Matrix4$5.multiply(this.modelMatrix, inverseTranslation, this.modelMatrix);
         for (let primitive of this.root._primitives) {
-          Matrix4$6.multiply(primitive.modelMatrix, translation, primitive.modelMatrix);
-          Matrix4$6.multiplyByMatrix3(primitive.modelMatrix, roateMatrix, primitive.modelMatrix);
-          Matrix4$6.multiply(primitive.modelMatrix, inverseTranslation, primitive.modelMatrix);
+          Matrix4$5.multiply(primitive.modelMatrix, translation, primitive.modelMatrix);
+          Matrix4$5.multiplyByMatrix3(primitive.modelMatrix, roateMatrix, primitive.modelMatrix);
+          Matrix4$5.multiply(primitive.modelMatrix, inverseTranslation, primitive.modelMatrix);
         }
         this.modelMatrix = this._modelMatrix;
         this.createRotateAux(this._startLocalPosition, this._angle);
@@ -21652,12 +25389,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         offset.x = -offset.x;
         offset.z = -offset.z;
-        Cartesian3$e.add(this._offset, offset, this._offset);
-        const matrix = Matrix4$6.fromTranslation(offset);
-        Matrix4$6.multiply(this._modelMatrix, matrix, this._modelMatrix);
+        Cartesian3$d.add(this._offset, offset, this._offset);
+        const matrix = Matrix4$5.fromTranslation(offset);
+        Matrix4$5.multiply(this._modelMatrix, matrix, this._modelMatrix);
         this.modelMatrix = this._modelMatrix;
         for (let primitive of this.root._primitives) {
-          Matrix4$6.multiply(primitive.modelMatrix, matrix, primitive.modelMatrix);
+          Matrix4$5.multiply(primitive.modelMatrix, matrix, primitive.modelMatrix);
         }
         this.createAux(this._offset, matrix);
       }
@@ -21668,35 +25405,35 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       createAux(offset) {
         if (offset.x > 0) {
-          const p1 = Cartesian3$e.clone(this.xAxis.positions[0]);
-          const p2 = Cartesian3$e.clone(this.xAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.xAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.xAxis.positions[0]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$e.clone(this.xAxis.positions[1]);
-          const p2 = Cartesian3$e.clone(this.xAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.xAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.xAxis.positions[1]);
           p2.x += -offset.x;
           this.xAux.positions = [p1, p2];
         }
         if (offset.y < 0) {
-          const p1 = Cartesian3$e.clone(this.yAxis.positions[0]);
-          const p2 = Cartesian3$e.clone(this.yAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.yAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.yAxis.positions[0]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$e.clone(this.yAxis.positions[1]);
-          const p2 = Cartesian3$e.clone(this.yAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.yAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.yAxis.positions[1]);
           p2.y += -offset.y;
           this.yAux.positions = [p1, p2];
         }
         if (offset.z > 0) {
-          const p1 = Cartesian3$e.clone(this.zAxis.positions[0]);
-          const p2 = Cartesian3$e.clone(this.zAxis.positions[0]);
+          const p1 = Cartesian3$d.clone(this.zAxis.positions[0]);
+          const p2 = Cartesian3$d.clone(this.zAxis.positions[0]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         } else {
-          const p1 = Cartesian3$e.clone(this.zAxis.positions[1]);
-          const p2 = Cartesian3$e.clone(this.zAxis.positions[1]);
+          const p1 = Cartesian3$d.clone(this.zAxis.positions[1]);
+          const p2 = Cartesian3$d.clone(this.zAxis.positions[1]);
           p2.z += -offset.z;
           this.zAux.positions = [p1, p2];
         }
@@ -21713,11 +25450,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
           return;
         }
         const q = Quaternion.fromAxisAngle(this.activePrimitive.normal, -angle);
-        const matrix3 = Matrix3$2.fromQuaternion(q, rm3);
-        const rotation = Matrix4$6.fromRotation(matrix3, mat4);
-        let position = Cartesian3$e.subtract(startLocalPosition, this.center, cartesian3_1);
-        Matrix4$6.multiplyByPoint(rotation, position, position);
-        Cartesian3$e.add(this.center, position, position);
+        const matrix3 = Matrix3$1.fromQuaternion(q, rm3);
+        const rotation = Matrix4$5.fromRotation(matrix3, mat4);
+        let position = Cartesian3$d.subtract(startLocalPosition, this.center, cartesian3_1);
+        Matrix4$5.multiplyByPoint(rotation, position, position);
+        Cartesian3$d.add(this.center, position, position);
         this.rAxuEnd.positions = [this.center, position];
       }
     }
@@ -21852,7 +25589,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (typeof options === 'string') {
                 options = {url: options};
             }
-            options.getFeatureInfoFormats = defaultValue$b(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
+            options.getFeatureInfoFormats = defaultValue$c(options.getFeatureInfoFormats, XYZLayer.defaultFeatureInfoFormats);
             super(options);
         }
         /**
@@ -22014,11 +25751,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         EntityCluster,
         PinBuilder,
         createGuid: createGuid$2,
-        Cartesian3: Cartesian3$d,
+        Cartesian3: Cartesian3$c,
         PointGraphics: PointGraphics$1,
         ArcType: ArcType$1,
         PolygonHierarchy: PolygonHierarchy$2,
-        Color: Color$n,
+        Color: Color$m,
         EntityCollection,
         HeightReference: HeightReference$2,
         Resource: Resource$5,
@@ -22201,7 +25938,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (defined$9(properties)) {
             const cssColor = properties['point-color'];
             if (defined$9(cssColor)) {
-                color = Color$n.fromCssColorString(cssColor);
+                color = Color$m.fromCssColorString(cssColor);
             }
 
             size = defaultValue$6(sizes$1[properties['point-size']], size);
@@ -22245,7 +25982,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             let stroke = properties.stroke;
             if (defined$9(stroke)) {
-                color = Color$n.fromCssColorString(stroke);
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$9(opacity) && opacity !== 1.0) {
@@ -22339,7 +26076,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             const stroke = properties.stroke;
             if (defined$9(stroke)) {
-                color = Color$n.fromCssColorString(stroke);
+                color = Color$m.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$9(opacity) && opacity !== 1.0) {
@@ -22356,7 +26093,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let fillColor;
             const fill = properties.fill;
             if (defined$9(fill)) {
-                fillColor = Color$n.fromCssColorString(fill);
+                fillColor = Color$m.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -22446,7 +26183,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback$1(defaultDescribe$1, properties, nameProperty), true);
     }
     function defaultCrsFunction$1(coordinates) {
-        return Cartesian3$d.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$c.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load$1(that, geoJson, options, sourceUri) {
         let name;
@@ -22571,21 +26308,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$n.ROYALBLUE;
+        static pointColor = Color$m.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$n.YELLOW;
+        static lineColor = Color$m.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof GeoJsonDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$n.fromBytes(255, 255, 0, 100);
+        static fill = Color$m.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof GeoJsonDataSource
@@ -22599,7 +26336,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$n.YELLOW;
+        static outlineColor = Color$m.YELLOW;
         /**
          * 线要素的宽度
          * @memberof GeoJsonDataSource
@@ -23260,11 +26997,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         PolygonGraphics,
         PolylineGraphics,
         createGuid: createGuid$1,
-        Cartesian3: Cartesian3$c,
+        Cartesian3: Cartesian3$b,
         PointGraphics,
         ArcType,
         PolygonHierarchy: PolygonHierarchy$1,
-        Color: Color$m,
+        Color: Color$l,
         HeightReference: HeightReference$1,
         Resource: Resource$4,
     } = Cesium;
@@ -23431,7 +27168,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (defined$8(properties)) {
             const cssColor = properties['point-color'];
             if (defined$8(cssColor)) {
-                color = Color$m.fromCssColorString(cssColor);
+                color = Color$l.fromCssColorString(cssColor);
             }
 
             size = defaultValue$5(sizes[properties['point-size']], size);
@@ -23475,7 +27212,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             let stroke = properties.stroke;
             if (defined$8(stroke)) {
-                color = Color$m.fromCssColorString(stroke);
+                color = Color$l.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$8(opacity) && opacity !== 1.0) {
@@ -23540,7 +27277,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let color;
             const stroke = properties.stroke;
             if (defined$8(stroke)) {
-                color = Color$m.fromCssColorString(stroke);
+                color = Color$l.fromCssColorString(stroke);
             }
             let opacity = properties['stroke-opacity'];
             if (defined$8(opacity) && opacity !== 1.0) {
@@ -23557,7 +27294,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             let fillColor;
             const fill = properties.fill;
             if (defined$8(fill)) {
-                fillColor = Color$m.fromCssColorString(fill);
+                fillColor = Color$l.fromCssColorString(fill);
                 fillColor.alpha = material.color.alpha;
             }
             opacity = properties['fill-opacity'];
@@ -23690,7 +27427,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Cesium.CallbackProperty(createDescriptionCallback(defaultDescribe, properties, nameProperty), true);
     }
     function defaultCrsFunction(coordinates) {
-        return Cartesian3$c.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
+        return Cartesian3$b.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
     }
     function load(that, geoJson, options, sourceUri) {
         let name;
@@ -23802,21 +27539,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.ROYALBLUE
          */
-        static pointColor = Color$m.ROYALBLUE;
+        static pointColor = Color$l.ROYALBLUE;
         /**
          * 线要素的颜色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static lineColor = Color$m.YELLOW;
+        static lineColor = Color$l.YELLOW;
         /**
          * 多边形要素的填充色
          * @memberof ShapefileDataSource
          * @type {Cesium.Color}
          * @default Cesium.Color.fromBytes(255, 255, 0, 100)
          */
-        static fill = Color$m.fromBytes(255, 255, 0, 100);
+        static fill = Color$l.fromBytes(255, 255, 0, 100);
         /**
          * 多边形要素是否显边框
          * @memberof ShapefileDataSource
@@ -23830,7 +27567,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          * @type {Cesium.Color}
          * @default Cesium.Color.YELLOW
          */
-        static outlineColor = Color$m.YELLOW;
+        static outlineColor = Color$l.YELLOW;
         /**
          * 线要素的宽度
          * @memberof ShapefileDataSource
@@ -24051,7 +27788,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         buildModuleUrl: buildModuleUrl$2,
-        Color: Color$l,
+        Color: Color$k,
         defined: defined$7,
         destroyObject: destroyObject$5,
         knockout,
@@ -24154,7 +27891,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                             var style = window.getComputedStyle(firstElementChild);
                             if (style !== null) {
                                 var backgroundColor = style["background-color"];
-                                var color = Color$l.fromCssColorString(backgroundColor);
+                                var color = Color$k.fromCssColorString(backgroundColor);
                                 if (defined$7(color) && color.alpha !== 0) {
                                     background = style["background-color"];
                                 }
@@ -25064,16 +28801,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(options.objects)) {
+            if (!defined$d(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
                 throw new CesiumProError$1('objects property must be an array')
             }
             //>>includeEnd('debug')
-            this._id = defaultValue$b(options.id, createGuid$3());
-            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
+            this._id = defaultValue$c(options.id, createGuid$3());
+            this._maxClusterLevel = defaultValue$c(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$c(options.minLoadLevel, 12);
             this._objects = undefined;
         }
         /**
@@ -25255,7 +28992,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         QuadtreeTileLoadState,
         Visibility,
         AssociativeArray: AssociativeArray$1,
-        Cartesian3: Cartesian3$b,
+        Cartesian3: Cartesian3$a,
         Cartographic: Cartographic$7,
         getTimestamp,
         RequestState
@@ -25294,7 +29031,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 tile.level,
                 request
             );
-            if (defined$c(requestPromise)) {
+            if (defined$d(requestPromise)) {
                 surfaceTile.terrainState = TerrainState.RECEIVING;
                 Promise.resolve(requestPromise)
                     .then(function (terrainData) {
@@ -25336,7 +29073,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const terrainData = surfaceTile.terrainData;
         const meshPromise = terrainData.createMesh(createMeshOptions);
 
-        if (!defined$c(meshPromise)) {
+        if (!defined$d(meshPromise)) {
             // Postponed.
             return;
         }
@@ -25373,16 +29110,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     function getObjectByTile(objects, tile) {
         const tileObject = [];
         for (let object of objects) {
-            if (!defined$c(object)) {
+            if (!defined$d(object)) {
                 continue;
             }
-            if (!defined$c(object.id)) {
+            if (!defined$d(object.id)) {
                 object.id = createGuid$3();
             }
-            if (!(defined$c(object) && defined$c(object.position))) {
+            if (!(defined$d(object) && defined$d(object.position))) {
                 continue;
             }
-            if (object.position instanceof Cartesian3$b) {
+            if (object.position instanceof Cartesian3$a) {
                 object.cartesian = object.position;
             } else if (object.position instanceof Cartographic$7) {
                 object.cartesian = Cartographic$7.toCartesian(object.position);
@@ -25425,7 +29162,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
         static initialize(tile, terrainProvider) {
             let surfaceTile = tile.data;
-            if (!defined$c(surfaceTile)) {
+            if (!defined$d(surfaceTile)) {
                 surfaceTile = tile.data = new QuadTile();
             }
 
@@ -25515,7 +29252,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return this._quadtree;
         }
         set quadtree(val) {
-            if (defined$c(val)) {
+            if (defined$d(val)) {
                 this._quadtree = val;
             }
         }
@@ -25546,7 +29283,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         showTileThisFrame(tile, framestate) {
             const surfaceData = tile.data;
-            if (!defined$c(surfaceData)) {
+            if (!defined$d(surfaceData)) {
                 return;
             }
             if (!this._tilesCahced.includes(tile)) {
@@ -25555,7 +29292,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             const layers = this._layers.values;
             getTimestamp();
             for (let layer of layers) {
-                if (!(defined$c(layer.objects) && Array.isArray(layer.objects))) {
+                if (!(defined$d(layer.objects) && Array.isArray(layer.objects))) {
                     continue;
                 }
                 // if(getTimestamp() < time + loadQueueTimeSlice) {
@@ -25567,7 +29304,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     return;
                 }
                 let tileObjects = surfaceData._objectsOfTile.get(id);
-                if (!defined$c(tileObjects) || layer._needReclass) {
+                if (!defined$d(tileObjects) || layer._needReclass) {
                     tileObjects = getObjectByTile(layer.objects, tile);
                     surfaceData._objectsOfTile.set(id, tileObjects);
                 }
@@ -25639,7 +29376,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return GlobeSurfaceTileProvider$1.prototype.canRefine.call(this, tile);
         }
         computeTileVisibility(tile, frameState, occluders) {
-            if (!defined$c(tile.data)) {
+            if (!defined$d(tile.data)) {
                 tile.data = new QuadTile();
             }
             return GlobeSurfaceTileProvider$1.prototype.computeTileVisibility.call(this, tile, frameState, occluders)
@@ -26358,7 +30095,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 #endif // #ifdef SHOW_REFLECTIVE_OCEAN\n\
 ";
 
-    const { BoundingSphere: BoundingSphere$6, buildModuleUrl: buildModuleUrl$1, Cartesian3: Cartesian3$a, Cartographic: Cartographic$6, Color: Color$k, defaultValue: defaultValue$4, defined: defined$6, destroyObject: destroyObject$4, DeveloperError: DeveloperError$3, Ellipsoid, EllipsoidTerrainProvider, Event: Event$6, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$2, Resource: Resource$3, ShaderSource: ShaderSource$4, Texture: Texture$2, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$2, ShadowMode } = Cesium;
+    const { BoundingSphere: BoundingSphere$5, buildModuleUrl: buildModuleUrl$1, Cartesian3: Cartesian3$9, Cartographic: Cartographic$6, Color: Color$j, defaultValue: defaultValue$4, defined: defined$6, destroyObject: destroyObject$4, DeveloperError: DeveloperError$3, Ellipsoid, EllipsoidTerrainProvider, Event: Event$6, IntersectionTests, NearFarScalar, Ray, Rectangle: Rectangle$2, Resource: Resource$3, ShaderSource: ShaderSource$3, Texture: Texture$2, when: when$2, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode: SceneMode$1, ShadowMode } = Cesium;
     const GlobeVS = Cesium._shadersGlobeVS;
     // const GlobeFS = Cesium._shadersGlobeFS;
     const AtmosphereCommon = Cesium._shadersAtmosphereCommon;
@@ -26398,7 +30135,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       this._terrainProvider = terrainProvider;
       this._terrainProviderChanged = new Event$6();
 
-      this._undergroundColor = Color$k.clone(Color$k.BLACK);
+      this._undergroundColor = Color$j.clone(Color$j.BLACK);
       this._undergroundColorAlphaByDistance = new NearFarScalar(
         ellipsoid.maximumRadius / 1000.0,
         0.0,
@@ -26544,7 +30281,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(5.5e-6, 13.0e-6, 28.4e-6)
        */
-      this.atmosphereRayleighCoefficient = new Cartesian3$a(5.5e-6, 13.0e-6, 28.4e-6);
+      this.atmosphereRayleighCoefficient = new Cartesian3$9(5.5e-6, 13.0e-6, 28.4e-6);
 
       /**
        * The Mie scattering coefficient used in the atmospheric scattering equations for the ground atmosphere.
@@ -26552,7 +30289,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
        * @type {Cartesian3}
        * @default Cartesian3(21e-6, 21e-6, 21e-6)
        */
-      this.atmosphereMieCoefficient = new Cartesian3$a(21e-6, 21e-6, 21e-6);
+      this.atmosphereMieCoefficient = new Cartesian3$9(21e-6, 21e-6, 21e-6);
 
       /**
        * The Rayleigh scale height used in the atmospheric scattering equations for the ground atmosphere, in meters.
@@ -26913,7 +30650,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
           return this._undergroundColor;
         },
         set: function (value) {
-          this._undergroundColor = Color$k.clone(value, this._undergroundColor);
+          this._undergroundColor = Color$j.clone(value, this._undergroundColor);
         },
       },
 
@@ -26987,12 +30724,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       }
       fragmentSources.push(GlobeFS);
 
-      globe._surfaceShaderSet.baseVertexShaderSource = new ShaderSource$4({
+      globe._surfaceShaderSet.baseVertexShaderSource = new ShaderSource$3({
         sources: [AtmosphereCommon, GroundAtmosphere, GlobeVS],
         defines: defines,
       });
 
-      globe._surfaceShaderSet.baseFragmentShaderSource = new ShaderSource$4({
+      globe._surfaceShaderSet.baseFragmentShaderSource = new ShaderSource$3({
         sources: fragmentSources,
         defines: defines,
       });
@@ -27001,11 +30738,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     function createComparePickTileFunction(rayOrigin) {
       return function (a, b) {
-        const aDist = BoundingSphere$6.distanceSquaredTo(
+        const aDist = BoundingSphere$5.distanceSquaredTo(
           a.pickBoundingSphere,
           rayOrigin
         );
-        const bDist = BoundingSphere$6.distanceSquaredTo(
+        const bDist = BoundingSphere$5.distanceSquaredTo(
           b.pickBoundingSphere,
           rayOrigin
         );
@@ -27069,22 +30806,22 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
 
         let boundingVolume = surfaceTile.pickBoundingSphere;
-        if (mode !== SceneMode$2.SCENE3D) {
-          surfaceTile.pickBoundingSphere = boundingVolume = BoundingSphere$6.fromRectangleWithHeights2D(
+        if (mode !== SceneMode$1.SCENE3D) {
+          surfaceTile.pickBoundingSphere = boundingVolume = BoundingSphere$5.fromRectangleWithHeights2D(
             tile.rectangle,
             projection,
             surfaceTile.tileBoundingRegion.minimumHeight,
             surfaceTile.tileBoundingRegion.maximumHeight,
             boundingVolume
           );
-          Cartesian3$a.fromElements(
+          Cartesian3$9.fromElements(
             boundingVolume.center.z,
             boundingVolume.center.x,
             boundingVolume.center.y,
             boundingVolume.center
           );
         } else if (defined$6(surfaceTile.renderedMesh)) {
-          BoundingSphere$6.clone(
+          BoundingSphere$5.clone(
             surfaceTile.tileBoundingRegion.boundingSphere,
             boundingVolume
           );
@@ -27139,8 +30876,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
      */
     Globe.prototype.pick = function (ray, scene, result) {
       result = this.pickWorldCoordinates(ray, scene, true, result);
-      if (defined$6(result) && scene.mode !== SceneMode$2.SCENE3D) {
-        result = Cartesian3$a.fromElements(result.y, result.z, result.x, result);
+      if (defined$6(result) && scene.mode !== SceneMode$1.SCENE3D) {
+        result = Cartesian3$9.fromElements(result.y, result.z, result.x, result);
         const carto = scene.mapProjection.unproject(result, cartoScratch);
         result = scene.globe.ellipsoid.cartographicToCartesian(carto, result);
       }
@@ -27148,8 +30885,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       return result;
     };
 
-    const scratchGetHeightCartesian = new Cartesian3$a();
-    const scratchGetHeightIntersection = new Cartesian3$a();
+    const scratchGetHeightCartesian = new Cartesian3$9();
+    const scratchGetHeightIntersection = new Cartesian3$9();
     const scratchGetHeightCartographic = new Cartographic$6();
     const scratchGetHeightRay = new Ray();
 
@@ -27230,7 +30967,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
       const ellipsoid = this._surface._tileProvider.tilingScheme.ellipsoid;
 
       //cartesian has to be on the ellipsoid surface for `ellipsoid.geodeticSurfaceNormal`
-      const cartesian = Cartesian3$a.fromRadians(
+      const cartesian = Cartesian3$9.fromRadians(
         cartographic.longitude,
         cartographic.latitude,
         0.0,
@@ -27263,12 +31000,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const magnitude = Math.min(defaultValue$4(minimumHeight, 0.0), -11500.0);
 
         // multiply by the *positive* value of the magnitude
-        const vectorToMinimumPoint = Cartesian3$a.multiplyByScalar(
+        const vectorToMinimumPoint = Cartesian3$9.multiplyByScalar(
           surfaceNormal,
           Math.abs(magnitude) + 1,
           scratchGetHeightIntersection
         );
-        Cartesian3$a.subtract(cartesian, vectorToMinimumPoint, ray.origin);
+        Cartesian3$9.subtract(cartesian, vectorToMinimumPoint, ray.origin);
       }
 
       const intersection = tile.data.pick(
@@ -27361,7 +31098,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         tileProvider.nightFadeOutDistance = this.nightFadeOutDistance;
         tileProvider.nightFadeInDistance = this.nightFadeInDistance;
         tileProvider.zoomedOutOceanSpecularIntensity =
-          mode === SceneMode$2.SCENE3D ? this._zoomedOutOceanSpecularIntensity : 0.0;
+          mode === SceneMode$1.SCENE3D ? this._zoomedOutOceanSpecularIntensity : 0.0;
         tileProvider.hasWaterMask = hasWaterMask;
         tileProvider.oceanNormalMap = this._oceanNormalMap;
         tileProvider.enableLighting = this.enableLighting;
@@ -27455,7 +31192,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     };
 
     const {
-        ShaderProgram: ShaderProgram$4,
+        ShaderProgram: ShaderProgram$3,
         RuntimeError: RuntimeError$1,
         createUniform,
         defined: defined$5,
@@ -27871,24 +31608,24 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         }
     }
     function override$1() {
-        const originPrototype = ShaderProgram$4.prototype;
-        ShaderProgram$4.prototype = {};
-        ShaderProgram$4.prototype._bind = function () {
+        const originPrototype = ShaderProgram$3.prototype;
+        ShaderProgram$3.prototype = {};
+        ShaderProgram$3.prototype._bind = function () {
             initialize(this);
             this._gl.useProgram(this._program);
         };
-        ShaderProgram$4.prototype.destroy = originPrototype.destroy;
-        ShaderProgram$4.prototype._setUniforms = function (uniformMap,
+        ShaderProgram$3.prototype.destroy = originPrototype.destroy;
+        ShaderProgram$3.prototype._setUniforms = function (uniformMap,
             uniformState,
             validate) {
             originPrototype._setUniforms.call(this, uniformMap,
                 uniformState,
                 validate);
         };
-        ShaderProgram$4.prototype.isDestroyed = originPrototype.isDestroyed;
-        ShaderProgram$4.prototype.finalDestroy = originPrototype.finalDestroy;
+        ShaderProgram$3.prototype.isDestroyed = originPrototype.isDestroyed;
+        ShaderProgram$3.prototype.finalDestroy = originPrototype.finalDestroy;
 
-        Object.defineProperties(ShaderProgram$4.prototype, {
+        Object.defineProperties(ShaderProgram$3.prototype, {
             vertexAttributes: {
                 get: function () {
                     initialize(this);
@@ -27922,18 +31659,18 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const CesiumScene = Cesium.Scene;
     const {
-        JulianDate: JulianDate$2,
+        JulianDate: JulianDate$1,
         defined: defined$4,
         RequestScheduler,
         PerformanceDisplay,
         Cesium3DTilePassState,
         Cesium3DTilePass,
         defaultValue: defaultValue$3,
-        Color: Color$j,
+        Color: Color$i,
         BoundingRectangle: BoundingRectangle$2,
-        Pass: Pass$3,
+        Pass: Pass$2,
         SunLight,
-        Cartesian3: Cartesian3$9
+        Cartesian3: Cartesian3$8
     } = Cesium;
     const preloadTilesetPassState = new Cesium3DTilePassState({
         pass: Cesium3DTilePass.PRELOAD,
@@ -27950,7 +31687,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     function updateFrameNumber(scene, frameNumber, time) {
         var frameState = scene._frameState;
         frameState.frameNumber = frameNumber;
-        frameState.time = JulianDate$2.clone(time, frameState.time);
+        frameState.time = JulianDate$1.clone(time, frameState.time);
     }
     function tryAndCatchError(scene, functionToExecute) {
         try {
@@ -28069,9 +31806,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.passes.postProcess = scene.postProcessStages.hasSelected;
         frameState.tilesetPassState = renderTilesetPassState;
 
-        var backgroundColor = defaultValue$3(scene.backgroundColor, Color$j.BLACK);
+        var backgroundColor = defaultValue$3(scene.backgroundColor, Color$i.BLACK);
         if (scene._hdr) {
-            backgroundColor = Color$j.clone(backgroundColor, scratchBackgroundColor);
+            backgroundColor = Color$i.clone(backgroundColor, scratchBackgroundColor);
             backgroundColor.red = Math.pow(backgroundColor.red, scene.gamma);
             backgroundColor.green = Math.pow(backgroundColor.green, scene.gamma);
             backgroundColor.blue = Math.pow(backgroundColor.blue, scene.gamma);
@@ -28086,9 +31823,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         if (defined$4(shadowMap) && shadowMap.enabled) {
             if (!defined$4(scene.light) || scene.light instanceof SunLight) {
                 // Negate the sun direction so that it is from the Sun, not to the Sun
-                Cartesian3$9.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
+                Cartesian3$8.negate(us.sunDirectionWC, scene._shadowMapCamera.direction);
             } else {
-                Cartesian3$9.clone(scene.light.direction, scene._shadowMapCamera.direction);
+                Cartesian3$8.clone(scene.light.direction, scene._shadowMapCamera.direction);
             }
             frameState.shadowMaps.push(shadowMap);
         }
@@ -28133,7 +31870,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
     function executeOverlayCommands(scene, passState) {
         var us = scene.context.uniformState;
-        us.updatePass(Pass$3.OVERLAY);
+        us.updatePass(Pass$2.OVERLAY);
 
         var context = scene.context;
         var commandList = scene._overlayCommandList;
@@ -28149,7 +31886,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         frameState.newFrame = false;
 
         if (!defined$4(time)) {
-            time = JulianDate$2.now();
+            time = JulianDate$1.now();
         }
 
         // Determine if shouldRender
@@ -28167,13 +31904,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             defined$4(this._lastRenderTime)
         ) {
             var difference = Math.abs(
-                JulianDate$2.secondsDifference(this._lastRenderTime, time)
+                JulianDate$1.secondsDifference(this._lastRenderTime, time)
             );
             shouldRender = shouldRender || difference > this.maximumRenderTimeChange;
         }
 
         if (shouldRender) {
-            this._lastRenderTime = JulianDate$2.clone(time, this._lastRenderTime);
+            this._lastRenderTime = JulianDate$1.clone(time, this._lastRenderTime);
             this._renderRequested = false;
             this._logDepthBufferDirty = false;
             this._hdrDirty = false;
@@ -28240,16 +31977,16 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         Primitive: Primitive$4,
-        ShaderProgram: ShaderProgram$3,
+        ShaderProgram: ShaderProgram$2,
         defined: defined$3,
         DeveloperError: DeveloperError$2,
         defaultValue: defaultValue$2,
-        ShaderSource: ShaderSource$3 
+        ShaderSource: ShaderSource$2 
     } = Cesium;
 
     const update$1 = Primitive$4.prototype.update;
     function appendPickToVertexShader(source) {
-        var renamedVS = ShaderSource$3.replaceMain(source, "czm_non_pick_main");
+        var renamedVS = ShaderSource$2.replaceMain(source, "czm_non_pick_main");
         var pickMain =
             "varying vec4 v_pickColor; \n" +
             "void main() \n" +
@@ -28339,7 +32076,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         modifiedVS = modifiedVS.replace(/attribute\s+vec2\s+st;/g, "");
         modifiedVS = modifiedVS.replace(/attribute\s+vec3\s+tangent;/g, "");
         modifiedVS = modifiedVS.replace(/attribute\s+vec3\s+bitangent;/g, "");
-        modifiedVS = ShaderSource$3.replaceMain(modifiedVS, "czm_non_compressed_main");
+        modifiedVS = ShaderSource$2.replaceMain(modifiedVS, "czm_non_compressed_main");
         var compressedMain =
             "void main() \n" +
             "{ \n" +
@@ -28379,7 +32116,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         //>>includeEnd('debug');
     }
     function depthClampVS(vertexShaderSource) {
-        var modifiedVS = ShaderSource$3.replaceMain(
+        var modifiedVS = ShaderSource$2.replaceMain(
             vertexShaderSource,
             "czm_non_depth_clamp_main"
         );
@@ -28391,7 +32128,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         return modifiedVS;
     }
     function depthClampFS(fragmentShaderSource) {
-        var modifiedFS = ShaderSource$3.replaceMain(
+        var modifiedFS = ShaderSource$2.replaceMain(
             fragmentShaderSource,
             "czm_non_depth_clamp_main"
         );
@@ -28413,7 +32150,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             modifiedFS;
         return modifiedFS;
     }
-    function createShaderProgram$1(primitive, frameState, appearance) {
+    function createShaderProgram(primitive, frameState, appearance) {
         const context = frameState.context;
 
         const attributeLocations = primitive._attributeLocations;
@@ -28435,7 +32172,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         var fs = appearance.getFragmentShaderSource();
         fs = appendPickToFragmentShader(fs);
 
-        primitive._sp = ShaderProgram$3.replaceCache({
+        primitive._sp = ShaderProgram$2.replaceCache({
             context: context,
             shaderProgram: primitive._sp,
             vertexShaderSource: vs,
@@ -28464,7 +32201,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             fs = appendPickToFragmentShader(fs);
             fs = depthClampFS(fs);
 
-            primitive._spDepthFail = ShaderProgram$3.replaceCache({
+            primitive._spDepthFail = ShaderProgram$2.replaceCache({
                 context: context,
                 shaderProgram: primitive._spDepthFail,
                 vertexShaderSource: vs,
@@ -28490,7 +32227,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             if (this.needUpdate) {
                 var spFunc = defaultValue$2(
                     this._createShaderProgramFunction,
-                    createShaderProgram$1
+                    createShaderProgram
                 );
                 console.log('update shader');
                 spFunc(this, frameState, appearance);
@@ -28529,10 +32266,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             this._url = options.url;
             this._typeName = options.typeName;
             this._style = options.style;
-            if (!defined$c(this._url)) {
+            if (!defined$d(this._url)) {
                 throw new CesiumProError$1('parameter url must be provided.')
             }
-            if (!defined$c(this._typeName)) {
+            if (!defined$d(this._typeName)) {
                 throw new CesiumProError$1('parameter typeName must be provided.')
             }
             const resource = new Resource$2({
@@ -28570,11 +32307,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         CustomDataSource: CustomDataSource$1,
-        Color: Color$i,
+        Color: Color$h,
         HeightReference,
         HorizontalOrigin,
         VerticalOrigin: VerticalOrigin$1,
-        Cartesian3: Cartesian3$8,
+        Cartesian3: Cartesian3$7,
         Cartographic: Cartographic$5
     } = Cesium;
     function getCartesians(positions) {
@@ -28582,44 +32319,44 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         if (first instanceof LonLat) {
             return positions.map(_ => _.toCartesian());
         }
-        if (first instanceof Cartesian3$8) {
+        if (first instanceof Cartesian3$7) {
             return positions
         }
         if (first instanceof Cartographic$5) {
             return positions.map(_ => Cartographic$5.toCartesian(_));
         }
         if (typeof first === 'number') {
-            return Cartesian3$8.fromDegreesArray(positions);
+            return Cartesian3$7.fromDegreesArray(positions);
         }
         return positions;
     }
     class DefaultDataSource {
         constructor(viewer, options = {}) {
             this.viewer = viewer;
-            this.pointStyle = defaultValue$b(options.point, {
-                color: Color$i.RED,
+            this.pointStyle = defaultValue$c(options.point, {
+                color: Color$h.RED,
                 pixelSize: 10,
-                outlineColor: Color$i.WHITE,
+                outlineColor: Color$h.WHITE,
                 outlineWidth: 4,
             });
-            this.lineStyle = defaultValue$b(options.polyline, {
+            this.lineStyle = defaultValue$c(options.polyline, {
                 width: 5,
-                material: Color$i.GOLD.withAlpha(0.5),
+                material: Color$h.GOLD.withAlpha(0.5),
                 clampToGround: true,
             });
-            this.labelStyle = defaultValue$b(options.label, {
-                fillColor: Color$i.WHITE,
+            this.labelStyle = defaultValue$c(options.label, {
+                fillColor: Color$h.WHITE,
                 showBackground: true,
                 horizontalOrigin: HorizontalOrigin.LEFT,
                 verticalOrigin: VerticalOrigin$1.TOP,
                 showBackground: true,
-                backgroundColor: Color$i.BLACK.withAlpha(0.5),
-                fillColor: Color$i.WHITE,
+                backgroundColor: Color$h.BLACK.withAlpha(0.5),
+                fillColor: Color$h.WHITE,
                 font: '40px sans-serif',
                 scale: 0.5
             });
-            this.polygonStyle = defaultValue$b(options.polygon, {
-                material: Color$i.GOLD.withAlpha(0.6),
+            this.polygonStyle = defaultValue$c(options.polygon, {
+                material: Color$h.GOLD.withAlpha(0.6),
             });
             this.ds = new CustomDataSource$1('cesiumpro-default');
             viewer.dataSources.add(this.ds);
@@ -28672,8 +32409,8 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Matrix4: Matrix4$5,
-        BoundingSphere: BoundingSphere$5,
+        Matrix4: Matrix4$4,
+        BoundingSphere: BoundingSphere$4,
         ScreenSpaceEventType,
         ScreenSpaceEventHandler
     } = Cesium;
@@ -28727,10 +32464,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     let fpsCount = 0, msCount = 0;
     let fps = 'N/A', ms = 'N/A';
     function updateFps() {
-        if (!defined$c(lastFpsTime)) {
+        if (!defined$d(lastFpsTime)) {
             lastFpsTime = Cesium.getTimestamp();
         }
-        if (!defined$c(lastMsTime)) {
+        if (!defined$d(lastMsTime)) {
             lastMsTime = Cesium.getTimestamp();
         }
         fpsCount++;
@@ -28768,7 +32505,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const icrfToFixed = Cesium.Transforms.computeIcrfToFixedMatrix(
             viewer.clock.currentTime
         );
-        if (defined$c(icrfToFixed)) {
+        if (defined$d(icrfToFixed)) {
             const camera = viewer.camera;
             const offset = Cesium.Cartesian3.clone(camera.position);
             const transform = Cesium.Matrix4.fromRotationTranslation(icrfToFixed);
@@ -28804,9 +32541,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         const {
             camera
         } = viewer;
-        const step1 = defaultValue$b(options.step1Duration, 3);
-        const step2 = defaultValue$b(options.step2Duration, 3);
-        const step3 = defaultValue$b(options.step3Duration, 3);
+        const step1 = defaultValue$c(options.step1Duration, 3);
+        const step2 = defaultValue$c(options.step2Duration, 3);
+        const step3 = defaultValue$c(options.step3Duration, 3);
 
         const cartographic = options.destination;
         // 第一步改变位置
@@ -28947,10 +32684,10 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         });
         target.readyPromise.then(() => {
             if (target._boundingSpheres) {
-                flyTo(viewer, BoundingSphere$5.fromBoundingSpheres(target._boundingSpheres), options);
+                flyTo(viewer, BoundingSphere$4.fromBoundingSpheres(target._boundingSpheres), options);
             } else if (target.boundingSphere) {
                 let boundingSphere = target.boundingSphere;
-                boundingSphere = BoundingSphere$5.clone(boundingSphere);
+                boundingSphere = BoundingSphere$4.clone(boundingSphere);
                 // if (target.modelMatrix) {
                 //     Matrix4.multiplyByPoint(target.modelMatrix, boundingSphere.center, boundingSphere.center)
                 // }
@@ -29099,13 +32836,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @type {Boolean}
          */
         get enableLighting() {
-            if (!defined$c(this.globe)) {
+            if (!defined$d(this.globe)) {
                 return;
             }
             return this.scene.globe.enableLighting
         }
         set enableLighting(val) {
-            if (!defined$c(this.globe)) {
+            if (!defined$d(this.globe)) {
                 return;
             }
             this.scene.globe.enableLighting = val;
@@ -29203,7 +32940,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             return this.terrainProvider;
         }
         set terrain(value) {
-            if (!defined$c(value) || value === false) {
+            if (!defined$d(value) || value === false) {
                 this.terrainProvider = new Cesium.EllipsoidTerrainProvider();
             }
             if (value !== this.terrainProvider) {
@@ -29303,6 +33040,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @param {Model|Tileset} model 
          */
         addModel(model) {
+            if (!model.delegate) {
+                return;
+            }
             this.primitives.add(model.delegate);
         }
         /**
@@ -29378,7 +33118,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * cancelLink();
          */
         linkView(viewer) {
-            if (!defined$c(viewer)) {
+            if (!defined$d(viewer)) {
                 throw new CesiumProError$1('viewer不是一个有效的Cesium.Viewer对象')
             }
             return syncDoubleView(this, viewer);
@@ -29417,7 +33157,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                         resolve(value);
                     };
                 });
-                const radius = defaultValue$b(options.radius, 1000);
+                const radius = defaultValue$c(options.radius, 1000);
                 delete options.radius;
                 const boundingSphere = new Cesium.BoundingSphere(target, radius);
                 flyTo(this, boundingSphere, options);
@@ -29433,9 +33173,9 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
             } else if (target instanceof Cesium.Cesium3DTileset) {
                 super.flyTo(target, options);
             } else if (target.boundingSphere) {
-                const modelMatrix = target.modelMatrix || Matrix4$5.IDENTITY;
-                const center = Matrix4$5.multiplyByPoint(modelMatrix, target.boundingSphere.center, {});
-                const bounding = new BoundingSphere$5(center, target.boundingSphere.radius);
+                const modelMatrix = target.modelMatrix || Matrix4$4.IDENTITY;
+                const center = Matrix4$4.multiplyByPoint(modelMatrix, target.boundingSphere.center, {});
+                const bounding = new BoundingSphere$4(center, target.boundingSphere.radius);
                 return this.camera.flyToBoundingSphere(bounding);
             }
             return super.flyTo(target, options);
@@ -29464,12 +33204,12 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 //>>includeStart('debug', pragmas.debug);
                 throw new CesiumProError$1('point不是一个有效值。')
             }
-            const multiplier = defaultValue$b(options.multiplier, 1);
-            const offset = defaultValue$b(options.offset, {});
+            const multiplier = defaultValue$c(options.multiplier, 1);
+            const offset = defaultValue$c(options.offset, {});
             function rotate() {
-                const heading = Cesium.Math.toRadians(defaultValue$b(offset.heading, viewer.heading) + 1 * multiplier);
-                const pitch = Cesium.Math.toRadians(defaultValue$b(offset.pitch, -20));
-                const range = defaultValue$b(offset.range, 10000);
+                const heading = Cesium.Math.toRadians(defaultValue$c(offset.heading, viewer.heading) + 1 * multiplier);
+                const pitch = Cesium.Math.toRadians(defaultValue$c(offset.pitch, -20));
+                const range = defaultValue$c(offset.range, 10000);
                 viewer.flyTo(target, {
                     duration: 0,
                     offset: new Cesium.HeadingPitchRange(heading, pitch, range)
@@ -29607,7 +33347,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
         /**
          * 鼠标事件监听
          * @param {Function} fn 回调函数
-         * @param {String} [event = 'LEFT_CLICK'] 事件类型
+         * @param {String} [event = 'LEFT_CLICK'] 事件类型, 该参数应该是Cesium.ScreenSpaceEventType的属性
          * @param {Element} [target = this.canvas] 触发事件的元素，默认为球的canvas
          * @returns 取消事件监听的函数
          * @example
@@ -29640,13 +33380,13 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
     }
 
     const {
-        Color: Color$h,
+        Color: Color$g,
         MaterialAppearance: MaterialAppearance$5,
         CircleGeometry: CircleGeometry$1,
         GroundPrimitive: GroundPrimitive$1,
         Primitive: Primitive$3,
         GeometryInstance: GeometryInstance$2,
-        Material: Material$g
+        Material: Material$f
     } = Cesium;
     class PointBaseGraphic extends Graphic {
         /**
@@ -29655,7 +33395,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @param {PointBaseGraphic.ConstructorOptions} options 描述一个几何要素的属性信息
          */
         constructor(options) {
-            if (!defined$c(options)) {
+            if (!defined$d(options)) {
                 throw new CesiumProError$1("options must be provided.")
             }
             if (LonLat.isValid(options.position) === false) {
@@ -29665,16 +33405,16 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 throw new CesiumProError$1("options.radius parameter must be a number greater than 0.");
             }
             super(options);
-            this._color = defaultValue$b(options.color, Color$h.WHITE);
+            this._color = defaultValue$c(options.color, Color$g.WHITE);
             if (typeof this._color === 'string') {
-                this._color = Color$h.fromCssColorString(this._color);
+                this._color = Color$g.fromCssColorString(this._color);
             }
             this._position = options.position;
             this._radius = options.radius;
-            this._stRotation = Cesium.Math.toRadians(defaultValue$b(options.stRotation, 0));
-            this._height = defaultValue$b(options.height, 0);
-            this._extrudedHeight = defaultValue$b(options.extrudedHeight, 0);
-            this._asynchronous = defaultValue$b(options.asynchronous, true);
+            this._stRotation = Cesium.Math.toRadians(defaultValue$c(options.stRotation, 0));
+            this._height = defaultValue$c(options.height, 0);
+            this._extrudedHeight = defaultValue$c(options.extrudedHeight, 0);
+            this._asynchronous = defaultValue$c(options.asynchronous, true);
         }
         /**
          * @private
@@ -29742,11 +33482,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * @returns 外观
          */
         createAppearance() {
-            if (defined$c(this._appearance)) {
+            if (defined$d(this._appearance)) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$5({
-                material: Material$g.fromType('Color', {
+                material: Material$f.fromType('Color', {
                     color: this._color
                 })
             });
@@ -29808,7 +33548,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          * graphic.color = '#FF0000'
          */
         get color() {
-            if (!defined$c(this._color)) {
+            if (!defined$d(this._color)) {
                 return;
             }
             return this._color.toCssColorString();
@@ -29883,7 +33623,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
 
     const {
         MaterialAppearance: MaterialAppearance$4,
-        Material: Material$f
+        Material: Material$e
     } = Cesium;
     class CircleScanGraphic extends PointBaseGraphic {
         /**
@@ -29904,7 +33644,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$b(options.speed, 10);
+            this._speed = defaultValue$c(options.speed, 10);
             this._time = 0;
             this.createGraphic();
         }
@@ -29931,7 +33671,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$4({
-                material: new Material$f({
+                material: new Material$e({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -29998,7 +33738,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
 
     const {
         MaterialAppearance: MaterialAppearance$3,
-        Material: Material$e
+        Material: Material$d
     } = Cesium;
     class CircleSpreadGraphic extends PointBaseGraphic {
         /**
@@ -30019,7 +33759,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$b(options.speed, 10);
+            this._speed = defaultValue$c(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -30046,7 +33786,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$3({
-                material: new Material$e({
+                material: new Material$d({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -30163,23 +33903,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     };
 
     const {
-        PrimitiveType: PrimitiveType$3,
-        VertexFormat: VertexFormat$2,
-        Math: CesiumMath$3,
+        PrimitiveType: PrimitiveType$2,
+        VertexFormat: VertexFormat$1,
+        Math: CesiumMath$2,
         IndexDatatype: IndexDatatype$1,
         GeometryOffsetAttribute,
         GeometryAttributes,
         GeometryAttribute,
         Geometry,
-        ComponentDatatype: ComponentDatatype$2,
+        ComponentDatatype: ComponentDatatype$1,
         Cartesian2: Cartesian2$4,
-        Cartesian3: Cartesian3$7,
-        BoundingSphere: BoundingSphere$4
+        Cartesian3: Cartesian3$6,
+        BoundingSphere: BoundingSphere$3
     } = Cesium;
     const radiusScratch = new Cartesian2$4();
-    const normalScratch = new Cartesian3$7();
-    const bitangentScratch = new Cartesian3$7();
-    const tangentScratch = new Cartesian3$7();
+    const normalScratch = new Cartesian3$6();
+    const bitangentScratch = new Cartesian3$6();
+    const tangentScratch = new Cartesian3$6();
     /**
      * Fill an array or a portion of an array with a given value.
      *
@@ -30199,13 +33939,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         }
 
         var length = array.length >>> 0;
-        var relativeStart = defaultValue$b(start, 0);
+        var relativeStart = defaultValue$c(start, 0);
         // If negative, find wrap around position
         var k =
             relativeStart < 0
                 ? Math.max(length + relativeStart, 0)
                 : Math.min(relativeStart, length);
-        var relativeEnd = defaultValue$b(end, length);
+        var relativeEnd = defaultValue$c(end, length);
         // If negative, find wrap around position
         var last =
             relativeEnd < 0
@@ -30242,7 +33982,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var topOffset = fill ? (twoSlice + slices) * 3 : slices * 3;
 
         for (i = 0; i < slices; i++) {
-            var angle = (i / slices) * CesiumMath$3.TWO_PI;
+            var angle = (i / slices) * CesiumMath$2.TWO_PI;
             var x = Math.cos(angle);
             var y = Math.sin(angle);
             var bottomX = x * bottomRadius;
@@ -30296,22 +34036,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
      */
     function CylinderGeometry$1(options) {
-        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
+        options = defaultValue$c(options, defaultValue$c.EMPTY_OBJECT);
 
         var length = options.length;
         var topRadius = options.topRadius;
         var bottomRadius = options.bottomRadius;
-        var vertexFormat = defaultValue$b(options.vertexFormat, VertexFormat$2.DEFAULT);
-        var slices = defaultValue$b(options.slices, 128);
+        var vertexFormat = defaultValue$c(options.vertexFormat, VertexFormat$1.DEFAULT);
+        var slices = defaultValue$c(options.slices, 128);
 
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$c(length)) {
+        if (!defined$d(length)) {
             throw new CesiumProError$1("options.length must be defined.");
         }
-        if (!defined$c(topRadius)) {
+        if (!defined$d(topRadius)) {
             throw new CesiumProError$1("options.topRadius must be defined.");
         }
-        if (!defined$c(bottomRadius)) {
+        if (!defined$d(bottomRadius)) {
             throw new CesiumProError$1("options.bottomRadius must be defined.");
         }
         if (slices < 3) {
@@ -30320,7 +34060,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             );
         }
         if (
-            defined$c(options.offsetAttribute) &&
+            defined$d(options.offsetAttribute) &&
             options.offsetAttribute === GeometryOffsetAttribute.TOP
         ) {
             throw new CesiumProError$1(
@@ -30332,7 +34072,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this._length = length;
         this._topRadius = topRadius;
         this._bottomRadius = bottomRadius;
-        this._vertexFormat = VertexFormat$2.clone(vertexFormat);
+        this._vertexFormat = VertexFormat$1.clone(vertexFormat);
         this._slices = slices;
         this._offsetAttribute = options.offsetAttribute;
         this._workerName = "createCylinderGeometry";
@@ -30342,7 +34082,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * The number of elements used to pack the object into an array.
      * @type {Number}
      */
-    CylinderGeometry$1.packedLength = VertexFormat$2.packedLength + 5;
+    CylinderGeometry$1.packedLength = VertexFormat$1.packedLength + 5;
 
     /**
      * Stores the provided instance into the provided array.
@@ -30355,29 +34095,29 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.pack = function (value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$c(value)) {
+        if (!defined$d(value)) {
             throw new CesiumProError$1("value is required");
         }
-        if (!defined$c(array)) {
+        if (!defined$d(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$b(startingIndex, 0);
+        startingIndex = defaultValue$c(startingIndex, 0);
 
-        VertexFormat$2.pack(value._vertexFormat, array, startingIndex);
-        startingIndex += VertexFormat$2.packedLength;
+        VertexFormat$1.pack(value._vertexFormat, array, startingIndex);
+        startingIndex += VertexFormat$1.packedLength;
 
         array[startingIndex++] = value._length;
         array[startingIndex++] = value._topRadius;
         array[startingIndex++] = value._bottomRadius;
         array[startingIndex++] = value._slices;
-        array[startingIndex] = defaultValue$b(value._offsetAttribute, -1);
+        array[startingIndex] = defaultValue$c(value._offsetAttribute, -1);
 
         return array;
     };
 
-    var scratchVertexFormat = new VertexFormat$2();
+    var scratchVertexFormat = new VertexFormat$1();
     var scratchOptions = {
         vertexFormat: scratchVertexFormat,
         length: undefined,
@@ -30397,19 +34137,19 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      */
     CylinderGeometry$1.unpack = function (array, startingIndex, result) {
         //>>includeStart('debug', pragmas.debug);
-        if (!defined$c(array)) {
+        if (!defined$d(array)) {
             throw new CesiumProError$1("array is required");
         }
         //>>includeEnd('debug');
 
-        startingIndex = defaultValue$b(startingIndex, 0);
+        startingIndex = defaultValue$c(startingIndex, 0);
 
-        var vertexFormat = VertexFormat$2.unpack(
+        var vertexFormat = VertexFormat$1.unpack(
             array,
             startingIndex,
             scratchVertexFormat
         );
-        startingIndex += VertexFormat$2.packedLength;
+        startingIndex += VertexFormat$1.packedLength;
 
         var length = array[startingIndex++];
         var topRadius = array[startingIndex++];
@@ -30417,7 +34157,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var slices = array[startingIndex++];
         var offsetAttribute = array[startingIndex];
 
-        if (!defined$c(result)) {
+        if (!defined$d(result)) {
             scratchOptions.length = length;
             scratchOptions.topRadius = topRadius;
             scratchOptions.bottomRadius = bottomRadius;
@@ -30427,7 +34167,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             return new CylinderGeometry$1(scratchOptions);
         }
 
-        result._vertexFormat = VertexFormat$2.clone(vertexFormat, result._vertexFormat);
+        result._vertexFormat = VertexFormat$1.clone(vertexFormat, result._vertexFormat);
         result._length = length;
         result._topRadius = topRadius;
         result._bottomRadius = bottomRadius;
@@ -30501,7 +34241,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             var bitangent = bitangentScratch;
 
             for (i = 0; i < slices; i++) {
-                var angle = (i / slices) * CesiumMath$3.TWO_PI;
+                var angle = (i / slices) * CesiumMath$2.TWO_PI;
                 var x = normalScale * Math.cos(angle);
                 var y = normalScale * Math.sin(angle);
                 if (computeNormal) {
@@ -30509,8 +34249,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     normal.y = y;
 
                     if (computeTangent) {
-                        tangent = Cartesian3$7.normalize(
-                            Cartesian3$7.cross(Cartesian3$7.UNIT_Z, normal, tangent),
+                        tangent = Cartesian3$6.normalize(
+                            Cartesian3$6.cross(Cartesian3$6.UNIT_Z, normal, tangent),
                             tangent
                         );
                     }
@@ -30534,8 +34274,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     }
 
                     if (vertexFormat.bitangent) {
-                        bitangent = Cartesian3$7.normalize(
-                            Cartesian3$7.cross(normal, tangent, bitangent),
+                        bitangent = Cartesian3$6.normalize(
+                            Cartesian3$6.cross(normal, tangent, bitangent),
                             bitangent
                         );
                         bitangents[bitangentIndex++] = bitangent.x;
@@ -30614,21 +34354,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         var attributes = new GeometryAttributes();
         if (vertexFormat.position) {
             attributes.position = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$2.DOUBLE,
+                componentDatatype: ComponentDatatype$1.DOUBLE,
                 componentsPerAttribute: 3,
                 values: positions,
             });
         }
         if (vertexFormat.st) {
             attributes.st = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$2.FLOAT,
+                componentDatatype: ComponentDatatype$1.FLOAT,
                 componentsPerAttribute: 2,
                 values: st,
             });
         }
         if (vertexFormat.normal) {
             attributes.normal = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$2.FLOAT,
+                componentDatatype: ComponentDatatype$1.FLOAT,
                 componentsPerAttribute: 3,
                 values: normals,
             });
@@ -30637,12 +34377,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         radiusScratch.x = length * 0.5;
         radiusScratch.y = Math.max(bottomRadius, topRadius);
 
-        var boundingSphere = new BoundingSphere$4(
-            Cartesian3$7.ZERO,
+        var boundingSphere = new BoundingSphere$3(
+            Cartesian3$6.ZERO,
             Cartesian2$4.magnitude(radiusScratch)
         );
 
-        if (defined$c(cylinderGeometry._offsetAttribute)) {
+        if (defined$d(cylinderGeometry._offsetAttribute)) {
             length = positions.length;
             var applyOffset = new Uint8Array(length / 3);
             var offsetValue =
@@ -30651,7 +34391,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
                     : 1;
             arrayFill(applyOffset, offsetValue);
             attributes.applyOffset = new GeometryAttribute({
-                componentDatatype: ComponentDatatype$2.UNSIGNED_BYTE,
+                componentDatatype: ComponentDatatype$1.UNSIGNED_BYTE,
                 componentsPerAttribute: 1,
                 values: applyOffset,
             });
@@ -30660,7 +34400,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         return new Geometry({
             attributes: attributes,
             indices: indices,
-            primitiveType: PrimitiveType$3.TRIANGLES,
+            primitiveType: PrimitiveType$2.TRIANGLES,
             boundingSphere: boundingSphere,
             offsetAttribute: cylinderGeometry._offsetAttribute,
         });
@@ -30675,13 +34415,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
      * @private
      */
     CylinderGeometry$1.getUnitCylinder = function () {
-        if (!defined$c(unitCylinderGeometry)) {
+        if (!defined$d(unitCylinderGeometry)) {
             unitCylinderGeometry = CylinderGeometry$1.createGeometry(
                 new CylinderGeometry$1({
                     topRadius: 1.0,
                     bottomRadius: 1.0,
                     length: 1.0,
-                    vertexFormat: VertexFormat$2.POSITION_ONLY,
+                    vertexFormat: VertexFormat$1.POSITION_ONLY,
                 })
             );
         }
@@ -30691,15 +34431,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
     const { baseMaterialShader, dashCircleMaterialShader, coneMaterialShader, cylinderMaterialShader } = glsl$1;
     const {
         MaterialAppearance: MaterialAppearance$2,
-        Material: Material$d,
+        Material: Material$c,
         GroundPrimitive,
         Primitive: Primitive$2,
         GeometryInstance: GeometryInstance$1,
         PrimitiveCollection: PrimitiveCollection$2,
         CircleGeometry,
         Transforms: Transforms$3,
-        Matrix4: Matrix4$4,
-        Cartesian3: Cartesian3$6
+        Matrix4: Matrix4$3,
+        Cartesian3: Cartesian3$5
     } = Cesium;
     class DynamicConeGraphic extends PointBaseGraphic {
         /**
@@ -30720,8 +34460,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$b(options.speed, 1);
-            this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('assets/img/particle.png'));
+            this._speed = defaultValue$c(options.speed, 1);
+            this._image = defaultValue$c(options.image, Url$1.buildModuleUrl('assets/img/particle.png'));
             this._appearance = {};
             this._length = options.length;
             this._primitive = new PrimitiveCollection$2();
@@ -30822,10 +34562,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             if (this.isDestroyed()) {
                 return;
             }
-            const length = defaultValue$b(this._length, this._radius * 0.35 * 8) * heighFactor;
+            const length = defaultValue$c(this._length, this._radius * 0.35 * 8) * heighFactor;
             const matrix = Transforms$3.eastNorthUpToFixedFrame(LonLat.toCartesian(this._position));
-            const translation = Matrix4$4.fromTranslation(new Cartesian3$6(0, 0, length / 2 + this._height));
-            Matrix4$4.multiply(matrix, translation, matrix);
+            const translation = Matrix4$3.fromTranslation(new Cartesian3$5(0, 0, length / 2 + this._height));
+            Matrix4$3.multiply(matrix, translation, matrix);
             const geometry = new CylinderGeometry$1({
                 bottomRadius: bottmRadius,
                 topRadius: topRadius,
@@ -30904,7 +34644,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             }
             this._appearance[shader] = new MaterialAppearance$2({
                 flat: true,
-                material: new Material$d({
+                material: new Material$c({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -31867,7 +35607,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             super(options);
             this._primitive = new BillboardCollection$1();
             this._image = options.image;
-            this._speedFactor = defaultValue$b(options.speedFactor, 1.0);
+            this._speedFactor = defaultValue$c(options.speedFactor, 1.0);
             this._imageIndex = 0;
             this._imageParser = options.imageParser;
             this.createGraphic();
@@ -31926,7 +35666,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
     const {
         MaterialAppearance: MaterialAppearance$1,
-        Material: Material$c
+        Material: Material$b
     } = Cesium;
     class RadarScanGraphic extends PointBaseGraphic {
         /**
@@ -31947,7 +35687,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options) {
             super(options);
-            this._speed = defaultValue$b(options.speed, 10);
+            this._speed = defaultValue$c(options.speed, 10);
             this._time = 0.0;
             this.createGraphic();
         }
@@ -31974,7 +35714,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 return this._appearance;
             }
             this._appearance = new MaterialAppearance$1({
-                material: new Material$c({
+                material: new Material$b({
                     translucent: true,
                     fabric: {
                         uniforms: {
@@ -32003,8 +35743,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Cartesian3: Cartesian3$5,
-      Matrix4: Matrix4$3,
+      Cartesian3: Cartesian3$4,
+      Matrix4: Matrix4$2,
       Transforms: Transforms$2,
       Model,
       CylinderGeometry,
@@ -32012,12 +35752,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       BillboardCollection,
       MaterialAppearance,
       GeometryInstance,
-      Material: Material$b,
-      Color: Color$g,
+      Material: Material$a,
+      Color: Color$f,
       Primitive: Primitive$1
     } = Cesium;
     function transform(satelliteScane, angle, axis) {
-      if (!defined$c(satelliteScane)) {
+      if (!defined$d(satelliteScane)) {
         return;
       }
       angle = Cesium.Math.toRadians(angle);
@@ -32101,14 +35841,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         super(options);
 
         this._clampToGround = false;
-        if (!defined$c(options.position)) {
+        if (!defined$d(options.position)) {
           throw new CesiumProError$1('参数options必须定义position或path属性。')
         }
         const cartographic = LonLat.toCartographic(options.position, viewer);
         this._position = LonLat.toCartesian(options.position);
-        this._thickness = defaultValue$b(options.thickness, 0.3);
-        this._slices = defaultValue$b(options.slices, 20);
-        this.speed = defaultValue$b(options.speed, 0.5);
+        this._thickness = defaultValue$c(options.thickness, 0.3);
+        this._slices = defaultValue$c(options.slices, 20);
+        this.speed = defaultValue$c(options.speed, 0.5);
 
         /**
          * 卫星所在的高度
@@ -32117,7 +35857,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         /**
          * 卫星在地面的投影位置
          */
-        this._surface = Cartesian3$5.fromRadians(cartographic.longitude, cartographic.latitude);
+        this._surface = Cartesian3$4.fromRadians(cartographic.longitude, cartographic.latitude);
         /**
          * 卫星在地面的扫描半径
          * @type {Number}
@@ -32126,8 +35866,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this.radius = options.radius || this._height * 0.5;
 
         this._inverse = options.inverse || false;
-        this._animation = defined$c(options.animation) ? options.animation : true;
-        this._show = defined$c(options.show) ? options.show : true;
+        this._animation = defined$d(options.animation) ? options.animation : true;
+        this._show = defined$d(options.show) ? options.show : true;
 
         this._color = options.color;
         /**
@@ -32143,10 +35883,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 
         this._axis = options.axis;
 
-        this._matrix = Matrix4$3.multiplyByTranslation(
+        this._matrix = Matrix4$2.multiplyByTranslation(
           Transforms$2.eastNorthUpToFixedFrame(this._surface),
-          new Cartesian3$5(0, 0, 0.5 * this._height),
-          new Matrix4$3()
+          new Cartesian3$4(0, 0, 0.5 * this._height),
+          new Matrix4$2()
         );
         this.transform(this._rotation);
         /**
@@ -32216,11 +35956,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           geometry,
         });
         const source = this.getShaderSorce();
-        const material = new Material$b({
+        const material = new Material$a({
           fabric: {
             type: 'satelliteMaterial',
             uniforms: {
-              color: this._color || Color$g.WHITE,
+              color: this._color || Color$f.WHITE,
               repeat: this.slices, //锥体被分成30份
               offset: 0.0,
               thickness: this.thickness,
@@ -32399,21 +36139,21 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           return;
         }
         if (angle.x) {
-          transform(this, angle.x, new Cartesian3$5(1, 0, 0));
+          transform(this, angle.x, new Cartesian3$4(1, 0, 0));
         }
         if (angle.y) {
-          transform(this, angle.y, new Cartesian3$5(0, 1, 0));
+          transform(this, angle.y, new Cartesian3$4(0, 1, 0));
         }
         if (angle.z) {
-          transform(this, angle.z, new Cartesian3$5(0, 0, 1));
+          transform(this, angle.z, new Cartesian3$4(0, 0, 1));
         }
       }
     }
 
     const {
-        Cartesian2: Cartesian2$3,Cartesian3: Cartesian3$4,Cartographic: Cartographic$4,Credit: Credit$1,defaultValue: defaultValue$1,defined: defined$2,
+        Cartesian2: Cartesian2$3,Cartesian3: Cartesian3$3,Cartographic: Cartographic$4,Credit: Credit$1,defaultValue: defaultValue$1,defined: defined$2,
         DeveloperError: DeveloperError$1,Event: Event$5,GeographicProjection,GeographicTilingScheme: GeographicTilingScheme$2,
-        Math: CesiumMath$2,Rectangle: Rectangle$1,Resource: Resource$1,RuntimeError,TileProviderError,
+        Math: CesiumMath$1,Rectangle: Rectangle$1,Resource: Resource$1,RuntimeError,TileProviderError,
         WebMercatorProjection,WebMercatorTilingScheme,DiscardMissingTileImagePolicy,
         ImageryLayerFeatureInfo,ImageryProvider
     } = Cesium;
@@ -32690,7 +36430,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 const projection = new WebMercatorProjection();
                 const extent = data.fullExtent;
                 const sw = projection.unproject(
-                  new Cartesian3$4(
+                  new Cartesian3$3(
                     Math.max(
                       extent.xmin,
                       -that._tilingScheme.ellipsoid.maximumRadius * Math.PI
@@ -32703,7 +36443,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                   )
                 );
                 const ne = projection.unproject(
-                  new Cartesian3$4(
+                  new Cartesian3$3(
                     Math.min(
                       extent.xmax,
                       that._tilingScheme.ellipsoid.maximumRadius * Math.PI
@@ -33237,8 +36977,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       let vertical;
       let sr;
       if (this._tilingScheme.projection instanceof GeographicProjection) {
-        horizontal = CesiumMath$2.toDegrees(longitude);
-        vertical = CesiumMath$2.toDegrees(latitude);
+        horizontal = CesiumMath$1.toDegrees(longitude);
+        vertical = CesiumMath$1.toDegrees(latitude);
         sr = "4326";
       } else {
         const projected = this._tilingScheme.projection.project(
@@ -33303,7 +37043,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             } else if (wkid === 102100 || wkid === 900913 || wkid === 3857) {
               const projection = new WebMercatorProjection();
               featureInfo.position = projection.unproject(
-                new Cartesian3$4(
+                new Cartesian3$3(
                   feature.geometry.x,
                   feature.geometry.y,
                   feature.geometry.z
@@ -33343,8 +37083,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @see {@link http://lbsyun.baidu.com/custom/list.htm|百度个性化地图列表}
          */
         constructor(options) {
-            options = defaultValue$b(options, {});
-            options.url = defaultValue$b(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
+            options = defaultValue$c(options, {});
+            options.url = defaultValue$c(options.url, 'http://maponline{s}.bdimg.com/tile/?qt=vtile&styles=pl&scaler=1&udt=20200102');
             if (options.customid) {
                 options.url = `https://api.map.baidu.com/customimage/tile?customid=${options.customid}`;
             }
@@ -33388,8 +37128,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          */
         constructor(options = {}) {
             options.url = 'https://dev.virtualearth.net';
-            options.mapStyle = defaultValue$b(options.mapStyle, BingLayer.mapStyle.AERIAL);
-            options.key = defaultValue$b(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
+            options.mapStyle = defaultValue$c(options.mapStyle, BingLayer.mapStyle.AERIAL);
+            options.key = defaultValue$c(options.key, 'AqMhBWJKbBPBtoWEvtGdUii6XSkDCJ3vWFpOVWzplD-Q0J-ECUF6i8MGXpew8bkc');
             super(options);
         }
         /**
@@ -33564,14 +37304,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          *
          */
         constructor(options) {
-            options = defaultValue$b(options, {});
+            options = defaultValue$c(options, {});
 
-            const layer = defaultValue$b(options.layer, 'img');
+            const layer = defaultValue$c(options.layer, 'img');
             const {
                 scl,
                 style
             } = GaoDeLayer.getParametersByLayer(layer);
-            const lang = defaultValue$b(options.lang, 'zh_cn');
+            const lang = defaultValue$c(options.lang, 'zh_cn');
             options.url = `https://webst0{s}.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=${lang}&size=1&scl=${scl}&style=${style}`;
             options.subdomains = '1234';
             super(options);
@@ -33646,7 +37386,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
                 rectangle: Cesium.Rectangle.MAX_VALUE,
                 intervalOfZeorLevel: options.intervalOfZeorLevel
             });
-            this._hasAlphaChannel = defaultValue$b(options.hasAlphaChannel, true);
+            this._hasAlphaChannel = defaultValue$c(options.hasAlphaChannel, true);
             this._tilingScheme = tilingScheme;
             this._image = undefined;
             this._texture = undefined;
@@ -33656,10 +37396,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this._ready = true;
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$b(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$b(options.color, 'white');
-            this._lineColor = defaultValue$b(options.lineColor, 'gold');
-            this._lineWidth = defaultValue$b(options.lineWidth, 2);
+            this._font = defaultValue$c(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$c(options.color, 'white');
+            this._lineColor = defaultValue$c(options.lineColor, 'gold');
+            this._lineWidth = defaultValue$c(options.lineWidth, 2);
         }
         get hasAlphaChannel() {
             return this._hasAlphaChannel;
@@ -34038,24 +37778,24 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        *
        */
       constructor(options) {
-        options = defaultValue$b(options, {});
+        options = defaultValue$c(options, {});
         const key = options.key;
         if (!key) {
           console.warn('未定义key，地图服务将不可用');
           console.warn('请前往http://lbs.tianditu.gov.cn/server/MapService.html获取地图key');
         }
-        const tilingScheme = defaultValue$b(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
+        const tilingScheme = defaultValue$c(options.tilingScheme, new Cesium.WebMercatorTilingScheme());
         let crs = 'w',
           tileMatrixSet = 'w',
           tileMatrixLabels = options.tileMatrixLabels;
         if (tilingScheme instanceof Cesium.GeographicTilingScheme) {
           crs = 'c';
           tileMatrixSet = 'c';
-          if (!defined$c(tileMatrixLabels)) {
+          if (!defined$d(tileMatrixLabels)) {
             tileMatrixLabels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
           }
         }
-        const layer = defaultValue$b(options.layer, 'img');
+        const layer = defaultValue$c(options.layer, 'img');
         const url = `http://t{s}.tianditu.com/${layer}_${crs}/wmts?service=wmts&tileMatrixSet=${tileMatrixSet}&request=GetTile&version=1.0.0&LAYER=${layer}&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=${key}`;
         return new Cesium.WebMapTileServiceImageryProvider({
           url,
@@ -34135,7 +37875,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @extends XYZLayer
          */
         constructor(options = {}) {
-            options.layer = defaultValue$b(options.layer, 'img');
+            options.layer = defaultValue$c(options.layer, 'img');
             options.subdomains = '123';
             options.url = layerMap[options.layer];
             options.customTags = {
@@ -34175,20 +37915,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * @param {Cesium.TilingScheme} [options.tilingScheme = proj.get('EPSG:4326')] 瓦片分割坐标系
          */
         constructor(options = {}) {
-            options.tileWidth = defaultValue$b(options.tileWidth, 256);
-            options.tileHeight = defaultValue$b(options.tileHeight, 256);
-            this._tilingScheme = defined$c(options.tilingScheme)
+            options.tileWidth = defaultValue$c(options.tileWidth, 256);
+            options.tileHeight = defaultValue$c(options.tileHeight, 256);
+            this._tilingScheme = defined$d(options.tilingScheme)
                 ? options.tilingScheme
                 : proj.get('EPSG:4326', { ellipsoid: options.ellipsoid });
             this._errorEvent = new Event$9();
-            this._tileWidth = defaultValue$b(options.tileWidth, 256);
-            this._tileHeight = defaultValue$b(options.tileHeight, 256);
+            this._tileWidth = defaultValue$c(options.tileWidth, 256);
+            this._tileHeight = defaultValue$c(options.tileHeight, 256);
             this._readyPromise = Promise.resolve(true);
 
-            this._font = defaultValue$b(options.font, 'bold 24px sans-serif');
-            this._color = defaultValue$b(options.color, new Cesium.Color(1,1,1,1));
-            this._borderColor = defaultValue$b(options.borderColor, Cesium.Color.GOLD);
-            this._borderWidth = defaultValue$b(options.borderWidth, 2);    
+            this._font = defaultValue$c(options.font, 'bold 24px sans-serif');
+            this._color = defaultValue$c(options.color, new Cesium.Color(1,1,1,1));
+            this._borderColor = defaultValue$c(options.borderColor, Cesium.Color.GOLD);
+            this._borderWidth = defaultValue$c(options.borderWidth, 2);    
         }
         /**
          * 表示图层是否已准备完成。
@@ -34355,11 +38095,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this._tilingScheme = proj.get('EPSG:4326');        
             this._ready = false;
             this._ready = true;
-            this._minimumLevel = defaultValue$b(options.minimumLevel, 0);
+            this._minimumLevel = defaultValue$c(options.minimumLevel, 0);
             this._maximumLevel = options.maximumLevel;
-            this._tileWidth = defaultValue$b(options.tileWidth, 256);
-            this._tileHeight = defaultValue$b(options.tileHeight, 256);
-            this._rectangle = defaultValue$b(options.rectangle, Rectangle.MAX_VALUE);
+            this._tileWidth = defaultValue$c(options.tileWidth, 256);
+            this._tileHeight = defaultValue$c(options.tileHeight, 256);
+            this._rectangle = defaultValue$c(options.rectangle, Rectangle.MAX_VALUE);
             this._readyPromise = Promise.resolve(true);
             this._errorEvent.addEventListener((x, y, z) => {
                 // 主要是为了不让TileProviderError.handleError打印错误
@@ -34672,10 +38412,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * viewer.addLayer(provider);
          */
         constructor(options = {}) {
-            if (!defined$c(options.parameters)) {
+            if (!defined$d(options.parameters)) {
                 options.parameters = WMSLayer.DefaultParameters;
             }
-            if (!defined$c(options.GetFeatureInfoDefaultParameters)) ;
+            if (!defined$d(options.GetFeatureInfoDefaultParameters)) ;
             super(options);
         }
         /**
@@ -34819,9 +38559,9 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._type = undefined;
         this._properties = undefined;
         this._show = true;
-        this._id = defaultValue$b(entityOptions.id, guid());
-        this._clampToGround = defaultValue$b(options.clampToGround);
-        this._clampToModel = defaultValue$b(options.clampToModel);
+        this._id = defaultValue$c(entityOptions.id, guid());
+        this._clampToGround = defaultValue$c(options.clampToGround);
+        this._clampToModel = defaultValue$c(options.clampToModel);
 
       }
       /**
@@ -34947,7 +38687,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._positions = undefined;
         this.properties && this.properties.destroy();
         this._properties = undefined;
-        destroyObject$7(this);    
+        destroyObject$8(this);    
       }
 
       /**
@@ -35014,14 +38754,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         abstract();
       }
       static getEntityFromGeoJson(json) {
-        if (!defined$c(json)) {
+        if (!defined$d(json)) {
           return;
         }
 
         if (json.geometry && json.geometry.type.toUpperCase() === 'POLYGON') {
           let hierarchy = [];
           const coordinates = json.geometry.coordinates;
-          if (!defined$c(coordinates) || !Array.isArray(coordinates)) {
+          if (!defined$d(coordinates) || !Array.isArray(coordinates)) {
             return;
           }
           for (let coords of coordinates) {
@@ -35030,7 +38770,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             }
             for (let coor of coords) {
               const ll = Cesium.Cartesian3.fromDegrees(coor[0], coor[1]);
-              if (!defined$c(ll)) return;
+              if (!defined$d(ll)) return;
               hierarchy.push(ll);
             }
           }      return new Cesium.Entity({
@@ -37136,14 +40876,14 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * },{type:PlotType.BILLBOARD})
        */
       constructor(entityOptions, options = {}) {
-        entityOptions = defaultValue$b(entityOptions, {});
+        entityOptions = defaultValue$c(entityOptions, {});
         super(entityOptions, options);
         this._entityOptions = entityOptions;
         this._options = options;
-        this._positions = defaultValue$b(entityOptions.position, new Cesium.Cartesian3());
-        this._type = defaultValue$b(options.type, PlotType$1.POINT);
+        this._positions = defaultValue$c(entityOptions.position, new Cesium.Cartesian3());
+        this._type = defaultValue$c(options.type, PlotType$1.POINT);
         this._entity = this.createEntity();
-        this._text = defaultValue$b(entityOptions.text, '');
+        this._text = defaultValue$c(entityOptions.text, '');
       }
       /**
        * 该图形的几何描述，包括类型，经纬度等
@@ -37174,7 +40914,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         }
         if (this.type === PlotType$1.BILLBOARD) {
           options.billboard = clone(this._entityOptions);
-          if (!defined$c(options.billboard.image)) {
+          if (!defined$d(options.billboard.image)) {
             options.billboard.image = Url$1.buildModuleUrl('./assets/marker.png');
           }
         }
@@ -37185,7 +40925,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           options.orientation = this._entityOptions.orientation;
           delete this._entityOptions.orientation;
           options.model = clone(this._entityOptions);
-          if (!defined$c(options.model.uri)) {
+          if (!defined$d(options.model.uri)) {
             options.model.uri = Url$1.buildModuleUrl('./assets/Wood_Tower.gltf');
           }
         }
@@ -37307,7 +41047,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Bool}
        */
       static equal(left, right) {
-        if (!defined$c(left) || !defined$c(right)) {
+        if (!defined$d(left) || !defined$d(right)) {
           return false;
         }
         if (left instanceof PointPlot) {
@@ -37382,7 +41122,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
+        if (!defined$d(json.geometry) || !(defined$d(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -37471,8 +41211,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._entityOptions = defaultValue$b(entityOptions, {});
-        this._positions = defaultValue$b(this._entityOptions.positions, []);
+        this._entityOptions = defaultValue$c(entityOptions, {});
+        this._positions = defaultValue$c(this._entityOptions.positions, []);
         this._nodePositions = this._positions;
         this._type = PlotType$1.POLYLINE;
         this._entity = this.createEntity();
@@ -37542,7 +41282,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$c(index) && index < vertexNumber) {
+        if (defined$d(index) && index < vertexNumber) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
           }
@@ -37557,7 +41297,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$c(index)) {
+        if (!defined$d(index)) {
           return;
         }
         if (index < 0 || index >= this.positions.length) {
@@ -37623,7 +41363,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
+        if (!defined$d(json.geometry) || !(defined$d(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -37680,7 +41420,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$b(entityOptions.positions, []);
+        this._positions = defaultValue$c(entityOptions.positions, []);
         this._nodePositions = [...this.positions];
         if (this._nodePositions.length) {
           this._nodePositions[this._nodePositions.length] = this._nodePositions[0];
@@ -37775,7 +41515,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addNode(node, index) {
         const vertexNumber = this.positions.length;
-        if (defined$c(index) && index < vertexNumber && index >= 0) {
+        if (defined$d(index) && index < vertexNumber && index >= 0) {
           for (let i = vertexNumber; i > index; i--) {
             this.positions[i] = this.positions[i - 1];
             this._nodePositions[i] = this._nodePositions[i - 1];
@@ -37796,7 +41536,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param  {Number} index 顶点编号
        */
       removeNode(index) {
-        if (!defined$c(index)) {
+        if (!defined$d(index)) {
           return
         }
         if (index < 0 || index >= this.positions.length) {
@@ -37886,7 +41626,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (typeof json === 'string') {
           json = JSON.parse(json);
         }
-        if (!defined$c(json.geometry) || !(defined$c(json.properties))) {
+        if (!defined$d(json.geometry) || !(defined$d(json.properties))) {
           return;
         }
         const type = json.properties.PlotType;
@@ -38074,16 +41814,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._viewer = viewer;
         const defaultLabelStyle = PointPlot.defaultLabelStyle;
         defaultLabelStyle.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-        this._labelStyle = defaultValue$b(labelStyle, defaultLabelStyle);
-        this._polylineStyle = defaultValue$b(polylineStyle, PolylinePlot.defaultStyle);
-        this._polygonStyle = defaultValue$b(polygonStyle, PolygonPlot.defaultStyle);
-        this._pointStyle = defaultValue$b(pointStyle, PointPlot.defaultStyle);
+        this._labelStyle = defaultValue$c(labelStyle, defaultLabelStyle);
+        this._polylineStyle = defaultValue$c(polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$c(polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$c(pointStyle, PointPlot.defaultStyle);
 
         this._startMeasure = new Event$9();
         this._stopMeasure = new Event$9();
         this._addNode = new Event$9();
 
-        this.formatText = defaultValue$b(options.formatText, formatText);
+        this.formatText = defaultValue$c(options.formatText, formatText);
 
         const defaultNode = {
           distance: true,
@@ -38097,29 +41837,29 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           height: true,
           angle: true,
         };
-        this._nodeMode = defaultValue$b(options.nodeMode, defaultNode);
-        this._auxiliaryGeometry = defaultValue$b(options.auxiliaryGeometry, defaultAuxiliary);
+        this._nodeMode = defaultValue$c(options.nodeMode, defaultNode);
+        this._auxiliaryGeometry = defaultValue$c(options.auxiliaryGeometry, defaultAuxiliary);
 
         const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         this._handler = handler;
         this._values = {};
-        this._mode = defaultValue$b(options.mode, CartometryType$1.SURFACE_DISTANCE);
-        this._showTip = defaultValue$b(options.showTip, true);
+        this._mode = defaultValue$c(options.mode, CartometryType$1.SURFACE_DISTANCE);
+        this._showTip = defaultValue$c(options.showTip, true);
         if (this._showTip) {
           this._tip = new CursorTip();
           this._tip.show = false;
         }    
-        this._autoDepthTest = defaultValue$b(options.autoDepthTest, true);
+        this._autoDepthTest = defaultValue$c(options.autoDepthTest, true);
         this.listening = false;
         const auxiliarylineMaterial = new Cesium.PolylineDashMaterialProperty({
           color: Cesium.Color.RED,
         });
-        this._auxiliarylineMaterial = defaultValue$b(options.auxiliaryLineMaterial, auxiliarylineMaterial);
+        this._auxiliarylineMaterial = defaultValue$c(options.auxiliaryLineMaterial, auxiliarylineMaterial);
         const auxiliarypolygonMaterial = new Cesium.PolylineDashMaterialProperty({
           color: Cesium.Color.RED,
         });
         this._depthTestAgainstTerrain = this._viewer.scene.globe.depthTestAgainstTerrain;
-        this._auxiliaryPolygonMaterial = defaultValue$b(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
+        this._auxiliaryPolygonMaterial = defaultValue$c(options.auxiliaryPolygonMaterial, auxiliarypolygonMaterial);
       }
 
       /**
@@ -38454,7 +42194,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (this.tip) {
           this.tip.show = true;
         }
-        mode = defaultValue$b(mode, this.mode);
+        mode = defaultValue$c(mode, this.mode);
         const valid = CartometryType$1.validate(mode);
         if (!valid) {
           console.warn('无效的测量模式'); // WARNING: 无效的测量模式
@@ -38746,7 +42486,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       constructor(entityOptions) {
         this._type = PlotType$1.MUTIPOINT;
-        this._positions = defaultValue$b(entityOptions.positions, []);
+        this._positions = defaultValue$c(entityOptions.positions, []);
         this._entityOptions = entityOptions;
         this._values = [];
         this.createEntity();
@@ -38775,7 +42515,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       highlightActiveNode() {
-        const values = this._values.filter(_ => defined$c(_.position));
+        const values = this._values.filter(_ => defined$d(_.position));
         for (let i = 0, length = values.length; i < length; i++) {
           const v = values[i];
           if (i === this.activeIndex) {
@@ -38818,7 +42558,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity} index对应的顶点实体
        */
       get(index) {
-        const values = this._values.filter(_ => defined$c(_.position));
+        const values = this._values.filter(_ => defined$d(_.position));
         return values[index];
       }
       /**
@@ -38883,7 +42623,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Entity}    被删除的顶点
        */
       removeNode(index) {
-        if (!defined$c(index)) {
+        if (!defined$d(index)) {
           return;
         }
         // const node = this._values[index];
@@ -38963,10 +42703,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     class ArrowPlot extends BasePlot {
       constructor(entityOptions, options = {}) {
         super(entityOptions, options);
-        this._type = defaultValue$b(options.type, PlotType$1.STRAIGHTARROW);
+        this._type = defaultValue$c(options.type, PlotType$1.STRAIGHTARROW);
         this._entityOptions = entityOptions;
-        this._positions = defaultValue$b(entityOptions.positions, []);
-        this._arrowType = defaultValue$b(options.type, PlotType$1.STRAIGHTARROW);
+        this._positions = defaultValue$c(entityOptions.positions, []);
+        this._arrowType = defaultValue$c(options.type, PlotType$1.STRAIGHTARROW);
         if (!ArrowType.validate(this._arrowType)) {
           throw new CesiumProError$1('无效的箭头图形.')
         }
@@ -39085,7 +42825,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       updatePositions() {
-        if (!defined$c(this.arrow)) {
+        if (!defined$d(this.arrow)) {
           return;
         }
         const controls = this.arrow.controls;
@@ -39146,8 +42886,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       constructor(viewer, options) {
         checkViewer(viewer);
         this._viewer = viewer;
-        options = defaultValue$b(options, {});
-        this._id = defaultValue$b(options.id, guid());
+        options = defaultValue$c(options, {});
+        this._id = defaultValue$c(options.id, guid());
         this._dataSource = new Cesium.CustomDataSource('cesiumpro-graphic_' + this._id);
         this._nodeDataSource = new Cesium.CustomDataSource('cesiumpro-graphic-node_' + this._id);
         this._viewer.dataSources.add(this._dataSource);
@@ -39163,15 +42903,15 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._postRemove = new Event$9();
         this._values = new Cesium.AssociativeArray();
         this._handler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
-        this._pointStyle = defaultValue$b(options.pointStyle, PointPlot.defaultPointStyle);
-        this._labelStyle = defaultValue$b(options.labelStyle, PointPlot.defaultLabelStyle);
-        this._modelStyle = defaultValue$b(options.modelStyle, PointPlot.defaultModelStyle);
-        this._billboardStyle = defaultValue$b(options.billboardStyle, PointPlot.defaultBillboardStyle);
-        this._polylineStyle = defaultValue$b(options.polylineStyle, PolylinePlot.defaultStyle);
-        this._polygonStyle = defaultValue$b(options.polygonStyle, PolygonPlot.defaultStyle);
+        this._pointStyle = defaultValue$c(options.pointStyle, PointPlot.defaultPointStyle);
+        this._labelStyle = defaultValue$c(options.labelStyle, PointPlot.defaultLabelStyle);
+        this._modelStyle = defaultValue$c(options.modelStyle, PointPlot.defaultModelStyle);
+        this._billboardStyle = defaultValue$c(options.billboardStyle, PointPlot.defaultBillboardStyle);
+        this._polylineStyle = defaultValue$c(options.polylineStyle, PolylinePlot.defaultStyle);
+        this._polygonStyle = defaultValue$c(options.polygonStyle, PolygonPlot.defaultStyle);
         this._editEventHandler = new Cesium.ScreenSpaceEventHandler(this._viewer.canvas);
         this._viewer.screenSpaceEventHandler.removeInputAction(LEFT_DOUBLE_CLICK);
-        this.showTip = defaultValue$b(options.showTip, true);
+        this.showTip = defaultValue$c(options.showTip, true);
 
         this._mode = PlotMode.ready;
 
@@ -39179,7 +42919,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
          * 右键菜单管理器
          * @type {ContextMenu}
          */
-        options.contextEnabled = defaultValue$b(options.contextEnabled, true);
+        options.contextEnabled = defaultValue$c(options.contextEnabled, true);
         if (options.contextEnabled) {
           this.contextMenu = this.createContext();
           this.addContextEventListener();
@@ -39405,7 +43145,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       add(graphic) {
         this.preCreate.raise(graphic);
-        if (defined$c(this.viewer && defined$c(graphic.entity))) {
+        if (defined$d(this.viewer && defined$d(graphic.entity))) {
           this.root.add(graphic.entity);
           this._values.set(graphic.id, graphic);
           this.postCreate.raise(graphic);
@@ -39417,11 +43157,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {PolylinePlot|PointPlot|PolygonPlot} graphic 要从场景中删除的图形
        */
       remove(graphic) {
-        if (!defined$c(graphic)) {
+        if (!defined$d(graphic)) {
           return;
         }
         this.preRemove.raise(graphic);
-        if (defined$c(this.viewer) && defined$c(graphic.entity)) {
+        if (defined$d(this.viewer) && defined$d(graphic.entity)) {
           this.root.remove(graphic.entity);
           this.postRemove.raise(graphic);
         }
@@ -39450,7 +43190,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Boolean}  true表示包含
        */
       hasEntity(entity) {
-        if (!defined$c(entity)) {
+        if (!defined$d(entity)) {
           return false;
         }
         return this._root.contains(entity);
@@ -39476,7 +43216,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (!this._handler.isDestroyed()) {
           this._handler.destroy();
         }
-        destroyObject$7(this);
+        destroyObject$8(this);
       }
       /**
        * 定位到图形
@@ -39491,7 +43231,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         } else {
           entities.push(graphic.entity);
         }
-        if (defined$c(this._viewer)) {
+        if (defined$d(this._viewer)) {
           this._viewer.zoomTo(entities);
         }
       }
@@ -39569,7 +43309,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @private
        */
       addEventListener(single = true) {
-        if (!defined$c(this.activeGraphic)) {
+        if (!defined$d(this.activeGraphic)) {
           return;
         }
         const positions = this.activeGraphic.positions;
@@ -39578,13 +43318,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
             this.activeGraphic.updatePosition.bind(this.activeGraphic) : 
             this.activeGraphic.addNode.bind(this.activeGraphic);
           const position = this.pickPosition(e.position);
-          if (!defined$c(position)) {
+          if (!defined$d(position)) {
             return;
           } 
           // if (this.activeGraphic._arrowType === ArrowType.attackarrow && this.positions.length > 1) {
           //   this.activeGraphic.popNode();
           // }
-          if (defined$c(addNode)) {
+          if (defined$d(addNode)) {
             addNode(position);
           }
           if (single) {
@@ -39596,7 +43336,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         };
         const onMouseMove = (e) => {
           const position = this.pickPosition(e.endPosition);
-          if (!defined$c(position)) {
+          if (!defined$d(position)) {
             return;
           }
           if (this.showTip) {
@@ -39624,7 +43364,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           // this.activeGraphic = undefined;
           // this._mode = PlotMode.ready;
           this.stopEdit(this.activeGraphic);
-          defined$c(this.contextMenu) && this.addContextEventListener();
+          defined$d(this.contextMenu) && this.addContextEventListener();
         };
         if (!single) {
           this._handler.setInputAction(onMouseMove, MOUSE_MOVE);
@@ -39636,12 +43376,12 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         const handler = this._editEventHandler;
         let dragging = false;
         const onClick = e => {
-          defined$c(this.contextMenu) && (this.contextMenu.show = false);
-          if (!defined$c(this.activeGraphic)) {
+          defined$d(this.contextMenu) && (this.contextMenu.show = false);
+          if (!defined$d(this.activeGraphic)) {
             return;
           }
           const feature = this._viewer.scene.pick(e.position);
-          if (defined$c(feature) && feature.id instanceof Cesium.Entity) {
+          if (defined$d(feature) && feature.id instanceof Cesium.Entity) {
             if (this.hasEntity(feature.id)) {
               this.activeGraphic.highlightGraphic();
               this._nodeGraphic && (this._nodeGraphic.activeNode = undefined);
@@ -39694,10 +43434,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
           }
           const feat = this._viewer.scene.pick(e.position);
           const position = pickPosition(e.position, this._viewer, true);
-          if (defined$c(feat) && this.hasEntity(feat.id)) {
+          if (defined$d(feat) && this.hasEntity(feat.id)) {
             this.contextMenu.position = position;
             this.selectedGraphic = this.getById(feat.id.id);
-            defined$c(this.contextMenu) && (this.contextMenu.show = true);
+            defined$d(this.contextMenu) && (this.contextMenu.show = true);
           }
         }, RIGHT_DOWN);
       }
@@ -39710,20 +43450,20 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
       updatePosition(cartesian) {
         const graphic = this.activeGraphic;
-        if (!defined$c(graphic)) {
+        if (!defined$d(graphic)) {
           return;
         }
         if (PlotType$1.isPoint(graphic.type)) {
           graphic.updatePosition(cartesian);
         } else {
-          if (!defined$c(this._nodeGraphic) || !defined$c(this._nodeGraphic.activeIndex)) {
+          if (!defined$d(this._nodeGraphic) || !defined$d(this._nodeGraphic.activeIndex)) {
             return;
           }
           graphic.updateNode(this._nodeGraphic.activeIndex, cartesian);
         }
       }
       pickPosition(pixel) {
-        if (!defined$c(this.activeGraphic)) {
+        if (!defined$d(this.activeGraphic)) {
           return;
         }
         this.activeGraphic.clampToModel;
@@ -39851,8 +43591,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
     }
 
     const {
-      Material: Material$a,
-      Color: Color$f,
+      Material: Material$9,
+      Color: Color$e,
       Property: Property$1
     } = Cesium;
 
@@ -39868,16 +43608,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Number} [options.maximumDistance=0.5] 介于0~1之间的值，当值为0时，整个颜色为fadeOutColor，值为1时，整个颜色为fadeInColor
        */
       constructor(options = {}) {
-        this._fadeInColor = defaultValue$b(options.fadeInColor, Cesium.Color.RED);
-        this._fadeOutColor = defaultValue$b(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
-        this._time = defaultValue$b(options.time, new Cesium.Cartesian2(0, 0));
-        this._repeat = defaultValue$b(options.repeat, false);
-        this._duration = defaultValue$b(options.duration, 3000);
-        this._fadeDirection = defaultValue$b(options.fadeDirection, {
+        this._fadeInColor = defaultValue$c(options.fadeInColor, Cesium.Color.RED);
+        this._fadeOutColor = defaultValue$c(options.fadeOutColor, Cesium.Color.WHITE.withAlpha(0.5));
+        this._time = defaultValue$c(options.time, new Cesium.Cartesian2(0, 0));
+        this._repeat = defaultValue$c(options.repeat, false);
+        this._duration = defaultValue$c(options.duration, 3000);
+        this._fadeDirection = defaultValue$c(options.fadeDirection, {
           x: true,
           y: false
         });
-        this._maximumDistance = defaultValue$b(options.maximumDistance, 0.5);
+        this._maximumDistance = defaultValue$c(options.maximumDistance, 0.5);
         this._definitionChanged = new Event$9();
       }
 
@@ -39973,7 +43713,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @type {String}
        */
       getType() {
-        return Material$a.FadeType;
+        return Material$9.FadeType;
       }
 
       /**
@@ -39983,7 +43723,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         if (this._time === undefined) {
           this._time = {
             x: time.secondsOfDay,
@@ -40032,16 +43772,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$9,
-      Color: Color$e
+      Material: Material$8,
+      Color: Color$d
     } = Cesium;
 
-    Material$9.DynamicFlowWallType = 'DynamicFlowWall';
-    Material$9._materialCache.addMaterial(Material$9.DynamicFlowWallType, {
+    Material$8.DynamicFlowWallType = 'DynamicFlowWall';
+    Material$8._materialCache.addMaterial(Material$8.DynamicFlowWallType, {
       fabric: {
-        type: Material$9.DynamicFlowWallType,
+        type: Material$8.DynamicFlowWallType,
         uniforms: {
-          color: new Color$e(1.0, 0.0, 0.0),
+          color: new Color$d(1.0, 0.0, 0.0),
           time: 0,
           gradient: 1,
           image: '',
@@ -40066,13 +43806,13 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Cesium.Cartesian2} [options.repeat=new Cesium.Cartesian2(1,1)] 图片在x和y方向上重复的次数
        */
       constructor(options = {}) {
-        this._color = defaultValue$b(options.color, Cesium.Color.RED);
+        this._color = defaultValue$c(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$b(options.duration, 1000);
-        this._gradient = defaultValue$b(options.gradient, 1.0);
-        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/wall.png'));
-        this._wrapX = defaultValue$b(options.wrapX, false);
-        this._repeat = defaultValue$b(options.repeat, new Cesium.Cartesian2(1, 1));
+        this._duration = defaultValue$c(options.duration, 1000);
+        this._gradient = defaultValue$c(options.gradient, 1.0);
+        this._image = defaultValue$c(options.image, Url$1.buildModuleUrl('./assets/images/wall.png'));
+        this._wrapX = defaultValue$c(options.wrapX, false);
+        this._repeat = defaultValue$c(options.repeat, new Cesium.Cartesian2(1, 1));
         this._definitionChanged = new Event$9();
       }
 
@@ -40163,7 +43903,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$9.DynamicFlowWallType;
+        return Material$8.DynamicFlowWallType;
       }
       /**
        * 获取指定时间的属性值。
@@ -40172,7 +43912,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -40214,16 +43954,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$8,
-      Color: Color$d,
+      Material: Material$7,
+      Color: Color$c,
     } = Cesium;
 
-    Material$8.DynamicSpreadType = 'DynamicSpread';
-    Material$8._materialCache.addMaterial(Material$8.DynamicSpreadType, {
+    Material$7.DynamicSpreadType = 'DynamicSpread';
+    Material$7._materialCache.addMaterial(Material$7.DynamicSpreadType, {
       fabric: {
-        type: Material$8.DynamicSpreadType,
+        type: Material$7.DynamicSpreadType,
         uniforms: {
-          color: new Color$d(1.0, 0.0, 0.0),
+          color: new Color$c(1.0, 0.0, 0.0),
           time: 0,
           gradient: 0.0
         },
@@ -40240,10 +43980,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=4.0] 渐变强度，不小于0的值，值越大渐变越明显，值为0将不会产生渐变效果
        */
       constructor(options = {}) {
-        this._color = defaultValue$b(options.color, Cesium.Color.RED);
+        this._color = defaultValue$c(options.color, Cesium.Color.RED);
         this._time = 0;
-        this._duration = defaultValue$b(options.duration, 1000);
-        this._gradient = defaultValue$b(options.gradient, 4.0);
+        this._duration = defaultValue$c(options.duration, 1000);
+        this._gradient = defaultValue$c(options.gradient, 4.0);
         this._definitionChanged = new Event$9();
       }
 
@@ -40299,7 +44039,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$8.DynamicSpreadType;
+        return Material$7.DynamicSpreadType;
       }
       /**
        * 获取指定时间的属性值。
@@ -40308,7 +44048,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -40361,18 +44101,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$7,
-      Color: Color$c,
+      Material: Material$6,
+      Color: Color$b,
       Property
     } = Cesium;
 
-    Material$7.DynamicWaveType = "DynamicWave";
-    Material$7._materialCache.addMaterial(Material$7.DynamicWaveType, {
+    Material$6.DynamicWaveType = "DynamicWave";
+    Material$6._materialCache.addMaterial(Material$6.DynamicWaveType, {
       fabric: {
-        type: Material$7.DynamicWaveType,
+        type: Material$6.DynamicWaveType,
         uniforms: {
           count: 1,
-          color: Color$c.RED,
+          color: Color$b.RED,
           duration: 1000,
           time: 0,
           gradient: 0.1
@@ -40390,11 +44130,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @param {Number} [options.gradient=1.0] 介于0~1之间的数，表示条纹的宽度，值越大条纹越宽
        */
       constructor(options = {}) {
-        this._color = defaultValue$b(options.color, Cesium.Color.RED);
-        this._time = defaultValue$b(options.time, 0);
-        this._duration = defaultValue$b(options.duration, 1000);
-        this._count = defaultValue$b(options.count, 3);
-        this._gradient = defaultValue$b(options.gradient, 1.0);
+        this._color = defaultValue$c(options.color, Cesium.Color.RED);
+        this._time = defaultValue$c(options.time, 0);
+        this._duration = defaultValue$c(options.duration, 1000);
+        this._count = defaultValue$c(options.count, 3);
+        this._gradient = defaultValue$c(options.gradient, 1.0);
         this._gradient = Cesium.Math.clamp(this._gradient, 0, 1);
         this._definitionChanged = new Event$9();
       }
@@ -40466,7 +44206,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @type {String}
        */
       getType() {
-        return Material$7.DynamicWaveType;
+        return Material$6.DynamicWaveType;
       }
 
       /**
@@ -40476,7 +44216,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -40510,8 +44250,8 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
     `;
     const {
-        Material: Material$6,
-        Color: Color$b
+        Material: Material$5,
+        Color: Color$a
     } = Cesium;
     class PolylineAntialiasingMaterialProperty {
         constructor(opt = {}) {
@@ -40529,7 +44269,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             return PolylineAntialiasingMaterialProperty.materialType;
         }
         getValue(time, result = {}) {
-            result.color = this.color || Color$b.RED;
+            result.color = this.color || Color$a.RED;
             return result;
         }
         equals(other) {
@@ -40540,11 +44280,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         }
         static materialType = 'PolylineAntialiasing'
     }
-    Material$6._materialCache.addMaterial(PolylineAntialiasingMaterialProperty.materialType, {
+    Material$5._materialCache.addMaterial(PolylineAntialiasingMaterialProperty.materialType, {
         fabric: {
             type: PolylineAntialiasingMaterialProperty.materialType,
             uniforms: {
-                color: new Color$b(1, 1, 1, 1)
+                color: new Color$a(1, 1, 1, 1)
             },
             source: shader$g
         },
@@ -40564,16 +44304,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
 `;
 
     const {
-      Material: Material$5,
-      Color: Color$a,
+      Material: Material$4,
+      Color: Color$9,
     } = Cesium;
 
-    Material$5.PolylineFlowType = 'PolylineFlow';
-    Material$5._materialCache.addMaterial(Material$5.PolylineFlowType, {
+    Material$4.PolylineFlowType = 'PolylineFlow';
+    Material$4._materialCache.addMaterial(Material$4.PolylineFlowType, {
       fabric: {
-        type: Material$5.PolylineFlowType,
+        type: Material$4.PolylineFlowType,
         uniforms: {
-          color: new Color$a(1.0, 0.0, 0.0),
+          color: new Color$9(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
@@ -40592,10 +44332,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineTrailLinkMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$b(options.color, Cesium.Color.RED);
-        this._time = defaultValue$b(options.time, 0);
-        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/flowLine.png'));
-        this._duration = defaultValue$b(options.duration, 1000);
+        this._color = defaultValue$c(options.color, Cesium.Color.RED);
+        this._time = defaultValue$c(options.time, 0);
+        this._image = defaultValue$c(options.image, Url$1.buildModuleUrl('./assets/images/flowLine.png'));
+        this._duration = defaultValue$c(options.duration, 1000);
         this._definitionChanged = new Event$9();
       }
 
@@ -40651,7 +44391,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {String}
        */
       getType(time) {
-        return Material$5.PolylineFlowType;
+        return Material$4.PolylineFlowType;
       }
       /**
        * 获取指定时间的属性值。
@@ -40660,7 +44400,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         result.color = this.color;
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
@@ -40681,19 +44421,19 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
 
     const {
-      Material: Material$4,
-      Color: Color$9
+      Material: Material$3,
+      Color: Color$8
     } = Cesium;
-    Material$4.ODLineType = 'ODLine';
-    Material$4._materialCache.addMaterial(Material$4.ODLineType, {
+    Material$3.ODLineType = 'ODLine';
+    Material$3._materialCache.addMaterial(Material$3.ODLineType, {
       fabric: {
-        type: Material$4.ODLineType,
+        type: Material$3.ODLineType,
         uniforms: {
           startTime: 0,
           speed: 2.3,
           bidirectional: 2,
-          baseColor: Color$9.RED,
-          color: Color$9.WHITE
+          baseColor: Color$8.RED,
+          color: Color$8.WHITE
         },
         source: `
     czm_material czm_getMaterial(czm_materialInput materialInput) {
@@ -40730,23 +44470,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
           /**
            * @type {Cesium.Color}
            */
-          this.baseColor = defaultValue$b(options.baseColor, Cesium.Color.RED);
+          this.baseColor = defaultValue$c(options.baseColor, Cesium.Color.RED);
           /**
            * @type {Cesium.Color}
            */
-          this.color = defaultValue$b(options.color, Cesium.Color.WHITE);
+          this.color = defaultValue$c(options.color, Cesium.Color.WHITE);
           /**
            * @type {number}
            */
-          this.speed = defaultValue$b(options.speed, 3);
+          this.speed = defaultValue$c(options.speed, 3);
           /**
            * @type {number}
            */
-          this.startTime = defaultValue$b(options.startTime, Math.random());
+          this.startTime = defaultValue$c(options.startTime, Math.random());
           /**
            * @type {number}
            */
-          this.bidirectional = defaultValue$b(options.bidirectional, 2);
+          this.bidirectional = defaultValue$c(options.bidirectional, 2);
           this._definitionChanged = new Event();
         }
         /**
@@ -40770,7 +44510,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
          * @type {string}
          */
         getType() {
-          return Material$4.ODLineType;
+          return Material$3.ODLineType;
         }
       
         /**
@@ -40780,7 +44520,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
          * @returns {object} 修改后的result,如果未提供result参数，则为新实例。
          */
         getValue(time, result) {
-          result = defaultValue$b(result, {});
+          result = defaultValue$c(result, {});
           result.baseColor = this.baseColor;
           result.color = this.color;
           result.speed = this.speed;
@@ -40813,16 +44553,16 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
         }`;
 
     const {
-      Material: Material$3,
-      Color: Color$8,
+      Material: Material$2,
+      Color: Color$7,
     } = Cesium;
 
-    Material$3.PolylineTrailLinkType = "PolylineTrailLink";
-    Material$3._materialCache.addMaterial(Material$3.PolylineTrailLinkType, {
+    Material$2.PolylineTrailLinkType = "PolylineTrailLink";
+    Material$2._materialCache.addMaterial(Material$2.PolylineTrailLinkType, {
       fabric: {
-        type: Material$3.PolylineTrailLinkType,
+        type: Material$2.PolylineTrailLinkType,
         uniforms: {
-          color: new Color$8(1.0, 0.0, 0.0),
+          color: new Color$7(1.0, 0.0, 0.0),
           image: '',
           time: 0
         },
@@ -40841,10 +44581,10 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @see PolylineFlowMaterialProperty
        */
       constructor(options = {}) {
-        this._color = defaultValue$b(options.color, Cesium.Color.RED);
-        this._time = defaultValue$b(options.time, 0);
-        this._image = defaultValue$b(options.image, Url$1.buildModuleUrl('./assets/images/colors.png'));
-        this._duration = defaultValue$b(options.duration, 1000);
+        this._color = defaultValue$c(options.color, Cesium.Color.RED);
+        this._time = defaultValue$c(options.time, 0);
+        this._image = defaultValue$c(options.image, Url$1.buildModuleUrl('./assets/images/colors.png'));
+        this._duration = defaultValue$c(options.duration, 1000);
         this._definitionChanged = new Event$9();
       }
 
@@ -40904,7 +44644,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @type {String}
        */
       getType() {
-        return Material$3.PolylineTrailLinkType;
+        return Material$2.PolylineTrailLinkType;
       }
 
       /**
@@ -40914,7 +44654,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
        * @return {Object} 修改后的result,如果未提供result参数，则为新实例。
        */
       getValue(time, result) {
-        result = defaultValue$b(result, {});
+        result = defaultValue$c(result, {});
         if (this._time === undefined) {
           this._time = time.secondsOfDay;
         }
@@ -40946,7 +44686,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
             if (!options.element) {
                 throw new CesiumProError$1("parameter element must be provided.");
             }
-            this._show = defaultValue$b(options.show, true);
+            this._show = defaultValue$c(options.show, true);
             this._element = element;
         }
         get show() {
@@ -40969,11 +44709,11 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     }
 
     const {
-      BoundingRectangle: BoundingRectangle$1, Cartesian3: Cartesian3$3, Cartographic: Cartographic$3, Color: Color$7, defined: defined$1, destroyObject: destroyObject$3, Matrix4: Matrix4$2, 
+      BoundingRectangle: BoundingRectangle$1, Cartesian3: Cartesian3$2, Cartographic: Cartographic$3, Color: Color$6, defined: defined$1, destroyObject: destroyObject$3, Matrix4: Matrix4$1, 
       OrthographicOffCenterFrustum, PixelFormat: PixelFormat$1, ClearCommand: ClearCommand$1, Framebuffer: Framebuffer$1, PassState: PassState$1, 
-      PixelDatatype: PixelDatatype$1, Texture: Texture$1, PolygonGeometry: PolygonGeometry$1, PolygonHierarchy, BoundingSphere: BoundingSphere$3, VertexArray: VertexArray$2, 
-      BufferUsage: BufferUsage$2, ShaderProgram: ShaderProgram$2, RenderState: RenderState$2, WebGLConstants, DrawCommand: DrawCommand$2, PrimitiveType: PrimitiveType$2, Pass: Pass$2, 
-      Transforms: Transforms$1, CustomShader, UniformType, TextureUniform, TextureManager, ShaderSource: ShaderSource$2
+      PixelDatatype: PixelDatatype$1, Texture: Texture$1, PolygonGeometry: PolygonGeometry$1, PolygonHierarchy, BoundingSphere: BoundingSphere$2, VertexArray: VertexArray$1, 
+      BufferUsage: BufferUsage$1, ShaderProgram: ShaderProgram$1, RenderState: RenderState$1, WebGLConstants, DrawCommand: DrawCommand$1, PrimitiveType: PrimitiveType$1, Pass: Pass$1, 
+      Transforms: Transforms$1, CustomShader, UniformType, TextureUniform, TextureManager, ShaderSource: ShaderSource$1
     } = Cesium;
     const loadTexture2D = TextureManager.prototype.loadTexture2D;
     TextureManager.prototype.loadTexture2D = function (textureId, textureUniform) {
@@ -40985,23 +44725,23 @@ czm_material czm_getMaterial(czm_materialInput materialInput){
     };
     class OrthographicCamera {
       constructor() {
-        this.viewMatrix = Matrix4$2.IDENTITY;
-        this.inverseViewMatrix = Matrix4$2.IDENTITY;
+        this.viewMatrix = Matrix4$1.IDENTITY;
+        this.inverseViewMatrix = Matrix4$1.IDENTITY;
         this.frustum = new OrthographicOffCenterFrustum();
         this.positionCartographic = new Cartographic$3();
-        this.upWC = Cartesian3$3.clone(Cartesian3$3.UNIT_Y);
-        this.rightWC = Cartesian3$3.clone(Cartesian3$3.UNIT_X);
-        this.directionWC = Cartesian3$3.clone(Cartesian3$3.UNIT_Z);
-        this.viewPorjectionMatrix = Matrix4$2.IDENTITY;
+        this.upWC = Cartesian3$2.clone(Cartesian3$2.UNIT_Y);
+        this.rightWC = Cartesian3$2.clone(Cartesian3$2.UNIT_X);
+        this.directionWC = Cartesian3$2.clone(Cartesian3$2.UNIT_Z);
+        this.viewPorjectionMatrix = Matrix4$1.IDENTITY;
       }
       clone(camera) {
-        Matrix4$2.clone(camera.viewMatrix, this.viewMatrix);
-        Matrix4$2.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
+        Matrix4$1.clone(camera.viewMatrix, this.viewMatrix);
+        Matrix4$1.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
         this.frustum = camera.frustum.clone(this.frustum);
         Cartographic$3.clone(camera.positionCartographic, this.positionCartographic);
-        Cartesian3$3.clone(camera.upWC, this.upWC);
-        Cartesian3$3.clone(camera.rigtWC, this.rightWC);
-        Cartesian3$3.clone(camera.directionWC, this.directionWC);
+        Cartesian3$2.clone(camera.upWC, this.upWC);
+        Cartesian3$2.clone(camera.rigtWC, this.rightWC);
+        Cartesian3$2.clone(camera.directionWC, this.directionWC);
       }
     }
     const vs$1 = `
@@ -41100,7 +44840,7 @@ void main() {
         this.canvas = undefined;
         this._clearColorCommand = new ClearCommand$1({
           depth: 1,
-          coloe: new Color$7(0.0, 0.0, 0.0, 1.0)
+          coloe: new Color$6(0.0, 0.0, 0.0, 1.0)
         });
         this._useScissorTest = false;
         this._scissorRectangle = false;
@@ -41216,38 +44956,38 @@ void main() {
         const frameState = this._frameState;
         const ap = geometry.attributes.position.values;
         for (let i = 0, n = ap.length; i < n / 3; i++) {
-          const p = new Cartesian3$3(ap[i * 3], ap[i * 3 + 1], ap[i * 3 + 2]);
-          Matrix4$2.multiplyByPoint(matrix, p, p);
+          const p = new Cartesian3$2(ap[i * 3], ap[i * 3 + 1], ap[i * 3 + 2]);
+          Matrix4$1.multiplyByPoint(matrix, p, p);
           ap[i * 3] = p.x;
           ap[i * 3 + 1] = p.y;
           ap[i * 3 + 2] = p.z;
           this._positions.push(p);
         }
-        geometry.boundingSphere = BoundingSphere$3.transform(geometry.boundingSphere, matrix);
+        geometry.boundingSphere = BoundingSphere$2.transform(geometry.boundingSphere, matrix);
         this.polygonBounding = BoundingRectangle$1.fromPoints(this._positions);
-        const vertex = VertexArray$2.fromGeometry({
+        const vertex = VertexArray$1.fromGeometry({
           context: frameState.context,
           geometry,
           attributeLocations: { position: 0 },
-          bufferUsage: BufferUsage$2.STREAM_DRAW,
+          bufferUsage: BufferUsage$1.STREAM_DRAW,
           interleave: true,
         });
-        const sp = ShaderProgram$2.fromCache({
+        const sp = ShaderProgram$1.fromCache({
           context: frameState.context,
           vertexShaderSource: vs$1,
           fragmentShaderSource: fs$1,
         });
-        const renderState = new RenderState$2();
+        const renderState = new RenderState$1();
         renderState.depthTest.enabled = true;
         renderState.cull.enabled = true;
         renderState.cull.face = WebGLConstants.BACK;
-        const command = new DrawCommand$2({
-          primitiveType: PrimitiveType$2.TRIANGLES,
+        const command = new DrawCommand$1({
+          primitiveType: PrimitiveType$1.TRIANGLES,
           vertexArray: vertex,
           shaderProgram: sp,
           uniformMap: {},
           renderState,
-          pass: Pass$2.CESIUM_3D_TILE
+          pass: Pass$1.CESIUM_3D_TILE
         });
         this._updateUniforms();
         this._drawCommandList.push(command);
@@ -41267,10 +45007,10 @@ void main() {
         if (!center) {
           const bCenter = this._model.boundingSphere.center;
           const cartographic = Cartographic$3.fromCartesian(bCenter);
-          center = Cartesian3$3.fromRadians(cartographic.longitude, cartographic.latitude, 0);
+          center = Cartesian3$2.fromRadians(cartographic.longitude, cartographic.latitude, 0);
         }
         this._localModel = Transforms$1.eastNorthUpToFixedFrame(center);
-        this._inverseLocalModel = Matrix4$2.inverse(this._localModel, {});
+        this._inverseLocalModel = Matrix4$1.inverse(this._localModel, {});
       }
       addPolygonFromPositionArray(positions) {
         const height = Math.min(...positions.map(_ => Cartographic$3.fromCartesian(_).height));
@@ -41372,7 +45112,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(options.objects)) {
+            if (!defined$d(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -41383,13 +45123,13 @@ void main() {
             //     throw new CesiumProError('property scene must be defined.')
             // }
             super(options);
-            this._id = defaultValue$b(options.id, createGuid$3());
+            this._id = defaultValue$c(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$4();
-            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$c(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$c(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
         }
@@ -41585,7 +45325,7 @@ void main() {
             if(tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$b(this._createGeometryFunction, defaultCreateGeometryFunction$1);
+            const createGeometry = defaultValue$c(this._createGeometryFunction, defaultCreateGeometryFunction$1);
             const geometry = createGeometry(object, tile, framestate);
             const keys = Object.keys(object);
             for (let key of keys) {
@@ -41654,7 +45394,7 @@ void main() {
         when: when$1,
         Event: Event$3,
         Cartographic: Cartographic$2,
-        Color: Color$6,
+        Color: Color$5,
         Entity: Entity$1
     } = Cesium;
     function defaultCreateFn$1(options) {
@@ -41663,8 +45403,8 @@ void main() {
                 id: object.id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$b(object.pixelSize, options.pixelSize),
-                    color: defaultValue$b(object.color, options.color)
+                    pixelSize: defaultValue$c(object.pixelSize, options.pixelSize),
+                    color: defaultValue$c(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -41683,10 +45423,10 @@ void main() {
          * @param {MassiveBillboardLayer.Options} options 选项
          */
         constructor(options = {}) {
-            options.objects = defaultValue$b(options.objects, []);
-            options.pixelSize = defaultValue$b(options.pixelSize, 5);
-            options.color = defaultValue$b(options.color, Color$6.fromRandom);
-            options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn$1(options));
+            options.objects = defaultValue$c(options.objects, []);
+            options.pixelSize = defaultValue$c(options.pixelSize, 5);
+            options.color = defaultValue$c(options.color, Color$5.fromRandom);
+            options.createGeometryFunction = defaultValue$c(options.createGeometryFunction, defaultCreateFn$1(options));
             super(options);
         }
     }
@@ -41711,13 +45451,13 @@ void main() {
             modelOption.modelMatrix = Transforms.eastNorthUpToFixedFrame(cartesian);
             object.modelMatrix = modelOption.modelMatrix;
         }
-        modelOption.minimumPixelSize = defaultValue$b(object.minimumPixelSize, options.minimumPixelSize);
-        modelOption.maximumScale = defaultValue$b(object.maximumScale, options.maximumScale);
-        modelOption.scale = defaultValue$b(object.scale, options.scale);
-        modelOption.allowPicking = defaultValue$b(object.allowPicking, options.allowPicking);
-        modelOption.shadows = defaultValue$b(object.shadows, options.shadows);
+        modelOption.minimumPixelSize = defaultValue$c(object.minimumPixelSize, options.minimumPixelSize);
+        modelOption.maximumScale = defaultValue$c(object.maximumScale, options.maximumScale);
+        modelOption.scale = defaultValue$c(object.scale, options.scale);
+        modelOption.allowPicking = defaultValue$c(object.allowPicking, options.allowPicking);
+        modelOption.shadows = defaultValue$c(object.shadows, options.shadows);
         modelOption.id = object._id;
-        modelOption.url = defaultValue$b(object.url, options.url);
+        modelOption.url = defaultValue$c(object.url, options.url);
         return Cesium.Model.fromGltf(modelOption)
     };
     const ZEROLEVELHEIGHT = 31638318;
@@ -41766,7 +45506,7 @@ void main() {
          */
         constructor(options = {}) {
             //>>includeStart('debug', pragmas.debug);
-            if (!defined$c(options.objects)) {
+            if (!defined$d(options.objects)) {
                 throw new CesiumProError$1('objects property must be provided.')
             }
             if (!Array.isArray(options.objects)) {
@@ -41782,13 +45522,13 @@ void main() {
                 delete _.id;
             });
             super(options);
-            this._id = defaultValue$b(options.id, createGuid$3());
+            this._id = defaultValue$c(options.id, createGuid$3());
             this._createGeometryFunction = options.createGeometryFunction;
             this._data = options.objects;
             this._needReclass = true;
             this._changeEvent = new Event$2();
-            this._maxClusterLevel = defaultValue$b(options.maxClusterLevel, 12);
-            this._minLoadLevel = defaultValue$b(options.minLoadLevel, 12);
+            this._maxClusterLevel = defaultValue$c(options.maxClusterLevel, 12);
+            this._minLoadLevel = defaultValue$c(options.minLoadLevel, 12);
             this._geometryCached = {};
             this._objectsCached = {};
             this._options = options;
@@ -41897,7 +45637,7 @@ void main() {
             if (tile.level < this._minLoadLevel) {
                 return;
             }
-            const createGeometry = defaultValue$b(this._createGeometryFunction, defaultCreateGeometryFunction);
+            const createGeometry = defaultValue$c(this._createGeometryFunction, defaultCreateGeometryFunction);
             const geometry = createGeometry(object, this._options);
             this.add(geometry);
             return geometry;
@@ -41952,7 +45692,7 @@ void main() {
         when,
         Event: Event$1,
         Cartographic: Cartographic$1,
-        Color: Color$5,
+        Color: Color$4,
         Entity,
         createGuid
     } = Cesium;
@@ -41966,8 +45706,8 @@ void main() {
                 id: id,
                 position: object.position,
                 point: {
-                    pixelSize: defaultValue$b(object.pixelSize, options.pixelSize),
-                    color: defaultValue$b(object.color, options.color)
+                    pixelSize: defaultValue$c(object.pixelSize, options.pixelSize),
+                    color: defaultValue$c(object.color, options.color)
                 }
             };
             if (object.label) {
@@ -42004,10 +45744,10 @@ void main() {
          * @demo {@link examples/apps/index.html#/5.4.1mag-point|100万点加载示例}
          */
         constructor(options = {}) {
-            options.objects = defaultValue$b(options.objects, []);
-            options.pixelSize = defaultValue$b(options.pixelSize, 5);
-            options.color = defaultValue$b(options.color, Color$5.fromRandom);
-            options.createGeometryFunction = defaultValue$b(options.createGeometryFunction, defaultCreateFn(options));
+            options.objects = defaultValue$c(options.objects, []);
+            options.pixelSize = defaultValue$c(options.pixelSize, 5);
+            options.color = defaultValue$c(options.color, Color$4.fromRandom);
+            options.createGeometryFunction = defaultValue$c(options.createGeometryFunction, defaultCreateFn(options));
             super(options);
         }
     }
@@ -42027,18 +45767,18 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
 `;
 
     const {
-        Material: Material$2,
+        Material: Material$1,
         Cartesian2: Cartesian2$2,
-        Color: Color$4
+        Color: Color$3
     } = Cesium;
 
     (function () {
-        Material$2.FlowImageType = 'FlowImage';
-        Material$2._materialCache.addMaterial(Material$2.FlowImageType, {
+        Material$1.FlowImageType = 'FlowImage';
+        Material$1._materialCache.addMaterial(Material$1.FlowImageType, {
             fabric: {
-                type: Material$2.FlowImageType,
+                type: Material$1.FlowImageType,
                 uniforms: {
-                    color: new Color$4(1.0, 1.0, 1.0, 1.0),
+                    color: new Color$3(1.0, 1.0, 1.0, 1.0),
                     repeat: new Cartesian2$2(1, 1),
                     image: '',
                     speed: 1.0,
@@ -42054,7 +45794,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        * @param {Object} [options={}]
        */
       constructor(options) {
-        options = defaultValue$b(options, {});
+        options = defaultValue$c(options, {});
         this._options = options;
         this._postProcessStage = undefined;
       }
@@ -42065,7 +45805,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
        */
       addTo(viewer) {
         checkViewer(viewer);
-        if (!defined$c(this._viewer)) {
+        if (!defined$d(this._viewer)) {
           this._viewer = viewer;
         }
         if (!this._postProcessStage) {
@@ -42148,1436 +45888,6 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
       }
     }
 
-    var scanPlaneFS = `#ifdef GL_OES_standard_derivatives
-  #extension GL_OES_standard_derivatives : enable
-#endif
-
-uniform bool u_showIntersection;
-uniform bool u_showThroughEllipsoid;
-
-uniform float u_radius;
-uniform float u_xHalfAngle;
-uniform float u_yHalfAngle;
-uniform float u_normalDirection;
-uniform vec4 u_color;
-
-varying vec3 v_position;
-varying vec3 v_positionWC;
-varying vec3 v_positionEC;
-varying vec3 v_normalEC;
-
-vec4 getColor(float sensorRadius, vec3 pointEC)
-{
-  czm_materialInput materialInput;
-
-  vec3 pointMC = (czm_inverseModelView * vec4(pointEC, 1.0)).xyz;
-  materialInput.st = sensor2dTextureCoordinates(sensorRadius, pointMC);
-  materialInput.str = pointMC / sensorRadius;
-
-  vec3 positionToEyeEC = -v_positionEC;
-  materialInput.positionToEyeEC = positionToEyeEC;
-
-  vec3 normalEC = normalize(v_normalEC);
-  materialInput.normalEC = u_normalDirection * normalEC;
-
-  czm_material material = czm_getMaterial(materialInput);
-
-  material.diffuse = u_color.rgb;
-  material.alpha = u_color.a;
-
-  return mix(czm_phong(normalize(positionToEyeEC), material), vec4(material.diffuse, material.alpha), 0.4);
-
-}
-
-bool isOnBoundary(float value, float epsilon)
-{
-  float width = getIntersectionWidth();
-  float tolerance = width * epsilon;
-
-#ifdef GL_OES_standard_derivatives
-  float delta = max(abs(dFdx(value)), abs(dFdy(value)));
-  float pixels = width * delta;
-  float temp = abs(value);
-  // There are a couple things going on here.
-  // First we test the value at the current fragment to see if it is within the tolerance.
-  // We also want to check if the value of an adjacent pixel is within the tolerance,
-  // but we don't want to admit points that are obviously not on the surface.
-  // For example, if we are looking for "value" to be close to 0, but value is 1 and the adjacent value is 2,
-  // then the delta would be 1 and "temp - delta" would be "1 - 1" which is zero even though neither of
-  // the points is close to zero.
-  return temp < tolerance && temp < pixels || (delta < 10.0 * tolerance && temp - delta < tolerance && temp < pixels);
-#else
-  return abs(value) < tolerance;
-#endif
-}
-
-vec4 shade(bool isOnBoundary)
-{
-  if (u_showIntersection && isOnBoundary)
-  {
-      return getIntersectionColor();
-  }
-  return getColor(u_radius, v_positionEC);
-}
-
-float ellipsoidSurfaceFunction(czm_ellipsoid ellipsoid, vec3 point)
-{
-  vec3 scaled = ellipsoid.inverseRadii * point;
-  return dot(scaled, scaled) - 1.0;
-}
-
-void main()
-{
-  vec3 sensorVertexWC = czm_model[3].xyz;      // (0.0, 0.0, 0.0) in model coordinates
-  vec3 sensorVertexEC = czm_modelView[3].xyz;  // (0.0, 0.0, 0.0) in model coordinates
-
-  //vec3 pixDir = normalize(v_position);
-  float positionX = v_position.x;
-  float positionY = v_position.y;
-  float positionZ = v_position.z;
-
-  vec3 zDir = vec3(0.0, 0.0, 1.0);
-  vec3 lineX = vec3(positionX, 0 ,positionZ);
-  vec3 lineY = vec3(0, positionY, positionZ);
-  float resX = dot(normalize(lineX), zDir);
-  if(resX < cos(u_xHalfAngle) - 0.0001){
-      discard;
-  }
-  float resY = dot(normalize(lineY), zDir);
-  if(resY < cos(u_yHalfAngle)- 0.0001){
-      discard;
-  }
-
-
-  czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();
-  float ellipsoidValue = ellipsoidSurfaceFunction(ellipsoid, v_positionWC);
-
-  // Occluded by the ellipsoid?
-if (!u_showThroughEllipsoid)
-{
-    // Discard if in the ellipsoid
-    // PERFORMANCE_IDEA: A coarse check for ellipsoid intersection could be done on the CPU first.
-    if (ellipsoidValue < 0.0)
-    {
-          discard;
-    }
-
-    // Discard if in the sensor's shadow
-    if (inSensorShadow(sensorVertexWC, ellipsoid, v_positionWC))
-    {
-        discard;
-    }
-  }
-
-  // Notes: Each surface functions should have an associated tolerance based on the floating point error.
-  bool isOnEllipsoid = isOnBoundary(ellipsoidValue, czm_epsilon3);
-  gl_FragColor = shade(isOnEllipsoid);
-
-}`;
-
-    var sensorComm = `
-uniform vec4 u_intersectionColor;
-uniform float u_intersectionWidth;
-uniform vec4 u_lineColor;
-bool inSensorShadow(vec3 coneVertexWC, czm_ellipsoid ellipsoidEC, vec3 pointWC)
-{
-  // Diagonal matrix from the unscaled ellipsoid space to the scaled space.
-  vec3 D = ellipsoidEC.inverseRadii;
-
-  // Sensor vertex in the scaled ellipsoid space
-  vec3 q = D * coneVertexWC;
-  float qMagnitudeSquared = dot(q, q);
-  float test = qMagnitudeSquared - 1.0;
-
-  // Sensor vertex to fragment vector in the ellipsoid's scaled space
-  vec3 temp = D * pointWC - q;
-  float d = dot(temp, q);
-
-  // Behind silhouette plane and inside silhouette cone
-  return (d < -test) && (d / length(temp) < -sqrt(test));
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-vec4 getLineColor()
-{
-  return u_lineColor;
-}
-
-vec4 getIntersectionColor()
-{
-  return u_intersectionColor;
-}
-
-float getIntersectionWidth()
-{
-  return u_intersectionWidth;
-}
-
-vec2 sensor2dTextureCoordinates(float sensorRadius, vec3 pointMC)
-{
-  // (s, t) both in the range [0, 1]
-  float t = pointMC.z / sensorRadius;
-  float s = 1.0 + (atan(pointMC.y, pointMC.x) / czm_twoPi);
-  s = s - floor(s);
-
-  return vec2(s, t);
-}`;
-
-    var sensorFS = `
-#ifdef GL_OES_standard_derivatives
-  #extension GL_OES_standard_derivatives : enable
-#endif
-
-uniform bool u_showIntersection;
-uniform bool u_showThroughEllipsoid;
-
-uniform float u_radius;
-uniform float u_xHalfAngle;
-uniform float u_yHalfAngle;
-uniform float u_normalDirection;
-uniform float u_type;
-
-varying vec3 v_position;
-varying vec3 v_positionWC;
-varying vec3 v_positionEC;
-varying vec3 v_normalEC;
-
-vec4 getColor(float sensorRadius, vec3 pointEC)
-{
-  czm_materialInput materialInput;
-
-  vec3 pointMC = (czm_inverseModelView * vec4(pointEC, 1.0)).xyz;
-  materialInput.st = sensor2dTextureCoordinates(sensorRadius, pointMC);
-  materialInput.str = pointMC / sensorRadius;
-
-  vec3 positionToEyeEC = -v_positionEC;
-  materialInput.positionToEyeEC = positionToEyeEC;
-
-  vec3 normalEC = normalize(v_normalEC);
-  materialInput.normalEC = u_normalDirection * normalEC;
-
-  czm_material material = czm_getMaterial(materialInput);
-
-  return mix(czm_phong(normalize(positionToEyeEC), material), vec4(material.diffuse, material.alpha), 0.4);
-
-}
-
-bool isOnBoundary(float value, float epsilon)
-{
-  float width = getIntersectionWidth();
-  float tolerance = width * epsilon;
-
-#ifdef GL_OES_standard_derivatives
-  float delta = max(abs(dFdx(value)), abs(dFdy(value)));
-  float pixels = width * delta;
-  float temp = abs(value);
-  // There are a couple things going on here.
-  // First we test the value at the current fragment to see if it is within the tolerance.
-  // We also want to check if the value of an adjacent pixel is within the tolerance,
-  // but we don't want to admit points that are obviously not on the surface.
-  // For example, if we are looking for "value" to be close to 0, but value is 1 and the adjacent value is 2,
-  // then the delta would be 1 and "temp - delta" would be "1 - 1" which is zero even though neither of
-  // the points is close to zero.
-  return temp < tolerance && temp < pixels || (delta < 10.0 * tolerance && temp - delta < tolerance && temp < pixels);
-#else
-  return abs(value) < tolerance;
-#endif
-}
-
-vec4 shade(bool isOnBoundary)
-{
-  if (u_showIntersection && isOnBoundary)
-  {
-      return getIntersectionColor();
-  }
-  if(u_type == 1.0){
-      return getLineColor();
-  }
-  return getColor(u_radius, v_positionEC);
-}
-
-float ellipsoidSurfaceFunction(czm_ellipsoid ellipsoid, vec3 point)
-{
-  vec3 scaled = ellipsoid.inverseRadii * point;
-  return dot(scaled, scaled) - 1.0;
-}
-
-void main()
-{
-  vec3 sensorVertexWC = czm_model[3].xyz;      // (0.0, 0.0, 0.0) in model coordinates
-  vec3 sensorVertexEC = czm_modelView[3].xyz;  // (0.0, 0.0, 0.0) in model coordinates
-
-  //vec3 pixDir = normalize(v_position);
-  float positionX = v_position.x;
-  float positionY = v_position.y;
-  float positionZ = v_position.z;
-
-  vec3 zDir = vec3(0.0, 0.0, 1.0);
-  vec3 lineX = vec3(positionX, 0 ,positionZ);
-  vec3 lineY = vec3(0, positionY, positionZ);
-  float resX = dot(normalize(lineX), zDir);
-  if(resX < cos(u_xHalfAngle)-0.00001){
-      discard;
-  }
-  float resY = dot(normalize(lineY), zDir);
-  if(resY < cos(u_yHalfAngle)-0.00001){
-      discard;
-  }
-
-
-  czm_ellipsoid ellipsoid = czm_getWgs84EllipsoidEC();
-  float ellipsoidValue = ellipsoidSurfaceFunction(ellipsoid, v_positionWC);
-
-  // Occluded by the ellipsoid?
-if (!u_showThroughEllipsoid)
-{
-    // Discard if in the ellipsoid
-    // PERFORMANCE_IDEA: A coarse check for ellipsoid intersection could be done on the CPU first.
-    if (ellipsoidValue < 0.0)
-    {
-          discard;
-    }
-
-    // Discard if in the sensor's shadow
-    if (inSensorShadow(sensorVertexWC, ellipsoid, v_positionWC))
-    {
-        discard;
-    }
-  }
-
-  // Notes: Each surface functions should have an associated tolerance based on the floating point error.
-  bool isOnEllipsoid = isOnBoundary(ellipsoidValue, czm_epsilon3);
-  //isOnEllipsoid = false;
-  //if((resX >= 0.8 && resX <= 0.81)||(resY >= 0.8 && resY <= 0.81)){
-  /*if(false){
-      gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-  }else{
-      gl_FragColor = shade(isOnEllipsoid);
-  }
-*/
-  gl_FragColor = shade(isOnEllipsoid);
-
-}`;
-
-    var sensorVS = `attribute vec4 position;
-attribute vec3 normal;
-
-varying vec3 v_position;
-varying vec3 v_positionWC;
-varying vec3 v_positionEC;
-varying vec3 v_normalEC;
-
-void main()
-{
-  gl_Position = czm_modelViewProjection * position;
-  v_position = vec3(position);
-  v_positionWC = (czm_model * position).xyz;
-  v_positionEC = (czm_modelView * position).xyz;
-  v_normalEC = czm_normal * normal;
-}`;
-
-    const {
-      Matrix4: Matrix4$1,
-      Material: Material$1,
-      Color: Color$3,
-      JulianDate: JulianDate$1,
-      BoundingSphere: BoundingSphere$2,
-      DrawCommand: DrawCommand$1,
-      PrimitiveType: PrimitiveType$1,
-      SceneMode: SceneMode$1,
-      Matrix3: Matrix3$1,
-      Buffer: Buffer$1,
-      BufferUsage: BufferUsage$1,
-      VertexArray: VertexArray$1,
-      VertexFormat: VertexFormat$1,
-      ComponentDatatype: ComponentDatatype$1,
-      RenderState: RenderState$1,
-      BlendingState,
-      Pass: Pass$1,
-      combine,
-      CullFace,
-      Cartesian3: Cartesian3$2,
-      EllipsoidGeometry,
-      EllipsoidOutlineGeometry,
-      ShaderSource: ShaderSource$1,
-      ShaderProgram: ShaderProgram$1,
-    } = Cesium;
-    const {
-      cos,
-      sin,
-      tan,
-      atan
-    } = Math;
-    const CesiumMath$1 = Cesium.Math;
-
-    const attributeLocations = {
-      position: 0,
-      normal: 1
-    };
-
-    class RectangularSensorPrimitive {
-      /**
-       * 模拟相控阵雷达。
-       * @param {Object} options 具有以下属性
-       * @param {Boolean} [options.show] 是否显示
-       * @param {Cartesian3|LonLat} [options.position] 图形位置
-       * @param {Matrix4} [options.modelMatrix] 模型矩阵,如果定义，则覆盖position属性
-       * @param {Number} [options.slice=32] 切分程度
-       * @param {Number} [options.radius=1] 半径
-       * @param {Color} [options.lineColor=Color.RED] 线的颜色
-       * @param {Number} [options.xHalfAngle] 水平半夹角,单位度
-       * @param {Number} [options.xyHalfAngle] 垂直半夹角，单位度
-       * @param {Boolean} [options.showSectorLines=true] 是否显示扇面线
-       * @param {Boolean} [options.showSectorSegmentLines=true] 是否显示扇面和圆顶面连接线
-       * @param {Boolean} [options.showLateralSurfaces=true] 是否显示侧面
-       * @param {Material} [options.material=Material.ColorType] 材质
-       * @param {Material} [options.lateralSurfaceMaterial=Material.ColorType] 侧面材质
-       * @param {Boolean} [options.showDomeSurfaces=true] 是否显示圆弧顶表面
-       * @param {Material} [options.domeSurfaceMaterial=Material.ColorType] 圆弧顶表面材质
-       * @param {Boolean} [options.showDomeLines=true] 是否显示圆弧顶表面线
-       * @param {Boolean} [options.showIntersection = false] 是否显示与地球相交的线
-       * @param {Color} [options.intersectionColor] 与地球相交的线的颜色
-       * @param {Number} [options.intersectionWidth=5] 与地球相交的线的宽度
-       * @param {Boolean} [options.showThroughEllipsoid=false] 是否穿过地球
-       * @param {Boolean} [options.showScanPlane=true] 是否显示扫描面
-       * @param {Color} [options.scanPlaneColor=Color.WHITE] 扫描面颜色
-       * @param {String} [options.scanPlaneMode='H'] 扫描方向，H表示水平扫描，V表示垂直扫描
-       * @param {Number} [options.speed=10] 扫描速度，值越大，扫描越快
-       */
-      constructor(options) {
-        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
-        const self = this;
-        this._createVS = true;
-        this._createRS = true;
-        this._createSP = true;
-        /**
-         * 是否显示
-         * @type {Boolean}
-         */
-        this.show = defaultValue$b(options.show, true);
-
-        //切分程度
-        this.slice = defaultValue$b(options.slice, 32);
-
-        //传感器的模型矩阵
-        if (!options.modelMatrix) {
-          if (!options.position) {
-            throw new CesiumProError$1('parameter position or modelMatrix must be provided.')
-          }
-          this._modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(LonLat.toCartesian(options.position));
-        } else {
-          this._modelMatrix = Matrix4$1.clone(options.modelMatrix, new Matrix4$1());
-        }
-
-        this._computedModelMatrix = new Matrix4$1();
-        this._computedScanPlaneModelMatrix = new Matrix4$1();
-
-        //传感器的半径
-        this._radius = defaultValue$b(options.radius, Number.POSITIVE_INFINITY);
-
-        //传感器水平半角
-        this._xHalfAngle = CesiumMath$1.toRadians(defaultValue$b(options.xHalfAngle, 0));
-
-        //传感器垂直半角
-        this._yHalfAngle = CesiumMath$1.toRadians(defaultValue$b(options.yHalfAngle, 0));
-
-        this._color = defaultValue$b(options._color, Color$3.AQUA.withAlpha(0.4));
-
-        /**
-         * 线的颜色
-         * @type {Cesium.Color}
-         */
-        this.lineColor = defaultValue$b(options.lineColor, Color$3.WHITE);
-
-        /**
-         * 是否显示扇面的线
-         * @type {Boolean}
-         */
-        this.showSectorLines = defaultValue$b(options.showSectorLines, true);
-
-        /**
-         * 是否显示扇面和圆顶面连接的线
-         * @type {Boolean}
-         */
-        this.showSectorSegmentLines = defaultValue$b(options.showSectorSegmentLines, true);
-
-        /**
-         * 是否显示侧面
-         * @type {Boolean}
-         */
-        this.showLateralSurfaces = defaultValue$b(options.showLateralSurfaces, true);
-
-        //目前用的统一材质
-        this._material = defined$c(options.material) ? options.material : Material$1.fromType(Material$1.ColorType);
-        this._material.uniforms.color = this._color;
-        this._translucent = undefined;
-
-        /**
-         * 侧面材质
-         * @type {Material}
-         */
-        this.lateralSurfaceMaterial = defined$c(options.lateralSurfaceMaterial) ? options.lateralSurfaceMaterial : Material$1.fromType(Material$1.ColorType);
-        this._lateralSurfaceMaterial = undefined;
-        this._lateralSurfaceTranslucent = undefined;
-
-        /**
-         * 是否显示圆顶表面
-         * @type {Boolean}
-         */
-        this.showDomeSurfaces = defaultValue$b(options.showDomeSurfaces, true);
-
-        /**
-         * 圆顶表面材质
-         * @type {Material}
-         */
-        this.domeSurfaceMaterial = defined$c(options.domeSurfaceMaterial) ? options.domeSurfaceMaterial : Material$1.fromType(Material$1.ColorType);
-
-        /**
-         * 是否显示圆顶面线
-         * @type {Boolean}
-         */
-        this.showDomeLines = defaultValue$b(options.showDomeLines, true);
-
-        /**
-         * 是否显示与地球相交的线
-         * @type {Boolean}
-         */
-        this.showIntersection = defaultValue$b(options.showIntersection, false);
-
-        /**
-         * 与地球相交的线的颜色
-         * @type {Color}
-         */
-        this.intersectionColor = defaultValue$b(options.intersectionColor, Color$3.WHITE);
-
-        /**
-         * 与地球相交的线的宽度（像素）
-         * @type {Number}
-         */
-        this.intersectionWidth = defaultValue$b(options.intersectionWidth, 5.0);
-
-        //是否穿过地球
-        this._showThroughEllipsoid = defaultValue$b(options.showThroughEllipsoid, false);
-
-        /**
-         * 是否显示扫描面
-         * @type {Boolean}
-         */
-        this.showScanPlane = defaultValue$b(options.showScanPlane, true);
-
-        /**
-         * 扫描面颜色
-         * @type {Color}
-         */
-        this.scanPlaneColor = defaultValue$b(options.scanPlaneColor, Color$3.AQUA);
-
-        /**
-         * 扫描面模式 垂直V/水平H
-         * @type {String}
-         */
-        this.scanPlaneMode = defaultValue$b(options.scanPlaneMode, 'H');
-
-        /**
-         * 扫描速率，值越大，扫描越慢
-         * @type {Number}
-         */
-        this.speed = defaultValue$b(options.speed, 10);
-
-        this._scanePlaneXHalfAngle = 0;
-        this._scanePlaneYHalfAngle = 0;
-
-        //时间计算的起点
-        this._time = JulianDate$1.now();
-
-        this._boundingSphere = new BoundingSphere$2();
-        this._boundingSphereWC = new BoundingSphere$2();
-        this._boundingSphere = new BoundingSphere$2(Cartesian3$2.ZERO, this._radius);
-        Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-        BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
-
-        //扇面 sector
-        this._sectorFrontCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._sectorBackCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._sectorVA = undefined;
-
-        //扇面边线 sectorLine
-        this._sectorLineCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.LINES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._sectorLineVA = undefined;
-
-        //扇面分割线 sectorSegmentLine
-        this._sectorSegmentLineCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.LINES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._sectorSegmentLineVA = undefined;
-
-        //弧面 dome
-        this._domeFrontCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._domeBackCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._domeVA = undefined;
-
-        //弧面线 domeLine
-        this._domeLineCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.LINES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._domeLineVA = undefined;
-
-        //扫描面 scanPlane/scanRadial
-        this._scanPlaneFrontCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-        this._scanPlaneBackCommand = new DrawCommand$1({
-          owner: this,
-          primitiveType: PrimitiveType$1.TRIANGLES,
-          boundingVolume: this._boundingSphereWC
-        });
-
-        this._scanRadialCommand = undefined;
-
-        this._colorCommands = [];
-
-        this._frontFaceRS = undefined;
-        this._backFaceRS = undefined;
-        this._sp = undefined;
-
-        this._uniforms = {
-          u_type: function u_type() {
-            return 0; //面
-          },
-          u_xHalfAngle: function u_xHalfAngle() {
-            return self._xHalfAngle;
-          },
-          u_yHalfAngle: function u_yHalfAngle() {
-            return self._yHalfAngle;
-          },
-          u_radius: function u_radius() {
-            return self.radius;
-          },
-          u_showThroughEllipsoid: function u_showThroughEllipsoid() {
-            return self.showThroughEllipsoid;
-          },
-          u_showIntersection: function u_showIntersection() {
-            return self.showIntersection;
-          },
-          u_intersectionColor: function u_intersectionColor() {
-            return self.intersectionColor;
-          },
-          u_intersectionWidth: function u_intersectionWidth() {
-            return self.intersectionWidth;
-          },
-          u_normalDirection: function u_normalDirection() {
-            return 1.0;
-          },
-          u_lineColor: function u_lineColor() {
-            return self.lineColor;
-          }
-        };
-
-        this._scanUniforms = {
-          u_xHalfAngle: function u_xHalfAngle() {
-            return self._scanePlaneXHalfAngle;
-          },
-          u_yHalfAngle: function u_yHalfAngle() {
-            return self._scanePlaneYHalfAngle;
-          },
-          u_radius: function u_radius() {
-            return self.radius;
-          },
-          u_color: function u_color() {
-            return self.scanPlaneColor;
-          },
-          u_showThroughEllipsoid: function u_showThroughEllipsoid() {
-            return self.showThroughEllipsoid;
-          },
-          u_showIntersection: function u_showIntersection() {
-            return self.showIntersection;
-          },
-          u_intersectionColor: function u_intersectionColor() {
-            return self.intersectionColor;
-          },
-          u_intersectionWidth: function u_intersectionWidth() {
-            return self.intersectionWidth;
-          },
-          u_normalDirection: function u_normalDirection() {
-            return 1.0;
-          },
-          u_lineColor: function u_lineColor() {
-            return self.lineColor;
-          }
-        };
-      }
-      get color() {
-        return this._color;
-      }
-      set color(val) {
-        this._color = val;
-        this._material.uniforms.color = val;
-      }
-      get boundingSphere() {
-        return this._boundingSphere;
-      }
-      /**
-       * 水平面半夹角,单位：度
-       * @type {Number}
-       */
-      get xHalfAngle() {
-        return CesiumMath$1.toDegrees(this._xHalfAngle);
-      }
-      set xHalfAngle(val) {
-        if (this._xHalfAngle !== val) {
-          this._xHalfAngle = CesiumMath$1.toRadians(val);
-          this._createVS = true;
-        }
-      }
-      /**
-       * 垂直面半夹角,单位：度
-       * @type {Number}
-       */
-      get yHalfAngle() {
-        return CesiumMath$1.toDegrees(this._yHalfAngle);  }
-      set yHalfAngle(val) {
-        if (this._yHalfAngle !== val) {
-          this._yHalfAngle = CesiumMath$1.toRadians(val);
-          this._createVS = true;
-        }
-      }
-      /**
-       * 传感器半径
-       * @type {Number}
-       */
-      get radius() {
-        return this._radius;
-      }
-      set radius(val) {
-        if (this._radius !== val) {
-          this._radius = val;
-          this._boundingSphere = new BoundingSphere$2(Cartesian3$2.ZERO, val);
-          Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-          BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
-        }
-      }
-      /**
-       * 传感器模型矩阵
-       * @type {Matrix4}
-       */
-      get modelMatrix() {
-        return this._modelMatrix;
-      }
-      set modelMatrix(val) {
-        const modelMatrixChanged = !Matrix4$1.equals(val, this._modelMatrix);
-        if (modelMatrixChanged) {
-          Matrix4$1.clone(val, this._modelMatrix);
-          Matrix4$1.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-          BoundingSphere$2.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
-        }
-      }
-      /**
-       * 是否传过地球
-       * @type {Boolean}
-       */
-      get showThroughEllipsoid() {
-        return this._showThroughEllipsoid;
-      }
-      set showThroughEllipsoid(val) {
-        if (this._showThroughEllipsoid !== val) {
-          this._showThroughEllipsoid = val;
-          this._createRS = true;
-        }
-      }
-      /**
-       * 材质
-       * @type {Material}
-       */
-      get material() {
-        return this._material
-      }
-      set material(val) {
-        this._material = val;
-        this._createRS = true;
-        this._createSP = true;
-      }
-
-      /**
-       * 每一帧在渲染时Cesium会自动调用该方法。不要主动调用该方法
-       * @override
-       * @param  {frameState} frameState
-       */
-      update(frameState) {
-        const mode = frameState.mode;
-        if (!this.show || mode !== SceneMode$1.SCENE3D) {
-          return;
-        }
-        const xHalfAngle = this._xHalfAngle;
-        const yHalfAngle = this._yHalfAngle;
-
-        if (xHalfAngle < 0.0 || yHalfAngle < 0.0) {
-          throw new CesiumProError$1('halfAngle must be greater than or equal to zero.');
-        }
-        if (xHalfAngle == 0.0 || yHalfAngle == 0.0) {
-          return;
-        }
-
-        const radius = this.radius;
-        if (radius < 0.0) {
-          throw new CesiumProError$1('this.radius must be greater than or equal to zero.');
-        }
-        const showThroughEllipsoid = this.showThroughEllipsoid;
-        const material = this.material;
-        const translucent = material.isTranslucent();
-        if (this._translucent !== translucent) {
-          this._translucent = translucent;
-          this._createRS = true;
-        }
-        if (this.showScanPlane) {
-          const time = frameState.time;
-          let timeDiff = JulianDate$1.secondsDifference(time, this._time);
-          if (timeDiff < 0) {
-            this._time = JulianDate$1.clone(time, this._time);
-          }
-          let percentage;
-          if (this.speed <= 0) {
-            percentage = 0;
-          } else {
-            const speet = 10 / this.speed;
-            percentage = Math.max(timeDiff % speet / speet, 0);
-          }
-          let angle;
-          const matrix3Scratch = new Matrix3$1;
-
-          if (this.scanPlaneMode == 'H') {
-            angle = 2 * yHalfAngle * percentage - yHalfAngle;
-            const cosYHalfAngle = cos(angle);
-            const tanXHalfAngle = tan(xHalfAngle);
-
-            const maxX = atan(cosYHalfAngle * tanXHalfAngle);
-            this._scanePlaneXHalfAngle = maxX;
-            this._scanePlaneYHalfAngle = angle;
-            Matrix3$1.fromRotationX(this._scanePlaneYHalfAngle, matrix3Scratch);
-          } else {
-            angle = 2 * xHalfAngle * percentage - xHalfAngle;
-            const tanYHalfAngle = tan(yHalfAngle);
-            const cosXHalfAngle = cos(angle);
-
-            const maxY = atan(cosXHalfAngle * tanYHalfAngle);
-            this._scanePlaneXHalfAngle = angle;
-            this._scanePlaneYHalfAngle = maxY;
-            Matrix3$1.fromRotationY(this._scanePlaneXHalfAngle, matrix3Scratch);
-          }
-
-          Matrix4$1.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
-          Matrix4$1.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
-        }
-
-        if (this._createVS) {
-          createVertexArray(this, frameState);
-        }
-        if (this._createRS) {
-          createRenderState(this, showThroughEllipsoid, translucent);
-        }
-        if (this._createSP) {
-          createShaderProgram(this, frameState, material);
-        }
-        if (this._createRS || this._createSP) {
-          createCommands(this, translucent);
-        }
-
-        const commandList = frameState.commandList;
-        const passes = frameState.passes;
-        const colorCommands = this._colorCommands;
-        if (passes.render) {
-          for (let i = 0, len = colorCommands.length; i < len; i++) {
-            const colorCommand = colorCommands[i];
-            commandList.push(colorCommand);
-          }
-        }
-      }
-      /**
-       * 销毁对象并翻译WebGL资源
-       * @example
-       * const radar=new CesiumPro.RectangularSensorPrimitive();
-       * if(!radar.isDestroyed()){
-       *    radar.destroy();
-       * }
-       */
-      destroy() {
-        this._pickSP.destroy();
-        this._sp = this._sp.destroy();
-        this._scanePlaneSP && (this._scanePlaneSP = this._scanePlaneSP.destroy());
-        destroyObject$7(this);
-      }
-    }
-
-
-    function createCommand(primitive, frontCommand, backCommand, frontFaceRS, backFaceRS, sp, va, uniforms, modelMatrix, translucent, pass, isLine) {
-      if (translucent && backCommand) {
-        backCommand.vertexArray = va;
-        backCommand.renderState = backFaceRS;
-        backCommand.shaderProgram = sp;
-        backCommand.uniformMap = combine(uniforms, primitive._material._uniforms);
-        backCommand.uniformMap.u_normalDirection = function () {
-          return -1.0;
-        };
-        backCommand.pass = pass;
-        backCommand.modelMatrix = modelMatrix;
-        primitive._colorCommands.push(backCommand);
-      }
-
-      frontCommand.vertexArray = va;
-      frontCommand.renderState = frontFaceRS;
-      frontCommand.shaderProgram = sp;
-      frontCommand.uniformMap = combine(uniforms, primitive._material._uniforms);
-      if (isLine) {
-        frontCommand.uniformMap.u_type = function () {
-          return 1;
-        };
-      }
-      frontCommand.pass = pass;
-      frontCommand.modelMatrix = modelMatrix;
-      primitive._colorCommands.push(frontCommand);
-    }
-
-    function createCommands(primitive, translucent) {
-      primitive._colorCommands.length = 0;
-
-      const pass = translucent ? Pass$1.TRANSLUCENT : Pass$1.OPAQUE;
-
-      //显示扇面
-      if (primitive.showLateralSurfaces) {
-        createCommand(primitive, primitive._sectorFrontCommand, primitive._sectorBackCommand,
-          primitive._frontFaceRS, primitive._backFaceRS, primitive._sp, primitive._sectorVA,
-          primitive._uniforms, primitive._computedModelMatrix, translucent,
-          pass);
-      }
-      //显示扇面线
-      if (primitive.showSectorLines) {
-        createCommand(primitive, primitive._sectorLineCommand, undefined, primitive._frontFaceRS,
-          primitive._backFaceRS, primitive._sp, primitive._sectorLineVA, primitive._uniforms,
-          primitive._computedModelMatrix, translucent, pass, true);
-      }
-
-      //显示扇面交接线
-      if (primitive.showSectorSegmentLines) {
-        createCommand(primitive, primitive._sectorSegmentLineCommand, undefined, primitive._frontFaceRS,
-          primitive._backFaceRS, primitive._sp, primitive._sectorSegmentLineVA, primitive._uniforms,
-          primitive._computedModelMatrix, translucent, pass,
-          true);
-      }
-
-      //显示弧面
-      if (primitive.showDomeSurfaces) {
-        createCommand(primitive, primitive._domeFrontCommand, primitive._domeBackCommand,
-          primitive._frontFaceRS, primitive._backFaceRS, primitive._sp, primitive._domeVA,
-          primitive._uniforms, primitive._computedModelMatrix, translucent, pass);
-      }
-
-      //显示弧面线
-      if (primitive.showDomeLines) {
-        createCommand(primitive, primitive._domeLineCommand, undefined, primitive._frontFaceRS,
-          primitive._backFaceRS, primitive._sp, primitive._domeLineVA, primitive._uniforms,
-          primitive._computedModelMatrix, translucent, pass, true);
-      }
-      //显示扫描面
-      if (primitive.showScanPlane) {
-        createCommand(primitive, primitive._scanPlaneFrontCommand, primitive._scanPlaneBackCommand,
-          primitive._frontFaceRS, primitive._backFaceRS, primitive._scanePlaneSP, primitive._scanPlaneVA,
-          primitive._scanUniforms, primitive
-          ._computedScanPlaneModelMatrix, translucent, pass);
-      }
-      return
-    }
-
-    function createCommonShaderProgram(primitive, frameState, material) {
-      const context = frameState.context;
-
-      const vs = sensorVS;
-      const fs = new ShaderSource$1({
-        sources: [sensorComm, material.shaderSource, sensorFS]
-      });
-
-      primitive._sp = ShaderProgram$1.replaceCache({
-        context: context,
-        shaderProgram: primitive._sp,
-        vertexShaderSource: vs,
-        fragmentShaderSource: fs,
-        attributeLocations: attributeLocations
-      });
-
-      const pickFS = new ShaderSource$1({
-        sources: [sensorComm, material.shaderSource, sensorFS],
-        pickColorQualifier: 'uniform'
-      });
-
-      primitive._pickSP = ShaderProgram$1.replaceCache({
-        context: context,
-        shaderProgram: primitive._pickSP,
-        vertexShaderSource: vs,
-        fragmentShaderSource: pickFS,
-        attributeLocations: attributeLocations
-      });
-    }
-
-    function createScanPlaneShaderProgram(primitive, frameState, material) {
-      const context = frameState.context;
-
-      const vs = sensorVS;
-      const fs = new ShaderSource$1({
-        sources: [sensorComm, material.shaderSource, scanPlaneFS]
-      });
-
-      primitive._scanePlaneSP = ShaderProgram$1.replaceCache({
-        context: context,
-        shaderProgram: primitive._scanePlaneSP,
-        vertexShaderSource: vs,
-        fragmentShaderSource: fs,
-        attributeLocations: attributeLocations
-      });
-    }
-
-    function createShaderProgram(primitive, frameState, material) {
-      createCommonShaderProgram(primitive, frameState, material);
-
-      if (primitive.showScanPlane) {
-        createScanPlaneShaderProgram(primitive, frameState, material);
-      }
-    }
-
-    function createRenderState(primitive, showThroughEllipsoid, translucent) {
-      if (translucent) {
-        primitive._frontFaceRS = RenderState$1.fromCache({
-          depthTest: {
-            enabled: !showThroughEllipsoid
-          },
-          depthMask: false,
-          blending: BlendingState.ALPHA_BLEND,
-          cull: {
-            enabled: true,
-            face: CullFace.BACK
-          }
-        });
-
-        primitive._backFaceRS = RenderState$1.fromCache({
-          depthTest: {
-            enabled: !showThroughEllipsoid
-          },
-          depthMask: false,
-          blending: BlendingState.ALPHA_BLEND,
-          cull: {
-            enabled: true,
-            face: CullFace.FRONT
-          }
-        });
-
-        primitive._pickRS = RenderState$1.fromCache({
-          depthTest: {
-            enabled: !showThroughEllipsoid
-          },
-          depthMask: false,
-          blending: BlendingState.ALPHA_BLEND
-        });
-      } else {
-        primitive._frontFaceRS = RenderState$1.fromCache({
-          depthTest: {
-            enabled: !showThroughEllipsoid
-          },
-          depthMask: true
-        });
-
-        primitive._pickRS = RenderState$1.fromCache({
-          depthTest: {
-            enabled: true
-          },
-          depthMask: true
-        });
-      }
-    }
-
-    function computeUnitPosiiton(primitive, xHalfAngle, yHalfAngle) {
-      const slice = primitive.slice;
-      //以中心为角度
-      const cosYHalfAngle = cos(yHalfAngle);
-      const tanYHalfAngle = tan(yHalfAngle);
-      const cosXHalfAngle = cos(xHalfAngle);
-      const tanXHalfAngle = tan(xHalfAngle);
-
-      const maxY = atan(cosXHalfAngle * tanYHalfAngle);
-      const maxX = atan(cosYHalfAngle * tanXHalfAngle);
-
-      //ZOY面单位圆
-      const zoy = [];
-      for (let i = 0; i < slice; i++) {
-        const phi = 2 * maxY * i / (slice - 1) - maxY;
-        zoy.push(new Cartesian3$2(0, sin(phi), cos(phi)));
-      }
-      //zox面单位圆
-      const zox = [];
-      for (let i = 0; i < slice; i++) {
-        const phi = 2 * maxX * i / (slice - 1) - maxX;
-        zox.push(new Cartesian3$2(sin(phi), 0, cos(phi)));
-      }
-
-      return {
-        zoy: zoy,
-        zox: zox
-      };
-    }
-
-
-    function computeSectorPositions(primitive, unitPosition) {
-      const xHalfAngle = primitive._xHalfAngle,
-        yHalfAngle = primitive._yHalfAngle,
-        zoy = unitPosition.zoy,
-        zox = unitPosition.zox;
-      const positions = [];
-
-      //zoy面沿y轴逆时针转xHalfAngle
-      const matrix3Scratch = new Matrix3$1();
-      let matrix3 = Matrix3$1.fromRotationY(xHalfAngle, matrix3Scratch);
-      positions.push(zoy.map(function (p) {
-        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
-      }));
-      //zox面沿x轴顺时针转yHalfAngle
-      matrix3 = Matrix3$1.fromRotationX(-yHalfAngle, matrix3Scratch);
-      positions.push(zox.map(function (p) {
-        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
-      }).reverse());
-      //zoy面沿y轴顺时针转xHalfAngle
-      matrix3 = Matrix3$1.fromRotationY(-xHalfAngle, matrix3Scratch);
-      positions.push(zoy.map(function (p) {
-        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
-      }).reverse());
-      //zox面沿x轴逆时针转yHalfAngle
-      matrix3 = Matrix3$1.fromRotationX(yHalfAngle, matrix3Scratch);
-      positions.push(zox.map(function (p) {
-        return Matrix3$1.multiplyByVector(matrix3, p, new Cartesian3$2());
-      }));
-      return positions;
-    }
-    /**
-     * 创建扇面顶点
-     * @private
-     * @param context
-     * @param positions
-     * @returns {*}
-     */
-
-    function createSectorVertexArray(context, positions) {
-      const planeLength = Array.prototype.concat.apply([], positions).length - positions.length;
-      const vertices = new Float32Array(2 * 3 * 3 * planeLength);
-
-      let k = 0;
-      for (let i = 0, len = positions.length; i < len; i++) {
-        const planePositions = positions[i];
-        const nScratch = new Cartesian3$2();
-        const n = Cartesian3$2.normalize(Cartesian3$2.cross(planePositions[0],
-          planePositions[planePositions.length - 1], nScratch), nScratch);
-        for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
-          vertices[k++] = 0.0;
-          vertices[k++] = 0.0;
-          vertices[k++] = 0.0;
-          vertices[k++] = -n.x;
-          vertices[k++] = -n.y;
-          vertices[k++] = -n.z;
-
-          vertices[k++] = planePositions[j].x;
-          vertices[k++] = planePositions[j].y;
-          vertices[k++] = planePositions[j].z;
-          vertices[k++] = -n.x;
-          vertices[k++] = -n.y;
-          vertices[k++] = -n.z;
-
-          vertices[k++] = planePositions[j + 1].x;
-          vertices[k++] = planePositions[j + 1].y;
-          vertices[k++] = planePositions[j + 1].z;
-          vertices[k++] = -n.x;
-          vertices[k++] = -n.y;
-          vertices[k++] = -n.z;
-        }
-      }
-
-      const vertexBuffer = Buffer$1.createVertexBuffer({
-        context: context,
-        typedArray: vertices,
-        usage: BufferUsage$1.STATIC_DRAW
-      });
-
-      const stride = 2 * 3 * Float32Array.BYTES_PER_ELEMENT;
-
-      const attributes = [{
-        index: attributeLocations.position,
-        vertexBuffer: vertexBuffer,
-        componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype$1.FLOAT,
-        offsetInBytes: 0,
-        strideInBytes: stride
-      }, {
-        index: attributeLocations.normal,
-        vertexBuffer: vertexBuffer,
-        componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype$1.FLOAT,
-        offsetInBytes: 3 * Float32Array.BYTES_PER_ELEMENT,
-        strideInBytes: stride
-      }];
-
-      return new VertexArray$1({
-        context: context,
-        attributes: attributes
-      });
-    }
-
-    /**
-     * 创建扇面边线顶点
-     * @param context
-     * @param positions
-     * @returns {*}
-     */
-    function createSectorLineVertexArray(context, positions) {
-      const planeLength = positions.length;
-      const vertices = new Float32Array(3 * 3 * planeLength);
-
-      let k = 0;
-      for (let i = 0, len = positions.length; i < len; i++) {
-        const planePositions = positions[i];
-        vertices[k++] = 0.0;
-        vertices[k++] = 0.0;
-        vertices[k++] = 0.0;
-
-        vertices[k++] = planePositions[0].x;
-        vertices[k++] = planePositions[0].y;
-        vertices[k++] = planePositions[0].z;
-      }
-
-      const vertexBuffer = Buffer$1.createVertexBuffer({
-        context: context,
-        typedArray: vertices,
-        usage: BufferUsage$1.STATIC_DRAW
-      });
-
-      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
-
-      const attributes = [{
-        index: attributeLocations.position,
-        vertexBuffer: vertexBuffer,
-        componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype$1.FLOAT,
-        offsetInBytes: 0,
-        strideInBytes: stride
-      }];
-
-      return new VertexArray$1({
-        context: context,
-        attributes: attributes
-      });
-    }
-
-    /**
-     * 创建扇面圆顶面连接线顶点
-     * @private
-     * @param context
-     * @param positions
-     * @returns {*}
-     */
-    function createSectorSegmentLineVertexArray(context, positions) {
-      const planeLength = Array.prototype.concat.apply([], positions).length - positions.length;
-      const vertices = new Float32Array(3 * 3 * planeLength);
-
-      let k = 0;
-      for (let i = 0, len = positions.length; i < len; i++) {
-        const planePositions = positions[i];
-
-        for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
-          vertices[k++] = planePositions[j].x;
-          vertices[k++] = planePositions[j].y;
-          vertices[k++] = planePositions[j].z;
-
-          vertices[k++] = planePositions[j + 1].x;
-          vertices[k++] = planePositions[j + 1].y;
-          vertices[k++] = planePositions[j + 1].z;
-        }
-      }
-
-      const vertexBuffer = Buffer$1.createVertexBuffer({
-        context: context,
-        typedArray: vertices,
-        usage: BufferUsage$1.STATIC_DRAW
-      });
-
-      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
-
-      const attributes = [{
-        index: attributeLocations.position,
-        vertexBuffer: vertexBuffer,
-        componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype$1.FLOAT,
-        offsetInBytes: 0,
-        strideInBytes: stride
-      }];
-
-      return new VertexArray$1({
-        context: context,
-        attributes: attributes
-      });
-    }
-
-    /**
-     * 创建圆顶面顶点
-     * @param context
-     */
-    function createDomeVertexArray(context) {
-      const geometry = EllipsoidGeometry.createGeometry(new EllipsoidGeometry({
-        vertexFormat: VertexFormat$1.POSITION_ONLY,
-        stackPartitions: 32,
-        slicePartitions: 32
-      }));
-
-      const vertexArray = VertexArray$1.fromGeometry({
-        context: context,
-        geometry: geometry,
-        attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage$1.STATIC_DRAW,
-        interleave: false
-      });
-      return vertexArray;
-    }
-
-    /**
-     * 创建圆顶面连线顶点
-     * @param context
-     */
-    function createDomeLineVertexArray(context) {
-      const geometry = EllipsoidOutlineGeometry.createGeometry(new EllipsoidOutlineGeometry({
-        vertexFormat: VertexFormat$1.POSITION_ONLY,
-        stackPartitions: 32,
-        slicePartitions: 32
-      }));
-
-      const vertexArray = VertexArray$1.fromGeometry({
-        context: context,
-        geometry: geometry,
-        attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage$1.STATIC_DRAW,
-        interleave: false
-      });
-      return vertexArray;
-    }
-
-    /**
-     * 创建扫描面顶点
-     * @param context
-     * @param positions
-     * @returns {*}
-     */
-    function createScanPlaneVertexArray(context, positions) {
-      const planeLength = positions.length - 1;
-      const vertices = new Float32Array(3 * 3 * planeLength);
-
-      let k = 0;
-      for (let i = 0; i < planeLength; i++) {
-        vertices[k++] = 0.0;
-        vertices[k++] = 0.0;
-        vertices[k++] = 0.0;
-
-        vertices[k++] = positions[i].x;
-        vertices[k++] = positions[i].y;
-        vertices[k++] = positions[i].z;
-
-        vertices[k++] = positions[i + 1].x;
-        vertices[k++] = positions[i + 1].y;
-        vertices[k++] = positions[i + 1].z;
-      }
-
-      const vertexBuffer = Buffer$1.createVertexBuffer({
-        context: context,
-        typedArray: vertices,
-        usage: BufferUsage$1.STATIC_DRAW
-      });
-
-      const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
-
-      const attributes = [{
-        index: attributeLocations.position,
-        vertexBuffer: vertexBuffer,
-        componentsPerAttribute: 3,
-        componentDatatype: ComponentDatatype$1.FLOAT,
-        offsetInBytes: 0,
-        strideInBytes: stride
-      }];
-
-      return new VertexArray$1({
-        context: context,
-        attributes: attributes
-      });
-    }
-
-    function createVertexArray(primitive, frameState) {
-      const context = frameState.context;
-
-      const unitSectorPositions = computeUnitPosiiton(primitive, primitive._xHalfAngle, primitive._yHalfAngle);
-      const positions = computeSectorPositions(primitive, unitSectorPositions);
-
-      //显示扇面
-      if (primitive.showLateralSurfaces) {
-        primitive._sectorVA = createSectorVertexArray(context, positions);
-      }
-
-      //显示扇面线
-      if (primitive.showSectorLines) {
-        primitive._sectorLineVA = createSectorLineVertexArray(context, positions);
-      }
-
-      //显示扇面圆顶面的交线
-      if (primitive.showSectorSegmentLines) {
-        primitive._sectorSegmentLineVA = createSectorSegmentLineVertexArray(context, positions);
-      }
-
-      //显示弧面
-      if (primitive.showDomeSurfaces) {
-        primitive._domeVA = createDomeVertexArray(context);
-      }
-
-      //显示弧面线
-      if (primitive.showDomeLines) {
-        primitive._domeLineVA = createDomeLineVertexArray(context);
-      }
-
-      //显示扫描面
-      if (primitive.showScanPlane) {
-
-        if (primitive.scanPlaneMode == 'H') {
-          const unitScanPlanePositions = computeUnitPosiiton(primitive, CesiumMath$1.PI_OVER_TWO, 0);
-          primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zox);
-        } else {
-          const unitScanPlanePositions = computeUnitPosiiton(primitive, 0, CesiumMath$1.PI_OVER_TWO);
-          primitive._scanPlaneVA = createScanPlaneVertexArray(context, unitScanPlanePositions.zoy);
-        }
-      }
-    }
-
     const {
       VertexFormat
     } = Cesium;
@@ -43616,24 +45926,24 @@ void main()
        * })
        */
       constructor(options) {
-        options = defaultValue$b(options, defaultValue$b.EMPTY_OBJECT);
-        if (!defined$c(options.center)) {
+        options = defaultValue$c(options, defaultValue$c.EMPTY_OBJECT);
+        if (!defined$d(options.center)) {
           throw new CesiumProError$1('parameter center is required.')
         }
-        if (!defined$c(options.radius)) {
+        if (!defined$d(options.radius)) {
           throw new CesiumProError$1('parameter radius is required.')
         }
-        if (!defined$c(options.fov)) {
+        if (!defined$d(options.fov)) {
           throw new CesiumProError$1('parameter fov is required.');
         }
         this._center = options.center;
         this._radius = options.radius;
         this._fov = options.fov;
-        this._slices = defaultValue$b(options.slices, this._fov);
-        this._rotation = Cesium.Math.toRadians(defaultValue$b(options.rotation, 0));
-        this._vertexFormat = defaultValue$b(options.vertexFormat, VertexFormat.POSITION_AND_ST);
-        this._extrudedHeight = defaultValue$b(options.extrudedHeight, 0);
-        this._height = defaultValue$b(options.height, 0);
+        this._slices = defaultValue$c(options.slices, this._fov);
+        this._rotation = Cesium.Math.toRadians(defaultValue$c(options.rotation, 0));
+        this._vertexFormat = defaultValue$c(options.vertexFormat, VertexFormat.POSITION_AND_ST);
+        this._extrudedHeight = defaultValue$c(options.extrudedHeight, 0);
+        this._height = defaultValue$c(options.height, 0);
         this._positions = undefined;
         this._workerName = "createSectorGeometry";
         this._rectangle = undefined;
@@ -43849,10 +46159,10 @@ void main(){
        */
       constructor(options) {
         super(options);
-        this._fragmentShader = defaultValue$b(this._options.fragmentShader, shader$d);
-        this._thickness = defaultValue$b(this._options.thickness, 0.5);
-        this._density = defaultValue$b(this._options.density, 10.0);
-        this._speed = defaultValue$b(this._options.speed, 350);
+        this._fragmentShader = defaultValue$c(this._options.fragmentShader, shader$d);
+        this._thickness = defaultValue$c(this._options.thickness, 0.5);
+        this._density = defaultValue$c(this._options.density, 10.0);
+        this._speed = defaultValue$c(this._options.speed, 350);
         const uniforms = {
           alpha: () => {
             return this.thickness
@@ -43864,7 +46174,7 @@ void main(){
             return this.speed
           }
         };
-        this._uniforms = defaultValue$b(this._options.uniforms, uniforms);
+        this._uniforms = defaultValue$c(this._options.uniforms, uniforms);
 
       }
       /**
@@ -43965,7 +46275,7 @@ void main(){
         return url;
       }
 
-      if (!defined$c(a)) {
+      if (!defined$d(a)) {
         a = document.createElement('a');
       }
       a.href = url;
@@ -43996,7 +46306,7 @@ void main(){
     }
 
     function getCesiumProBaseUrl() {
-      if (defined$c(baseResource)) {
+      if (defined$d(baseResource)) {
         return baseResource;
       }
 
@@ -44005,7 +46315,7 @@ void main(){
         baseUrlString = CESIUMPRO_BASE_URL;
       } else if (
         typeof window.define === 'object'
-        && defined$c(window.define.amd)
+        && defined$d(window.define.amd)
         && !window.define.amd.toUrlUndefined
       ) {
         baseUrlString = Cesium.getAbsoluteUri(
@@ -44016,13 +46326,13 @@ void main(){
         baseUrlString = getBaseUrlFromCesiumScript();
       }
       // >>includeStart('debug');
-      if (!defined$c(baseUrlString)) {
+      if (!defined$d(baseUrlString)) {
         throw new CesiumProError$1(
           'Unable to determine CesiumPro base URL automatically, try defining a global variable called CESIUMPRO_BASE_URL.',
         );
       }
       // >>includeEnd('debug');
-      if(!defined$c(baseUrlString)) {
+      if(!defined$d(baseUrlString)) {
           baseUrlString = '';
       }
       baseResource = new Cesium.Resource({
@@ -44041,11 +46351,11 @@ void main(){
     }
 
     function buildModuleUrl(relativeUrl) {
-      if (!defined$c(implementation)) {
+      if (!defined$d(implementation)) {
         // select implementation
         if (
           typeof window.define === 'object'
-          && defined$c(window.define.amd)
+          && defined$d(window.define.amd)
           && !window.define.amd.toUrlUndefined
         ) {
           implementation = buildModuleUrlFromRequireToUrl;
@@ -44124,16 +46434,16 @@ void main(){
        *
        */
       constructor(options) {
-        options = defaultValue$b(options, {});
-        this._normalMap = defaultValue$b(options.normalMap, Url.buildModuleUrl('./assets/images/waterNormal.jpg'));
-        this._baseWaterColor = defaultValue$b(options.baseWaterColor, new Cesium.Color(0, 0.42, 0.71));
-        this._blendColor = defaultValue$b(options.blendColor, this._baseWaterColor);
-        this._frequency = defaultValue$b(options.frequency, 8000);
-        this._animationSpeed = defaultValue$b(options.animationSpeed, 0.02);
-        this._amplitude = defaultValue$b(options.amplitude, 5);
-        this._specularIntensity = defaultValue$b(options.specularIntensity, 0.8);
-        this._fadeFactor = defaultValue$b(options.fadeFactor, 1);
-        this._alpha = defaultValue$b(options.alpha, 0.4);
+        options = defaultValue$c(options, {});
+        this._normalMap = defaultValue$c(options.normalMap, Url.buildModuleUrl('./assets/images/waterNormal.jpg'));
+        this._baseWaterColor = defaultValue$c(options.baseWaterColor, new Cesium.Color(0, 0.42, 0.71));
+        this._blendColor = defaultValue$c(options.blendColor, this._baseWaterColor);
+        this._frequency = defaultValue$c(options.frequency, 8000);
+        this._animationSpeed = defaultValue$c(options.animationSpeed, 0.02);
+        this._amplitude = defaultValue$c(options.amplitude, 5);
+        this._specularIntensity = defaultValue$c(options.specularIntensity, 0.8);
+        this._fadeFactor = defaultValue$c(options.fadeFactor, 1);
+        this._alpha = defaultValue$c(options.alpha, 0.4);
         this._material = new Material({
           fabric: {
             type: Material.WaterType,
@@ -44322,7 +46632,7 @@ void main(void)
         return;
       }
 
-      if (frameState.useLogDepth && defined$c(command.derivedCommands.logDepth)) {
+      if (frameState.useLogDepth && defined$d(command.derivedCommands.logDepth)) {
         command = command.derivedCommands.logDepth.command;
       }
 
@@ -44330,8 +46640,8 @@ void main(void)
       if (
         !passes.pick &&
         !passes.depth &&
-        defined$c(command.derivedCommands) &&
-        defined$c(command.derivedCommands.hdr)
+        defined$d(command.derivedCommands) &&
+        defined$d(command.derivedCommands.hdr)
       ) {
         command = command.derivedCommands.hdr.command;
       }
@@ -44340,12 +46650,12 @@ void main(void)
         if (
           passes.pick &&
           !passes.depth &&
-          defined$c(command.derivedCommands.picking)
+          defined$d(command.derivedCommands.picking)
         ) {
           command = command.derivedCommands.picking.pickCommand;
           command.execute(context, passState);
           return;
-        } else if (defined$c(command.derivedCommands.depth)) {
+        } else if (defined$d(command.derivedCommands.depth)) {
           command = command.derivedCommands.depth.depthOnlyCommand;
           command.execute(context, passState);
           return;
@@ -44355,7 +46665,7 @@ void main(void)
       if (
         frameState.shadowState.lightShadowsEnabled &&
         command.receiveShadows &&
-        defined$c(command.derivedCommands.shadows)
+        defined$d(command.derivedCommands.shadows)
       ) {
         // If the command receives shadows, execute the derived shadows command.
         // Some commands, such as OIT derived commands, do not have derived shadow commands themselves
@@ -44383,25 +46693,25 @@ void main(void)
        *
        */
       constructor(options) {
-        options = defaultValue$b(options, {});
+        options = defaultValue$c(options, {});
         this._pointsToCartographic = [];
         this._waterPolygon = options.waterPolygon;
-        if (!defined$c(this._waterPolygon)) {
+        if (!defined$d(this._waterPolygon)) {
           throw new CesiumProError$1('paramater options.waterPolygon must be provided.')
         }
-        this._waterColor = defaultValue$b(options.waterColor, Cesium.Color.DARKCYAN);
-        this._refractColor = defaultValue$b(options.refractColor, new Color$1(0, 0, 0, 0));
-        this._reflectColor = defaultValue$b(options.reflectColor, new Color$1(.439, .564, .788, 0));
-        this._waveWidth = defaultValue$b(options.waveWidth, 5);
-        this._flowDirection = defaultValue$b(options.flowDirection, 45);
-        this._flowSpeed = defaultValue$b(options.flowSpeed, 3);
-        this._normalTexture = defaultValue$b(options.normalTexture, Url$1.buildModuleUrl('./assets/images/waterNormal2.png'));
+        this._waterColor = defaultValue$c(options.waterColor, Cesium.Color.DARKCYAN);
+        this._refractColor = defaultValue$c(options.refractColor, new Color$1(0, 0, 0, 0));
+        this._reflectColor = defaultValue$c(options.reflectColor, new Color$1(.439, .564, .788, 0));
+        this._waveWidth = defaultValue$c(options.waveWidth, 5);
+        this._flowDirection = defaultValue$c(options.flowDirection, 45);
+        this._flowSpeed = defaultValue$c(options.flowSpeed, 3);
+        this._normalTexture = defaultValue$c(options.normalTexture, Url$1.buildModuleUrl('./assets/images/waterNormal2.png'));
         this._m_startTime = 0;
         this._reflectCamera = undefined;
         this._reflectPassState = undefined;
         this._ready = false;
         this._drawCommand = undefined;
-        this._show = defaultValue$b(options.show, true);
+        this._show = defaultValue$c(options.show, true);
 
       }
       /**
@@ -44422,7 +46732,7 @@ void main(void)
         return this._waterPolygon;
       }
       set waterPolygon(val) {
-        if (defined$c(val)) {
+        if (defined$d(val)) {
           this._waterPolygon = val;
         }
       }
@@ -44528,10 +46838,10 @@ void main(void)
           context,
           camera
         } = frameState;
-        if (!defined$c(this._reflectCamera)) {
+        if (!defined$d(this._reflectCamera)) {
           this._reflectCamera = Camera.clone(camera);
         }
-        if (!defined$c(this._reflectPassState)) {
+        if (!defined$d(this._reflectPassState)) {
           const framebuffer = new Framebuffer({
             context,
             colorTextures: [new Texture({
@@ -47577,17 +49887,17 @@ void main() {
        */
       constructor(viewer, options) {
         const userInput = {};
-        userInput.speedFactor = defaultValue$b(options.speedFactor, 1.0);
-        userInput.lineWidth = defaultValue$b(options.lineWidth, 4.0);
-        userInput.dropRateBump = defaultValue$b(options.dropRateBump, 0.01);
-        userInput.dropRate = defaultValue$b(options.dropRate,0.003);
-        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$b(options.maxParticles, 64*64)));
+        userInput.speedFactor = defaultValue$c(options.speedFactor, 1.0);
+        userInput.lineWidth = defaultValue$c(options.lineWidth, 4.0);
+        userInput.dropRateBump = defaultValue$c(options.dropRateBump, 0.01);
+        userInput.dropRate = defaultValue$c(options.dropRate,0.003);
+        userInput.particlesTextureSize = Math.ceil(Math.sqrt(defaultValue$c(options.maxParticles, 64*64)));
         userInput.maxParticles = userInput.particlesTextureSize * userInput.particlesTextureSize;
-        userInput.fadeOpacity = defaultValue$b(options.fadeOpacity, 0.996);
-        userInput.particleHeight = defaultValue$b(options.particleHeight, 100);
-        userInput.color = defaultValue$b(options.color, Color.WHITE);
+        userInput.fadeOpacity = defaultValue$c(options.fadeOpacity, 0.996);
+        userInput.particleHeight = defaultValue$c(options.particleHeight, 100);
+        userInput.color = defaultValue$c(options.color, Color.WHITE);
         this._maxParticles = userInput.maxParticles;
-        this._color = defaultValue$b(options.color, "#FFFFFF");
+        this._color = defaultValue$c(options.color, "#FFFFFF");
         this.viewer = viewer;
         this.scene = this.viewer.scene;
         this.camera = this.viewer.camera;
@@ -47787,7 +50097,7 @@ void main() {
       destroy() {
         this.remove();
         this.removeEventListener && this.removeEventListener();
-        destroyObject$7(this);
+        destroyObject$8(this);
       }
     }
 
@@ -48327,7 +50637,7 @@ void main(){
     exports.MassiveGraphicLayerCollection = MassiveGraphicLayerCollection;
     exports.MassiveModelLayer = MassiveModelLayer;
     exports.MassivePointLayer = MassivePointLayer;
-    exports.Material = Material$2;
+    exports.Material = Material$1;
     exports.Model = Model$1;
     exports.MultipleTerrainProvider = MultipleTerrainProvider;
     exports.NodePlot = NodePlot;
@@ -48366,7 +50676,10 @@ void main(){
     exports.Url = Url$1;
     exports.VERSION = VERSION;
     exports.VectorTileProvider = VectorTileProvider;
+    exports.ViewShadowPrimitive = ViewShadowPrimitive;
+    exports.ViewShedAnalysis = ViewShedAnalysis;
     exports.Viewer = Viewer;
+    exports.ViewshedMap = ViewshedMap;
     exports.WFSLayer = WFSLayer;
     exports.WMSLayer = WMSLayer;
     exports.WMTSLayer = WMTSLayer;
@@ -48421,9 +50734,9 @@ void main(){
     exports.customPrimitive = CustomPrimitive;
     exports.dataProcess = DataProcess;
     exports.dateFormat = dateFormat;
-    exports.defaultValue = defaultValue$b;
-    exports.defined = defined$c;
-    exports.destroyObject = destroyObject$7;
+    exports.defaultValue = defaultValue$c;
+    exports.defined = defined$d;
+    exports.destroyObject = destroyObject$8;
     exports.getParabolaPoints = getParabolaPoints;
     exports.guid = guid;
     exports.index = overrideCesium;

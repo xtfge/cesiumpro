@@ -20,13 +20,24 @@ class BaseAnalysis {
          * @type {Event}
          * @readonly
          */
-        this.preDo = new Event();
+        this.preAnalysis = new Event();
+        /**
+         * @deprecated
+         * 请使用preAnalysis
+         */
+        this.preDo = this.preAnalysis;
         /**
          * 分析完成后触发的事件
          * @type {Event}
          * @readonly
          */
-        this.postDo = new Event();
+        this.postAnalysis = new Event();
+        /**
+         * @deprecated
+         * 请使用postAnalysis
+         */
+        this.postDo = this.postDo;
+
     }
     /**
      * @readonly

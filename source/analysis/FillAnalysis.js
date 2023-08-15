@@ -142,7 +142,7 @@ class FillAnalysis extends BaseAnalysis {
             excavaVolume,
             graphicCollection: this._root
         }
-        this.postDo.raise(data);
+        this.postAnalysis.raise(data);
         this._doing = false;
         return data;
 
