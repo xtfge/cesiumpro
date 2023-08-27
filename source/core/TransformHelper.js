@@ -122,6 +122,7 @@ class TransformHelper {
    * @param {number} [options.scaleAxisLength] 缩放轴的长度，如果未定义将自动计算
    * @param {number} [options.rotatePlaneRadius] 旋转轴的半径，如果未定义将自动计算
    * @param {boolean} [options.sizeInPixel = false] 控制器的大小是否以像素为单位
+   * @param {number} [options.radiusRatio = 1] 如果没有为坐标轴指定长度，将使用模型boundingSphere的半径乘该系数作长度
    * @param {Cesium.Cartesian3} [options.originOffset = Cesium.Cartesian3.ZERO] 默认原点在点或模型的中心位置，该值设置相对于默认位置的偏移
    * 
    * @example
@@ -149,6 +150,7 @@ class TransformHelper {
     this._translateEnabled = defaultValue(options.translateEnabled, true);
     this._rotateEnabled = defaultValue(options.rotateEnabled, false);
     this._scaleEnabled = defaultValue(options.scaleEnabled, false);
+    this._radiusRatio = defaultValue(options.radiusRatio, 1);
     this.xAxisLength = options.xAxisLength;
     this.yAxisLength = options.yAxisLength;
     this.zAxisLength = options.zAxisLength;
@@ -265,7 +267,7 @@ class TransformHelper {
     if (!this.center) {
       return;
     }
-    const lineLength = this._radius * 1.3;
+    const lineLength = this._radius * this._radiusRatio;
     const plc = this.axisRoot;
     const center = this.center;
     this.xAxis = plc.add({
@@ -292,7 +294,7 @@ class TransformHelper {
         center,
         new Cartesian3(
           center.x,
-          -(defaultValue(this.yAxisLength, lineLength) + center.y),
+          -(defaultValue(this.yAxisLength, lineLength)) + center.y,
           center.z
         ),
       ],
@@ -419,7 +421,7 @@ class TransformHelper {
    */
   createRotateAxis() {
     const pts = [];
-    const radius = this.rotatePlaneRadius || this._radius;
+    const radius = this.rotatePlaneRadius || this._radius * this._radiusRatio;
     const center = this.center;
     for (let i = 0; i <= 360; i++) {
       const rad = (i / 180) * Math.PI;
@@ -495,9 +497,9 @@ class TransformHelper {
    * @private
    */
   createScaleAxis() {
-    const lineLength = this._radius * 1.1;    
+    const lineLength = this._radius * this._radiusRatio;    
     const l = defaultValue(this.scaleAxisLength, lineLength);
-    const delta = Math.sqrt(3);
+    const delta = Math.pow(l, 1 / 3);
     this.scaleAxis = this.axisRoot.add({
       positions: [
         this._center,
@@ -516,7 +518,7 @@ class TransformHelper {
    */
   bind(object) {
     if (!this._viewer) {
-      return;
+      throw new CesiumProError('please call addTo method to add to viewer')
     }
     this.unbind();
     if (object instanceof Model) {

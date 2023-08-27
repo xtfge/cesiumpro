@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-08-15
+ * @datetime 2023-08-27
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -24751,6 +24751,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @param {number} [options.scaleAxisLength] 缩放轴的长度，如果未定义将自动计算
        * @param {number} [options.rotatePlaneRadius] 旋转轴的半径，如果未定义将自动计算
        * @param {boolean} [options.sizeInPixel = false] 控制器的大小是否以像素为单位
+       * @param {number} [options.radiusRatio = 1] 如果没有为坐标轴指定长度，将使用模型boundingSphere的半径乘该系数作长度
        * @param {Cesium.Cartesian3} [options.originOffset = Cesium.Cartesian3.ZERO] 默认原点在点或模型的中心位置，该值设置相对于默认位置的偏移
        * 
        * @example
@@ -24778,6 +24779,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         this._translateEnabled = defaultValue$7(options.translateEnabled, true);
         this._rotateEnabled = defaultValue$7(options.rotateEnabled, false);
         this._scaleEnabled = defaultValue$7(options.scaleEnabled, false);
+        this._radiusRatio = defaultValue$7(options.radiusRatio, 1);
         this.xAxisLength = options.xAxisLength;
         this.yAxisLength = options.yAxisLength;
         this.zAxisLength = options.zAxisLength;
@@ -24894,7 +24896,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         if (!this.center) {
           return;
         }
-        const lineLength = this._radius * 1.3;
+        const lineLength = this._radius * this._radiusRatio;
         const plc = this.axisRoot;
         const center = this.center;
         this.xAxis = plc.add({
@@ -24921,7 +24923,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
             center,
             new Cartesian3$d(
               center.x,
-              -(defaultValue$7(this.yAxisLength, lineLength) + center.y),
+              -(defaultValue$7(this.yAxisLength, lineLength)) + center.y,
               center.z
             ),
           ],
@@ -25048,7 +25050,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       createRotateAxis() {
         const pts = [];
-        const radius = this.rotatePlaneRadius || this._radius;
+        const radius = this.rotatePlaneRadius || this._radius * this._radiusRatio;
         const center = this.center;
         for (let i = 0; i <= 360; i++) {
           const rad = (i / 180) * Math.PI;
@@ -25124,7 +25126,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @private
        */
       createScaleAxis() {
-        const lineLength = this._radius * 1.1;    
+        const lineLength = this._radius * this._radiusRatio;    
         const l = defaultValue$7(this.scaleAxisLength, lineLength);
         const delta = Math.sqrt(3);
         this.scaleAxis = this.axisRoot.add({
@@ -25145,7 +25147,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        */
       bind(object) {
         if (!this._viewer) {
-          return;
+          throw new CesiumProError$1('please call addTo method to add to viewer')
         }
         this.unbind();
         if (object instanceof Model$1) {
@@ -32791,7 +32793,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
              * @type {DefaultDataSource}
              */
             this.dds = new DefaultDataSource(this);
-            var date = new Date('2023-08-31 00:00:00').getTime();
+            var date = new Date('2023-09-21 00:00:00').getTime();
             this.scene.postRender.addEventListener(() => {            
                 var now = new Date().getTime();
                 if (now > date) {
