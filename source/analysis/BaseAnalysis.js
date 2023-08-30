@@ -36,7 +36,7 @@ class BaseAnalysis {
          * @deprecated
          * 请使用postAnalysis
          */
-        this.postDo = this.postDo;
+        this.postDo = this.postAnalysis;
 
     }
     /**
@@ -52,7 +52,10 @@ class BaseAnalysis {
      * @param {*} options 
      */
     do(options) {
-       
+    //    throw new CesiumProError("abstract method cannot be called");
+        if (this._doing) {
+            throw new CesiumProError("当前有正在分析的任务，请稍候再试");
+        }
     }
     isDestroyed() {
         return false;
@@ -62,6 +65,16 @@ class BaseAnalysis {
             throw new CesiumProError('上一次分析正在进行，请稍候...');
         }
         this._doing = true;
+    }
+    clear() {
+        
+    }
+    /**
+     * 销毁对象
+     */
+    destroy() {
+        this.clear();
+        destroyObject(this);
     }
 }
 export default BaseAnalysis;

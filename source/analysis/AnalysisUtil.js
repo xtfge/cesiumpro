@@ -61,6 +61,7 @@ AnalysisUtil.triangleGrid = function(positions, cellSize, options = {}) {
     return triangleGrid(box, cellSize, options);
 }
 AnalysisUtil.getCartesians = function(positions) {
+    if (!positions) return;
     const first = positions[0];
     if (first instanceof LonLat) {
         return positions.map(_ => _.toCartesian());

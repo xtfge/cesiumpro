@@ -11,6 +11,7 @@
     <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
     <link href="/build/assets/core.css" rel="stylesheet" />
     <script src='/build/CesiumPro.js'></script>
+    <script src="./editor/utils.js"></script>
     <style>
         #map {
             width: 100%;
@@ -50,32 +51,57 @@
         viewer.flyTo(pg)
         const manager = new CesiumPro.PlotManager(viewer);
         const gui = new GUI();
-        let fill;
+        let fill = new CesiumPro.FillAnalysis(viewer, {
+            height: 2000
+        });
+        // fill.postAnalysis.addEventListener(result => {
+        //     obj.fillVolume = result.fillVolume;
+        //     obj.excavaVolume = result.excavaVolume
+        //     resultFolder.add(obj, 'fillVolume').name('填充体积(m3)')
+        //     resultFolder.add(obj, 'excavaVolume').name('挖方体积(m3)')
+        //     loading.close();
+        // });
+        manager.postEdit.addEventListener((graphic) => {
+            fill = new CesiumPro.FillAnalysis(viewer, {
+                height: 2000,
+                mask: graphic.positions
+            })
+            let loading = new Loading("正在分析，请稍候...")
+            manager.remove(graphic);
+            setTimeout(() => {
+                // 开始分析
+                const result = fill.do();
+                obj.fillVolume = result.fillVolume;
+                obj.excavaVolume = result.excavaVolume
+                resultFolder.add(obj, 'fillVolume').name('填充体积(m3)')
+                resultFolder.add(obj, 'excavaVolume').name('挖方体积(m3)')
+                loading.close();
+            }, 100);
+        })
+        let resultFolder;
         const obj = {
             draw: function () {
                 manager.pick(CesiumPro.PlotType.POLYGON);
 
-                manager.postEdit.addEventListener((graphic) => {
-                    fill = new CesiumPro.FillAnalysis(viewer, {
-                        height: 2000,
-                        mask: graphic.positions
-                    })
-                    fill.postDo.addEventListener(result => {
-                        obj.fillVolume = result.fillVolume;
-                        obj.excavaVolume = result.excavaVolume
-                        gui.add(obj, 'fillVolume').name('填充体积')
-                        gui.add(obj, 'excavaVolume').name('挖方体积')
-                    });
-                    manager.remove(graphic);
-                    // 开始分析
-                    fill.do();
-                })
+            },
+            remove: function () {
+                if (fill) {
+                    fill.clear();
+                }
+                if (resultFolder && resultFolder.children) {
+                    resultFolder.children[1].destroy();
+                    resultFolder.children[0].destroy();
+                    resultFolder.children = []
+                }
+
             },
             fillVolume: 0,
             excavaVolume: 0
         }
 
         gui.add(obj, 'draw').name('绘制分析区域');
+        gui.add(obj, 'remove').name('清除分析结果');
+        resultFolder = gui.addFolder("分析结果")
 
     </script>
 </body>

@@ -270,18 +270,22 @@ class TransformHelper {
     const lineLength = this._radius * this._radiusRatio;
     const plc = this.axisRoot;
     const center = this.center;
+    let positions = [
+      center,
+      new Cartesian3(
+        defaultValue(this.xAxisLength, lineLength) + center.x,
+        center.y,
+        center.z
+      ),
+    ]
     this.xAxis = plc.add({
-      positions: [
-        center,
-        new Cartesian3(
-          defaultValue(this.xAxisLength, lineLength) + center.x,
-          center.y,
-          center.z
-        ),
-      ],
+      positions: positions,
       width: this.lineWidth,
       material: this.getAxisMaterial(this.xAxisColor),
     });
+    this.xNormal = new Cartesian3();
+    Cartesian3.subtract(positions[1], positions[0], this.xNormal)
+    Cartesian3.normalize(this.xNormal, this.xNormal)
     this.xAux = plc.add({
       positions: [],
       width: this.lineWidth,
@@ -289,18 +293,22 @@ class TransformHelper {
     });
     this.xAxis.axis = "X";
     this.xAxis.color = this.xAxisColor;
+    positions = [
+      center,
+      new Cartesian3(
+        center.x,
+        -(defaultValue(this.yAxisLength, lineLength)) + center.y,
+        center.z
+      ),
+    ];
     this.yAxis = plc.add({
-      positions: [
-        center,
-        new Cartesian3(
-          center.x,
-          -(defaultValue(this.yAxisLength, lineLength)) + center.y,
-          center.z
-        ),
-      ],
+      positions: positions,
       width: this.lineWidth,
       material: this.getAxisMaterial(this.yAxisColor),
     });
+    this.yNormal = new Cartesian3();
+    Cartesian3.subtract(positions[1], positions[0], this.yNormal)
+    Cartesian3.normalize(this.yNormal, this.yNormal)
     this.yAux = plc.add({
       positions: [],
       width: this.lineWidth,
@@ -308,18 +316,22 @@ class TransformHelper {
     });
     this.yAxis.axis = "Y";
     this.yAxis.color = this.yAxisColor;
+    positions = [
+      center,
+      new Cartesian3(
+        center.x,
+        center.y,
+        defaultValue(this.zAxisLength, lineLength) + center.z
+      ),
+    ];
     this.zAxis = plc.add({
-      positions: [
-        center,
-        new Cartesian3(
-          center.x,
-          center.y,
-          defaultValue(this.zAxisLength, lineLength) + center.z
-        ),
-      ],
+      positions: positions,
       width: this.lineWidth,
       material: this.getAxisMaterial(this.zAxisColor),
     });
+    this.zNormal = new Cartesian3();
+    Cartesian3.subtract(positions[1], positions[0], this.zNormal)
+    Cartesian3.normalize(this.zNormal, this.zNormal)
     this.zAux = plc.add({
       positions: [],
       width: this.lineWidth,
@@ -497,13 +509,22 @@ class TransformHelper {
    * @private
    */
   createScaleAxis() {
-    const lineLength = this._radius * this._radiusRatio;    
+    const lineLength = this._radius * this._radiusRatio;  
+    let normal = new Cartesian3(1, 1, 1);
+    if (this.xNormal && this.yNormal && this.zNormal) {
+      Cartesian3.add(this.xNormal, this.yNormal, normal);
+      Cartesian3.add(normal, this.zNormal, normal);
+    }
+    Cartesian3.normalize(normal, normal);
     const l = defaultValue(this.scaleAxisLength, lineLength);
-    const delta = Math.pow(l, 1 / 3);
+    // 对角线顶点 
+    const v = new Cartesian3();
+    Cartesian3.multiplyByScalar(normal, l, v)
+    Cartesian3.add(this._center, v, v)
     this.scaleAxis = this.axisRoot.add({
       positions: [
         this._center,
-        new Cartesian3((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+        v,
       ],
       width: this.lineWidth,
       material: this.getAxisMaterial(this.scaleAxisColor),

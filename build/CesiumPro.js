@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-08-27
+ * @datetime 2023-08-30
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -5279,6 +5279,7 @@
         return triangleGrid(box, cellSize, options);
     };
     AnalysisUtil.getCartesians = function(positions) {
+        if (!positions) return;
         const first = positions[0];
         if (first instanceof LonLat) {
             return positions.map(_ => _.toCartesian());
@@ -5526,7 +5527,7 @@
              * @deprecated
              * 请使用postAnalysis
              */
-            this.postDo = this.postDo;
+            this.postDo = this.postAnalysis;
 
         }
         /**
@@ -5542,7 +5543,10 @@
          * @param {*} options 
          */
         do(options) {
-           
+        //    throw new CesiumProError("abstract method cannot be called");
+            if (this._doing) {
+                throw new CesiumProError$1("当前有正在分析的任务，请稍候再试");
+            }
         }
         isDestroyed() {
             return false;
@@ -5818,7 +5822,7 @@
          * @extends BaseAnalysis
          * @param {*} viewer 
          * @param {*} options 具有以下属性
-         * @param {LonLat[]|Cesium.Cartesian3[]} options.mask 分析范围
+         * @param {LonLat[]|Cesium.Cartesian3[]} [options.mask] 分析范围
          * @param {Cesium.Color} [options.fillColor = Cesium.Color.RED] 需要填充的区域的颜色
          * @param {Cesium.Color} [options.excavatedColor = Cesium.Color.GREEN] 需要挖掘的区域的颜色
          * @param {number} [options.height] 挖填高度
@@ -5828,11 +5832,13 @@
          */
         constructor(viewer, options = {}) {
             super(viewer, options);
-            if (!options.mask) {
-                throw new CesiumProError$1('parameter mask must be provided.')
-            }
+            // if (!options.mask) {
+            //     throw new CesiumProError('parameter mask must be provided.')
+            // }
             const mask = AnalysisUtil.getCartesians(options.mask);
-            this._mask = [...mask, mask[0]];
+            if (mask) {
+                this._mask = [...mask, mask[0]];
+            }
             if (this._mask instanceof Cartesian3$m) {
                 this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
             }
@@ -5845,6 +5851,21 @@
             this._renderToViewer = defaultValue$c(options.renderToViewer, true);
         }
         /**
+         * 设置分析范围
+         * @param {*} mask 
+         */
+        setMask(mask) {
+            if (!Array.isArray(mask)) {
+                throw new CesiumProError$1('mask must be an array');
+            }
+            const maskCartesians = AnalysisUtil.getCartesians(options.mask);        
+            this._mask = [...maskCartesians, maskCartesians[0]];
+            if (this._mask instanceof Cartesian3$m) {
+                this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
+            }
+        }
+
+        /**
          * 建议采样间距
          * @type {number}
          */
@@ -5854,7 +5875,14 @@
          * @returns {object} 分析结果
          */
         do() {
+            super.do();
+            if (!this._mask) {
+                if (!Array.isArray(mask)) {
+                    throw new CesiumProError$1('请通过setMask方法指定分析范围');
+                }
+            }
             this._check();
+            this.clear();
             this.preDo.raise({
                 samplerSize: this._samplerSize,
                 id: this._id
@@ -5906,6 +5934,14 @@
             const clamp = height > this._height ? true : false;
             const polygon = createPolygon$2(positions, color, this._height, clamp);
             this._root.add(polygon);
+        }
+        /**
+         * 清空分析结果
+         */
+        clear() {
+            if (this._root) {
+                this._viewer.scene.primitives.remove(this._root);
+            }
         }
         destroy() {
             this._viewer.scene.primitives.remove(this._root);
@@ -24899,18 +24935,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         const lineLength = this._radius * this._radiusRatio;
         const plc = this.axisRoot;
         const center = this.center;
+        let positions = [
+          center,
+          new Cartesian3$d(
+            defaultValue$7(this.xAxisLength, lineLength) + center.x,
+            center.y,
+            center.z
+          ),
+        ];
         this.xAxis = plc.add({
-          positions: [
-            center,
-            new Cartesian3$d(
-              defaultValue$7(this.xAxisLength, lineLength) + center.x,
-              center.y,
-              center.z
-            ),
-          ],
+          positions: positions,
           width: this.lineWidth,
           material: this.getAxisMaterial(this.xAxisColor),
         });
+        this.xNormal = new Cartesian3$d();
+        Cartesian3$d.subtract(positions[1], positions[0], this.xNormal);
+        Cartesian3$d.normalize(this.xNormal, this.xNormal);
         this.xAux = plc.add({
           positions: [],
           width: this.lineWidth,
@@ -24918,18 +24958,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.xAxis.axis = "X";
         this.xAxis.color = this.xAxisColor;
+        positions = [
+          center,
+          new Cartesian3$d(
+            center.x,
+            -(defaultValue$7(this.yAxisLength, lineLength)) + center.y,
+            center.z
+          ),
+        ];
         this.yAxis = plc.add({
-          positions: [
-            center,
-            new Cartesian3$d(
-              center.x,
-              -(defaultValue$7(this.yAxisLength, lineLength)) + center.y,
-              center.z
-            ),
-          ],
+          positions: positions,
           width: this.lineWidth,
           material: this.getAxisMaterial(this.yAxisColor),
         });
+        this.yNormal = new Cartesian3$d();
+        Cartesian3$d.subtract(positions[1], positions[0], this.yNormal);
+        Cartesian3$d.normalize(this.yNormal, this.yNormal);
         this.yAux = plc.add({
           positions: [],
           width: this.lineWidth,
@@ -24937,18 +24981,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
         });
         this.yAxis.axis = "Y";
         this.yAxis.color = this.yAxisColor;
+        positions = [
+          center,
+          new Cartesian3$d(
+            center.x,
+            center.y,
+            defaultValue$7(this.zAxisLength, lineLength) + center.z
+          ),
+        ];
         this.zAxis = plc.add({
-          positions: [
-            center,
-            new Cartesian3$d(
-              center.x,
-              center.y,
-              defaultValue$7(this.zAxisLength, lineLength) + center.z
-            ),
-          ],
+          positions: positions,
           width: this.lineWidth,
           material: this.getAxisMaterial(this.zAxisColor),
         });
+        this.zNormal = new Cartesian3$d();
+        Cartesian3$d.subtract(positions[1], positions[0], this.zNormal);
+        Cartesian3$d.normalize(this.zNormal, this.zNormal);
         this.zAux = plc.add({
           positions: [],
           width: this.lineWidth,
@@ -25126,13 +25174,22 @@ czm_material czm_getMaterial(czm_materialInput materialInput)
        * @private
        */
       createScaleAxis() {
-        const lineLength = this._radius * this._radiusRatio;    
+        const lineLength = this._radius * this._radiusRatio;  
+        let normal = new Cartesian3$d(1, 1, 1);
+        if (this.xNormal && this.yNormal && this.zNormal) {
+          Cartesian3$d.add(this.xNormal, this.yNormal, normal);
+          Cartesian3$d.add(normal, this.zNormal, normal);
+        }
+        Cartesian3$d.normalize(normal, normal);
         const l = defaultValue$7(this.scaleAxisLength, lineLength);
-        const delta = Math.sqrt(3);
+        // 对角线顶点 
+        const v = new Cartesian3$d();
+        Cartesian3$d.multiplyByScalar(normal, l, v);
+        Cartesian3$d.add(this._center, v, v);
         this.scaleAxis = this.axisRoot.add({
           positions: [
             this._center,
-            new Cartesian3$d((l + this._center.x) / delta, -(l + this._center.y) / delta, (l + this._center.z) / delta),
+            v,
           ],
           width: this.lineWidth,
           material: this.getAxisMaterial(this.scaleAxisColor),

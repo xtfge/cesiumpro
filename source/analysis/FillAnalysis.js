@@ -64,7 +64,7 @@ class FillAnalysis extends BaseAnalysis {
      * @extends BaseAnalysis
      * @param {*} viewer 
      * @param {*} options 具有以下属性
-     * @param {LonLat[]|Cesium.Cartesian3[]} options.mask 分析范围
+     * @param {LonLat[]|Cesium.Cartesian3[]} [options.mask] 分析范围
      * @param {Cesium.Color} [options.fillColor = Cesium.Color.RED] 需要填充的区域的颜色
      * @param {Cesium.Color} [options.excavatedColor = Cesium.Color.GREEN] 需要挖掘的区域的颜色
      * @param {number} [options.height] 挖填高度
@@ -74,11 +74,13 @@ class FillAnalysis extends BaseAnalysis {
      */
     constructor(viewer, options = {}) {
         super(viewer, options);
-        if (!options.mask) {
-            throw new CesiumProError('parameter mask must be provided.')
-        }
+        // if (!options.mask) {
+        //     throw new CesiumProError('parameter mask must be provided.')
+        // }
         const mask = AnalysisUtil.getCartesians(options.mask);
-        this._mask = [...mask, mask[0]];
+        if (mask) {
+            this._mask = [...mask, mask[0]];
+        }
         if (this._mask instanceof Cartesian3) {
             this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
         }
@@ -91,6 +93,21 @@ class FillAnalysis extends BaseAnalysis {
         this._renderToViewer = defaultValue(options.renderToViewer, true);
     }
     /**
+     * 设置分析范围
+     * @param {*} mask 
+     */
+    setMask(mask) {
+        if (!Array.isArray(mask)) {
+            throw new CesiumProError('mask must be an array');
+        }
+        const maskCartesians = AnalysisUtil.getCartesians(options.mask);        
+        this._mask = [...maskCartesians, maskCartesians[0]];
+        if (this._mask instanceof Cartesian3) {
+            this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
+        }
+    }
+
+    /**
      * 建议采样间距
      * @type {number}
      */
@@ -100,7 +117,14 @@ class FillAnalysis extends BaseAnalysis {
      * @returns {object} 分析结果
      */
     do() {
+        super.do();
+        if (!this._mask) {
+            if (!Array.isArray(mask)) {
+                throw new CesiumProError('请通过setMask方法指定分析范围');
+            }
+        }
         this._check();
+        this.clear();
         this.preDo.raise({
             samplerSize: this._samplerSize,
             id: this._id
@@ -153,9 +177,13 @@ class FillAnalysis extends BaseAnalysis {
         const polygon = createPolygon(positions, color, this._height, clamp);
         this._root.add(polygon);
     }
-    destroy() {
-        this._viewer.scene.primitives.remove(this._root);
-        destroyObject(this);
+    /**
+     * 清空分析结果
+     */
+    clear() {
+        if (this._root) {
+            this._viewer.scene.primitives.remove(this._root);
+        }
     }
 }
 
