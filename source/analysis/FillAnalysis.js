@@ -114,7 +114,7 @@ class FillAnalysis extends BaseAnalysis {
     static suggestGridCount = 300;
     /**
      * 开始分析
-     * @returns {object} 分析结果
+     * @returns {object} 分析参数及结果
      */
     do() {
         super.do();

@@ -40,7 +40,7 @@ class ViewShedAnalysis extends BaseAnalysis {
   /**
    * <p>视域分析</p>
    * <b>Note:使用视域分析时需要关闭场景的阴影.</b>
-   * @extends Analysis
+   * @extends BaseAnalysis
    * @param {Cesium.Viewer} viewer  viewer对象
    * @param {Object} options 具有以下属性
    * @param {Cesium.Cartesian3} options.observe 观察位置，即视点所在的位置
