@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+  <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+  <script src='/build/CesiumPro.js'></script>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body,
+    html {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div id='toolbar'></div>
+  <script>
+    const viewer = new CesiumPro.Viewer('map');
+    const point = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(110.025, 30.021),
+      point: {
+        pixelSize: 10,
+        color: Cesium.Color.RED,
+      },
+      properties: {
+        bufferRadius: 1000
+      }
+    })
+    const point1 = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(110.009, 30.021),
+      point: {
+        pixelSize: 10,
+        color: Cesium.Color.RED,
+      },
+      properties: {
+        bufferRadius: 1400
+      }
+    })
+    const point2 = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(110.045, 30.011),
+      point: {
+        pixelSize: 10,
+        color: Cesium.Color.RED,
+      },
+      properties: {
+        bufferRadius: 1200
+      }
+    })
+    const line = viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([110.012, 30.015, 110.02, 30.01, 110.05, 30.02]),
+        width: 3,
+        material: Cesium.Color.GOLD,
+      },
+      properties: {
+        bufferRadius: 1400,
+        name: 'linestring'
+      }
+    })
+    const polygon = viewer.entities.add({
+      polygon: {
+        hierarchy: Cesium.Cartesian3.fromDegreesArray([110.01, 30.02, 110.03, 30.03, 110.04, 30.005]),
+        material: Cesium.Color.WHITE
+      },
+      properties: {}
+    })
+    polygon.properties.addProperty('bufferRadius', 500)
+    console.log(CesiumPro.Point.fromEntity(point));
+    console.log(CesiumPro.Polyline.fromEntity(line));
+    console.log(CesiumPro.Polygon.fromEntity(polygon));
+    viewer.flyTo(polygon)
+      // viewer.entities.add(point.entity);
+      // viewer.entities.add(line.entity);
+      // viewer.entities.add(polygon.entity);
+      // viewer.entities.add(point1.entity);
+      // viewer.entities.add(point2.entity);
+      // viewer.flyTo([point.entity, line.entity, polygon.entity]);
+      // const graphics = [point, point1, point2, line, polygon];
+      // const buffer = new CesiumPro.BufferAnalysis(viewer, {
+      //   graphics,
+      //   material: Cesium.Color.RED.withAlpha(0.6)
+      // })
+    // const buffer = new CesiumPro.BufferAnalysis(viewer, {
+    //   graphics: [...[point, point1, point2].map(_ => CesiumPro.Point.fromEntity(_))]
+    // })
+    // buffer.do();
+  </script>
+</body>
+
+</html>

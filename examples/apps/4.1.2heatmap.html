@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+   <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+  <script src='/build/CesiumPro.js'></script>
+  <style>
+    #map {
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+    body,html {
+      margin: 0;
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+   <div id='toolbar'></div>
+  <script>
+    const viewer = new CesiumPro.Viewer('map');
+    let heatmap;
+    fetch('../data/heatmap.json').then(res => {
+      return res.json();
+    }).then(json => {
+      heatmap = new CesiumPro.Heatmap({
+        points: json,
+        lonField: 'lon',
+        latField: 'lat',
+        heatmapOptions: {
+          radius: 16
+        },
+        autoRerender: false,
+        useLocalExtrema: false,
+        render3D: false
+      })
+      heatmap.addTo(viewer);
+      heatmap.zoomTo()
+      
+    })
+
+    const object = {
+      radius: 16,
+      autoRerender: false,
+      useLocalExtrema: false,
+      render3D: false
+    }
+    const gui = new GUI();
+    const radiusEl = gui.add(object, 'radius', 2, 20,1).name('半径').onChange(() => {
+      heatmap.radius = object.radius;
+    });;
+    gui.add(object, 'autoRerender').name('自动适应半径').onChange(() => {
+      radiusEl.setValue(4);
+      heatmap.autoRerender = object.autoRerender;      
+    });
+    gui.add(object, 'useLocalExtrema').name('仅使用当前屏幕范围内的点').onChange(() => {
+      heatmap.useLocalExtrema = object.useLocalExtrema
+    });;
+    gui.add(object, 'render3D').name('3D热力图').onChange(() => {
+      heatmap.render3D = object.render3D
+    });;
+  </script>
+</body>
+</html>
