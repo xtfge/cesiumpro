@@ -493,17 +493,27 @@
           {
             "label": "缓冲区分析",
             "value": "6.1.3buffer",
-            "thumb": "./images/images/6.1.3buffer"
+            "thumb": "./images/6.1.3buffer.png"
+          },
+          {
+            "label": "区域地形极值",
+            "value": "6.1.4.regionTerrain",
+            "thumb": "./images/6.1.4.regionTerrain.png"
           },
           {
             "label": "淹没分析",
             "value": "6.1.4hiy",
-            "thumb": "./assets/images/6.1.4hiy.png"
+            "thumb": "./images/6.1.4hiy.png"
           },
           {
             "label": "可视域分析",
-            "value": "2.1.5viewshed",
-            "thumb": "./assets/images/2.1.5viewshed.png"
+            "value": "6.1.5viewshed",
+            "thumb": "./images/6.1.5viewshed.png"
+          },
+          {
+            "label": "地形分析",
+            "value": "6.1.6terrainAnalysis",
+            "thumb": "./images/6.1.6terrainAnalysis.png"
           }
         ]
       },

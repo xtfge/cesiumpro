@@ -4,6 +4,7 @@ import czm_ellipsoid from './ellipsoid';
 import czm_getWgs84EllipsoidEC from './getWgs84EllipsoidEC';
 import czm_translucentPhong from './translucentPhong';
 import czm_phong from './phong'
+import czm_p_inClipRegion from './inClipRegion'
 //必须以czm_开头
 const buildins = {
   czm_p_toEye,
@@ -11,7 +12,8 @@ const buildins = {
   czm_ellipsoid,
   czm_getWgs84EllipsoidEC,
   czm_translucentPhong,
-  czm_phong
+  czm_phong,
+  czm_p_inClipRegion
 };
 
 function buildShader() {

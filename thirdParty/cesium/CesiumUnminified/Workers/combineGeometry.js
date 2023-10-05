@@ -40,3 +40,4 @@ define(['./PrimitivePipeline-27f11d3f', './createTaskProcessorWorker', './Transf
   return combineGeometry$1;
 
 }));
+//# sourceMappingURL=combineGeometry.js.map

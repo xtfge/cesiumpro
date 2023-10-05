@@ -1,3 +1,5 @@
+import createInRegionShader from '../core/createInRegionShader'
+import attachCustomUniforms from '../core/attachCustomUniforms'
 const CesiumScene = Cesium.Scene;
 const {
     JulianDate,
@@ -188,11 +190,13 @@ function render(scene) {
 
     if (defined(scene.globe)) {
         scene.globe.beginFrame(frameState);
-        // override
+        // cesiumpro override
+        attachCustomUniforms(scene)
         scene._vectorTileQuadtree.beginFrame(frameState)
     }
     scene.updateEnvironment();
     scene.updateAndExecuteCommands(passState, backgroundColor);
+    // cesiumpro override
     scene.globe && scene._vectorTileQuadtree.render(frameState);
     scene.resolveFramebuffers(passState);
 
@@ -201,8 +205,9 @@ function render(scene) {
 
     if (defined(scene.globe)) {
         scene.globe.endFrame(frameState);
+        // cesiumpro override
         scene._vectorTileQuadtree.endFrame(frameState)
-
+        scene.globe && scene.globe.clipRegion.update(frameState);
         if (!scene.globe.tilesLoaded) {
             scene._renderRequested = true;
         }
@@ -286,6 +291,7 @@ function sceneRender(time) {
     if (shouldRender) {
         this._preRender.raiseEvent(this, time);
         frameState.creditDisplay.beginFrame();
+        createInRegionShader(this);
         tryAndCatchError(this, render);
     }
 

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../Source/Widgets/ProjectionPicker/ProjectionPicker.css"],
+  "sourcesContent": ["span.cesium-projectionPicker-wrapper {\n  display: inline-block;\n  position: relative;\n  margin: 0 3px;\n}\n\n.cesium-projectionPicker-visible {\n  visibility: visible;\n  opacity: 1;\n  transition: opacity 0.25s linear;\n}\n\n.cesium-projectionPicker-hidden {\n  visibility: hidden;\n  opacity: 0;\n  transition: visibility 0s 0.25s, opacity 0.25s linear;\n}\n\n.cesium-projectionPicker-wrapper .cesium-projectionPicker-none {\n  display: none;\n}\n\n.cesium-projectionPicker-wrapper .cesium-projectionPicker-dropDown-icon {\n  box-sizing: border-box;\n  padding: 0;\n  margin: 3px 0;\n}\n\n.cesium-projectionPicker-wrapper .cesium-projectionPicker-buttonPerspective,\n.cesium-projectionPicker-wrapper .cesium-projectionPicker-buttonOrthographic {\n  margin: 0 0 3px 0;\n}\n\n.cesium-projectionPicker-wrapper\n  .cesium-projectionPicker-buttonPerspective\n  .cesium-projectionPicker-iconOrthographic {\n  left: 100%;\n}\n\n.cesium-projectionPicker-wrapper\n  .cesium-projectionPicker-buttonOrthographic\n  .cesium-projectionPicker-iconPerspective {\n  left: -100%;\n}\n\n.cesium-projectionPicker-wrapper .cesium-projectionPicker-selected {\n  border-color: #2e2;\n  box-shadow: 0 0 8px #fff, 0 0 8px #fff;\n}\n"],
+  "mappings": ";AAAA;AACE;AACA;AACA;AAAA;AAGF;AACE;AACA;AACA;AAAA;AAGF;AACE;AACA;AACA;AAAA;AAGF;AACE;AAAA;AAGF;AACE;AACA;AACA;AAAA;AAGF;AAAA;AAEE;AAAA;AAGF;AAGE;AAAA;AAGF;AAGE;AAAA;AAGF;AACE;AACA;AAAA;",
+  "names": []
+}

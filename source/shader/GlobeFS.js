@@ -414,8 +414,12 @@ void main()\n\
     materialInput.height = v_height;\n\
     materialInput.aspect = v_aspect;\n\
     czm_material material = czm_getMaterial(materialInput);\n\
-    vec4 materialColor = vec4(material.diffuse, material.alpha);\n\
-    color = alphaBlend(materialColor, color);\n\
+    bool isIn = czm_p_inClipRegion((czm_model * vec4(v_positionMC, 1.0)).xyz); \n\
+    if (isIn) {\n\
+        czm_material material = czm_getMaterial(materialInput);\n\
+        vec4 materialColor = vec4(material.diffuse, material.alpha);\n\
+        color = alphaBlend(materialColor, color);\n\
+    }\n\
 #endif\n\
 \n\
 #ifdef ENABLE_VERTEX_LIGHTING\n\

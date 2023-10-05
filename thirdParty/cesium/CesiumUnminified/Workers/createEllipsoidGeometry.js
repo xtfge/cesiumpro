@@ -35,3 +35,4 @@ define(['./defaultValue-135942ca', './EllipsoidGeometry-fb52d895', './Transforms
   return createEllipsoidGeometry;
 
 }));
+//# sourceMappingURL=createEllipsoidGeometry.js.map

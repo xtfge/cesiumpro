@@ -558,3 +558,4 @@ define(['./defaultValue-135942ca', './Matrix3-ea964448', './Matrix2-f9f1b94b', '
   return createRectangleOutlineGeometry;
 
 }));
+//# sourceMappingURL=createRectangleOutlineGeometry.js.map

@@ -468,3 +468,4 @@ define(['./Transforms-ac2d28a9', './BoxGeometry-a1d96334', './Matrix3-ea964448',
   return createVectorTileGeometries$1;
 
 }));
+//# sourceMappingURL=createVectorTileGeometries.js.map

@@ -521,3 +521,4 @@ define(['exports', './Matrix3-ea964448', './PolylineVolumeGeometryLibrary-e460dd
   exports.CorridorGeometryLibrary = CorridorGeometryLibrary$1;
 
 }));
+//# sourceMappingURL=CorridorGeometryLibrary-756a53c6.js.map

@@ -663,3 +663,4 @@ define(['./AxisAlignedBoundingBox-48df2a2e', './Transforms-ac2d28a9', './Matrix2
   return createVerticesFromGoogleEarthEnterpriseBuffer$1;
 
 }));
+//# sourceMappingURL=createVerticesFromGoogleEarthEnterpriseBuffer.js.map

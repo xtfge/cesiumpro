@@ -8017,3 +8017,4 @@
     return $root.keyhole.dbroot;
   };
 })();
+//# sourceMappingURL=google-earth-dbroot-parser.js.map

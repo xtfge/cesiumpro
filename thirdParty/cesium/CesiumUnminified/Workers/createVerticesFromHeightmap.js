@@ -2730,3 +2730,4 @@ define(['./Matrix3-ea964448', './AxisAlignedBoundingBox-48df2a2e', './Transforms
   return createVerticesFromHeightmap$1;
 
 }));
+//# sourceMappingURL=createVerticesFromHeightmap.js.map

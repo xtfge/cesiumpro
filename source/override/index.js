@@ -1,9 +1,10 @@
 import overrideShaderProgram from './ShaderProgram.js'
 import overrideScene from './Scene.js'
-import overridePrimitive from './Primitive'
+import overrideUniformState from './UniformState.js'
 function overrideCesium() {
     overrideScene();
-    overrideShaderProgram();
+    // overrideShaderProgram();
+    overrideUniformState();
     // overridePrimitive();
 }
 export default overrideCesium;

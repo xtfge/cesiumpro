@@ -490,3 +490,4 @@ define(['exports', './Transforms-ac2d28a9', './Matrix2-f9f1b94b', './Matrix3-ea9
   exports.CylinderGeometry = CylinderGeometry;
 
 }));
+//# sourceMappingURL=CylinderGeometry-6ab4de6a.js.map

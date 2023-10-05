@@ -138,3 +138,4 @@ define(['./defaultValue-135942ca', './Transforms-ac2d28a9', './Matrix3-ea964448'
   return createPlaneOutlineGeometry;
 
 }));
+//# sourceMappingURL=createPlaneOutlineGeometry.js.map

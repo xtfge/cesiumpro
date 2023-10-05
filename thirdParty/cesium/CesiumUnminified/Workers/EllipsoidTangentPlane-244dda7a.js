@@ -396,3 +396,4 @@ define(['exports', './AxisAlignedBoundingBox-48df2a2e', './Matrix2-f9f1b94b', '.
   exports.EllipsoidTangentPlane = EllipsoidTangentPlane;
 
 }));
+//# sourceMappingURL=EllipsoidTangentPlane-244dda7a.js.map

@@ -336,3 +336,4 @@ define(['./Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84a28', './Co
   return createBoxOutlineGeometry;
 
 }));
+//# sourceMappingURL=createBoxOutlineGeometry.js.map

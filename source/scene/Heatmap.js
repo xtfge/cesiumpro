@@ -90,7 +90,7 @@ class Heatmap {
 		if (!this._options.points) {
 			throw new Error("parameter points must be provided");
 		}
-		const lonField = options.lonFiled || 'lon';
+		const lonField = options.lonField || 'lon';
 		const latField = options.latField || 'lat';
 		const valueField = options.valueField || 'value';
 		if (!Array.isArray(this._options.points)) {
@@ -434,13 +434,6 @@ class Heatmap {
 		this._viewer.scene.primitives.remove(this.primitive);
 	}
 	/**
-	 * 销毁热力图
-	 */
-	destroy() {
-		this.remove();
-		this._removeEventListener && this._removeEventListener();
-	}
-	/**
 	 * 定位到热力图
 	 */
 	zoomTo() {
@@ -474,6 +467,8 @@ class Heatmap {
 	 * 销毁热力图
 	 */
 	destroy() {
+		this.remove();
+		this._removeEventListener && this._removeEventListener();
 		document.body.removeChild(this._container);
 		destroyObject(this);
 	}

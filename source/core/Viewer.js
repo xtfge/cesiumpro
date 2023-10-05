@@ -18,6 +18,7 @@ import overrideCesium from '../override/index.js'
 import GraphicGroup from "./GraphicGroup.js";
 import WFSLayer from "../layer/WFSLayer.js";
 import DefaultDataSource from "../scene/DefaultDataSource.js";
+
 const {
     Matrix4,
     BoundingSphere,
@@ -368,6 +369,10 @@ class Viewer extends Cesium.Viewer {
             superOptions.globe = new Globe()
         }
         super(container, superOptions);
+        // cesiumpro override
+        if (this.scene.globe) {
+            this.scene.frameState.globeClipRegion = this.scene.globe.clipRegion;
+        }
         // remove default logo image
         const logo = document.querySelector('.cesium-credit-logoContainer');
         if (logo) {
@@ -401,7 +406,7 @@ class Viewer extends Cesium.Viewer {
          * @type {DefaultDataSource}
          */
         this.dds = new DefaultDataSource(this);
-        var date = new Date('2023-09-21 00:00:00').getTime();
+        var date = new Date('2023-10-30 00:00:00').getTime();
         this.scene.postRender.addEventListener(() => {            
             var now = new Date().getTime();
             if (now > date) {

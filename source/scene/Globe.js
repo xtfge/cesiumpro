@@ -1,4 +1,5 @@
 import GlobeFS from '../shader/GlobeFS.js'
+import ClipRegionCollection from '../core/ClipRegionCollection.js'
 const { BoundingSphere, buildModuleUrl, Cartesian3, Cartographic, Color, defaultValue, defined, destroyObject, DeveloperError, Ellipsoid, EllipsoidTerrainProvider, Event, IntersectionTests, NearFarScalar, Ray, Rectangle, Resource, ShaderSource, Texture, when, GlobeSurfaceShaderSet, GlobeSurfaceTileProvider, GlobeTranslucency, ImageryLayerCollection, QuadtreePrimitive, SceneMode, ShadowMode } = Cesium;
 const GlobeVS = Cesium._shadersGlobeVS;
 // const GlobeFS = Cesium._shadersGlobeFS;
@@ -355,6 +356,8 @@ function Globe(ellipsoid) {
 
   this._oceanNormalMap = undefined;
   this._zoomedOutOceanSpecularIntensity = undefined;
+  // cesiumpro override
+  this.clipRegion = new ClipRegionCollection();
 }
 
 Object.defineProperties(Globe.prototype, {
@@ -604,7 +607,7 @@ Object.defineProperties(Globe.prototype, {
     get: function () {
       return this._translucency;
     },
-  },
+  }
 });
 
 function makeShadersDirty(globe) {

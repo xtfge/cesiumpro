@@ -35,3 +35,4 @@ define(['./BoxGeometry-a1d96334', './defaultValue-135942ca', './Transforms-ac2d2
   return createBoxGeometry;
 
 }));
+//# sourceMappingURL=createBoxGeometry.js.map

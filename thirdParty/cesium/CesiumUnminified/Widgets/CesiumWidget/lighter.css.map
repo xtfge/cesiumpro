@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../Source/Widgets/CesiumWidget/lighter.css"],
+  "sourcesContent": [".cesium-lighter .cesium-widget-errorPanel {\n  background: rgba(255, 255, 255, 0.7);\n}\n\n.cesium-lighter .cesium-widget-errorPanel-content {\n  border: 1px solid #526f82;\n  border-radius: 7px;\n  background-color: white;\n  color: black;\n}\n\n.cesium-lighter .cesium-widget-errorPanel-header {\n  color: #b87d00;\n}\n"],
+  "mappings": ";AAAA;AACE;AAAA;AAGF;AACE;AACA;AACA;AACA;AAAA;AAGF;AACE;AAAA;",
+  "names": []
+}

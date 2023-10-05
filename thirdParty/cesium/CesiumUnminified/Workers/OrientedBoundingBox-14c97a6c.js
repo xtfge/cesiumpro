@@ -1280,3 +1280,4 @@ define(['exports', './Transforms-ac2d28a9', './Matrix2-f9f1b94b', './Matrix3-ea9
   exports.OrientedBoundingBox = OrientedBoundingBox;
 
 }));
+//# sourceMappingURL=OrientedBoundingBox-14c97a6c.js.map

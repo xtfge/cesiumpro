@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+   <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+  <script src='/build/CesiumPro.js'></script>
+  <link href="/build/assets/core.css" rel="stylesheet"/>
+  <style>
+    #map {
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+    body,html {
+      margin: 0;
+      width: 100%;
+      height:100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+   <div id='toolbar'></div>
+  <script>
+    const viewer = new CesiumPro.Viewer('map');
+    const pm = new CesiumPro.PlotManager(viewer);
+
+    const object = {
+      'draw': function() {
+        pm.pick(CesiumPro.PlotType.POLYGON);
+      }
+    }
+    const gui = new GUI();
+    gui.add(object, 'draw').name('绘制区域');
+  </script>
+</body>
+</html>

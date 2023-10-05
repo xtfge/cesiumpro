@@ -76,7 +76,7 @@ function updateFramebuffer(frameState) {
     pixelFormat: PixelFormat.RGBA,
     pixelDatatype: PixelDatatype.UNSIGNED_BYTE
   })
-  window._colorTexture = this._colorTexture;
+  // window._colorTexture = this._colorTexture;
   // create texture
   this._clearPassState = new PassState(frameState.context);
   this._depthStenclilTexture = new Texture({

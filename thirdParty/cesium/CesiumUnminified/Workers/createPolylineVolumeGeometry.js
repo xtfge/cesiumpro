@@ -434,3 +434,4 @@ define(['./defaultValue-135942ca', './Matrix3-ea964448', './arrayRemoveDuplicate
   return createPolylineVolumeGeometry;
 
 }));
+//# sourceMappingURL=createPolylineVolumeGeometry.js.map

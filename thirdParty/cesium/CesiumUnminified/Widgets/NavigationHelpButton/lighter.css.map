@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../Source/Widgets/NavigationHelpButton/lighter.css"],
+  "sourcesContent": [".cesium-lighter .cesium-navigation-help-instructions {\n  border: 1px solid #759dc0;\n  background-color: rgba(255, 255, 255, 0.9);\n}\n\n.cesium-lighter .cesium-navigation-help-pan {\n  color: #66ccee;\n  font-weight: bold;\n}\n\n.cesium-lighter .cesium-navigation-help-zoom {\n  color: #65ec00;\n  font-weight: bold;\n}\n\n.cesium-lighter .cesium-navigation-help-rotate {\n  color: #eec722;\n  font-weight: bold;\n}\n\n.cesium-lighter .cesium-navigation-help-tilt {\n  color: #d800d8;\n  font-weight: bold;\n}\n\n.cesium-lighter .cesium-navigation-help-details {\n  color: #222222;\n}\n\n.cesium-lighter .cesium-navigation-button {\n  color: #222222;\n  border-top: 1px solid #759dc0;\n  border-right: 1px solid #759dc0;\n}\n\n.cesium-lighter .cesium-navigation-button-selected {\n  background-color: rgba(196, 225, 255, 0.9);\n}\n\n.cesium-lighter .cesium-navigation-button-unselected {\n  background-color: rgba(226, 240, 255, 0.9);\n}\n\n.cesium-lighter .cesium-navigation-button-unselected:hover {\n  background-color: rgba(166, 210, 255, 0.9);\n}\n"],
+  "mappings": ";AAAA;AACE;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AAAA;AAGF;AACE;AACA;AACA;AAAA;AAGF;AACE;AAAA;AAGF;AACE;AAAA;AAGF;AACE;AAAA;",
+  "names": []
+}

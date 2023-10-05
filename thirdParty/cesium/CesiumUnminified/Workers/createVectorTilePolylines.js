@@ -277,3 +277,4 @@ define(['./Matrix3-ea964448', './combine-462d91dd', './AttributeCompression-53c7
   return createVectorTilePolylines$1;
 
 }));
+//# sourceMappingURL=createVectorTilePolylines.js.map

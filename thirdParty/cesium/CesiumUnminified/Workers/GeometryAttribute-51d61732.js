@@ -642,3 +642,4 @@ define(['exports', './Matrix2-f9f1b94b', './Matrix3-ea964448', './Check-40d84a28
   exports.PrimitiveType = PrimitiveType$1;
 
 }));
+//# sourceMappingURL=GeometryAttribute-51d61732.js.map

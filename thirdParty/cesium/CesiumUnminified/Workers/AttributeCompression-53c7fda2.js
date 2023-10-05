@@ -739,3 +739,4 @@ define(['exports', './Matrix2-f9f1b94b', './Matrix3-ea964448', './ComponentDatat
   exports.AttributeCompression = AttributeCompression$1;
 
 }));
+//# sourceMappingURL=AttributeCompression-53c7fda2.js.map

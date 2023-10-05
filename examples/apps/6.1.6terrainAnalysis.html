@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+  <script src="./script/zlib.js"></script>
+  <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+  <script src='/build/CesiumPro.js'></script>
+  <script src="./script/cesiumTdt.js"></script>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body,
+    html {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div id='toolbar'></div>
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzOGJiNzRiNS0xYTVjLTQyNTMtOTQyOS02YWM5YWI4ODQ1MTQiLCJpZCI6ODMxOSwiaWF0IjoxNjk2NDA5NDI0fQ.uAt_KMCYqP1_8K7re_5VNjAoegAjUDI22YedXnlWIus'
+    const viewer = new CesiumPro.Viewer('map', {
+      imageryProvider: new CesiumPro.GaoDeLayer(),
+    });
+    viewer.depthTest = true;
+    const subdomains = ['0', '1', '2', '3', '4', '5', '6', '7'];
+    var terrainUrls = new Array();
+    const terrainUrl = "https://[t0-t7].tianditu.gov.cn/mapservice/swdx?tk=fcbdbc6655229cf43ac26daff3e0ab7d"
+    for (let i = 0; i < subdomains.length; i++) {
+      const url1 = terrainUrl.replace('[t0-t7]', 't' + subdomains[i])
+      terrainUrls.push(url1);
+    }
+
+    var terrain = new Cesium.GeoTerrainProvider({
+      urls: terrainUrls,
+      requestVertexNormals: true // 如果计算坡度，必须请求顶点法线，且数据必须支持
+    });
+    viewer.terrain = terrain;
+    const positions = Cesium.Cartesian3.fromDegreesArray([108.4, 33.2, 108.6, 33.2, 108.5, 33.3, 108.6, 33.4, 108.4, 33.4,
+      108.4, 33.2])
+    const heightAnalyser = new CesiumPro.HeightAnalyser(viewer, { mask: positions });
+    const pl = viewer.entities.add({
+      polyline: {
+        positions,
+        width: 5,
+        material: Cesium.Color.GOLD,
+        clampToGround: true
+      }
+    })
+    viewer.flyTo(pl).then(() => {
+      // 获得最小高度和最大高度
+      const result = heightAnalyser.do();
+      console.log(result)
+    });
+    const clipRegion = new CesiumPro.ClipRegion(positions);
+    viewer.scene.globe.clipRegion.add(clipRegion)
+    //----------------------------------------------------------------
+    const object = {
+      overlay: '无',
+      line: true,
+      spacing: 150,
+      width: 2,
+      local: true,
+      color: '#FF0000'
+    }
+    function getHeights() {
+      let min, max;
+      if (object.local) {
+        min = 840;
+        max = 2270;
+      } else {
+        min = -414.0;
+        max = 8777.0
+      }
+      return { min, max };
+    }
+    const elevationRamp = [0.0, 0.045, 0.1, 0.15, 0.37, 0.54, 1.0];
+    const slopeRamp = [0.0, 0.29, 0.5, Math.sqrt(2) / 2, 0.87, 0.91, 1.0];
+    const aspectRamp = [0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 1.0];
+    function getColorImage() {
+      const ramp = document.createElement("canvas");
+      ramp.width = 100;
+      ramp.height = 10;
+      const ctx = ramp.getContext("2d");
+
+      let values;
+      if (object.overlay === "高度图") {
+        values = elevationRamp;
+      } else if (object.overlay === "坡度图") {
+        values = slopeRamp;
+      } else if (object.overlay === "坡向图") {
+        values = aspectRamp;
+      }
+      const grd = ctx.createLinearGradient(0, 0, 100, 0);
+      grd.addColorStop(values[0], "#000000"); //black
+      grd.addColorStop(values[1], "#2747E0"); //blue
+      grd.addColorStop(values[2], "#D33B7D"); //pink
+      grd.addColorStop(values[3], "#D33038"); //red
+      grd.addColorStop(values[4], "#FF9742"); //orange
+      grd.addColorStop(values[5], "#ffd700"); //yellow
+      grd.addColorStop(values[6], "#ffffff"); //white
+
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, 100, 10);
+      console.log(ramp.toDataURL())
+      return ramp;
+    }
+    function updateMaterial() {
+      let material;
+      let countorUniforms;
+      let countorMaterial;
+      if (object.overlay === '无') {
+        material = Cesium.Material.fromType("ElevationContour");
+        countorUniforms = material.uniforms;
+      } else if (object.overlay === '高度图') {
+        material = new Cesium.Material({
+          fabric: {
+            type: "ElevationColorContour",
+            materials: {
+              contourMaterial: {
+                type: "ElevationContour",
+              },
+              elevationRampMaterial: {
+                type: "ElevationRamp",
+              },
+            },
+            components: {
+              diffuse:
+                "contourMaterial.alpha == 0.0 ? elevationRampMaterial.diffuse : contourMaterial.diffuse",
+              alpha:
+                "max(contourMaterial.alpha, elevationRampMaterial.alpha)",
+            },
+          },
+          translucent: false,
+        });
+        const { min, max } = getHeights();
+        material.materials.elevationRampMaterial.uniforms.maximumHeight = max;
+        material.materials.elevationRampMaterial.uniforms.minimumHeight = min;
+        material.materials.elevationRampMaterial.uniforms.image = getColorImage()
+        countorUniforms = material.materials.contourMaterial.uniforms;
+      } else if (object.overlay === '坡度图') {
+        material = new Cesium.Material({
+          fabric: {
+            type: "SlopeColorContour",
+            materials: {
+              contourMaterial: {
+                type: "ElevationContour",
+              },
+              slopeRampMaterial: {
+                type: "SlopeRamp",
+              },
+            },
+            components: {
+              diffuse:
+                "contourMaterial.alpha == 0.0 ? slopeRampMaterial.diffuse : contourMaterial.diffuse",
+              alpha: "max(contourMaterial.alpha, slopeRampMaterial.alpha)",
+            },
+          },
+          translucent: false,
+        });
+        countorUniforms = material.materials.contourMaterial.uniforms;
+        material.materials.slopeRampMaterial.uniforms.image = getColorImage()
+      } else if (object.overlay === '坡向图') {
+        material = new Cesium.Material({
+          fabric: {
+            type: "AspectColorContour",
+            materials: {
+              contourMaterial: {
+                type: "ElevationContour",
+              },
+              aspectRampMaterial: {
+                type: "AspectRamp",
+              },
+            },
+            components: {
+              diffuse:
+                "contourMaterial.alpha == 0.0 ? aspectRampMaterial.diffuse : contourMaterial.diffuse",
+              alpha: "max(contourMaterial.alpha, aspectRampMaterial.alpha)",
+            },
+          },
+          translucent: false,
+        });
+        material.materials.aspectRampMaterial.uniforms.image = getColorImage()
+        countorUniforms = material.materials.contourMaterial.uniforms;
+      }
+
+      if (object.line) {
+        countorUniforms.width = object.width;
+        countorUniforms.spacing = object.spacing
+        countorUniforms.color = Cesium.Color.fromCssColorString(object.color);
+      } else {
+        countorUniforms.width = 0;
+      }
+      viewer.scene.globe.material = material;
+    }
+    updateMaterial();
+    const gui = new GUI();
+    let spacing, width, color
+    gui.add(object, 'overlay', ['无', '高度图', '坡向图', '坡度图']).name('叠加').onChange(() => {
+      updateMaterial();
+    });
+    gui.add(object, 'line').name('等高线').onChange(() => {
+      spacing.disable(!object.line)
+      width.disable(!object.line)
+      color.disable(!object.line)
+      updateMaterial();
+    })
+
+    color = gui.addColor(object, 'color').name('等高线颜色').onChange(() => {
+      updateMaterial()
+    })
+    spacing = gui.add(object, 'spacing', 50, 300).name('等高线间距').onChange(() => {
+      updateMaterial()
+    })
+    width = gui.add(object, 'width', 1, 5).name('等高线宽度').onChange(() => {
+      updateMaterial()
+    })
+    gui.add(object, 'local').name('指定生效范围').onChange(() => {
+      viewer.scene.globe.clipRegion.enabled = object.local;
+      updateMaterial();
+    })
+  </script>
+</body>
+
+</html>

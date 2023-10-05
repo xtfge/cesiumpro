@@ -1499,3 +1499,4 @@ define(['./defaultValue-135942ca', './Matrix3-ea964448', './Matrix2-f9f1b94b', '
   return createRectangleGeometry;
 
 }));
+//# sourceMappingURL=createRectangleGeometry.js.map

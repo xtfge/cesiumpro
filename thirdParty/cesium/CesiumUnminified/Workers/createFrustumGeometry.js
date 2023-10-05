@@ -35,3 +35,4 @@ define(['./defaultValue-135942ca', './FrustumGeometry-18ca04a0', './Transforms-a
   return createFrustumGeometry;
 
 }));
+//# sourceMappingURL=createFrustumGeometry.js.map

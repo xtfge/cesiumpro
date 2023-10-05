@@ -24,7 +24,8 @@ const {
   Plane,
   Model: CesiumModel,
   IntersectionTests,
-  Transforms
+  Transforms,
+  PointPrimitive
 } = Cesium;
 const _offset = new Cartesian3();
 const _q = new Quaternion();
@@ -39,6 +40,8 @@ function setColorForPrimitive(geometry, color) {
     geometry.material.uniforms.color = color;
   } else if (geometry instanceof Primitive) {
     geometry.appearance.material.uniforms.color = color;
+  } else if (geometry instanceof PointPrimitive) {
+    geometry.color = color;
   }
 }
 function projectInAxis(normal, vector) {
@@ -75,6 +78,11 @@ function computeAngle(helper, startPosition, endPosition) {
   return Math.acos(angle) * sign;
 }
 function computeOffset(helper, startPosition, endPosition, offset) {
+  // if (helper.activePrimitive === helper.origin) {
+  //   const c1 = LonLat.fromPixel(startPosition, helper._viewer);
+  //   const c2 = LonLat.fromPixel(endPosition, helper._viewer);
+  //   return Cartesian3.subtract(c2, c1, offset);
+  // }
   const activeAxis = helper.activePrimitive.relativeAxis || [
     helper.activePrimitive,
   ];
@@ -147,6 +155,7 @@ class TransformHelper {
     this.zAxisColor = defaultValue(options.zAxisColor, Color.BLUE);
     this.scaleAxisColor = defaultValue(options.scaleAxisColor, Color.WHITE);
     this.activeAxisColor = defaultValue(options.activeAxisColor, Color.YELLOW);
+    this.originColor = defaultValue(options.originColor, Color.WHITE)
     this._translateEnabled = defaultValue(options.translateEnabled, true);
     this._rotateEnabled = defaultValue(options.rotateEnabled, false);
     this._scaleEnabled = defaultValue(options.scaleEnabled, false);
@@ -393,8 +402,11 @@ class TransformHelper {
       show: true,
       position: this.center,
       pixelSize: this.lineWidth * 1.5,
-      color: Cesium.Color.WHITE,
+      color: this.originColor,
     });
+    this.origin.axis = 'XYZ';
+    // point 中已有color属性，因此用pcolor，和其他轴中的color作用一样
+    this.origin.pcolor = this.originColor;
     this.root.add(pc);
     this._primitives.push(this.origin);
   }
@@ -509,7 +521,7 @@ class TransformHelper {
    * @private
    */
   createScaleAxis() {
-    const lineLength = this._radius * this._radiusRatio;  
+    const lineLength = this._radius * this._radiusRatio;
     let normal = new Cartesian3(1, 1, 1);
     if (this.xNormal && this.yNormal && this.zNormal) {
       Cartesian3.add(this.xNormal, this.yNormal, normal);
@@ -542,6 +554,7 @@ class TransformHelper {
       throw new CesiumProError('please call addTo method to add to viewer')
     }
     this.unbind();
+    this._hasBindObject = true;
     if (object instanceof Model) {
       object = object.delegate;
     }
@@ -570,6 +583,7 @@ class TransformHelper {
     if (position instanceof Cartesian3 === false) {
       throw new CesiumProError('position is invalid')
     }
+    this._hasBindObject = true;
     this.modelMatrix = Transforms.eastNorthUpToFixedFrame(position);
     this._center = new Cartesian3();
     Cartesian3.clone(this.originOffset, this._center);
@@ -605,6 +619,7 @@ class TransformHelper {
     this.yAxis = undefined;
     this.zAxis = undefined;
     this.modelMatrix = undefined;
+    this._hasBindObject = false;
   }
   /**
    * 添加到场景
@@ -623,6 +638,9 @@ class TransformHelper {
     const viewer = this._viewer;
     const handler = new ScreenSpaceEventHandler(viewer.canvas);
     handler.setInputAction((e) => {
+      if (!this._hasBindObject) {
+        return;
+      }
       const feat = viewer.scene.pick(e.position);
       if (!feat) {
         return;
@@ -641,6 +659,9 @@ class TransformHelper {
     }, ScreenSpaceEventType.LEFT_DOWN);
 
     handler.setInputAction((e) => {
+      if (!this._hasBindObject) {
+        return;
+      }
       this.active(null);
       handler.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       viewer.scene.screenSpaceCameraController.enableRotate = true;
@@ -669,7 +690,7 @@ class TransformHelper {
       return;
     }
     if (!geometry && this.activePrimitive) {
-      setColorForPrimitive(this.activePrimitive, this.activePrimitive.color);
+      setColorForPrimitive(this.activePrimitive, this.activePrimitive.pcolor || this.activePrimitive.color);
       if (this.activePrimitive.isAxisPlane) {
         for (let a of this.activePrimitive.relativeAxis) {
           setColorForPrimitive(a, a.color);
@@ -692,7 +713,7 @@ class TransformHelper {
     }
     if (geometry.axis.includes("R")) {
       this._mode = EModel.R;
-      const mousedownCartesian = getPositionInPlane(this._mousedownPixel, helper);
+      const mousedownCartesian = getPositionInPlane(this._mousedownPixel, this);
       this.rAxuStart.positions = [this.center, mousedownCartesian]
       this._startLocalPosition = mousedownCartesian;
     } else if (geometry.axis.includes("S")) {
@@ -716,8 +737,15 @@ class TransformHelper {
    * @param {*} endPosition 
    */
   transform(startPosition, endPosition) {
-    this.preTranformEvent.raise(this.modelMatrix)
-    if (this._mode === EModel.T) {
+    this.preTranformEvent.raise(Matrix4.clone(this.modelMatrix, {}));
+    if (this.activePrimitive === this.origin) {
+      const translation = LonLat.toCartesian(LonLat.fromPixel(endPosition, this._viewer))
+      Matrix4.setTranslation(this._modelMatrix, translation, this._modelMatrix);
+      this.modelMatrix = this._modelMatrix;
+      for (let primitive of this.root._primitives) {
+        primitive.modelMatrix = this.modelMatrix;
+      }
+    } else if (this._mode === EModel.T) {
       computeOffset(this, startPosition, endPosition, _offset);
       this.translate(_offset);
     } else if (this._mode === EModel.R) {
@@ -730,7 +758,7 @@ class TransformHelper {
       const s = -_offset.sxyz / Cartesian3.distance(...this.scaleAxis.positions) + 1;
       this.scale(new Cartesian3(s, s, s));
     }
-    this.postTransformEvent.raise(this.modelMatrix)
+    this.postTransformEvent.raise(Matrix4.clone(this.modelMatrix, {}))
   }
   scale(scale) {
     const scaleMatrix = Matrix4.fromScale(scale, mat4);

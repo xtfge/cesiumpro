@@ -429,3 +429,4 @@ define(['./AttributeCompression-53c7fda2', './Matrix3-ea964448', './Color-7ea361
   return createVectorTilePolygons$1;
 
 }));
+//# sourceMappingURL=createVectorTilePolygons.js.map

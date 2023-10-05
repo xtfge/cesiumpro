@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../Source/Widgets/Geocoder/lighter.css"],
+  "sourcesContent": [".cesium-lighter .cesium-geocoder-input {\n  border: solid 1px #759dc0;\n  background-color: rgba(240, 240, 240, 0.9);\n  color: black;\n}\n\n.cesium-lighter .cesium-viewer-geocoderContainer:hover .cesium-geocoder-input {\n  border-color: #aef;\n  box-shadow: 0 0 8px #fff;\n}\n\n.cesium-lighter .cesium-geocoder-searchButton {\n  background-color: #e2f0ff;\n  fill: #111;\n}\n\n.cesium-lighter .cesium-geocoder-searchButton:hover {\n  background-color: #a6d2ff;\n}\n"],
+  "mappings": ";AAAA;AACE;AACA;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AACA;AAAA;AAGF;AACE;AAAA;",
+  "names": []
+}

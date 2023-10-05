@@ -36,7 +36,7 @@
       position: Cesium.Cartesian3.fromDegrees(110.025, 30.021),
       point: {
         pixelSize: 10,
-        color: Cesium.Color.RED,
+        color: Cesium.Color.GOLD,
       },
       properties: {
         bufferRadius: 1000
@@ -48,9 +48,6 @@
         pixelSize: 10,
         color: Cesium.Color.RED,
       },
-      properties: {
-        bufferRadius: 1400
-      }
     })
     const point2 = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(110.045, 30.011),
@@ -58,9 +55,6 @@
         pixelSize: 10,
         color: Cesium.Color.RED,
       },
-      properties: {
-        bufferRadius: 1200
-      }
     })
     const line = viewer.entities.add({
       polyline: {
@@ -69,7 +63,7 @@
         material: Cesium.Color.GOLD,
       },
       properties: {
-        bufferRadius: 1400,
+        bufferRadius: 600,
         name: 'linestring'
       }
     })
@@ -81,25 +75,71 @@
       properties: {}
     })
     polygon.properties.addProperty('bufferRadius', 500)
-    console.log(CesiumPro.Point.fromEntity(point));
-    console.log(CesiumPro.Polyline.fromEntity(line));
-    console.log(CesiumPro.Polygon.fromEntity(polygon));
-    viewer.flyTo(polygon)
-      // viewer.entities.add(point.entity);
-      // viewer.entities.add(line.entity);
-      // viewer.entities.add(polygon.entity);
-      // viewer.entities.add(point1.entity);
-      // viewer.entities.add(point2.entity);
-      // viewer.flyTo([point.entity, line.entity, polygon.entity]);
-      // const graphics = [point, point1, point2, line, polygon];
-      // const buffer = new CesiumPro.BufferAnalysis(viewer, {
-      //   graphics,
-      //   material: Cesium.Color.RED.withAlpha(0.6)
-      // })
+    const graphics = [
+      CesiumPro.PointFeature.fromEntity(point),
+      CesiumPro.PointFeature.fromEntity(point1),
+      CesiumPro.PointFeature.fromEntity(point2)
+    ]
+    const buffer = new CesiumPro.BufferAnalyser(viewer, {
+      graphics,
+      bufferRadius: 1500,
+      material: Cesium.Color.RED.withAlpha(0.6)
+    })
     // const buffer = new CesiumPro.BufferAnalysis(viewer, {
     //   graphics: [...[point, point1, point2].map(_ => CesiumPro.Point.fromEntity(_))]
     // })
-    // buffer.do();
+    buffer.do();
+    buffer.zoomTo();
+
+
+    const gui = new GUI();
+    const object = {
+      point: true,
+      line: false,
+      polygon: false,
+      clear: function () {
+        object.point = false;
+        object.line = false;
+        object.polygon = false;
+        buffer.clear();
+      }
+    }
+    function getGraphics() {
+      const graphics = [];
+      if (object.point) {
+        graphics.push(
+          CesiumPro.PointFeature.fromEntity(point),
+          CesiumPro.PointFeature.fromEntity(point1),
+          CesiumPro.PointFeature.fromEntity(point2)
+        )
+      }
+      if (object.line) {
+        graphics.push(CesiumPro.PolylineFeature.fromEntity(line))
+      }
+      if (object.polygon) {
+        graphics.push(CesiumPro.PolygonFeature.fromEntity(polygon))
+      }
+      return graphics;
+    }
+    gui.add(object, 'point').name('点缓冲区').onChange(() => {
+      const graphics = getGraphics();
+      buffer.setGraphic(graphics)
+      buffer.clear();
+      buffer.do();
+    })
+    gui.add(object, 'line').name('线缓冲区').onChange(() => {
+      const graphics = getGraphics();
+      buffer.setGraphic(graphics)
+      buffer.clear();
+      buffer.do();
+    })
+    gui.add(object, 'polygon').name('面缓冲区').onChange(() => {
+      const graphics = getGraphics();
+      buffer.setGraphic(graphics)
+      buffer.clear();
+      buffer.do();
+    })
+    gui.add(object, 'clear').name('清除')
   </script>
 </body>
 

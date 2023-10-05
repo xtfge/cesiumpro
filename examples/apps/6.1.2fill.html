@@ -44,14 +44,14 @@
         const pg = viewer.dds.addPolygon(positions, undefined, {
             material: Cesium.Color.GOLD.withAlpha(0.1)
         });
-        const analysis = new CesiumPro.HeightAnalysis(viewer, {
+        const analysis = new CesiumPro.HeightAnalyser(viewer, {
             mask: positions
         })
         viewer.depthTest = true;
         viewer.flyTo(pg)
         const manager = new CesiumPro.PlotManager(viewer);
         const gui = new GUI();
-        let fill = new CesiumPro.FillAnalysis(viewer, {
+        let fill = new CesiumPro.FillAnalyser(viewer, {
             height: 2000
         });
         // fill.postAnalysis.addEventListener(result => {
@@ -62,7 +62,7 @@
         //     loading.close();
         // });
         manager.postEdit.addEventListener((graphic) => {
-            fill = new CesiumPro.FillAnalysis(viewer, {
+            fill = new CesiumPro.FillAnalyser(viewer, {
                 height: 2000,
                 mask: graphic.positions
             })

@@ -184,10 +184,11 @@ class PlotManager {
   }
   /**
    * 从地图上选取点创建图形，系统会根据type监听需要的事件
-   * @param  {PlotType} type 要创建的图形类型
+   * @param {PlotType} type 要创建的图形类型
+   * @param {object} 图形样式，如果未定义，则使用全局样式
    * @return {PointPlot|PolylinePlot|PolygonPlot}   创建好的几何图形
    */
-  pick(type) {
+  pick(type = PlotType.POINT, style) {
     let singlePoint = false;
     if (PlotType.isPoint(type)) {
       singlePoint = true;
@@ -195,19 +196,19 @@ class PlotManager {
     let graphic;
     this._mode = PlotMode.create;
     if (type === PlotType.POINT) {
-      graphic = this.createPoint(this._pointStyle, this._labelStyle);
+      graphic = this.createPoint(style || this._pointStyle, this._labelStyle);
     } else if (type === PlotType.LABEL) {
-      graphic = this.createLabel(this._labelStyle);
+      graphic = this.createLabel(style || this._labelStyle);
     } else if (type === PlotType.MODEL) {
-      graphic = this.createModel(this._modelStyle, this._labelStyle);
+      graphic = this.createModel(style || this._modelStyle, this._labelStyle);
     } else if (type === PlotType.BILLBOARD) {
-      graphic = this.createBillboard(this._billboardStyle, this._labelStyle);
+      graphic = this.createBillboard(style || this._billboardStyle, this._labelStyle);
     } else if (type === PlotType.POLYLINE) {
-      graphic = this.createPolyline(this._polylineStyle);
+      graphic = this.createPolyline(style || this._polylineStyle);
     } else if (type === PlotType.POLYGON) {
-      graphic = this.createPolygon(this._polygonStyle);
+      graphic = this.createPolygon(style || this._polygonStyle);
     } else if (PlotType.isArrow(type)) {
-      graphic = this.createArrow(this._polygonStyle, type);
+      graphic = this.createArrow(style || this._polygonStyle, type);
     }
     this.activeGraphic = graphic;
     graphic.startEdit();
@@ -438,7 +439,7 @@ class PlotManager {
       this.activeGraphic = undefined;
       this._mode = PlotMode.ready;
       this.postEdit.raise(graphic);
-      this.removeEditListener && this.removeEditListener();      
+      this.removeEditListener && this.removeEditListener();
     }
   }
   /**
@@ -475,12 +476,12 @@ class PlotManager {
     const positions = this.activeGraphic.positions;
     const onClick = e => {
       const addNode = PlotType.isPoint(this.activeGraphic.type) ?
-        this.activeGraphic.updatePosition.bind(this.activeGraphic) : 
+        this.activeGraphic.updatePosition.bind(this.activeGraphic) :
         this.activeGraphic.addNode.bind(this.activeGraphic);
       const position = this.pickPosition(e.position);
       if (!defined(position)) {
         return;
-      } 
+      }
       // if (this.activeGraphic._arrowType === ArrowType.attackarrow && this.positions.length > 1) {
       //   this.activeGraphic.popNode();
       // }
@@ -579,7 +580,7 @@ class PlotManager {
     }
     handler.setInputAction(onClick, LEFT_CLICK);
     handler.setInputAction(onMouseDown, LEFT_DOWN);
-    this.removeEditListener = function() {
+    this.removeEditListener = function () {
       handler.removeInputAction(MOUSE_MOVE);
       handler.removeInputAction(LEFT_UP);
       handler.removeInputAction(LEFT_CLICK);

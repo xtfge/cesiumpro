@@ -1017,3 +1017,4 @@ define(['./AxisAlignedBoundingBox-48df2a2e', './Matrix2-f9f1b94b', './Matrix3-ea
   return createVerticesFromQuantizedTerrainMesh$1;
 
 }));
+//# sourceMappingURL=createVerticesFromQuantizedTerrainMesh.js.map

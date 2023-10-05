@@ -392,3 +392,4 @@ define(['exports', './Matrix2-f9f1b94b', './Matrix3-ea964448', './Check-40d84a28
   exports.BoundingRectangle = BoundingRectangle;
 
 }));
+//# sourceMappingURL=BoundingRectangle-02351bff.js.map

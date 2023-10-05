@@ -2285,3 +2285,4 @@ define(['exports', './Check-40d84a28', './defaultValue-135942ca', './Transforms-
   exports.Color = Color;
 
 }));
+//# sourceMappingURL=Color-7ea3613e.js.map

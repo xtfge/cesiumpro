@@ -1430,3 +1430,4 @@ define(['./arrayRemoveDuplicates-3fb00ed2', './Transforms-ac2d28a9', './Matrix3-
   return createCorridorGeometry;
 
 }));
+//# sourceMappingURL=createCorridorGeometry.js.map

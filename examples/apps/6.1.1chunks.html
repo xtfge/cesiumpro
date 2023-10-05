@@ -30,7 +30,7 @@
         const viewer = new CesiumPro.Viewer('map');
         const positions = [new CesiumPro.LonLat(110, 30), new CesiumPro.LonLat(111, 31), new CesiumPro.LonLat(112, 31)]
         viewer.dds.addPolyline(positions);
-        const chunks = CesiumPro.AnalysisUtil.lineChunk(positions, 10, {units: 'miles'});
+        const chunks = CesiumPro.AnalyserUtil.lineChunk(positions, 10, {units: 'miles'});
         for (let chunk of [].slice.call(chunks.features, 0)) {
             const geometry = chunk.geometry;
             const coordinates = geometry.coordinates[0];
@@ -41,7 +41,7 @@
         new CesiumPro.LonLat(111.5, 31.5), new CesiumPro.LonLat(112, 32), 
         new CesiumPro.LonLat(112, 31), new CesiumPro.LonLat(111, 31)]
         viewer.dds.addPolygon(positions1)
-        const grid = CesiumPro.AnalysisUtil.polygonToGrid(positions1, 10, {units: 'miles'})
+        const grid = CesiumPro.AnalyserUtil.polygonToGrid(positions1, 10, {units: 'miles'})
         for (let chunk of [].slice.call(grid.features, 0)) {
             const geometry = chunk.geometry;
             const coordinates = geometry.coordinates;

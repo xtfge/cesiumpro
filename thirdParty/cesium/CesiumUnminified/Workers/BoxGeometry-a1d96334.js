@@ -907,3 +907,4 @@ define(['exports', './Transforms-ac2d28a9', './Matrix3-ea964448', './Check-40d84
   exports.BoxGeometry = BoxGeometry;
 
 }));
+//# sourceMappingURL=BoxGeometry-a1d96334.js.map

@@ -324,3 +324,4 @@ define(['./defaultValue-135942ca', './Matrix3-ea964448', './arrayRemoveDuplicate
   return createPolylineVolumeOutlineGeometry;
 
 }));
+//# sourceMappingURL=createPolylineVolumeOutlineGeometry.js.map

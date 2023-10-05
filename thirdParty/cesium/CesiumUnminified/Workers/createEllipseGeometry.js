@@ -37,3 +37,4 @@ define(['./Matrix3-ea964448', './defaultValue-135942ca', './EllipseGeometry-08ba
   return createEllipseGeometry;
 
 }));
+//# sourceMappingURL=createEllipseGeometry.js.map

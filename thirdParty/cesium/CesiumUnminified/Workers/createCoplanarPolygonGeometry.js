@@ -609,3 +609,4 @@ define(['./arrayRemoveDuplicates-3fb00ed2', './BoundingRectangle-02351bff', './T
   return createCoplanarPolygonGeometry;
 
 }));
+//# sourceMappingURL=createCoplanarPolygonGeometry.js.map
