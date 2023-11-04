@@ -14,7 +14,6 @@ class BaseAnalyser {
         this._id = defaultValue(options.id, guid());
         this.options = options;
         this._viewer = viewer;
-        this._doing = false;
         /**
          * 分析开始前触发的事件
          * @type {Event}
@@ -59,12 +58,6 @@ class BaseAnalyser {
     }
     isDestroyed() {
         return false;
-    }
-    _check() {
-        if (this._doing) {
-            throw new CesiumProError('上一次分析正在进行，请稍候...');
-        }
-        this._doing = true;
     }
     clear() {
         

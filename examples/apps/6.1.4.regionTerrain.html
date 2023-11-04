@@ -1,43 +1,89 @@
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
   <meta charset='UTF-8'>
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <title>Cesium Pro</title>
-   <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='./editor/lil-gui.module.min.js'></script>
   <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
-  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet'/>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
   <script src='/build/CesiumPro.js'></script>
-  <link href="/build/assets/core.css" rel="stylesheet"/>
+  <link href="/build/assets/core.css" rel="stylesheet" />
   <style>
     #map {
       width: 100%;
-      height:100%;
+      height: 100%;
       overflow: hidden;
     }
-    body,html {
+
+    body,
+    html {
       margin: 0;
       width: 100%;
-      height:100%;
+      height: 100%;
       overflow: hidden;
     }
   </style>
 </head>
+
 <body>
   <div id='map'></div>
-   <div id='toolbar'></div>
+  <div id='toolbar'></div>
   <script>
-    const viewer = new CesiumPro.Viewer('map');
+    const viewer = new CesiumPro.Viewer('map', {
+      imageryProvider: new CesiumPro.GaoDeLayer()
+    });
+    const terrain = new Cesium.CesiumTerrainProvider({
+      url: '../data/terrain/terrain1'
+    })
+    viewer.terrain = terrain;
+    viewer.flyTo(new CesiumPro.LonLat(108.5, 33.3, 10000)).then((v) => {
+      console.log('fly complete', v)
+    })
     const pm = new CesiumPro.PlotManager(viewer);
-
+    const analyser = new CesiumPro.HeightAnalyser(viewer, {
+      samplerSzie: 300
+    })
+    let minObj, maxObj, avgObj, result;
     const object = {
-      'draw': function() {
+      'draw': function () {
         pm.pick(CesiumPro.PlotType.POLYGON);
+      },
+      cellSize: 300,
+      min: 0,
+      max: 0,
+      avg: 0,
+      do: function () {
+        const r = analyser.do();
+        object.min = r.min;
+        object.max = r.max;
+        object.avg = r.avg;
+        if (!minObj) {
+          minObj = result.add(object, 'min').name('最小高程')
+          maxObj = result.add(object, 'max').name('最大高程')
+          avgObj = result.add(object, 'avg').name('最大高程')
+        } else {
+          minObj.setValue(object.min)
+          maxObj.setValue(object.max);
+          avgObj.setValue(object.avg)
+        }
       }
     }
+
+    pm.postEdit.addEventListener((graphic) => {
+      analyser.mask = graphic.positions;
+    })
+
     const gui = new GUI();
     gui.add(object, 'draw').name('绘制区域');
+    gui.add(object, 'cellSize', 100, 500, 10).name('采样间距').onChange(val => {
+      analyser.samplerSize = val;
+    })
+    gui.add(object, 'do').name('开始分析');
+    result = gui.addFolder('分析结果')
   </script>
 </body>
+
 </html>

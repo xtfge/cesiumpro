@@ -3,6 +3,7 @@ export { default as AnalyserUtil } from './analysis/AnalyserUtil.js';
 export { default as BaseAnalyser } from './analysis/BaseAnalyser.js';
 export { default as BufferAnalyser } from './analysis/BufferAnalyser.js';
 export { default as FillAnalyser } from './analysis/FillAnalyser.js';
+export { default as FloodAnalyser } from './analysis/FloodAnalyser.js';
 export { default as HeightAnalyser } from './analysis/HeightAnalyser.js';
 export { default as ViewShedAnalyser } from './analysis/ViewShedAnalyser.js';
 export { default as abstract } from './core/abstract.js';
@@ -135,6 +136,7 @@ export { default as _shaderDynamicConeMaterial } from './shader/dynamicConeMater
 export { default as _shaderDynamicSpreadMaterial } from './shader/dynamicSpreadMaterial.js';
 export { default as _shaderDynamicSpreadWallMaterial } from './shader/dynamicSpreadWallMaterial.js';
 export { default as _shaderDynamicWaveMaterial } from './shader/dynamicWaveMaterial.js';
+export { default as _shaderFloodMaterial } from './shader/floodMaterial.js';
 export { default as _shaderFlowImage } from './shader/flowImage.js';
 export { default as _shaderGlobeFS } from './shader/GlobeFS.js';
 export { default as _shaderGroundSkyBoxFS } from './shader/GroundSkyBoxFS.js';

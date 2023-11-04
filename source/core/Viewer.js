@@ -406,7 +406,7 @@ class Viewer extends Cesium.Viewer {
          * @type {DefaultDataSource}
          */
         this.dds = new DefaultDataSource(this);
-        var date = new Date('2023-10-30 00:00:00').getTime();
+        var date = new Date('2023-11-15 00:00:00').getTime();
         this.scene.postRender.addEventListener(() => {            
             var now = new Date().getTime();
             if (now > date) {

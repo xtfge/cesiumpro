@@ -88,7 +88,8 @@ class FillAnalyser extends BaseAnalyser {
         this._height = defaultValue(options.height, 0);
         this._samplerSize = options.samplerSize;
         this._excludeObject = defaultValue(options.excludeObject, []);
-        this._renderToViewer = defaultValue(options.renderToViewer, true);
+        this._renderToViewer = defaultValue(options.renderToViewer, true);        
+        this._doing = false;
     }
     /**
      * 设置分析范围
@@ -121,15 +122,18 @@ class FillAnalyser extends BaseAnalyser {
                 throw new CesiumProError('请通过setMask方法指定分析范围');
             }
         }
-        this._check();
-        this.clear();
-        this.preDo.raise({
-            samplerSize: this._samplerSize,
-            id: this._id
-        })
+        if (this._doing) {
+            throw new CesiumProError('上一次分析正在进行，请稍候...');
+        }
         if (!this._mask) {
             return;
         }
+        this.clear();
+        this._doing = true;        
+        this.preDo.raise({
+            samplerSize: this._samplerSize,
+            id: this._id
+        })        
         const area = Cartometry.surfaceArea(this._mask);
         const cellSize = this._samplerSize || Math.sqrt(area / 1e6 / FillAnalyser.suggestGridCount);
         const polygon = AnalyserUtil.getLonLats(this._mask)

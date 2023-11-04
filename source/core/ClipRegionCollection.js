@@ -132,9 +132,13 @@ class ClipRegionCollection {
   }
   /**
    * 删除一个clipRegion
-   * @param {string} id 需要删除的clipRegion的id
+   * @param {string} clipRegion 需要删除的clipRegion或其id
    */
-  remove(id) {
+  remove(clipRegion) {
+    let id = clipRegion;
+    if (clipRegion instanceof ClipRegion) {
+      id = clipRegion.id;
+    }
     this._values.remove(id);
     this._updateGlobeUniforms();
   }

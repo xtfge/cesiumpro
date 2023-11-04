@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-10-05
+ * @datetime 2023-11-04
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -27144,7 +27144,6 @@
             this._id = defaultValue$c(options.id, guid());
             this.options = options;
             this._viewer = viewer;
-            this._doing = false;
             /**
              * 分析开始前触发的事件
              * @type {Event}
@@ -27189,12 +27188,6 @@
         }
         isDestroyed() {
             return false;
-        }
-        _check() {
-            if (this._doing) {
-                throw new CesiumProError$1('上一次分析正在进行，请稍候...');
-            }
-            this._doing = true;
         }
         clear() {
             
@@ -28030,7 +28023,7 @@
     };
 
     const {
-        Color: Color$t,
+        Color: Color$u,
         Cartesian3: Cartesian3$o,
         Cartographic: Cartographic$d,
         PrimitiveCollection: PrimitiveCollection$5,
@@ -28106,13 +28099,14 @@
             if (this._mask instanceof Cartesian3$o) {
                 this._mask = this._mask.map(_ => LonLat.fromCartesian(_));
             }
-            this.excavatedColor = defaultValue$c(options.excavatedColor, Color$t.RED.withAlpha(0.5));
-            this.fillColor = defaultValue$c(options.fillColor, Color$t.GREEN.withAlpha(0.5));
+            this.excavatedColor = defaultValue$c(options.excavatedColor, Color$u.RED.withAlpha(0.5));
+            this.fillColor = defaultValue$c(options.fillColor, Color$u.GREEN.withAlpha(0.5));
             this._type = 'excavation-analysis';
             this._height = defaultValue$c(options.height, 0);
             this._samplerSize = options.samplerSize;
             this._excludeObject = defaultValue$c(options.excludeObject, []);
-            this._renderToViewer = defaultValue$c(options.renderToViewer, true);
+            this._renderToViewer = defaultValue$c(options.renderToViewer, true);        
+            this._doing = false;
         }
         /**
          * 设置分析范围
@@ -28145,15 +28139,18 @@
                     throw new CesiumProError$1('请通过setMask方法指定分析范围');
                 }
             }
-            this._check();
-            this.clear();
-            this.preDo.raise({
-                samplerSize: this._samplerSize,
-                id: this._id
-            });
+            if (this._doing) {
+                throw new CesiumProError$1('上一次分析正在进行，请稍候...');
+            }
             if (!this._mask) {
                 return;
             }
+            this.clear();
+            this._doing = true;        
+            this.preDo.raise({
+                samplerSize: this._samplerSize,
+                id: this._id
+            });        
             const area = Cartometry.surfaceArea(this._mask);
             const cellSize = this._samplerSize || Math.sqrt(area / 1e6 / FillAnalyser.suggestGridCount);
             const polygon = AnalyserUtil.getLonLats(this._mask);
@@ -28210,75 +28207,246 @@
     }
 
     const {
-        Cartographic: Cartographic$c
+      Cartesian3: Cartesian3$n, RenderState: RenderState$6, Cartesian4: Cartesian4$2, Matrix4: Matrix4$9, Texture: Texture$4, PixelFormat: PixelFormat$3, PixelDatatype: PixelDatatype$3, 
+      Framebuffer: Framebuffer$3, DrawCommand: DrawCommand$5, Pass: Pass$5, ShaderProgram: ShaderProgram$6, BoundingSphere: BoundingSphere$a, VertexArray: VertexArray$4, PolygonHierarchy: PolygonHierarchy$3, 
+      PolygonGeometry: PolygonGeometry$2, BoundingRectangle: BoundingRectangle$5, Transforms: Transforms$7, ClearCommand: ClearCommand$3, Color: Color$t, PassState: PassState$3, OrthographicOffCenterFrustum: OrthographicOffCenterFrustum$2, 
+      Cartographic: Cartographic$c, defined: defined$d, destroyObject: destroyObject$b, BufferUsage: BufferUsage$4, WebGLConstants: WebGLConstants$5, PrimitiveType: PrimitiveType$5
     } = Cesium;
+    const vs$2 = `
+attribute vec3 position;
+varying float depth;
+uniform mat4 u_inverseMatrix;
+void main() {
+  vec4 pos = vec4(position, 1.0);  
+  vec4 positionLC = u_inverseMatrix * pos;
+  depth = positionLC.z;
+  gl_Position = czm_projection * vec4(positionLC.xy, 0.0, 1.0); 
+}
+`;
+    const fs$2 = `
+varying float depth;
+void main() {
+  float fDepth = depth / 1024.0; 
+  gl_FragColor = czm_packDepth(fDepth);
+}
+`;
+    let OrthographicCamera$1 = class OrthographicCamera {
+      constructor() {
+        this.viewMatrix = Matrix4$9.IDENTITY;
+        this.inverseViewMatrix = Matrix4$9.IDENTITY;
+        this.frustum = new OrthographicOffCenterFrustum$2();
+        this.positionCartographic = new Cartographic$c();
+        this.upWC = Cartesian3$n.clone(Cartesian3$n.UNIT_Y);
+        this.rightWC = Cartesian3$n.clone(Cartesian3$n.UNIT_X);
+        this.directionWC = Cartesian3$n.clone(Cartesian3$n.UNIT_Z);
+        this.viewPorjectionMatrix = Matrix4$9.IDENTITY;
+      }
+      clone(camera) {
+        Matrix4$9.clone(camera.viewMatrix, this.viewMatrix);
+        Matrix4$9.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
+        this.frustum = camera.frustum.clone(this.frustum);
+        Cartographic$c.clone(camera.positionCartographic, this.positionCartographic);
+        Cartesian3$n.clone(camera.upWC, this.upWC);
+        Cartesian3$n.clone(camera.rigtWC, this.rightWC);
+        Cartesian3$n.clone(camera.directionWC, this.directionWC);
+      }
+    };
+    class ClipRegion {
+      /**
+       * 创建一个clipRegion
+       * @param {Cesium.Cartesian3[]} positions 定义clip区域的笛卡尔坐标
+       */
+      constructor(positions) {
+        if (!Array.isArray(positions)) {
+          throw CesiumProError$1('positions must be a cartesian3 array.');
+        }
+        this.positions = positions.filter(_ => _ instanceof Cartesian3$n);
+        this._colorTexture = undefined;
+        this._depthStenclilTexture = undefined;
+        this.frameBuffer = undefined;
+        this._viewport = new BoundingRectangle$5();
+        this._rs = undefined;
+        this._clearColorCommand = new ClearCommand$3({
+          depth: 1,
+          coloe: new Color$t(0.0, 0.0, 0.0, 1.0)
+        });
+        this._useScissorTest = false;
+        this._scissorRectangle = false;
+        this._command = undefined;
+        this._camera = new OrthographicCamera$1();
+        this._passState = undefined;
+        this._clearPassState = undefined;
+        this._positions = [];
+        this._delta = 0.0;
+        this._localModel = undefined;
+        this._inverseLocalModel = undefined;
+        this._uniforms = {};
+        this._initShaderSource = false;
+        this._colorTexture = undefined;
+        this._enabled = true;
+        const bounding = BoundingSphere$a.fromPoints(this.positions);
+        let center = bounding.center;
+        const cartographic = Cartographic$c.fromCartesian(center);
+        center = Cartesian3$n.fromRadians(cartographic.longitude, cartographic.latitude, 0);
+        this._localModel = Transforms$7.eastNorthUpToFixedFrame(center);
+        this._inverseLocalModel = Matrix4$9.inverse(this._localModel, {});
+        const localPositions = positions.map(_ => Matrix4$9.multiplyByPoint(this._inverseLocalModel, _, {}));
+        const boundingRect = BoundingRectangle$5.fromPoints(localPositions);
+        this.boundingRect = new Cartesian4$2(boundingRect.x, boundingRect.y, boundingRect.x + boundingRect.width, boundingRect.y + boundingRect.height);
+        const frustum = this._camera.frustum;
+        frustum.left = boundingRect.x;
+        frustum.top = boundingRect.y + boundingRect.height;
+        frustum.right = boundingRect.x + boundingRect.width;
+        frustum.bottom = boundingRect.y;
+        this.normal = Cartesian3$n.normalize(this.positions[0], {});
+        this._width = 256;
+        this._height = 256;
+        this._id = guid();
+      }
+      /**
+       * 是否有效
+       * @type {boolean}
+       */
+      get enabled() {
+        return this._enabled;
+      }
+      set enabled(enabled) {
+        this._enabled = enabled;
+      }
+      _createVertexArray(frameState) {
+        const polygon = new PolygonGeometry$2({
+          polygonHierarchy: new PolygonHierarchy$3(this.positions)
+        });
+        const geometry = PolygonGeometry$2.createGeometry(polygon);
+        return VertexArray$4.fromGeometry({
+          context: frameState.context,
+          geometry,
+          attributeLocations: { position: 0 },
+          bufferUsage: BufferUsage$4.STREAM_DRAW,
+          interleave: true,
+        });
 
-    function computeHeight(positions, viewer, exclude = []) {
-    	let max = Number.MIN_SAFE_INTEGER;
-    	let min = Number.MAX_SAFE_INTEGER;
-    	let h = 0;
-    	positions.map(_ => {
-    		const height = viewer.scene.sampleHeight(_, exclude);
-    		if (isNaN(height)) {
-    			return;
-    		}
-    		if (height > max) {
-    			max = height;
-    		}
-    		if (height < min) {
-    			min = height;
-    		}
-    		h += height;
-    	});
-    	return {
-    		max, min, avg: h / positions.length
-    	}
-    }
-    class HeightAnalyser extends BaseAnalyser {
-        /**
-         * 分析给定范围的的高度，获得最大高度，最小高度和平均高度
-         * @extends BaseAnalyser
-         * @param {*} viewer 
-         * @param {object} options 具有以下属性
-         * @param {number} [options.samplerSize] 采样间距，值越小获得的结果越准确，但是相应的性能开销会更大
-         * @param {LonLat[]|Cesium.Cartesian3[]|number[]} options.mask 分析范围
-         */
-        constructor(viewer, options = {}) {
-            super(viewer);
-            this._samplerSize = options.samplerSzie;
-            const position = AnalyserUtil.getCartesians(options.mask);
-            this._mask = [...position, position[0]];
-            this._type = 'height-analysis';
+      }
+      _createDrawcommand(frameState) {
+        this._passState = new PassState$3(frameState.context);
+        this._passState.viewport = new BoundingRectangle$5(100, 100, this._width, this._height);
+        this._clearPassState = new PassState$3(frameState.context);
+        const va = this._createVertexArray(frameState);
+        const sp = ShaderProgram$6.fromCache({
+          context: frameState.context,
+          vertexShaderSource: vs$2,
+          fragmentShaderSource: fs$2,
+        });
+        const renderState = RenderState$6.fromCache({
+          viewport: new BoundingRectangle$5(0, 0, this._width, this._height),
+          depthTest: {
+            enabled: true,
+            // func: Cesium.DepthFunction.ALWAYS // always pass depth test for full control of depth information
+          },
+          cull: {
+            enabled: true,
+            face: WebGLConstants$5.BACK
+          },
+          depthMask: true
+        });
+        const command = new DrawCommand$5({
+          primitiveType: PrimitiveType$5.TRIANGLES,
+          vertexArray: va,
+          shaderProgram: sp,
+          uniformMap: {
+            u_inverseMatrix: () => {
+              return this._inverseLocalModel;
+            }
+          },
+          renderState,
+          pass: Pass$5.OPAQUE
+        });
+        this._command = command;
+      }
+      _updateFramebuffer(frameState) {
+        const colorTexture = this._colorTexture;
+        const isEqual = defined$d(colorTexture) && colorTexture.width !== this._width && colorTexture.height !== this._height;
+        if ((defined$d(this.frameBuffer) || isEqual)) {
+          return;
         }
-        /**
-         * 建议采样个数
-         */
-         static suggestGridCount = 300;
-        /**
-         * 开始分析
-         * @param {Array} 分析高度时需要排除的对象
-         * @returns {object} 最大高度，最小高度和平均高度
-         */
-        do(excludeObject = []) {
-            this._check();
-            this.preDo.raise({
-                id: this._id,
-                mask: this._mask
-            });
-            const area = Cartometry.surfaceArea(this._mask);
-            const cellSize = Math.sqrt(area / 1e6 / HeightAnalyser.suggestGridCount);
-            const polygon = AnalyserUtil.getLonLats(this._mask);
-            this.samplerSize = this._samplerSize || cellSize;
-            const grid = AnalyserUtil.polygonToGrid(polygon, this.samplerSize);
-            const samplerPoints = grid.features.map(_ => Cartographic$c.fromDegrees(..._.geometry.coordinates));
-            const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
-            this.postAnalysis.raise({
-                id: this._id,
-                mask: this._mask,
-                samplerSize: this.samplerSize
-            });
-            return { max, min, avg, samplerSize: this.samplerSize }
+        if (colorTexture && !colorTexture.isDestroyed()) {
+          colorTexture.destroy();
         }
+        if (this._depthStenclilTexture && !this._depthStenclilTexture.isDestroyed()) {
+          this._depthStenclilTexture.destroy();
+        }
+        if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
+          this.frameBuffer.destroy();
+        }
+        this._colorTexture = new Texture$4({
+          context: frameState.context,
+          width: this._width,
+          height: this._height,
+          pixelFormat: PixelFormat$3.RGBA,
+          pixelDatatype: PixelDatatype$3.UNSIGNED_BYTE
+        });
+
+        this._depthStenclilTexture = new Texture$4({
+          context: frameState.context,
+          width: this._width,
+          height: this._height,
+          pixelFormat: PixelFormat$3.DEPTH_STENCIL,
+          pixelDatatype: PixelDatatype$3.UNSIGNED_INT_24_8
+        });
+        this.frameBuffer = new Framebuffer$3({
+          context: frameState.context,
+          colorTextures: [this._colorTexture],
+          depthStencilTexture: this._depthStenclilTexture,
+          destroyAttachments: false
+        });
+      }
+      /**
+       * 不是主动调用该方法
+       * @param {Cesium.FrameState} frameState 
+       */
+      update(frameState) {
+        if (!this._enabled) {
+          return;
+        }
+        if (!this._command) {
+          this._createDrawcommand(frameState);
+        }
+        this._updateFramebuffer(frameState);
+        const uniformState = frameState.context.uniformState;
+        uniformState.updateCamera(this._camera);
+        this._clear(frameState);
+        uniformState.updatePass(this._command.pass);
+        this._command.framebuffer = this.frameBuffer;
+        this._command.execute(frameState.context, this._passState);
+      }
+      _clear(frameState) {
+        if (this._clearColorCommand) {
+          this._clearColorCommand.framebuffer = this.frameBuffer;
+          this._clearColorCommand.execute(frameState.context, this._clearPassState);
+        }
+      }
+      /**
+       * 是否被销毁
+       * @returns {boolean} true 并未已经被销毁，该实例的所有方法将被释放
+       */
+      isDestroyed() {
+        return false;
+      }
+      /**
+       * 销毁对象
+       */
+      destroy() {
+        if (this._colorTexture && !this._colorTexture.isDestroyed()) {
+          this._colorTexture.destroy();
+        }
+        if (this._depthStenclilTexture && !this._depthStenclilTexture.isDestroyed()) {
+          this._depthStenclilTexture.destroy();
+        }
+        if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
+          this.frameBuffer.destroy();
+        }
+        destroyObject$b(this);
+      }
     }
 
     function returnTrue$1() {
@@ -28304,7 +28472,7 @@
      *
      * @see CesiumProError
      */
-    function destroyObject$b(object, message) {
+    function destroyObject$a(object, message) {
       message = defaultValue$c(
         message,
         "This object was destroyed, i.e., destroy() was called."
@@ -28328,6 +28496,321 @@
       object.isDestroyed = returnTrue$1;
 
       return undefined;
+    }
+
+    const shader$p = `
+uniform float height;
+uniform vec4 color;
+
+czm_material czm_getMaterial(czm_materialInput materialInput) {
+    czm_material material = czm_getDefaultMaterial(materialInput);
+    if (materialInput.height < height) {
+      material.alpha = color.a;
+    } else {
+      material.alpha = 0.0;
+    }
+    material.diffuse = color.rgb;
+    return material;
+}
+`;
+
+    const {
+        Cartographic: Cartographic$b
+    } = Cesium;
+
+    function computeHeight(positions, viewer, exclude = []) {
+    	let max = Number.MIN_SAFE_INTEGER;
+    	let min = Number.MAX_SAFE_INTEGER;
+    	let h = 0;
+    	positions.map(_ => {
+            let height;
+    		try {
+                if (viewer.scene.globe.depthTestAgainstTerrain) {
+                    height = viewer.scene.sampleHeight(_, exclude);
+                } else {
+                    height = viewer.scene.globe.getHeight(position);
+                }            
+            } catch (e) {
+                height = viewer.scene.globe.getHeight(position);
+            }
+    		if (isNaN(height)) {
+    			return;
+    		}
+    		if (height > max) {
+    			max = height;
+    		}
+    		if (height < min) {
+    			min = height;
+    		}
+    		h += height;
+    	});
+    	return {
+    		max, min, avg: h / positions.length
+    	}
+    }
+    class HeightAnalyser extends BaseAnalyser {
+        /**
+         * 分析给定范围的的高度，获得最大高度，最小高度和平均高度
+         * @extends BaseAnalyser
+         * @param {*} viewer 
+         * @param {object} options 具有以下属性
+         * @param {boolean} [options.autoDepthTest = true] 准确的采样高度需要地球开启尝试测试，如果未开启，是否允许自动开启
+         * @param {number} [options.samplerSize] 采样间距，单位米，值越小获得的结果越准确，但是相应的性能开销会更大, 如果未定义将自动计算
+         * @param {LonLat[]|Cesium.Cartesian3[]|number[]} options.mask 分析范围
+         */
+        constructor(viewer, options = {}) {
+            super(viewer);
+            this._samplerSize = options.samplerSize ? options.samplerSize / 1e3 : undefined;
+            this.autoDepthTest = defaultValue$c(options.autoDepthTest, true);
+            const position = AnalyserUtil.getCartesians(options.mask);
+            this._mask = [];
+            if (position  && position.length) {
+                this._mask = [...position, position[0]];
+            }
+            this._type = 'height-analysis';
+        }
+        /**
+         * 采样间距，单位米
+         */
+        get samplerSize() {
+            return this._samplerSize * 1000;
+        }
+        set samplerSize(val) {
+            val = parseFloat(val);
+            if (typeof val === 'number') {
+                this._samplerSize = val / 1e3;
+                // this.do();
+            }    
+        }
+        get mask() {
+            return this._mask.slice(0, this._mask.length - 1);
+        }
+        set mask(mask) {
+            const position = AnalyserUtil.getCartesians(mask);
+            if (position  && position.length) {
+                this._mask = [...position, position[0]];
+            }
+        }
+        /**
+         * 建议采样个数
+         */
+         static suggestGridCount = 300;
+        /**
+         * 开始分析
+         * @param {Array} 分析高度时需要排除的对象
+         * @returns {object} 最大高度，最小高度和平均高度
+         */
+        do(excludeObject = []) {
+            if (!this._mask.length) {
+                return {};
+            }
+            this.preDo.raise({
+                id: this._id,
+                mask: this._mask
+            });
+            const depthTest = viewer.scene.globe.depthTestAgainstTerrain;
+            if (depthTest === false && this.autoDepthTest) {
+                viewer.scene.globe.depthTestAgainstTerrain = true;        }
+            const area = Cartometry.surfaceArea(this._mask);
+            const cellSize = Math.sqrt(area / 1e6 / HeightAnalyser.suggestGridCount);
+            const polygon = AnalyserUtil.getLonLats(this._mask);
+            const samplerSize = this._samplerSize || cellSize;
+            const grid = AnalyserUtil.polygonToGrid(polygon, samplerSize);
+            const samplerPoints = grid.features.map(_ => Cartographic$b.fromDegrees(..._.geometry.coordinates));
+            const { max, min, avg } = computeHeight(samplerPoints, this._viewer, excludeObject);
+            this.postAnalysis.raise({
+                id: this._id,
+                mask: this._mask,
+                samplerSize: samplerSize * 1e3
+            });
+            if (depthTest === false && this.autoDepthTest) {
+                viewer.scene.globe.depthTestAgainstTerrain = depthTest;        }
+            return { max, min, avg, samplerSize: samplerSize }
+        }
+    }
+
+    const { Material: Material$k, Color: Color$s, JulianDate: JulianDate$3, Clock } = Cesium;
+    Material$k.FloodMaterial = "FloodMaterial";
+    Material$k._materialCache.addMaterial(Material$k.FloodMaterial, {
+      fabric: {
+        type: Material$k.FloodMaterial,
+        uniforms: {
+          color: Color$s.fromCssColorString('rgba(0, 123, 230, 0.5)'),
+          height: 0
+        },
+        source: shader$p
+      }
+    });
+    class FloodAnalyser extends BaseAnalyser {
+      /**
+       * 
+       * @param {*} viewer 
+       * @param {object} options 具有以下属性
+       * @param {LonLat[]|Cesium.Cartesian3[]|number[]} options.mask 分析范围
+       * @param {number} [options.minHeight] 最小高度，如果不指定在开始分析前，会通过插值自动
+       * @param {number} [options.maxHeight] 最大高度，如果不指定在开始分析前，会通过插值自动
+       */
+      constructor(viewer, options = {}) {
+        super(viewer);
+        this._mask = [];
+        const positions = AnalyserUtil.getCartesians(options.mask);
+        if (positions && positions.length) {
+          this._mask = positions;
+          const clipRegion = new ClipRegion(this._mask);
+          if (this.clipRegion) {
+            this._viewer.scene.globe.clipRegion.remove(this.clipRegion);
+          }
+          this._viewer.scene.globe.clipRegion.add(clipRegion);
+          this.clipRegion = clipRegion;
+        }
+        this._color = defaultValue$c(options.color, 'rgba(0, 123, 230, 0.5)');
+        this._speed = defaultValue$c(options.speed, 1);
+        this.clock = new Clock({
+          startTime: JulianDate$3.now(),
+          shouldAnimate: true
+        });
+        this.minHeight = options.minHeight;
+        this.maxHeight = options.maxHeight;
+        this.currentHeight = undefined;
+        this._doing = false;
+        this.removeEventListener = viewer.clock.onTick.addEventListener(() => {
+          this.clock.tick();
+          if (!this._doing) {
+            return;
+          }
+          if (!this.clipRegion) {
+            return;
+          }
+          const currentTime = this.clock.currentTime;
+          const seconds = JulianDate$3.secondsDifference(currentTime, this.clock.startTime);
+          const height = seconds * this.speed;
+          const currentHeight = this.minHeight + height;
+          if (currentHeight >= this.maxHeight) {
+            this._doing = false;
+          }
+          this.currentHeight = Math.min(currentHeight, this.maxHeight);
+          viewer.scene.globe.material.uniforms.height = this.currentHeight;
+        });
+      }
+      get multiplier() {
+        return this.clock.multiplier;
+      }
+      set multiplier(val) {
+        this.clock.multiplier = val;
+      }
+      /**
+       * 淹没区域的颜色
+       * @type {string}
+       */
+      get color() {
+        return Color$s.fromCssColorString(this._color);
+      }
+      set color(val) {
+        if (val instanceof Cesium.Color) {
+          this._color = val;
+        }
+      }
+      /**
+       * 淹没速度，单位m/s，如果不小于0
+       */
+      get speed() {
+        return this._speed;
+      }
+      set speed(val) {
+        if (val > 0) {
+          this._speed = val;
+        } else {
+          this._speed = 0;
+        }
+      }
+      /**
+       * 分析范围
+       * @type {LonLat[]|Cesium.Cartesian3[]|number[]}
+       */
+      get mask() {
+        return this._mask;
+      }
+      set mask(val) {
+        const positions = AnalyserUtil.getCartesians(val);
+        if (positions && positions.length) {
+          this._mask = positions;
+          const clipRegion = new ClipRegion(this._mask);
+          if (this.clipRegion) {
+            this._viewer.scene.globe.clipRegion.remove(this.clipRegion);
+          }
+          this._viewer.scene.globe.clipRegion.add(clipRegion);
+          this.clipRegion = clipRegion;
+        }
+      }
+      calcRegionElevation() {
+        const analyser = new HeightAnalyser(this._viewer, {
+          mask: this.mask
+        });
+        const v = analyser.do();
+        this.minHeight = v.min;
+        this.maxHeight = v.max;
+        return {
+          minHeight: this.minHeight,
+          maxHeight: this.maxHeight
+        }
+      }
+      /**
+       * 开始分析
+       */
+      do() {
+        if (!this._mask.length) {
+          console.warn('mask must be specified.');
+          return;
+        }
+        if (!(typeof this.minHeight === 'number' && typeof this.maxHeight === 'number')) {
+          this.calcRegionElevation();
+        }
+        this.preAnalysis.raise();
+        this.clear();
+        this._doing = true;
+        this.clock.startTime = JulianDate$3.now();
+        this._viewer.scene.globe.material = Material$k.fromType('FloodMaterial', {
+          color: this.color
+        });
+        this.postAnalysis.raise({
+          minHeight: this.minHeight,
+          maxHeight: this.maxHeight
+        });
+        return {
+          minHeight: this.minHeight,
+          maxHeight: this.maxHeight
+        }
+      }
+      /**
+       * 暂停/继续
+       */
+      pause() {
+        this.clock.shouldAnimate = !this.clock.shouldAnimate;
+      }
+      /**
+       * 清除分析结果
+       */
+      clear() {
+        this._viewer.scene.globe.material = undefined;    
+        this.currentHeight = this.minHeight;
+      }
+      /**
+       * 对象是否被销毁，
+       * @returns {boolean} true表示对象已经被销毁，其除isDestroyed外所有方法将不能调用
+       */
+      isDestroyed() {
+        return false;
+      }
+      /**
+       * 销毁对象
+       */
+      destroy() {
+        this.clear();
+        this.clipRegion && this._viewer.scene.globe.clipRegion.remove(this.clipRegion);
+        this.clipRegion = undefined;
+        this.removeEventListener();
+        destroyObject$a(this);
+      }
     }
 
     class ViewShadowPrimitive {
@@ -28368,51 +28851,51 @@
         if (this._shadowMap && !this._shadowMap.isDestroyed()) {
           this._shadowMap.destroy();
         }
-        destroyObject$b(this);
+        destroyObject$a(this);
       }
 
     }
 
-    const BoundingRectangle$5 = Cesium.BoundingRectangle;
-    const BoundingSphere$a = Cesium.BoundingSphere;
+    const BoundingRectangle$4 = Cesium.BoundingRectangle;
+    const BoundingSphere$9 = Cesium.BoundingSphere;
     const BoxOutlineGeometry = Cesium.BoxOutlineGeometry;
     const Cartesian2$7 = Cesium.Cartesian2;
-    const Cartesian3$n = Cesium.Cartesian3;
-    const Cartesian4$2 = Cesium.Cartesian4;
-    const Cartographic$b = Cesium.Cartographic;
-    const Color$s = Cesium.Color;
+    const Cartesian3$m = Cesium.Cartesian3;
+    const Cartesian4$1 = Cesium.Cartesian4;
+    const Cartographic$a = Cesium.Cartographic;
+    const Color$r = Cesium.Color;
     const ColorGeometryInstanceAttribute = Cesium.ColorGeometryInstanceAttribute;
     const combine$1 = Cesium.combine;
     const CullingVolume = Cesium.CullingVolume;
     const defaultValue$b = Cesium.defaultValue;
-    const defined$d = Cesium.defined;
+    const defined$c = Cesium.defined;
     const defineProperties$1 = Object.defineProperties;
-    const destroyObject$a = Cesium.destroyObject;
+    const destroyObject$9 = Cesium.destroyObject;
     const DeveloperError$4 = Cesium.DeveloperError;
     const FeatureDetection$1 = Cesium.FeatureDetection;
     const GeometryInstance$4 = Cesium.GeometryInstance;
     const Intersect = Cesium.Intersect;
     const CesiumMath$9 = Cesium.Math;
-    const Matrix4$9 = Cesium.Matrix4;
-    const OrthographicOffCenterFrustum$2 = Cesium.OrthographicOffCenterFrustum;
+    const Matrix4$8 = Cesium.Matrix4;
+    const OrthographicOffCenterFrustum$1 = Cesium.OrthographicOffCenterFrustum;
     const PerspectiveFrustum = Cesium.PerspectiveFrustum;
-    const PixelFormat$3 = Cesium.PixelFormat;
+    const PixelFormat$2 = Cesium.PixelFormat;
     const Quaternion$1 = Cesium.Quaternion;
     const SphereOutlineGeometry = Cesium.SphereOutlineGeometry;
-    const WebGLConstants$5 = Cesium.WebGLConstants;
-    const ClearCommand$3 = Cesium.ClearCommand;
+    const WebGLConstants$4 = Cesium.WebGLConstants;
+    const ClearCommand$2 = Cesium.ClearCommand;
     const ContextLimits = Cesium.ContextLimits;
     const CubeMap$1 = Cesium.CubeMap;
-    const DrawCommand$5 = Cesium.DrawCommand;
-    const Framebuffer$3 = Cesium.Framebuffer;
-    const Pass$5 = Cesium.Pass;
-    const PassState$3 = Cesium.PassState;
-    const PixelDatatype$3 = Cesium.PixelDatatype;
+    const DrawCommand$4 = Cesium.DrawCommand;
+    const Framebuffer$2 = Cesium.Framebuffer;
+    const Pass$4 = Cesium.Pass;
+    const PassState$2 = Cesium.PassState;
+    const PixelDatatype$2 = Cesium.PixelDatatype;
     const Renderbuffer$1 = Cesium.Renderbuffer;
     const RenderbufferFormat$1 = Cesium.RenderbufferFormat;
-    const RenderState$6 = Cesium.RenderState;
+    const RenderState$5 = Cesium.RenderState;
     const Sampler$1 = Cesium.Sampler;
-    const Texture$4 = Cesium.Texture;
+    const Texture$3 = Cesium.Texture;
     const TextureMagnificationFilter = Cesium.TextureMagnificationFilter;
     const TextureMinificationFilter = Cesium.TextureMinificationFilter;
     const TextureWrap$1 = Cesium.TextureWrap;
@@ -28460,13 +28943,13 @@
       var context = options.context;
 
       //>>includeStart('debug', pragmas.debug);
-      if (!defined$d(context)) {
+      if (!defined$c(context)) {
         throw new DeveloperError$4("context is required.");
       }
-      if (!defined$d(options.lightCamera)) {
+      if (!defined$c(options.lightCamera)) {
         throw new DeveloperError$4("lightCamera is required.");
       }
-      if (defined$d(options.numberOfCascades) && (options.numberOfCascades !== 1 && options.numberOfCascades !== 4)) {
+      if (defined$c(options.numberOfCascades) && (options.numberOfCascades !== 1 && options.numberOfCascades !== 4)) {
         throw new DeveloperError$4("Only one or four cascades are supported.");
       }
       //>>includeEnd('debug');
@@ -28558,10 +29041,10 @@
       this._colorAttachment = undefined;
 
       // Uniforms
-      this._shadowMapMatrix = new Matrix4$9();
+      this._shadowMapMatrix = new Matrix4$8();
       this._shadowMapTexture = undefined;
-      this._lightDirectionEC = new Cartesian3$n();
-      this._lightPositionEC = new Cartesian4$2();
+      this._lightDirectionEC = new Cartesian3$m();
+      this._lightPositionEC = new Cartesian4$1();
       this._distance = 0.0;
 
       this._lightCamera = options.lightCamera;
@@ -28569,7 +29052,7 @@
       this._shadowMapCullingVolume = undefined;
       this._sceneCamera = undefined;
       // this._boundingSphere = new BoundingSphere();
-      this._boundingSphere = defaultValue$b(options.boundingSphere, new BoundingSphere$a());
+      this._boundingSphere = defaultValue$b(options.boundingSphere, new BoundingSphere$9());
 
       this._isPointLight = defaultValue$b(options.isPointLight, false);
       this._pointLightRadius = defaultValue$b(options.pointLightRadius, 100.0);
@@ -28584,16 +29067,16 @@
       this._isSpotLight = false;
       if (this._cascadesEnabled) {
         // Cascaded shadows are always orthographic. The frustum dimensions are calculated on the fly.
-        this._shadowMapCamera.frustum = new OrthographicOffCenterFrustum$2();
-      } else if (defined$d(this._lightCamera.frustum.fov)) {
+        this._shadowMapCamera.frustum = new OrthographicOffCenterFrustum$1();
+      } else if (defined$c(this._lightCamera.frustum.fov)) {
         // If the light camera uses a perspective frustum, then the light source is a spot light
         this._isSpotLight = true;
       }
 
       // Uniforms
-      this._cascadeSplits = [new Cartesian4$2(), new Cartesian4$2()];
-      this._cascadeMatrices = [new Matrix4$9(), new Matrix4$9(), new Matrix4$9(), new Matrix4$9()];
-      this._cascadeDistances = new Cartesian4$2();
+      this._cascadeSplits = [new Cartesian4$1(), new Cartesian4$1()];
+      this._cascadeMatrices = [new Matrix4$8(), new Matrix4$8(), new Matrix4$8(), new Matrix4$8()];
+      this._cascadeDistances = new Cartesian4$1();
 
       var numberOfPasses;
       if (this._isPointLight) {
@@ -28631,12 +29114,12 @@
       createRenderStates(this);
 
       // For clearing the shadow map texture every frame
-      this._clearCommand = new ClearCommand$3({
+      this._clearCommand = new ClearCommand$2({
         depth: 1.0,
-        color: new Color$s()
+        color: new Color$r()
       });
 
-      this._clearPassState = new PassState$3(context);
+      this._clearPassState = new PassState$2(context);
 
       this._size = defaultValue$b(options.size, 2048);
       this.size = this._size;
@@ -28652,7 +29135,7 @@
 
     function ShadowPass(context) {
       this.camera = new ShadowMapCamera();
-      this.passState = new PassState$3(context);
+      this.passState = new PassState$2(context);
       this.framebuffer = undefined;
       this.textureOffsets = undefined;
       this.commandList = [];
@@ -28660,7 +29143,7 @@
     }
 
     function createRenderState$1(colorMask, bias) {
-      return RenderState$6.fromCache({
+      return RenderState$5.fromCache({
         cull: {
           enabled: true,
           face: CullFace$1.BACK
@@ -28854,7 +29337,7 @@
       for (var i = 0; i < length; ++i) {
         var pass = shadowMap._passes[i];
         var framebuffer = pass.framebuffer;
-        if (defined$d(framebuffer) && !framebuffer.isDestroyed()) {
+        if (defined$c(framebuffer) && !framebuffer.isDestroyed()) {
           framebuffer.destroy();
         }
         pass.framebuffer = undefined;
@@ -28882,16 +29365,16 @@
         format: RenderbufferFormat$1.DEPTH_COMPONENT16
       });
 
-      var colorTexture = new Texture$4({
+      var colorTexture = new Texture$3({
         context: context,
         width: shadowMap._textureSize.x,
         height: shadowMap._textureSize.y,
-        pixelFormat: PixelFormat$3.RGBA,
-        pixelDatatype: PixelDatatype$3.UNSIGNED_BYTE,
+        pixelFormat: PixelFormat$2.RGBA,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_BYTE,
         sampler: createSampler()
       });
 
-      var framebuffer = new Framebuffer$3({
+      var framebuffer = new Framebuffer$2({
         context: context,
         depthRenderbuffer: depthRenderbuffer,
         colorTextures: [colorTexture],
@@ -28911,16 +29394,16 @@
     }
 
     function createFramebufferDepth(shadowMap, context) {
-      var depthStencilTexture = new Texture$4({
+      var depthStencilTexture = new Texture$3({
         context: context,
         width: shadowMap._textureSize.x,
         height: shadowMap._textureSize.y,
-        pixelFormat: PixelFormat$3.DEPTH_STENCIL,
-        pixelDatatype: PixelDatatype$3.UNSIGNED_INT_24_8,
+        pixelFormat: PixelFormat$2.DEPTH_STENCIL,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_INT_24_8,
         sampler: createSampler()
       });
 
-      var framebuffer = new Framebuffer$3({
+      var framebuffer = new Framebuffer$2({
         context: context,
         depthStencilTexture: depthStencilTexture,
         destroyAttachments: false
@@ -28949,8 +29432,8 @@
         context: context,
         width: shadowMap._textureSize.x,
         height: shadowMap._textureSize.y,
-        pixelFormat: PixelFormat$3.RGBA,
-        pixelDatatype: PixelDatatype$3.UNSIGNED_BYTE,
+        pixelFormat: PixelFormat$2.RGBA,
+        pixelDatatype: PixelDatatype$2.UNSIGNED_BYTE,
         sampler: createSampler()
       });
 
@@ -28964,7 +29447,7 @@
       ];
 
       for (var i = 0; i < 6; ++i) {
-        var framebuffer = new Framebuffer$3({
+        var framebuffer = new Framebuffer$2({
           context: context,
           depthRenderbuffer: depthRenderbuffer,
           colorTextures: [faces[i]],
@@ -28994,7 +29477,7 @@
       // Attempt to make an FBO with only a depth texture. If it fails, fallback to a color texture.
       if (
         shadowMap._usesDepthTexture &&
-        shadowMap._passes[0].framebuffer.status !== WebGLConstants$5.FRAMEBUFFER_COMPLETE
+        shadowMap._passes[0].framebuffer.status !== WebGLConstants$4.FRAMEBUFFER_COMPLETE
       ) {
         shadowMap._usesDepthTexture = false;
         createRenderStates(shadowMap);
@@ -29004,7 +29487,7 @@
     }
 
     function updateFramebuffer$1(shadowMap, context) {
-      if (!defined$d(shadowMap._passes[0].framebuffer) || shadowMap._shadowMapTexture.width !== shadowMap._textureSize.x) {
+      if (!defined$c(shadowMap._passes[0].framebuffer) || shadowMap._shadowMapTexture.width !== shadowMap._textureSize.x) {
         destroyFramebuffer(shadowMap);
         createFramebuffer$1(shadowMap, context);
         checkFramebuffer(shadowMap, context);
@@ -29030,7 +29513,7 @@
         size = ContextLimits.maximumCubeMapSize >= size ? size : ContextLimits.maximumCubeMapSize;
         textureSize.x = size;
         textureSize.y = size;
-        var faceViewport = new BoundingRectangle$5(0, 0, size, size);
+        var faceViewport = new BoundingRectangle$4(0, 0, size, size);
         passes[0].passState.viewport = faceViewport;
         passes[1].passState.viewport = faceViewport;
         passes[2].passState.viewport = faceViewport;
@@ -29044,7 +29527,7 @@
         size = ContextLimits.maximumTextureSize >= size ? size : ContextLimits.maximumTextureSize;
         textureSize.x = size;
         textureSize.y = size;
-        passes[0].passState.viewport = new BoundingRectangle$5(0, 0, size, size);
+        passes[0].passState.viewport = new BoundingRectangle$4(0, 0, size, size);
       } else if (numberOfPasses === 4) {
         // +----+----+
         // |  3 |  4 |
@@ -29054,14 +29537,14 @@
         size = ContextLimits.maximumTextureSize >= size * 2 ? size : ContextLimits.maximumTextureSize / 2;
         textureSize.x = size * 2;
         textureSize.y = size * 2;
-        passes[0].passState.viewport = new BoundingRectangle$5(0, 0, size, size);
-        passes[1].passState.viewport = new BoundingRectangle$5(size, 0, size, size);
-        passes[2].passState.viewport = new BoundingRectangle$5(0, size, size, size);
-        passes[3].passState.viewport = new BoundingRectangle$5(size, size, size, size);
+        passes[0].passState.viewport = new BoundingRectangle$4(0, 0, size, size);
+        passes[1].passState.viewport = new BoundingRectangle$4(size, 0, size, size);
+        passes[2].passState.viewport = new BoundingRectangle$4(0, size, size, size);
+        passes[3].passState.viewport = new BoundingRectangle$4(size, size, size, size);
       }
 
       // Update clear pass state
-      shadowMap._clearPassState.viewport = new BoundingRectangle$5(0, 0, textureSize.x, textureSize.y);
+      shadowMap._clearPassState.viewport = new BoundingRectangle$4(0, 0, textureSize.x, textureSize.y);
 
       // Transforms shadow coordinates [0, 1] into the pass's region of the texture
       for (var i = 0; i < numberOfPasses; ++i) {
@@ -29071,7 +29554,7 @@
         var biasY = viewport.y / textureSize.y;
         var scaleX = viewport.width / textureSize.x;
         var scaleY = viewport.height / textureSize.y;
-        pass.textureOffsets = new Matrix4$9(
+        pass.textureOffsets = new Matrix4$8(
           scaleX,
           0.0,
           0.0,
@@ -29092,7 +29575,7 @@
       }
     }
 
-    var scratchViewport = new BoundingRectangle$5();
+    var scratchViewport = new BoundingRectangle$4();
 
     function createDebugShadowViewCommand(shadowMap, context) {
       var fs;
@@ -29174,7 +29657,7 @@
           }
         }
       });
-      drawCommand.pass = Pass$5.OVERLAY;
+      drawCommand.pass = Pass$4.OVERLAY;
       return drawCommand;
     }
 
@@ -29192,15 +29675,15 @@
       viewport.height = size;
 
       var debugCommand = shadowMap._debugShadowViewCommand;
-      if (!defined$d(debugCommand)) {
+      if (!defined$c(debugCommand)) {
         debugCommand = createDebugShadowViewCommand(shadowMap, context);
         shadowMap._debugShadowViewCommand = debugCommand;
       }
 
       // Get a new RenderState for the updated viewport size
-      if (!defined$d(debugCommand.renderState) || !BoundingRectangle$5.equals(debugCommand.renderState.viewport, viewport)) {
-        debugCommand.renderState = RenderState$6.fromCache({
-          viewport: BoundingRectangle$5.clone(viewport)
+      if (!defined$c(debugCommand.renderState) || !BoundingRectangle$4.equals(debugCommand.renderState.viewport, viewport)) {
+        debugCommand.renderState = RenderState$5.fromCache({
+          viewport: BoundingRectangle$4.clone(viewport)
         });
       }
 
@@ -29208,26 +29691,26 @@
     }
 
     var frustumCornersNDC = new Array(8);
-    frustumCornersNDC[0] = new Cartesian4$2(-1.0, -1.0, -1.0, 1.0);
-    frustumCornersNDC[1] = new Cartesian4$2(1.0, -1.0, -1.0, 1.0);
-    frustumCornersNDC[2] = new Cartesian4$2(1.0, 1.0, -1.0, 1.0);
-    frustumCornersNDC[3] = new Cartesian4$2(-1.0, 1.0, -1.0, 1.0);
-    frustumCornersNDC[4] = new Cartesian4$2(-1.0, -1.0, 1.0, 1.0);
-    frustumCornersNDC[5] = new Cartesian4$2(1.0, -1.0, 1.0, 1.0);
-    frustumCornersNDC[6] = new Cartesian4$2(1.0, 1.0, 1.0, 1.0);
-    frustumCornersNDC[7] = new Cartesian4$2(-1.0, 1.0, 1.0, 1.0);
+    frustumCornersNDC[0] = new Cartesian4$1(-1.0, -1.0, -1.0, 1.0);
+    frustumCornersNDC[1] = new Cartesian4$1(1.0, -1.0, -1.0, 1.0);
+    frustumCornersNDC[2] = new Cartesian4$1(1.0, 1.0, -1.0, 1.0);
+    frustumCornersNDC[3] = new Cartesian4$1(-1.0, 1.0, -1.0, 1.0);
+    frustumCornersNDC[4] = new Cartesian4$1(-1.0, -1.0, 1.0, 1.0);
+    frustumCornersNDC[5] = new Cartesian4$1(1.0, -1.0, 1.0, 1.0);
+    frustumCornersNDC[6] = new Cartesian4$1(1.0, 1.0, 1.0, 1.0);
+    frustumCornersNDC[7] = new Cartesian4$1(-1.0, 1.0, 1.0, 1.0);
 
-    var scratchMatrix = new Matrix4$9();
+    var scratchMatrix = new Matrix4$8();
     var scratchFrustumCorners = new Array(8);
     for (var i = 0; i < 8; ++i) {
-      scratchFrustumCorners[i] = new Cartesian4$2();
+      scratchFrustumCorners[i] = new Cartesian4$1();
     }
 
     function createDebugPointLight(modelMatrix, color) {
       var box = new GeometryInstance$4({
         geometry: new BoxOutlineGeometry({
-          minimum: new Cartesian3$n(-0.5, -0.5, -0.5),
-          maximum: new Cartesian3$n(0.5, 0.5, 0.5)
+          minimum: new Cartesian3$m(-0.5, -0.5, -0.5),
+          maximum: new Cartesian3$m(0.5, 0.5, 0.5)
         }),
         attributes: {
           color: ColorGeometryInstanceAttribute.fromColor(color)
@@ -29254,8 +29737,8 @@
       });
     }
 
-    var debugOutlineColors = [Color$s.RED, Color$s.GREEN, Color$s.BLUE, Color$s.MAGENTA];
-    var scratchScale = new Cartesian3$n();
+    var debugOutlineColors = [Color$r.RED, Color$r.GREEN, Color$r.BLUE, Color$r.MAGENTA];
+    var scratchScale = new Cartesian3$m();
 
     function applyDebugSettings(shadowMap, frameState) {
       updateDebugShadowViewCommand(shadowMap, frameState);
@@ -29270,7 +29753,7 @@
           shadowMap._debugCameraFrustum = shadowMap._debugCameraFrustum && shadowMap._debugCameraFrustum.destroy();
           shadowMap._debugCameraFrustum = new DebugCameraPrimitive({
             camera: shadowMap._sceneCamera,
-            color: Color$s.CYAN,
+            color: Color$r.CYAN,
             updateOnChange: false
           });
         }
@@ -29285,7 +29768,7 @@
             shadowMap._debugLightFrustum = shadowMap._debugLightFrustum && shadowMap._debugLightFrustum.destroy();
             shadowMap._debugLightFrustum = new DebugCameraPrimitive({
               camera: shadowMap._shadowMapCamera,
-              color: Color$s.YELLOW,
+              color: Color$r.YELLOW,
               updateOnChange: false
             });
           }
@@ -29306,12 +29789,12 @@
           }
         }
       } else if (shadowMap._isPointLight) {
-        if (!defined$d(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
+        if (!defined$c(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
           var translation = shadowMap._shadowMapCamera.positionWC;
           var rotation = Quaternion$1.IDENTITY;
           var uniformScale = shadowMap._pointLightRadius * 2.0;
-          var scale = Cartesian3$n.fromElements(uniformScale, uniformScale, uniformScale, scratchScale);
-          var modelMatrix = Matrix4$9.fromTranslationQuaternionRotationScale(
+          var scale = Cartesian3$m.fromElements(uniformScale, uniformScale, uniformScale, scratchScale);
+          var modelMatrix = Matrix4$8.fromTranslationQuaternionRotationScale(
             translation,
             rotation,
             scale,
@@ -29319,14 +29802,14 @@
           );
 
           shadowMap._debugLightFrustum = shadowMap._debugLightFrustum && shadowMap._debugLightFrustum.destroy();
-          shadowMap._debugLightFrustum = createDebugPointLight(modelMatrix, Color$s.YELLOW);
+          shadowMap._debugLightFrustum = createDebugPointLight(modelMatrix, Color$r.YELLOW);
         }
         shadowMap._debugLightFrustum.update(frameState);
       } else {
-        if (!defined$d(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
+        if (!defined$c(shadowMap._debugLightFrustum) || shadowMap._needsUpdate) {
           shadowMap._debugLightFrustum = new DebugCameraPrimitive({
             camera: shadowMap._shadowMapCamera,
-            color: Color$s.YELLOW,
+            color: Color$r.YELLOW,
             updateOnChange: false
           });
         }
@@ -29335,44 +29818,44 @@
     }
 
     function ShadowMapCamera() {
-      this.viewMatrix = new Matrix4$9();
-      this.inverseViewMatrix = new Matrix4$9();
+      this.viewMatrix = new Matrix4$8();
+      this.inverseViewMatrix = new Matrix4$8();
       this.frustum = undefined;
-      this.positionCartographic = new Cartographic$b();
-      this.positionWC = new Cartesian3$n();
-      this.directionWC = Cartesian3$n.clone(Cartesian3$n.UNIT_Z);
-      this.upWC = Cartesian3$n.clone(Cartesian3$n.UNIT_Y);
-      this.rightWC = Cartesian3$n.clone(Cartesian3$n.UNIT_X);
-      this.viewProjectionMatrix = new Matrix4$9();
+      this.positionCartographic = new Cartographic$a();
+      this.positionWC = new Cartesian3$m();
+      this.directionWC = Cartesian3$m.clone(Cartesian3$m.UNIT_Z);
+      this.upWC = Cartesian3$m.clone(Cartesian3$m.UNIT_Y);
+      this.rightWC = Cartesian3$m.clone(Cartesian3$m.UNIT_X);
+      this.viewProjectionMatrix = new Matrix4$8();
     }
 
     ShadowMapCamera.prototype.clone = function(camera) {
-      Matrix4$9.clone(camera.viewMatrix, this.viewMatrix);
-      Matrix4$9.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
+      Matrix4$8.clone(camera.viewMatrix, this.viewMatrix);
+      Matrix4$8.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
       this.frustum = camera.frustum.clone(this.frustum);
-      Cartographic$b.clone(camera.positionCartographic, this.positionCartographic);
-      Cartesian3$n.clone(camera.positionWC, this.positionWC);
-      Cartesian3$n.clone(camera.directionWC, this.directionWC);
-      Cartesian3$n.clone(camera.upWC, this.upWC);
-      Cartesian3$n.clone(camera.rightWC, this.rightWC);
+      Cartographic$a.clone(camera.positionCartographic, this.positionCartographic);
+      Cartesian3$m.clone(camera.positionWC, this.positionWC);
+      Cartesian3$m.clone(camera.directionWC, this.directionWC);
+      Cartesian3$m.clone(camera.upWC, this.upWC);
+      Cartesian3$m.clone(camera.rightWC, this.rightWC);
     };
 
     // Converts from NDC space to texture space
-    var scaleBiasMatrix = new Matrix4$9(0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0);
+    var scaleBiasMatrix = new Matrix4$8(0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0);
 
     ShadowMapCamera.prototype.getViewProjection = function() {
       var view = this.viewMatrix;
       var projection = this.frustum.projectionMatrix;
-      Matrix4$9.multiply(projection, view, this.viewProjectionMatrix);
-      Matrix4$9.multiply(scaleBiasMatrix, this.viewProjectionMatrix, this.viewProjectionMatrix);
+      Matrix4$8.multiply(projection, view, this.viewProjectionMatrix);
+      Matrix4$8.multiply(scaleBiasMatrix, this.viewProjectionMatrix, this.viewProjectionMatrix);
       return this.viewProjectionMatrix;
     };
 
     var scratchSplits = new Array(5);
     var scratchFrustum = new PerspectiveFrustum();
     var scratchCascadeDistances = new Array(4);
-    var scratchMin = new Cartesian3$n();
-    var scratchMax = new Cartesian3$n();
+    var scratchMin = new Cartesian3$m();
+    var scratchMax = new Cartesian3$m();
 
     function computeCascades(shadowMap, frameState) {
       var shadowMapCamera = shadowMap._shadowMapCamera;
@@ -29426,9 +29909,9 @@
         }
       }
 
-      Cartesian4$2.unpack(splits, 0, shadowMap._cascadeSplits[0]);
-      Cartesian4$2.unpack(splits, 1, shadowMap._cascadeSplits[1]);
-      Cartesian4$2.unpack(cascadeDistances, 0, shadowMap._cascadeDistances);
+      Cartesian4$1.unpack(splits, 0, shadowMap._cascadeSplits[0]);
+      Cartesian4$1.unpack(splits, 1, shadowMap._cascadeSplits[1]);
+      Cartesian4$1.unpack(cascadeDistances, 0, shadowMap._cascadeDistances);
 
       var shadowFrustum = shadowMapCamera.frustum;
       var left = shadowFrustum.left;
@@ -29449,24 +29932,24 @@
         // Find the bounding box of the camera sub-frustum in shadow map texture space
         cascadeSubFrustum.near = splits[i];
         cascadeSubFrustum.far = splits[i + 1];
-        var viewProjection = Matrix4$9.multiply(
+        var viewProjection = Matrix4$8.multiply(
           cascadeSubFrustum.projectionMatrix,
           sceneCamera.viewMatrix,
           scratchMatrix
         );
-        var inverseViewProjection = Matrix4$9.inverse(viewProjection, scratchMatrix);
-        var shadowMapMatrix = Matrix4$9.multiply(shadowViewProjection, inverseViewProjection, scratchMatrix);
+        var inverseViewProjection = Matrix4$8.inverse(viewProjection, scratchMatrix);
+        var shadowMapMatrix = Matrix4$8.multiply(shadowViewProjection, inverseViewProjection, scratchMatrix);
 
         // Project each corner from camera NDC space to shadow map texture space. Min and max will be from 0 to 1.
-        var min = Cartesian3$n.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
-        var max = Cartesian3$n.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
+        var min = Cartesian3$m.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
+        var max = Cartesian3$m.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
 
         for (var k = 0; k < 8; ++k) {
-          var corner = Cartesian4$2.clone(frustumCornersNDC[k], scratchFrustumCorners[k]);
-          Matrix4$9.multiplyByVector(shadowMapMatrix, corner, corner);
-          Cartesian3$n.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
-          Cartesian3$n.minimumByComponent(corner, min, min);
-          Cartesian3$n.maximumByComponent(corner, max, max);
+          var corner = Cartesian4$1.clone(frustumCornersNDC[k], scratchFrustumCorners[k]);
+          Matrix4$8.multiplyByVector(shadowMapMatrix, corner, corner);
+          Cartesian3$m.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
+          Cartesian3$m.minimumByComponent(corner, min, min);
+          Cartesian3$m.maximumByComponent(corner, max, max);
         }
 
         // Limit light-space coordinates to the [0, 1] range
@@ -29493,46 +29976,46 @@
 
         // Transforms from eye space to the cascade's texture space
         var cascadeMatrix = shadowMap._cascadeMatrices[i];
-        Matrix4$9.multiply(cascadeCamera.getViewProjection(), sceneCamera.inverseViewMatrix, cascadeMatrix);
-        Matrix4$9.multiply(pass.textureOffsets, cascadeMatrix, cascadeMatrix);
+        Matrix4$8.multiply(cascadeCamera.getViewProjection(), sceneCamera.inverseViewMatrix, cascadeMatrix);
+        Matrix4$8.multiply(pass.textureOffsets, cascadeMatrix, cascadeMatrix);
       }
     }
 
-    var scratchLightView = new Matrix4$9();
-    var scratchRight = new Cartesian3$n();
-    var scratchUp = new Cartesian3$n();
-    var scratchTranslation = new Cartesian3$n();
+    var scratchLightView = new Matrix4$8();
+    var scratchRight = new Cartesian3$m();
+    var scratchUp = new Cartesian3$m();
+    var scratchTranslation = new Cartesian3$m();
 
     function fitShadowMapToScene(shadowMap, frameState) {
       var shadowMapCamera = shadowMap._shadowMapCamera;
       var sceneCamera = shadowMap._sceneCamera;
 
       // 1. First find a tight bounding box in light space that contains the entire camera frustum.
-      var viewProjection = Matrix4$9.multiply(sceneCamera.frustum.projectionMatrix, sceneCamera.viewMatrix, scratchMatrix);
-      var inverseViewProjection = Matrix4$9.inverse(viewProjection, scratchMatrix);
+      var viewProjection = Matrix4$8.multiply(sceneCamera.frustum.projectionMatrix, sceneCamera.viewMatrix, scratchMatrix);
+      var inverseViewProjection = Matrix4$8.inverse(viewProjection, scratchMatrix);
 
       // Start to construct the light view matrix. Set translation later once the bounding box is found.
       var lightDir = shadowMapCamera.directionWC;
       var lightUp = sceneCamera.directionWC; // Align shadows to the camera view.
-      var lightRight = Cartesian3$n.cross(lightDir, lightUp, scratchRight);
-      lightUp = Cartesian3$n.cross(lightRight, lightDir, scratchUp); // Recalculate up now that right is derived
-      Cartesian3$n.normalize(lightUp, lightUp);
-      Cartesian3$n.normalize(lightRight, lightRight);
-      var lightPosition = Cartesian3$n.fromElements(0.0, 0.0, 0.0, scratchTranslation);
+      var lightRight = Cartesian3$m.cross(lightDir, lightUp, scratchRight);
+      lightUp = Cartesian3$m.cross(lightRight, lightDir, scratchUp); // Recalculate up now that right is derived
+      Cartesian3$m.normalize(lightUp, lightUp);
+      Cartesian3$m.normalize(lightRight, lightRight);
+      var lightPosition = Cartesian3$m.fromElements(0.0, 0.0, 0.0, scratchTranslation);
 
-      var lightView = Matrix4$9.computeView(lightPosition, lightDir, lightUp, lightRight, scratchLightView);
-      var cameraToLight = Matrix4$9.multiply(lightView, inverseViewProjection, scratchMatrix);
+      var lightView = Matrix4$8.computeView(lightPosition, lightDir, lightUp, lightRight, scratchLightView);
+      var cameraToLight = Matrix4$8.multiply(lightView, inverseViewProjection, scratchMatrix);
 
       // Project each corner from NDC space to light view space, and calculate a min and max in light view space
-      var min = Cartesian3$n.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
-      var max = Cartesian3$n.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
+      var min = Cartesian3$m.fromElements(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, scratchMin);
+      var max = Cartesian3$m.fromElements(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, scratchMax);
 
       for (var i = 0; i < 8; ++i) {
-        var corner = Cartesian4$2.clone(frustumCornersNDC[i], scratchFrustumCorners[i]);
-        Matrix4$9.multiplyByVector(cameraToLight, corner, corner);
-        Cartesian3$n.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
-        Cartesian3$n.minimumByComponent(corner, min, min);
-        Cartesian3$n.maximumByComponent(corner, max, max);
+        var corner = Cartesian4$1.clone(frustumCornersNDC[i], scratchFrustumCorners[i]);
+        Matrix4$8.multiplyByVector(cameraToLight, corner, corner);
+        Cartesian3$m.divideByScalar(corner, corner.w, corner); // Handle the perspective divide
+        Cartesian3$m.minimumByComponent(corner, min, min);
+        Cartesian3$m.maximumByComponent(corner, max, max);
       }
 
       // 2. Set bounding box back to include objects in the light's view
@@ -29545,8 +30028,8 @@
       translation.y = -(0.5 * (min.y + max.y));
       translation.z = -max.z;
 
-      var translationMatrix = Matrix4$9.fromTranslation(translation, scratchMatrix);
-      lightView = Matrix4$9.multiply(translationMatrix, lightView, lightView);
+      var translationMatrix = Matrix4$8.fromTranslation(translation, scratchMatrix);
+      lightView = Matrix4$8.multiply(translationMatrix, lightView, lightView);
 
       // 4. Create an orthographic frustum that covers the bounding box extents
       var halfWidth = 0.5 * (max.x - min.x);
@@ -29562,43 +30045,43 @@
       frustum.far = depth;
 
       // 5. Update the shadow map camera
-      Matrix4$9.clone(lightView, shadowMapCamera.viewMatrix);
-      Matrix4$9.inverse(lightView, shadowMapCamera.inverseViewMatrix);
-      Matrix4$9.getTranslation(shadowMapCamera.inverseViewMatrix, shadowMapCamera.positionWC);
+      Matrix4$8.clone(lightView, shadowMapCamera.viewMatrix);
+      Matrix4$8.inverse(lightView, shadowMapCamera.inverseViewMatrix);
+      Matrix4$8.getTranslation(shadowMapCamera.inverseViewMatrix, shadowMapCamera.positionWC);
       frameState.mapProjection.ellipsoid.cartesianToCartographic(
         shadowMapCamera.positionWC,
         shadowMapCamera.positionCartographic
       );
-      Cartesian3$n.clone(lightDir, shadowMapCamera.directionWC);
-      Cartesian3$n.clone(lightUp, shadowMapCamera.upWC);
-      Cartesian3$n.clone(lightRight, shadowMapCamera.rightWC);
+      Cartesian3$m.clone(lightDir, shadowMapCamera.directionWC);
+      Cartesian3$m.clone(lightUp, shadowMapCamera.upWC);
+      Cartesian3$m.clone(lightRight, shadowMapCamera.rightWC);
     }
 
     var directions = [
-      new Cartesian3$n(-1.0, 0.0, 0.0),
-      new Cartesian3$n(0.0, -1.0, 0.0),
-      new Cartesian3$n(0.0, 0.0, -1.0),
-      new Cartesian3$n(1.0, 0.0, 0.0),
-      new Cartesian3$n(0.0, 1.0, 0.0),
-      new Cartesian3$n(0.0, 0.0, 1.0)
+      new Cartesian3$m(-1.0, 0.0, 0.0),
+      new Cartesian3$m(0.0, -1.0, 0.0),
+      new Cartesian3$m(0.0, 0.0, -1.0),
+      new Cartesian3$m(1.0, 0.0, 0.0),
+      new Cartesian3$m(0.0, 1.0, 0.0),
+      new Cartesian3$m(0.0, 0.0, 1.0)
     ];
 
     var ups = [
-      new Cartesian3$n(0.0, -1.0, 0.0),
-      new Cartesian3$n(0.0, 0.0, -1.0),
-      new Cartesian3$n(0.0, -1.0, 0.0),
-      new Cartesian3$n(0.0, -1.0, 0.0),
-      new Cartesian3$n(0.0, 0.0, 1.0),
-      new Cartesian3$n(0.0, -1.0, 0.0)
+      new Cartesian3$m(0.0, -1.0, 0.0),
+      new Cartesian3$m(0.0, 0.0, -1.0),
+      new Cartesian3$m(0.0, -1.0, 0.0),
+      new Cartesian3$m(0.0, -1.0, 0.0),
+      new Cartesian3$m(0.0, 0.0, 1.0),
+      new Cartesian3$m(0.0, -1.0, 0.0)
     ];
 
     var rights = [
-      new Cartesian3$n(0.0, 0.0, 1.0),
-      new Cartesian3$n(1.0, 0.0, 0.0),
-      new Cartesian3$n(-1.0, 0.0, 0.0),
-      new Cartesian3$n(0.0, 0.0, -1.0),
-      new Cartesian3$n(1.0, 0.0, 0.0),
-      new Cartesian3$n(1.0, 0.0, 0.0)
+      new Cartesian3$m(0.0, 0.0, 1.0),
+      new Cartesian3$m(1.0, 0.0, 0.0),
+      new Cartesian3$m(-1.0, 0.0, 0.0),
+      new Cartesian3$m(0.0, 0.0, -1.0),
+      new Cartesian3$m(1.0, 0.0, 0.0),
+      new Cartesian3$m(1.0, 0.0, 0.0)
     ];
 
     function computeOmnidirectional(shadowMap, frameState) {
@@ -29620,16 +30103,16 @@
         camera.upWC = ups[i];
         camera.rightWC = rights[i];
 
-        Matrix4$9.computeView(camera.positionWC, camera.directionWC, camera.upWC, camera.rightWC, camera.viewMatrix);
-        Matrix4$9.inverse(camera.viewMatrix, camera.inverseViewMatrix);
+        Matrix4$8.computeView(camera.positionWC, camera.directionWC, camera.upWC, camera.rightWC, camera.viewMatrix);
+        Matrix4$8.inverse(camera.viewMatrix, camera.inverseViewMatrix);
 
         camera.frustum = frustum;
       }
     }
 
-    var scratchCartesian1 = new Cartesian3$n();
-    var scratchCartesian2 = new Cartesian3$n();
-    var scratchBoundingSphere = new BoundingSphere$a();
+    var scratchCartesian1 = new Cartesian3$m();
+    var scratchCartesian2 = new Cartesian3$m();
+    var scratchBoundingSphere = new BoundingSphere$9();
     var scratchCenter = scratchBoundingSphere.center;
 
     function checkVisibility(shadowMap, frameState) {
@@ -29652,8 +30135,8 @@
           sceneCamera.positionWC,
           scratchCartesian1
         );
-        var lightDirection = Cartesian3$n.negate(shadowMapCamera.directionWC, scratchCartesian2);
-        var dot = Cartesian3$n.dot(surfaceNormal, lightDirection);
+        var lightDirection = Cartesian3$m.negate(shadowMapCamera.directionWC, scratchCartesian2);
+        var dot = Cartesian3$m.dot(surfaceNormal, lightDirection);
 
         // Shadows start to fade out once the light gets closer to the horizon.
         // At this point the globe uses vertex lighting alone to darken the surface.
@@ -29675,20 +30158,20 @@
         boundingSphere.radius = shadowMap._pointLightRadius;
         shadowMap._outOfView = frameState.cullingVolume.computeVisibility(boundingSphere) === Intersect.OUTSIDE;
         shadowMap._needsUpdate = !shadowMap._outOfView && !shadowMap._boundingSphere.equals(boundingSphere);
-        BoundingSphere$a.clone(boundingSphere, shadowMap._boundingSphere);
+        BoundingSphere$9.clone(boundingSphere, shadowMap._boundingSphere);
       } else {
         // Simplify frustum-frustum intersection test as a sphere-frustum test
         var frustumRadius = shadowMapCamera.frustum.far / 2.0;
-        var frustumCenter = Cartesian3$n.add(
+        var frustumCenter = Cartesian3$m.add(
           shadowMapCamera.positionWC,
-          Cartesian3$n.multiplyByScalar(shadowMapCamera.directionWC, frustumRadius, scratchCenter),
+          Cartesian3$m.multiplyByScalar(shadowMapCamera.directionWC, frustumRadius, scratchCenter),
           scratchCenter
         );
         boundingSphere.center = frustumCenter;
         boundingSphere.radius = frustumRadius;
         shadowMap._outOfView = frameState.cullingVolume.computeVisibility(boundingSphere) === Intersect.OUTSIDE;
         shadowMap._needsUpdate = !shadowMap._outOfView && !shadowMap._boundingSphere.equals(boundingSphere);
-        BoundingSphere$a.clone(boundingSphere, shadowMap._boundingSphere);
+        BoundingSphere$9.clone(boundingSphere, shadowMap._boundingSphere);
       }
     }
 
@@ -29700,21 +30183,21 @@
 
       // Clone light camera into the shadow map camera
       if (shadowMap._cascadesEnabled) {
-        Cartesian3$n.clone(lightCamera.directionWC, shadowMapCamera.directionWC);
+        Cartesian3$m.clone(lightCamera.directionWC, shadowMapCamera.directionWC);
       } else if (shadowMap._isPointLight) {
-        Cartesian3$n.clone(lightCamera.positionWC, shadowMapCamera.positionWC);
+        Cartesian3$m.clone(lightCamera.positionWC, shadowMapCamera.positionWC);
       } else {
         shadowMapCamera.clone(lightCamera);
       }
 
       // Get the light direction in eye coordinates
       var lightDirection = shadowMap._lightDirectionEC;
-      Matrix4$9.multiplyByPointAsVector(camera.viewMatrix, shadowMapCamera.directionWC, lightDirection);
-      Cartesian3$n.normalize(lightDirection, lightDirection);
-      Cartesian3$n.negate(lightDirection, lightDirection);
+      Matrix4$8.multiplyByPointAsVector(camera.viewMatrix, shadowMapCamera.directionWC, lightDirection);
+      Cartesian3$m.normalize(lightDirection, lightDirection);
+      Cartesian3$m.negate(lightDirection, lightDirection);
 
       // Get the light position in eye coordinates
-      Matrix4$9.multiplyByPoint(camera.viewMatrix, shadowMapCamera.positionWC, shadowMap._lightPositionEC);
+      Matrix4$8.multiplyByPoint(camera.viewMatrix, shadowMapCamera.positionWC, shadowMap._lightPositionEC);
       shadowMap._lightPositionEC.w = shadowMap._pointLightRadius;
 
       // Get the near and far of the scene camera
@@ -29789,7 +30272,7 @@
         // Transforms from eye space to shadow texture space.
         // Always requires an update since the scene camera constantly changes.
         var inverseView = this._sceneCamera.inverseViewMatrix;
-        Matrix4$9.multiply(this._shadowMapCamera.getViewProjection(), inverseView, this._shadowMapMatrix);
+        Matrix4$8.multiply(this._shadowMapCamera.getViewProjection(), inverseView, this._shadowMapMatrix);
       }
 
       if (this.debugShow) {
@@ -29843,7 +30326,7 @@
           texelStepSize.x = 1.0 / shadowMap._textureSize.x;
           texelStepSize.y = 1.0 / shadowMap._textureSize.y;
 
-          return Cartesian4$2.fromElements(
+          return Cartesian4$1.fromElements(
             texelStepSize.x,
             texelStepSize.y,
             bias.depthBias,
@@ -29852,7 +30335,7 @@
           );
         },
         shadowMap_normalOffsetScaleDistanceMaxDistanceAndDarkness: function() {
-          return Cartesian4$2.fromElements(
+          return Cartesian4$1.fromElements(
             bias.normalOffsetScale,
             shadowMap._distance,
             shadowMap.maximumDistance,
@@ -29861,8 +30344,8 @@
           );
         },
 
-        combinedUniforms1: new Cartesian4$2(),
-        combinedUniforms2: new Cartesian4$2()
+        combinedUniforms1: new Cartesian4$1(),
+        combinedUniforms2: new Cartesian4$1()
       };
 
       return combine$1(uniforms, mapUniforms, false);
@@ -29894,10 +30377,10 @@
 
     function createShadowReceiveFragmentShader(fs, shadowMap, castShadows, isTerrain, hasTerrainNormal) {
       var normalVaryingName = ShaderSource$7.findNormalVarying(fs);
-      var hasNormalVarying = (!isTerrain && defined$d(normalVaryingName)) || (isTerrain && hasTerrainNormal);
+      var hasNormalVarying = (!isTerrain && defined$c(normalVaryingName)) || (isTerrain && hasTerrainNormal);
 
       var positionVaryingName = ShaderSource$7.findPositionVarying(fs);
-      var hasPositionVarying = defined$d(positionVaryingName);
+      var hasPositionVarying = defined$c(positionVaryingName);
 
       var usesDepthTexture = shadowMap._usesDepthTexture;
       var polygonOffsetSupported = shadowMap._polygonOffsetSupported;
@@ -30114,7 +30597,7 @@
     }
 
     Cesium.ShadowMap.createReceiveDerivedCommand = function(lightShadowMaps, command, shadowsDirty, context, result) {
-      if (!defined$d(result)) {
+      if (!defined$c(result)) {
         result = {};
       }
 
@@ -30122,7 +30605,7 @@
       var shaderProgram = command.shaderProgram;
       var vertexShaderSource = shaderProgram.vertexShaderSource;
       var fragmentShaderSource = shaderProgram.fragmentShaderSource;
-      var isTerrain = command.pass === Pass$5.GLOBE;
+      var isTerrain = command.pass === Pass$4.GLOBE;
 
       var hasTerrainNormal = false;
       if (isTerrain) {
@@ -30133,12 +30616,12 @@
         // Only generate a receiveCommand if there is a shadow map originating from a light source.
         var receiveShader;
         var receiveUniformMap;
-        if (defined$d(result.receiveCommand)) {
+        if (defined$c(result.receiveCommand)) {
           receiveShader = result.receiveCommand.shaderProgram;
           receiveUniformMap = result.receiveCommand.uniformMap;
         }
 
-        result.receiveCommand = DrawCommand$5.shallowClone(command, result.receiveCommand);
+        result.receiveCommand = DrawCommand$4.shallowClone(command, result.receiveCommand);
         result.castShadows = false;
         result.receiveShadows = true;
 
@@ -30147,7 +30630,7 @@
         var castShadowsDirty = result.receiveShaderCastShadows !== command.castShadows;
         var shaderDirty = result.receiveShaderProgramId !== command.shaderProgram.id;
 
-        if (!defined$d(receiveShader) || shaderDirty || shadowsDirty || castShadowsDirty) {
+        if (!defined$c(receiveShader) || shaderDirty || shadowsDirty || castShadowsDirty) {
           var keyword;
           if (lightShadowMaps[0].isViewShed) {
             keyword = getShadowReceiveShaderKeyword(
@@ -30165,7 +30648,7 @@
             );
           }
           receiveShader = context.shaderCache.getDerivedShaderProgram(shaderProgram, keyword);
-          if (!defined$d(receiveShader)) {
+          if (!defined$c(receiveShader)) {
             var receiveVS = ShadowMapShader.createShadowReceiveVertexShader(
               vertexShaderSource,
               isTerrain,
@@ -30233,7 +30716,7 @@
         this._debugCascadeFrustums[i] = this._debugCascadeFrustums[i] && this._debugCascadeFrustums[i].destroy();
       }
 
-      return destroyObject$a(this);
+      return destroyObject$9(this);
     };
 
     var scanPlaneFS = `#ifdef GL_OES_standard_derivatives
@@ -30566,30 +31049,30 @@ void main()
 }`;
 
     const {
-      Matrix4: Matrix4$8,
+      Matrix4: Matrix4$7,
       Material: Material$j,
-      Color: Color$r,
+      Color: Color$q,
       JulianDate: JulianDate$2,
-      BoundingSphere: BoundingSphere$9,
-      DrawCommand: DrawCommand$4,
-      PrimitiveType: PrimitiveType$5,
+      BoundingSphere: BoundingSphere$8,
+      DrawCommand: DrawCommand$3,
+      PrimitiveType: PrimitiveType$4,
       SceneMode: SceneMode$7,
       Matrix3: Matrix3$3,
       Buffer: Buffer$1,
-      BufferUsage: BufferUsage$4,
-      VertexArray: VertexArray$4,
+      BufferUsage: BufferUsage$3,
+      VertexArray: VertexArray$3,
       VertexFormat: VertexFormat$4,
       ComponentDatatype: ComponentDatatype$3,
-      RenderState: RenderState$5,
+      RenderState: RenderState$4,
       BlendingState: BlendingState$2,
-      Pass: Pass$4,
+      Pass: Pass$3,
       combine,
       CullFace,
-      Cartesian3: Cartesian3$m,
+      Cartesian3: Cartesian3$l,
       EllipsoidGeometry,
       EllipsoidOutlineGeometry,
       ShaderSource: ShaderSource$6,
-      ShaderProgram: ShaderProgram$6,
+      ShaderProgram: ShaderProgram$5,
     } = Cesium;
     const {
       cos,
@@ -30655,11 +31138,11 @@ void main()
           }
           this._modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(LonLat.toCartesian(options.position));
         } else {
-          this._modelMatrix = Matrix4$8.clone(options.modelMatrix, new Matrix4$8());
+          this._modelMatrix = Matrix4$7.clone(options.modelMatrix, new Matrix4$7());
         }
 
-        this._computedModelMatrix = new Matrix4$8();
-        this._computedScanPlaneModelMatrix = new Matrix4$8();
+        this._computedModelMatrix = new Matrix4$7();
+        this._computedScanPlaneModelMatrix = new Matrix4$7();
 
         //传感器的半径
         this._radius = defaultValue$c(options.radius, Number.POSITIVE_INFINITY);
@@ -30670,13 +31153,13 @@ void main()
         //传感器垂直半角
         this._yHalfAngle = CesiumMath$8.toRadians(defaultValue$c(options.yHalfAngle, 0));
 
-        this._color = defaultValue$c(options._color, Color$r.AQUA.withAlpha(0.4));
+        this._color = defaultValue$c(options._color, Color$q.AQUA.withAlpha(0.4));
 
         /**
          * 线的颜色
          * @type {Cesium.Color}
          */
-        this.lineColor = defaultValue$c(options.lineColor, Color$r.WHITE);
+        this.lineColor = defaultValue$c(options.lineColor, Color$q.WHITE);
 
         /**
          * 是否显示扇面的线
@@ -30737,7 +31220,7 @@ void main()
          * 与地球相交的线的颜色
          * @type {Color}
          */
-        this.intersectionColor = defaultValue$c(options.intersectionColor, Color$r.WHITE);
+        this.intersectionColor = defaultValue$c(options.intersectionColor, Color$q.WHITE);
 
         /**
          * 与地球相交的线的宽度（像素）
@@ -30758,7 +31241,7 @@ void main()
          * 扫描面颜色
          * @type {Color}
          */
-        this.scanPlaneColor = defaultValue$c(options.scanPlaneColor, Color$r.AQUA);
+        this.scanPlaneColor = defaultValue$c(options.scanPlaneColor, Color$q.AQUA);
 
         /**
          * 扫描面模式 垂直V/水平H
@@ -30778,71 +31261,71 @@ void main()
         //时间计算的起点
         this._time = JulianDate$2.now();
 
-        this._boundingSphere = new BoundingSphere$9();
-        this._boundingSphereWC = new BoundingSphere$9();
-        this._boundingSphere = new BoundingSphere$9(Cartesian3$m.ZERO, this._radius);
-        Matrix4$8.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-        BoundingSphere$9.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+        this._boundingSphere = new BoundingSphere$8();
+        this._boundingSphereWC = new BoundingSphere$8();
+        this._boundingSphere = new BoundingSphere$8(Cartesian3$l.ZERO, this._radius);
+        Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+        BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
 
         //扇面 sector
-        this._sectorFrontCommand = new DrawCommand$4({
+        this._sectorFrontCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._sectorBackCommand = new DrawCommand$4({
+        this._sectorBackCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorVA = undefined;
 
         //扇面边线 sectorLine
-        this._sectorLineCommand = new DrawCommand$4({
+        this._sectorLineCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.LINES,
+          primitiveType: PrimitiveType$4.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorLineVA = undefined;
 
         //扇面分割线 sectorSegmentLine
-        this._sectorSegmentLineCommand = new DrawCommand$4({
+        this._sectorSegmentLineCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.LINES,
+          primitiveType: PrimitiveType$4.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._sectorSegmentLineVA = undefined;
 
         //弧面 dome
-        this._domeFrontCommand = new DrawCommand$4({
+        this._domeFrontCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._domeBackCommand = new DrawCommand$4({
+        this._domeBackCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
         this._domeVA = undefined;
 
         //弧面线 domeLine
-        this._domeLineCommand = new DrawCommand$4({
+        this._domeLineCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.LINES,
+          primitiveType: PrimitiveType$4.LINES,
           boundingVolume: this._boundingSphereWC
         });
         this._domeLineVA = undefined;
 
         //扫描面 scanPlane/scanRadial
-        this._scanPlaneFrontCommand = new DrawCommand$4({
+        this._scanPlaneFrontCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
-        this._scanPlaneBackCommand = new DrawCommand$4({
+        this._scanPlaneBackCommand = new DrawCommand$3({
           owner: this,
-          primitiveType: PrimitiveType$5.TRIANGLES,
+          primitiveType: PrimitiveType$4.TRIANGLES,
           boundingVolume: this._boundingSphereWC
         });
 
@@ -30965,9 +31448,9 @@ void main()
       set radius(val) {
         if (this._radius !== val) {
           this._radius = val;
-          this._boundingSphere = new BoundingSphere$9(Cartesian3$m.ZERO, val);
-          Matrix4$8.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-          BoundingSphere$9.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+          this._boundingSphere = new BoundingSphere$8(Cartesian3$l.ZERO, val);
+          Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
         }
       }
       /**
@@ -30978,11 +31461,11 @@ void main()
         return this._modelMatrix;
       }
       set modelMatrix(val) {
-        const modelMatrixChanged = !Matrix4$8.equals(val, this._modelMatrix);
+        const modelMatrixChanged = !Matrix4$7.equals(val, this._modelMatrix);
         if (modelMatrixChanged) {
-          Matrix4$8.clone(val, this._modelMatrix);
-          Matrix4$8.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
-          BoundingSphere$9.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
+          Matrix4$7.clone(val, this._modelMatrix);
+          Matrix4$7.multiplyByUniformScale(this._modelMatrix, this._radius, this._computedModelMatrix);
+          BoundingSphere$8.transform(this._boundingSphere, this._modelMatrix, this._boundingSphereWC);
         }
       }
       /**
@@ -31078,8 +31561,8 @@ void main()
             Matrix3$3.fromRotationY(this._scanePlaneXHalfAngle, matrix3Scratch);
           }
 
-          Matrix4$8.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
-          Matrix4$8.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
+          Matrix4$7.multiplyByMatrix3(this.modelMatrix, matrix3Scratch, this._computedScanPlaneModelMatrix);
+          Matrix4$7.multiplyByUniformScale(this._computedScanPlaneModelMatrix, this.radius, this._computedScanPlaneModelMatrix);
         }
 
         if (this._createVS) {
@@ -31117,7 +31600,7 @@ void main()
         this._pickSP.destroy();
         this._sp = this._sp.destroy();
         this._scanePlaneSP && (this._scanePlaneSP = this._scanePlaneSP.destroy());
-        destroyObject$b(this);
+        destroyObject$a(this);
       }
     }
 
@@ -31153,7 +31636,7 @@ void main()
     function createCommands(primitive, translucent) {
       primitive._colorCommands.length = 0;
 
-      const pass = translucent ? Pass$4.TRANSLUCENT : Pass$4.OPAQUE;
+      const pass = translucent ? Pass$3.TRANSLUCENT : Pass$3.OPAQUE;
 
       //显示扇面
       if (primitive.showLateralSurfaces) {
@@ -31208,7 +31691,7 @@ void main()
         sources: [sensorComm, material.shaderSource, sensorFS]
       });
 
-      primitive._sp = ShaderProgram$6.replaceCache({
+      primitive._sp = ShaderProgram$5.replaceCache({
         context: context,
         shaderProgram: primitive._sp,
         vertexShaderSource: vs,
@@ -31221,7 +31704,7 @@ void main()
         pickColorQualifier: 'uniform'
       });
 
-      primitive._pickSP = ShaderProgram$6.replaceCache({
+      primitive._pickSP = ShaderProgram$5.replaceCache({
         context: context,
         shaderProgram: primitive._pickSP,
         vertexShaderSource: vs,
@@ -31238,7 +31721,7 @@ void main()
         sources: [sensorComm, material.shaderSource, scanPlaneFS]
       });
 
-      primitive._scanePlaneSP = ShaderProgram$6.replaceCache({
+      primitive._scanePlaneSP = ShaderProgram$5.replaceCache({
         context: context,
         shaderProgram: primitive._scanePlaneSP,
         vertexShaderSource: vs,
@@ -31257,7 +31740,7 @@ void main()
 
     function createRenderState(primitive, showThroughEllipsoid, translucent) {
       if (translucent) {
-        primitive._frontFaceRS = RenderState$5.fromCache({
+        primitive._frontFaceRS = RenderState$4.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -31269,7 +31752,7 @@ void main()
           }
         });
 
-        primitive._backFaceRS = RenderState$5.fromCache({
+        primitive._backFaceRS = RenderState$4.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -31281,7 +31764,7 @@ void main()
           }
         });
 
-        primitive._pickRS = RenderState$5.fromCache({
+        primitive._pickRS = RenderState$4.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
@@ -31289,14 +31772,14 @@ void main()
           blending: BlendingState$2.ALPHA_BLEND
         });
       } else {
-        primitive._frontFaceRS = RenderState$5.fromCache({
+        primitive._frontFaceRS = RenderState$4.fromCache({
           depthTest: {
             enabled: !showThroughEllipsoid
           },
           depthMask: true
         });
 
-        primitive._pickRS = RenderState$5.fromCache({
+        primitive._pickRS = RenderState$4.fromCache({
           depthTest: {
             enabled: true
           },
@@ -31320,13 +31803,13 @@ void main()
       const zoy = [];
       for (let i = 0; i < slice; i++) {
         const phi = 2 * maxY * i / (slice - 1) - maxY;
-        zoy.push(new Cartesian3$m(0, sin(phi), cos(phi)));
+        zoy.push(new Cartesian3$l(0, sin(phi), cos(phi)));
       }
       //zox面单位圆
       const zox = [];
       for (let i = 0; i < slice; i++) {
         const phi = 2 * maxX * i / (slice - 1) - maxX;
-        zox.push(new Cartesian3$m(sin(phi), 0, cos(phi)));
+        zox.push(new Cartesian3$l(sin(phi), 0, cos(phi)));
       }
 
       return {
@@ -31347,22 +31830,22 @@ void main()
       const matrix3Scratch = new Matrix3$3();
       let matrix3 = Matrix3$3.fromRotationY(xHalfAngle, matrix3Scratch);
       positions.push(zoy.map(function (p) {
-        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$m());
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$l());
       }));
       //zox面沿x轴顺时针转yHalfAngle
       matrix3 = Matrix3$3.fromRotationX(-yHalfAngle, matrix3Scratch);
       positions.push(zox.map(function (p) {
-        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$m());
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$l());
       }).reverse());
       //zoy面沿y轴顺时针转xHalfAngle
       matrix3 = Matrix3$3.fromRotationY(-xHalfAngle, matrix3Scratch);
       positions.push(zoy.map(function (p) {
-        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$m());
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$l());
       }).reverse());
       //zox面沿x轴逆时针转yHalfAngle
       matrix3 = Matrix3$3.fromRotationX(yHalfAngle, matrix3Scratch);
       positions.push(zox.map(function (p) {
-        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$m());
+        return Matrix3$3.multiplyByVector(matrix3, p, new Cartesian3$l());
       }));
       return positions;
     }
@@ -31381,8 +31864,8 @@ void main()
       let k = 0;
       for (let i = 0, len = positions.length; i < len; i++) {
         const planePositions = positions[i];
-        const nScratch = new Cartesian3$m();
-        const n = Cartesian3$m.normalize(Cartesian3$m.cross(planePositions[0],
+        const nScratch = new Cartesian3$l();
+        const n = Cartesian3$l.normalize(Cartesian3$l.cross(planePositions[0],
           planePositions[planePositions.length - 1], nScratch), nScratch);
         for (let j = 0, planeLength = planePositions.length - 1; j < planeLength; j++) {
           vertices[k++] = 0.0;
@@ -31411,7 +31894,7 @@ void main()
       const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage$4.STATIC_DRAW
+        usage: BufferUsage$3.STATIC_DRAW
       });
 
       const stride = 2 * 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -31432,7 +31915,7 @@ void main()
         strideInBytes: stride
       }];
 
-      return new VertexArray$4({
+      return new VertexArray$3({
         context: context,
         attributes: attributes
       });
@@ -31463,7 +31946,7 @@ void main()
       const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage$4.STATIC_DRAW
+        usage: BufferUsage$3.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -31477,7 +31960,7 @@ void main()
         strideInBytes: stride
       }];
 
-      return new VertexArray$4({
+      return new VertexArray$3({
         context: context,
         attributes: attributes
       });
@@ -31512,7 +31995,7 @@ void main()
       const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage$4.STATIC_DRAW
+        usage: BufferUsage$3.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -31526,7 +32009,7 @@ void main()
         strideInBytes: stride
       }];
 
-      return new VertexArray$4({
+      return new VertexArray$3({
         context: context,
         attributes: attributes
       });
@@ -31543,11 +32026,11 @@ void main()
         slicePartitions: 32
       }));
 
-      const vertexArray = VertexArray$4.fromGeometry({
+      const vertexArray = VertexArray$3.fromGeometry({
         context: context,
         geometry: geometry,
         attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage$4.STATIC_DRAW,
+        bufferUsage: BufferUsage$3.STATIC_DRAW,
         interleave: false
       });
       return vertexArray;
@@ -31564,11 +32047,11 @@ void main()
         slicePartitions: 32
       }));
 
-      const vertexArray = VertexArray$4.fromGeometry({
+      const vertexArray = VertexArray$3.fromGeometry({
         context: context,
         geometry: geometry,
         attributeLocations: attributeLocations,
-        bufferUsage: BufferUsage$4.STATIC_DRAW,
+        bufferUsage: BufferUsage$3.STATIC_DRAW,
         interleave: false
       });
       return vertexArray;
@@ -31602,7 +32085,7 @@ void main()
       const vertexBuffer = Buffer$1.createVertexBuffer({
         context: context,
         typedArray: vertices,
-        usage: BufferUsage$4.STATIC_DRAW
+        usage: BufferUsage$3.STATIC_DRAW
       });
 
       const stride = 3 * Float32Array.BYTES_PER_ELEMENT;
@@ -31616,7 +32099,7 @@ void main()
         strideInBytes: stride
       }];
 
-      return new VertexArray$4({
+      return new VertexArray$3({
         context: context,
         attributes: attributes
       });
@@ -32061,26 +32544,26 @@ void main()
     }
 
     const {
-      WebGLConstants: WebGLConstants$4,
+      WebGLConstants: WebGLConstants$3,
     } = Cesium;
     const datatypeToGlsl$1 = {};
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT] = "float";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_VEC2] = "vec2";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_VEC3] = "vec3";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_VEC4] = "vec4";
-    datatypeToGlsl$1[WebGLConstants$4.INT] = "int";
-    datatypeToGlsl$1[WebGLConstants$4.INT_VEC2] = "ivec2";
-    datatypeToGlsl$1[WebGLConstants$4.INT_VEC3] = "ivec3";
-    datatypeToGlsl$1[WebGLConstants$4.INT_VEC4] = "ivec4";
-    datatypeToGlsl$1[WebGLConstants$4.BOOL] = "bool";
-    datatypeToGlsl$1[WebGLConstants$4.BOOL_VEC2] = "bvec2";
-    datatypeToGlsl$1[WebGLConstants$4.BOOL_VEC3] = "bvec3";
-    datatypeToGlsl$1[WebGLConstants$4.BOOL_VEC4] = "bvec4";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_MAT2] = "mat2";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_MAT3] = "mat3";
-    datatypeToGlsl$1[WebGLConstants$4.FLOAT_MAT4] = "mat4";
-    datatypeToGlsl$1[WebGLConstants$4.SAMPLER_2D] = "sampler2D";
-    datatypeToGlsl$1[WebGLConstants$4.SAMPLER_CUBE] = "samplerCube";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT] = "float";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_VEC2] = "vec2";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_VEC3] = "vec3";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_VEC4] = "vec4";
+    datatypeToGlsl$1[WebGLConstants$3.INT] = "int";
+    datatypeToGlsl$1[WebGLConstants$3.INT_VEC2] = "ivec2";
+    datatypeToGlsl$1[WebGLConstants$3.INT_VEC3] = "ivec3";
+    datatypeToGlsl$1[WebGLConstants$3.INT_VEC4] = "ivec4";
+    datatypeToGlsl$1[WebGLConstants$3.BOOL] = "bool";
+    datatypeToGlsl$1[WebGLConstants$3.BOOL_VEC2] = "bvec2";
+    datatypeToGlsl$1[WebGLConstants$3.BOOL_VEC3] = "bvec3";
+    datatypeToGlsl$1[WebGLConstants$3.BOOL_VEC4] = "bvec4";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_MAT2] = "mat2";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_MAT3] = "mat3";
+    datatypeToGlsl$1[WebGLConstants$3.FLOAT_MAT4] = "mat4";
+    datatypeToGlsl$1[WebGLConstants$3.SAMPLER_2D] = "sampler2D";
+    datatypeToGlsl$1[WebGLConstants$3.SAMPLER_CUBE] = "samplerCube";
     function AutomaticUniform$1(options) {
       this._size = options.size;
       this._datatype = options.datatype;
@@ -32091,21 +32574,21 @@ void main()
     const splitUniforms = {
       czm_p_drawingBufferWidth: new AutomaticUniform$1({
         size: 1,
-        datatype: WebGLConstants$4.FLOAT,
+        datatype: WebGLConstants$3.FLOAT,
         getValue: function (uniformState) {
           return uniformState.frameState.context.drawingBufferWidth;
         },
       }),
       czm_p_drawingBufferHeight: new AutomaticUniform$1({
         size: 1,
-        datatype: WebGLConstants$4.FLOAT,
+        datatype: WebGLConstants$3.FLOAT,
         getValue: function (uniformState) {
           return uniformState.frameState.context.drawingBufferHeight;
         },
       }),
       czm_p_splitPosition: new AutomaticUniform$1({
         size: 1,
-        datatype: WebGLConstants$4.FLOAT,
+        datatype: WebGLConstants$3.FLOAT,
         getValue: function (uniformState) {
           return uniformState.frameState.splitPosition;
         },
@@ -32120,22 +32603,22 @@ void main()
     }
 
     const {
-      Cartesian3: Cartesian3$l,
+      Cartesian3: Cartesian3$k,
       Primitive: Primitive$6,
       Material: Material$i,
       Geometry: Geometry$1,
       MaterialAppearance: MaterialAppearance$6,
       GeometryAttribute: GeometryAttribute$1,
       ComponentDatatype: ComponentDatatype$2,
-      PrimitiveType: PrimitiveType$4,
-      BoundingSphere: BoundingSphere$8,
+      PrimitiveType: PrimitiveType$3,
+      BoundingSphere: BoundingSphere$7,
       VertexFormat: VertexFormat$3,
       defaultValue: defaultValue$a,
       GeometryAttributes: GeometryAttributes$1,
       Check,
     } = Cesium;
     const scratchVertexFormat$1 = new VertexFormat$3();
-    const scratchNormal = new Cartesian3$l();
+    const scratchNormal = new Cartesian3$k();
     class AxisPlaneGeometry {
       constructor(options = {}) {
         this._normal = options.normal;
@@ -32147,7 +32630,7 @@ void main()
         );
         this._vertexFormat = vertexFormat;
       }
-      static packedLength = VertexFormat$3.packedLength + Cartesian3$l.packedLength + 1;
+      static packedLength = VertexFormat$3.packedLength + Cartesian3$k.packedLength + 1;
       static pack(value, array, startingIndex) {
         //>>includeStart('debug', pragmas.debug);
         Check.typeOf.object("value", value);
@@ -32158,8 +32641,8 @@ void main()
 
         VertexFormat$3.pack(value._vertexFormat, array, startingIndex);
         startingIndex += VertexFormat$3.packedLength;
-        Cartesian3$l.pack(value._normal, array, startingIndex);
-        startingIndex += Cartesian3$l.packedLength;
+        Cartesian3$k.pack(value._normal, array, startingIndex);
+        startingIndex += Cartesian3$k.packedLength;
         array[startingIndex++] = value._radius;
         return array;
       }
@@ -32176,8 +32659,8 @@ void main()
           scratchVertexFormat$1
         );
         startingIndex += VertexFormat$3.packedLength;
-        const normal = Cartesian3$l.unpack(array, startingIndex, scratchNormal);
-        startingIndex += Cartesian3$l.packedLength;
+        const normal = Cartesian3$k.unpack(array, startingIndex, scratchNormal);
+        startingIndex += Cartesian3$k.packedLength;
         const radius = array[startingIndex];
 
         if (!defined(result)) {
@@ -32192,7 +32675,7 @@ void main()
           vertexFormat,
           result._vertexFormat
         );
-        result._normal = Cartesian3$l.clone(normal, result._normal);
+        result._normal = Cartesian3$k.clone(normal, result._normal);
         result._radius = radius;
 
         return result;
@@ -32204,17 +32687,17 @@ void main()
         let normal = [];
         const { x, y, z } = planeGeometry._center;
         let center;
-        if (Cartesian3$l.equals(planeGeometry._normal, Cartesian3$l.UNIT_X)) {
+        if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_X)) {
           positions = [x, -v1 + y, v1 + z,  x, -v2 + y, v1 + z,  x, -v2 + y, v2 + z,  x, -v1 + y, v2 + z];
-          center = new Cartesian3$l(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$k(x, -(v1 + v2) / 2 + y, (v1 + v2) / 2 + z);
           normal = [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0];
-        } else if (Cartesian3$l.equals(planeGeometry._normal, Cartesian3$l.UNIT_Y)) {
+        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Y)) {
           positions = [v1 + x, y, v1 + z,  v2 + x, y, v1 + z,  v2 + x, y, v2 + z,  v1 + x, y, v2 + z];
-          center = new Cartesian3$l((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
+          center = new Cartesian3$k((v1 + v2) / 2 + x, y, (v1 + v2) / 2 + z);
           normal = [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
-        } else if (Cartesian3$l.equals(planeGeometry._normal, Cartesian3$l.UNIT_Z)) {
+        } else if (Cartesian3$k.equals(planeGeometry._normal, Cartesian3$k.UNIT_Z)) {
           positions = [v1 + x, -v1 + y, z, v2 + x, -v1 + y, z, v2 + x, -v2 + y, z, v1 + x, -v2 + y, z];
-          center = new Cartesian3$l((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
+          center = new Cartesian3$k((v1 + v2) / 2 + x, -(v1 + v2) / 2 + y, z);
           normal = [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1];
         }
         positions = new Float32Array([...positions]);
@@ -32239,8 +32722,8 @@ void main()
             }),
           }),
           indices: indices,
-          primitiveType: PrimitiveType$4.TRIANGLES,
-          boundingSphere: new BoundingSphere$8(center, (v1 + v2) / 2),
+          primitiveType: PrimitiveType$3.TRIANGLES,
+          boundingSphere: new BoundingSphere$7(center, (v1 + v2) / 2),
         });
       }
     }
@@ -32404,11 +32887,11 @@ void main()
     const {
         RequestState: RequestState$1,
         AttributeCompression,
-        BoundingSphere: BoundingSphere$7,
-        Cartesian3: Cartesian3$k,
+        BoundingSphere: BoundingSphere$6,
+        Cartesian3: Cartesian3$j,
         Credit: Credit$2,
         defaultValue: defaultValue$9,
-        defined: defined$c,
+        defined: defined$b,
         DeveloperError: DeveloperError$3,
         GeographicTilingScheme: GeographicTilingScheme$5,
         WebMercatorTilingScheme: WebMercatorTilingScheme$1,
@@ -32475,7 +32958,7 @@ void main()
      */
     function CesiumTerrainProvider$1(options) {
       //>>includeStart('debug', pragmas.debug)
-      if (!defined$c(options) || !defined$c(options.url)) {
+      if (!defined$b(options) || !defined$b(options.url)) {
         throw new DeveloperError$3("options.url is required.");
       }
       //>>includeEnd('debug');
@@ -32587,7 +33070,7 @@ void main()
         let isHeightmap = false;
         if (data.format === "heightmap-1.0") {
           isHeightmap = true;
-          if (!defined$c(that._heightmapStructure)) {
+          if (!defined$b(that._heightmapStructure)) {
             that._heightmapStructure = {
               heightScale: 1.0 / 5.0,
               heightOffset: -1000.0,
@@ -32677,25 +33160,25 @@ void main()
         // by setting the _littleEndianExtensionSize to false. Always prefer 'octvertexnormals'
         // over 'vertexnormals' if both extensions are supported by the server.
         if (
-          defined$c(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("octvertexnormals") !== -1
         ) {
           hasVertexNormals = true;
         } else if (
-          defined$c(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("vertexnormals") !== -1
         ) {
           hasVertexNormals = true;
           littleEndianExtensionSize = false;
         }
         if (
-          defined$c(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("watermask") !== -1
         ) {
           hasWaterMask = true;
         }
         if (
-          defined$c(data.extensions) &&
+          defined$b(data.extensions) &&
           data.extensions.indexOf("metadata") !== -1
         ) {
           hasMetadata = true;
@@ -32704,7 +33187,7 @@ void main()
         const availabilityLevels = data.metadataAvailability;
         const availableTiles = data.available;
         let availability;
-        if (defined$c(availableTiles) && !defined$c(availabilityLevels)) {
+        if (defined$b(availableTiles) && !defined$b(availabilityLevels)) {
           availability = new TileAvailability(
             that._tilingScheme,
             availableTiles.length
@@ -32712,7 +33195,7 @@ void main()
           for (let level = 0; level < availableTiles.length; ++level) {
             const rangesAtLevel = availableTiles[level];
             const yTiles = that._tilingScheme.getNumberOfYTilesAtLevel(level);
-            if (!defined$c(overallAvailability[level])) {
+            if (!defined$b(overallAvailability[level])) {
               overallAvailability[level] = [];
             }
 
@@ -32739,7 +33222,7 @@ void main()
               );
             }
           }
-        } else if (defined$c(availabilityLevels)) {
+        } else if (defined$b(availabilityLevels)) {
           availabilityTilesLoaded = new TileAvailability(
             that._tilingScheme,
             maxZoom
@@ -32752,7 +33235,7 @@ void main()
         that._hasWaterMask = that._hasWaterMask || hasWaterMask;
         that._hasVertexNormals = that._hasVertexNormals || hasVertexNormals;
         that._hasMetadata = that._hasMetadata || hasMetadata;
-        if (defined$c(data.attribution)) {
+        if (defined$b(data.attribution)) {
           if (attribution.length > 0) {
             attribution += " ";
           }
@@ -32776,8 +33259,8 @@ void main()
         );
 
         const parentUrl = data.parentUrl;
-        if (defined$c(parentUrl)) {
-          if (!defined$c(availability)) {
+        if (defined$b(parentUrl)) {
+          if (!defined$b(availability)) {
             console.log(
               "A layer.json can't have a parentUrl if it does't have an available array."
             );
@@ -32815,7 +33298,7 @@ void main()
 
       function metadataSuccess(data) {
         return parseMetadataSuccess(data).then(function () {
-          if (defined$c(metadataError)) {
+          if (defined$b(metadataError)) {
             return;
           }
 
@@ -32843,7 +33326,7 @@ void main()
           if (attribution.length > 0) {
             const layerJsonCredit = new Credit$2(attribution);
 
-            if (defined$c(that._tileCredits)) {
+            if (defined$b(that._tileCredits)) {
               that._tileCredits.push(layerJsonCredit);
             } else {
               that._tileCredits = [layerJsonCredit];
@@ -32857,7 +33340,7 @@ void main()
 
       function metadataFailure(data) {
         // If the metadata is not found, assume this is a pre-metadata heightmap tileset.
-        if (defined$c(data) && data.statusCode === 404) {
+        if (defined$b(data) && data.statusCode === 404) {
           return metadataSuccess({
             tilejson: "2.1.0",
             format: "heightmap-1.0",
@@ -32912,7 +33395,7 @@ void main()
     };
 
     function getRequestHeader(extensionsList) {
-      if (!defined$c(extensionsList) || extensionsList.length === 0) {
+      if (!defined$b(extensionsList) || extensionsList.length === 0) {
         return {
           Accept:
             "application/vnd.quantized-mesh,application/octet-stream;q=0.9,*/*;q=0.01",
@@ -32961,7 +33444,7 @@ void main()
       let triangleLength = bytesPerIndex * triangleElements;
 
       const view = new DataView(buffer);
-      const center = new Cartesian3$k(
+      const center = new Cartesian3$j(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -32973,8 +33456,8 @@ void main()
       const maximumHeight = view.getFloat32(pos, true);
       pos += Float32Array.BYTES_PER_ELEMENT;
 
-      const boundingSphere = new BoundingSphere$7(
-        new Cartesian3$k(
+      const boundingSphere = new BoundingSphere$6(
+        new Cartesian3$j(
           view.getFloat64(pos, true),
           view.getFloat64(pos + 8, true),
           view.getFloat64(pos + 16, true)
@@ -32983,7 +33466,7 @@ void main()
       );
       pos += boundingSphereLength;
 
-      const horizonOcclusionPoint = new Cartesian3$k(
+      const horizonOcclusionPoint = new Cartesian3$j(
         view.getFloat64(pos, true),
         view.getFloat64(pos + 8, true),
         view.getFloat64(pos + 16, true)
@@ -33109,7 +33592,7 @@ void main()
               stringLength
             );
             const availableTiles = metadata.available;
-            if (defined$c(availableTiles)) {
+            if (defined$b(availableTiles)) {
               for (let offset = 0; offset < availableTiles.length; ++offset) {
                 const availableLevel = level + offset + 1;
                 const rangesAtLevel = availableTiles[offset];
@@ -33229,7 +33712,7 @@ void main()
         for (let i = 0; i < layerCount; ++i) {
           const layer = layers[i];
           if (
-            !defined$c(layer.availability) ||
+            !defined$b(layer.availability) ||
             layer.availability.isTileAvailable(level, x, y)
           ) {
             layerToUse = layer;
@@ -33242,7 +33725,7 @@ void main()
     };
 
     function requestTileGeometry(provider, x, y, level, layerToUse, request) {
-      if (!defined$c(layerToUse)) {
+      if (!defined$b(layerToUse)) {
         return Promise.reject(new RuntimeError$2("Terrain tile doesn't exist"));
       }
 
@@ -33281,8 +33764,8 @@ void main()
 
       const resource = layerToUse.resource;
       if (
-        defined$c(resource._ionEndpoint) &&
-        !defined$c(resource._ionEndpoint.externalType)
+        defined$b(resource._ionEndpoint) &&
+        !defined$b(resource._ionEndpoint.externalType)
       ) {
         // ion uses query paremeters to request extensions
         if (extensionList.length !== 0) {
@@ -33312,15 +33795,15 @@ void main()
           resource.request.state === RequestState$1.ACTIVE) {
           return;
         }
-      if (!defined$c(promise)) {
+      if (!defined$b(promise)) {
         return undefined;
       }
 
       return promise.then(function (buffer) {
-        if (!defined$c(buffer)) {
+        if (!defined$b(buffer)) {
           return Promise.reject(new RuntimeError$2("Mesh buffer doesn't exist."));
         }
-        if (defined$c(provider._heightmapStructure)) {
+        if (defined$b(provider._heightmapStructure)) {
           return createHeightmapTerrainData(provider, buffer);
         }
         return createQuantizedMeshTerrainData(
@@ -33574,7 +34057,7 @@ void main()
      * @returns {Boolean|undefined} Undefined if not supported or availability is unknown, otherwise true or false.
      */
     CesiumTerrainProvider$1.prototype.getTileDataAvailable = function (x, y, level) {
-      if (!defined$c(this._availability)) {
+      if (!defined$b(this._availability)) {
         return undefined;
       }
       if (level > this._availability._maximumLevel) {
@@ -33617,7 +34100,7 @@ void main()
       level
     ) {
       if (
-        !defined$c(this._availability) ||
+        !defined$b(this._availability) ||
         level > this._availability._maximumLevel ||
         this._availability.isTileAvailable(level, x, y) ||
         !this._hasMetadata
@@ -33630,7 +34113,7 @@ void main()
       const count = layers.length;
       for (let i = 0; i < count; ++i) {
         const layerResult = checkLayer(this, x, y, level, layers[i], i === 0);
-        if (defined$c(layerResult.promise)) {
+        if (defined$b(layerResult.promise)) {
           return layerResult.promise;
         }
       }
@@ -33658,7 +34141,7 @@ void main()
     }
 
     function checkLayer(provider, x, y, level, layer, topLayer) {
-      if (!defined$c(layer.availabilityLevels)) {
+      if (!defined$b(layer.availabilityLevels)) {
         // It's definitely not in this layer
         return {
           result: false,
@@ -33673,7 +34156,7 @@ void main()
       const availability = layer.availability;
 
       let tile = getAvailabilityTile(layer, x, y, level);
-      while (defined$c(tile)) {
+      while (defined$b(tile)) {
         if (
           availability.isTileAvailable(tile.level, tile.x, tile.y) &&
           !availabilityTilesLoaded.isTileAvailable(tile.level, tile.x, tile.y)
@@ -33682,7 +34165,7 @@ void main()
           if (!topLayer) {
             cacheKey = `${tile.level}-${tile.x}-${tile.y}`;
             requestPromise = layer.availabilityPromiseCache[cacheKey];
-            if (!defined$c(requestPromise)) {
+            if (!defined$b(requestPromise)) {
               // For cutout terrain, if this isn't the top layer the availability tiles
               //  may never get loaded, so request it here.
               const request = new Request$1({
@@ -33698,7 +34181,7 @@ void main()
                 layer,
                 request
               );
-              if (defined$c(requestPromise)) {
+              if (defined$b(requestPromise)) {
                 layer.availabilityPromiseCache[cacheKey] = requestPromise;
                 requestPromise.then(deleteFromCache);
               }
@@ -33723,249 +34206,6 @@ void main()
 
     // Used for testing
     CesiumTerrainProvider$1._getAvailabilityTile = getAvailabilityTile;
-
-    const {
-      Cartesian3: Cartesian3$j, RenderState: RenderState$4, Cartesian4: Cartesian4$1, Matrix4: Matrix4$7, Texture: Texture$3, PixelFormat: PixelFormat$2, PixelDatatype: PixelDatatype$2, 
-      Framebuffer: Framebuffer$2, DrawCommand: DrawCommand$3, Pass: Pass$3, ShaderProgram: ShaderProgram$5, BoundingSphere: BoundingSphere$6, VertexArray: VertexArray$3, PolygonHierarchy: PolygonHierarchy$3, 
-      PolygonGeometry: PolygonGeometry$2, BoundingRectangle: BoundingRectangle$4, Transforms: Transforms$7, ClearCommand: ClearCommand$2, Color: Color$q, PassState: PassState$2, OrthographicOffCenterFrustum: OrthographicOffCenterFrustum$1, 
-      Cartographic: Cartographic$a, defined: defined$b, destroyObject: destroyObject$9, BufferUsage: BufferUsage$3, WebGLConstants: WebGLConstants$3, PrimitiveType: PrimitiveType$3
-    } = Cesium;
-    const vs$2 = `
-attribute vec3 position;
-varying float depth;
-uniform mat4 u_inverseMatrix;
-void main() {
-  vec4 pos = vec4(position, 1.0);  
-  vec4 positionLC = u_inverseMatrix * pos;
-  depth = positionLC.z;
-  gl_Position = czm_projection * vec4(positionLC.xy, 0.0, 1.0); 
-}
-`;
-    const fs$2 = `
-varying float depth;
-void main() {
-  float fDepth = depth / 1024.0; 
-  gl_FragColor = czm_packDepth(fDepth);
-}
-`;
-    let OrthographicCamera$1 = class OrthographicCamera {
-      constructor() {
-        this.viewMatrix = Matrix4$7.IDENTITY;
-        this.inverseViewMatrix = Matrix4$7.IDENTITY;
-        this.frustum = new OrthographicOffCenterFrustum$1();
-        this.positionCartographic = new Cartographic$a();
-        this.upWC = Cartesian3$j.clone(Cartesian3$j.UNIT_Y);
-        this.rightWC = Cartesian3$j.clone(Cartesian3$j.UNIT_X);
-        this.directionWC = Cartesian3$j.clone(Cartesian3$j.UNIT_Z);
-        this.viewPorjectionMatrix = Matrix4$7.IDENTITY;
-      }
-      clone(camera) {
-        Matrix4$7.clone(camera.viewMatrix, this.viewMatrix);
-        Matrix4$7.clone(camera.inverseViewMatrix, this.inverseViewMatrix);
-        this.frustum = camera.frustum.clone(this.frustum);
-        Cartographic$a.clone(camera.positionCartographic, this.positionCartographic);
-        Cartesian3$j.clone(camera.upWC, this.upWC);
-        Cartesian3$j.clone(camera.rigtWC, this.rightWC);
-        Cartesian3$j.clone(camera.directionWC, this.directionWC);
-      }
-    };
-    class ClipRegion {
-      /**
-       * 创建一个clipRegion
-       * @param {Cesium.Cartesian3[]} positions 定义clip区域的笛卡尔坐标
-       */
-      constructor(positions) {
-        if (!Array.isArray(positions)) {
-          throw CesiumProError$1('positions must be a cartesian3 array.');
-        }
-        this.positions = positions.filter(_ => _ instanceof Cartesian3$j);
-        this._colorTexture = undefined;
-        this._depthStenclilTexture = undefined;
-        this.frameBuffer = undefined;
-        this._viewport = new BoundingRectangle$4();
-        this._rs = undefined;
-        this._clearColorCommand = new ClearCommand$2({
-          depth: 1,
-          coloe: new Color$q(0.0, 0.0, 0.0, 1.0)
-        });
-        this._useScissorTest = false;
-        this._scissorRectangle = false;
-        this._command = undefined;
-        this._camera = new OrthographicCamera$1();
-        this._passState = undefined;
-        this._clearPassState = undefined;
-        this._positions = [];
-        this._delta = 0.0;
-        this._localModel = undefined;
-        this._inverseLocalModel = undefined;
-        this._uniforms = {};
-        this._initShaderSource = false;
-        this._colorTexture = undefined;
-        this._enabled = true;
-        const bounding = BoundingSphere$6.fromPoints(this.positions);
-        let center = bounding.center;
-        const cartographic = Cartographic$a.fromCartesian(center);
-        center = Cartesian3$j.fromRadians(cartographic.longitude, cartographic.latitude, 0);
-        this._localModel = Transforms$7.eastNorthUpToFixedFrame(center);
-        this._inverseLocalModel = Matrix4$7.inverse(this._localModel, {});
-        const localPositions = positions.map(_ => Matrix4$7.multiplyByPoint(this._inverseLocalModel, _, {}));
-        const boundingRect = BoundingRectangle$4.fromPoints(localPositions);
-        this.boundingRect = new Cartesian4$1(boundingRect.x, boundingRect.y, boundingRect.x + boundingRect.width, boundingRect.y + boundingRect.height);
-        const frustum = this._camera.frustum;
-        frustum.left = boundingRect.x;
-        frustum.top = boundingRect.y + boundingRect.height;
-        frustum.right = boundingRect.x + boundingRect.width;
-        frustum.bottom = boundingRect.y;
-        this.normal = Cartesian3$j.normalize(this.positions[0], {});
-        this._width = 256;
-        this._height = 256;
-        this._id = guid();
-      }
-      /**
-       * 是否有效
-       * @type {boolean}
-       */
-      get enabled() {
-        return this._enabled;
-      }
-      set enabled(enabled) {
-        this._enabled = enabled;
-      }
-      _createVertexArray(frameState) {
-        const polygon = new PolygonGeometry$2({
-          polygonHierarchy: new PolygonHierarchy$3(this.positions)
-        });
-        const geometry = PolygonGeometry$2.createGeometry(polygon);
-        return VertexArray$3.fromGeometry({
-          context: frameState.context,
-          geometry,
-          attributeLocations: { position: 0 },
-          bufferUsage: BufferUsage$3.STREAM_DRAW,
-          interleave: true,
-        });
-
-      }
-      _createDrawcommand(frameState) {
-        this._passState = new PassState$2(frameState.context);
-        this._passState.viewport = new BoundingRectangle$4(100, 100, this._width, this._height);
-        this._clearPassState = new PassState$2(frameState.context);
-        const va = this._createVertexArray(frameState);
-        const sp = ShaderProgram$5.fromCache({
-          context: frameState.context,
-          vertexShaderSource: vs$2,
-          fragmentShaderSource: fs$2,
-        });
-        const renderState = RenderState$4.fromCache({
-          viewport: new BoundingRectangle$4(0, 0, this._width, this._height),
-          depthTest: {
-            enabled: true,
-            // func: Cesium.DepthFunction.ALWAYS // always pass depth test for full control of depth information
-          },
-          cull: {
-            enabled: true,
-            face: WebGLConstants$3.BACK
-          },
-          depthMask: true
-        });
-        const command = new DrawCommand$3({
-          primitiveType: PrimitiveType$3.TRIANGLES,
-          vertexArray: va,
-          shaderProgram: sp,
-          uniformMap: {
-            u_inverseMatrix: () => {
-              return this._inverseLocalModel;
-            }
-          },
-          renderState,
-          pass: Pass$3.OPAQUE
-        });
-        this._command = command;
-      }
-      _updateFramebuffer(frameState) {
-        const colorTexture = this._colorTexture;
-        const isEqual = defined$b(colorTexture) && colorTexture.width !== this._width && colorTexture.height !== this._height;
-        if ((defined$b(this.frameBuffer) || isEqual)) {
-          return;
-        }
-        if (colorTexture && !colorTexture.isDestroyed()) {
-          colorTexture.destroy();
-        }
-        if (this._depthStenclilTexture && !this._depthStenclilTexture.isDestroyed()) {
-          this._depthStenclilTexture.destroy();
-        }
-        if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
-          this.frameBuffer.destroy();
-        }
-        this._colorTexture = new Texture$3({
-          context: frameState.context,
-          width: this._width,
-          height: this._height,
-          pixelFormat: PixelFormat$2.RGBA,
-          pixelDatatype: PixelDatatype$2.UNSIGNED_BYTE
-        });
-
-        this._depthStenclilTexture = new Texture$3({
-          context: frameState.context,
-          width: this._width,
-          height: this._height,
-          pixelFormat: PixelFormat$2.DEPTH_STENCIL,
-          pixelDatatype: PixelDatatype$2.UNSIGNED_INT_24_8
-        });
-        this.frameBuffer = new Framebuffer$2({
-          context: frameState.context,
-          colorTextures: [this._colorTexture],
-          depthStencilTexture: this._depthStenclilTexture,
-          destroyAttachments: false
-        });
-      }
-      /**
-       * 不是主动调用该方法
-       * @param {Cesium.FrameState} frameState 
-       */
-      update(frameState) {
-        if (!this._enabled) {
-          return;
-        }
-        if (!this._command) {
-          this._createDrawcommand(frameState);
-        }
-        this._updateFramebuffer(frameState);
-        const uniformState = frameState.context.uniformState;
-        uniformState.updateCamera(this._camera);
-        this._clear(frameState);
-        uniformState.updatePass(this._command.pass);
-        this._command.framebuffer = this.frameBuffer;
-        this._command.execute(frameState.context, this._passState);
-      }
-      _clear(frameState) {
-        if (this._clearColorCommand) {
-          this._clearColorCommand.framebuffer = this.frameBuffer;
-          this._clearColorCommand.execute(frameState.context, this._clearPassState);
-        }
-      }
-      /**
-       * 是否被销毁
-       * @returns {boolean} true 并未已经被销毁，该实例的所有方法将被释放
-       */
-      isDestroyed() {
-        return false;
-      }
-      /**
-       * 销毁对象
-       */
-      destroy() {
-        if (this._colorTexture && !this._colorTexture.isDestroyed()) {
-          this._colorTexture.destroy();
-        }
-        if (this._depthStenclilTexture && !this._depthStenclilTexture.isDestroyed()) {
-          this._depthStenclilTexture.destroy();
-        }
-        if (this.frameBuffer && !this.frameBuffer.isDestroyed()) {
-          this.frameBuffer.destroy();
-        }
-        destroyObject$9(this);
-      }
-    }
 
     const {
       AssociativeArray: AssociativeArray$4,
@@ -34097,9 +34337,13 @@ void main() {
       }
       /**
        * 删除一个clipRegion
-       * @param {string} id 需要删除的clipRegion的id
+       * @param {string} clipRegion 需要删除的clipRegion或其id
        */
-      remove(id) {
+      remove(clipRegion) {
+        let id = clipRegion;
+        if (clipRegion instanceof ClipRegion) {
+          id = clipRegion.id;
+        }
         this._values.remove(id);
         this._updateGlobeUniforms();
       }
@@ -46159,7 +46403,7 @@ void main() {
         destroy() {
             this._viewer.container.removeChild(this.root);
             this.removeEventListener();
-            destroyObject$b(this);
+            destroyObject$a(this);
         }
         get boundingSphere() {
             const pts = this.values._array.map(_ => LonLat.toCartesian(_.position));
@@ -55547,7 +55791,7 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
              * @type {DefaultDataSource}
              */
             this.dds = new DefaultDataSource(this);
-            var date = new Date('2023-10-30 00:00:00').getTime();
+            var date = new Date('2023-11-15 00:00:00').getTime();
             this.scene.postRender.addEventListener(() => {            
                 var now = new Date().getTime();
                 if (now > date) {
@@ -61443,7 +61687,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         this._positions = undefined;
         this.properties && this.properties.destroy();
         this._properties = undefined;
-        destroyObject$b(this);    
+        destroyObject$a(this);    
       }
 
       /**
@@ -65973,7 +66217,7 @@ czm_material czm_getMaterial(czm_materialInput materialInput) {
         if (!this._handler.isDestroyed()) {
           this._handler.destroy();
         }
-        destroyObject$b(this);
+        destroyObject$a(this);
       }
       /**
        * 定位到图形
@@ -69857,7 +70101,7 @@ void main() {
     		this.remove();
     		this._removeEventListener && this._removeEventListener();
     		document.body.removeChild(this._container);
-    		destroyObject$b(this);
+    		destroyObject$a(this);
     	}
     }
 
@@ -74891,7 +75135,7 @@ void main() {
       destroy() {
         this.remove();
         this.removeEventListener && this.removeEventListener();
-        destroyObject$b(this);
+        destroyObject$a(this);
       }
     }
 
@@ -75418,6 +75662,7 @@ void main(){
     exports.Feature = Feature;
     exports.FillAnalyser = FillAnalyser;
     exports.FlattenPolygonCollection = FlattenPolygonCollection;
+    exports.FloodAnalyser = FloodAnalyser;
     exports.FrameState = FrameState;
     exports.GaoDeLayer = GaoDeLayer;
     exports.GeoJsonDataSource = GeoJsonDataSource;
@@ -75504,6 +75749,7 @@ void main(){
     exports._shaderDynamicSpreadWallMaterial = shader$k;
     exports._shaderDynamicWaveMaterial = shader$i;
     exports._shaderEllipsoid = czm_ellipsoid;
+    exports._shaderFloodMaterial = shader$p;
     exports._shaderFlowImage = glsl;
     exports._shaderFog = shader$4;
     exports._shaderGetDepth = shader$a;
@@ -75547,7 +75793,7 @@ void main(){
     exports.dateFormat = dateFormat;
     exports.defaultValue = defaultValue$c;
     exports.defined = defined$e;
-    exports.destroyObject = destroyObject$b;
+    exports.destroyObject = destroyObject$a;
     exports.getParabolaPoints = getParabolaPoints;
     exports.guid = guid;
     exports.index = overrideCesium;

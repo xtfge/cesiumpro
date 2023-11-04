@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Cesium Pro</title>
+  <script src='./editor/lil-gui.module.min.js'></script>
+  <script src='/thirdParty/cesium/CesiumUnminified/Cesium.js'></script>
+  <link href='/thirdParty/cesium/Cesium/Widgets/widgets.css' rel='stylesheet' />
+  <script src='/build/CesiumPro.js'></script>
+  <link href="/build/assets/core.css" rel="stylesheet" />
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body,
+    html {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div id='toolbar'></div>
+  <script>
+    const viewer = new CesiumPro.Viewer('map', {
+      imageryProvider: new CesiumPro.GaoDeLayer()
+    });
+    const terrain = new Cesium.CesiumTerrainProvider({
+      url: '../data/terrain/terrain1'
+    })
+    viewer.terrain = terrain;
+    viewer.flyTo(new CesiumPro.LonLat(108.5, 33.3, 10000)).then((v) => {
+      console.log('fly complete', v)
+    })
+    const pm = new CesiumPro.PlotManager(viewer, {
+      polygonStyle: {
+        outlineWidth: 2,
+        outlineColor: Cesium.Color.RED.withAlpha(0.6),
+        fill: false,
+        heightReference: 1,
+        outline: true
+      }
+    });
+    const analyser = new CesiumPro.FloodAnalyser(viewer, {
+      speed: 100,
+      samplerSzie: 300,
+      minHeight: 1000,
+      maxHeight: 3000
+    })
+    // const clipRegion = new CesiumPro.ClipRegion(positions);
+    // viewer.scene.globe.clipRegion.add(clipRegion)
+    let minObj, maxObj, currObj, result;
+    const gui = new GUI();
+    const object = {
+      'draw': function () {
+        pm.pick(CesiumPro.PlotType.POLYGON);
+      },
+      cellSize: 300,
+      min: 1000,
+      max: 3000,
+      avg: 0,
+      speed: 100,
+      curr: 0,
+      height: function () {
+        if (!analyser.mask.length) {
+          alert('请绘制分析区域');
+          return
+        }
+        const v = analyser.calcRegionElevation();
+        minObj.setValue(v.minHeight)
+        maxObj.setValue(v.maxHeight)
+      },
+      do: function () {
+        if (!analyser.mask.length) {
+          alert('请绘制分析区域');
+          return
+        }
+        if (!(object.min && object.max)) {
+          alert('请输入高大高程和最小高程')
+        }
+        const result = analyser.do();
+      }
+    }
+    let cgraphic;
+    pm.postEdit.addEventListener((graphic) => {
+      analyser.mask = graphic.positions;
+      if (cgraphic) {
+        pm.remove(cgraphic)
+      }
+      cgraphic = graphic;
+    })
+
+    gui.add(object, 'draw').name('绘制分析区域');
+    gui.add(object, 'height').name(['计算区域高程'])
+    gui.add(object, 'speed', 1, 100, 1).name('淹没速度').onChange(v => {
+      analyser.speed = object.speed;
+    })
+    minObj = gui.add(object, 'min').name('最小高程').onChange(v => {
+      analyser.minHeight = object.min;
+    });
+    maxObj = gui.add(object, 'max').name('最大高程').onChange(v => {
+      analyser.maxHeight = object.max
+    })
+    currObj = gui.add(object, 'curr').name('当前高度').disable(true);
+    viewer.scene.postRender.addEventListener(() => {
+      currObj.setValue(analyser.currentHeight)
+    })
+    gui.add(object, 'do').name('开始分析');
+  </script>
+</body>
+
+</html>

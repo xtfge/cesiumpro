@@ -501,11 +501,6 @@
             "thumb": "./images/6.1.4.regionTerrain.png"
           },
           {
-            "label": "淹没分析",
-            "value": "6.1.4hiy",
-            "thumb": "./images/6.1.4hiy.png"
-          },
-          {
             "label": "可视域分析",
             "value": "6.1.5viewshed",
             "thumb": "./images/6.1.5viewshed.png"
@@ -514,6 +509,11 @@
             "label": "地形分析",
             "value": "6.1.6terrainAnalysis",
             "thumb": "./images/6.1.6terrainAnalysis.png"
+          },          
+          {
+            "label": "淹没分析",
+            "value": "6.1.7flood",
+            "thumb": "./images/6.1.7flood.png"
           }
         ]
       },
