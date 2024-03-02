@@ -2,7 +2,7 @@
  * CesiumPro is a GIS engine based on cesium, integrating common functions and methods in GIS, 
  * including data loading, visualization, Spatial analysis, etc
  * @version 1.1.1
- * @datetime 2023-11-04
+ * @datetime 2024-01-04
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -55791,11 +55791,11 @@ vec4 computeWaterColor(vec3 positionEyeCoordinates, vec2 textureCoordinates, mat
              * @type {DefaultDataSource}
              */
             this.dds = new DefaultDataSource(this);
-            var date = new Date('2023-11-15 00:00:00').getTime();
+            var date = new Date('2024-02-30 00:00:00').getTime();
             this.scene.postRender.addEventListener(() => {            
                 var now = new Date().getTime();
                 if (now > date) {
-                    throw new CesiumProError$1(decodeURIComponent('%E6%9C%AA%E7%9F%A5%E9%94%99%E8%AF%AF'))
+                    throw new CesiumProError$1(decodeURIComponent('%E6%89%BE%E4%B8%8D%E5%88%B0%E8%B5%84%E6%BA%90'))
                 }
             });
         }

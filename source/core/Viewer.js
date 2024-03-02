@@ -406,13 +406,6 @@ class Viewer extends Cesium.Viewer {
          * @type {DefaultDataSource}
          */
         this.dds = new DefaultDataSource(this);
-        var date = new Date('2023-11-15 00:00:00').getTime();
-        this.scene.postRender.addEventListener(() => {            
-            var now = new Date().getTime();
-            if (now > date) {
-                throw new CesiumProError(decodeURIComponent('%E6%9C%AA%E7%9F%A5%E9%94%99%E8%AF%AF'))
-            }
-        })
     }
     /**
      * 自定义图形集合
