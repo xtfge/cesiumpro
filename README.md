@@ -1,7 +1,7 @@
 
 关于Cesium的二次封装，断断续续写了好几年了，最近两年由于岗位的变化对Cesium使用越来越少，已经无力维护了。
 ### 使用说明
-
+1. 使用script引入
 ```html
     <script src="/cesium/Cesium/Cesium.js"></script>    
     <script src="/build/CesiumPro.js"></script>
