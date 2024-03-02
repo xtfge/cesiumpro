@@ -10,6 +10,7 @@
 ```
 **建议使用这种方法引入**
 **支持的Cesium最高版本为cesium 1.99**
+
 2. 使用npm引入
 ```sh
 npm install cesium@1.99 cesiumpro
